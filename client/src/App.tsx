@@ -9,12 +9,14 @@ import Fleet from "./pages/Fleet";
 import Booking from "./pages/Booking";
 import Operations from "./pages/Operations";
 import Compliance from "./pages/Compliance";
-
+import FleetManagement from "./pages/FleetManagement";
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/fleet"} component={Fleet} />
+      <Route path={"/fleet-management"} component={FleetManagement} />
       <Route path={"/booking"} component={Booking} />
       <Route path={"/operations"} component={Operations} />
       <Route path={"/compliance"} component={Compliance} />

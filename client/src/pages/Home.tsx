@@ -32,14 +32,14 @@ export default function Home() {
               A comprehensive technical analysis of the essential components required to build a scalable, data-driven car rental platform in 2026.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/fleet">
+              <Link href="/fleet-management">
                 <Button size="lg" className="font-mono bg-primary hover:bg-primary/90 text-primary-foreground border-none">
-                  INITIATE SYSTEM <ArrowRight className="ml-2 h-4 w-4" />
+                  MANAGE FLEET <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/booking">
+              <Link href="/fleet">
                 <Button size="lg" variant="outline" className="font-mono bg-background/50 backdrop-blur-sm hover:bg-accent/50">
-                  VIEW MODULES
+                  VIEW GUIDE
                 </Button>
               </Link>
             </div>

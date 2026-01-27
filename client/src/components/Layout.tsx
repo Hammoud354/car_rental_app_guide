@@ -10,7 +10,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: "/", label: "Overview", icon: BarChart3 },
-    { href: "/fleet", label: "Fleet Management", icon: Car },
+    { href: "/fleet", label: "Fleet Guide", icon: FileText },
+    { href: "/fleet-management", label: "Fleet Management", icon: Car },
     { href: "/booking", label: "Booking System", icon: FileText },
     { href: "/operations", label: "Operations", icon: Settings },
     { href: "/compliance", label: "Compliance", icon: Shield },
