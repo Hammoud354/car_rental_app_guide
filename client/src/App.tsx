@@ -10,11 +10,13 @@ import Booking from "./pages/Booking";
 import Operations from "./pages/Operations";
 import Compliance from "./pages/Compliance";
 import FleetManagement from "./pages/FleetManagement";
+import Dashboard from "./pages/Dashboard";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
+      <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/fleet"} component={Fleet} />
       <Route path={"/fleet-management"} component={FleetManagement} />
       <Route path={"/booking"} component={Booking} />
