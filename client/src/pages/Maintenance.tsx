@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut } from "lucide-react";
+import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -52,7 +52,7 @@ export default function Maintenance() {
       performedBy: formData.get("performedBy") as string || undefined,
       garageLocation: formData.get("garageLocation") as string || undefined,
       mileageAtService: formData.get("mileageAtService") ? parseInt(formData.get("mileageAtService") as string) : undefined,
-      nextServiceDue: formData.get("nextServiceDue") ? new Date(formData.get("nextServiceDue") as string) : undefined,
+      kmDueMaintenance: formData.get("kmDueMaintenance") ? parseInt(formData.get("kmDueMaintenance") as string) : undefined,
     });
   };
 
@@ -75,6 +75,7 @@ export default function Maintenance() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/fleet-management", label: "Fleet", icon: Car },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
+    { href: "/rental-contracts", label: "Contracts", icon: FileText },
   ];
 
   return (
@@ -211,8 +212,8 @@ export default function Maintenance() {
                       <Input id="cost" name="cost" type="number" step="0.01" min="0" placeholder="0.00" />
                     </div>
                     <div>
-                      <Label htmlFor="nextServiceDue">Next Service Due</Label>
-                      <Input id="nextServiceDue" name="nextServiceDue" type="date" />
+                      <Label htmlFor="kmDueMaintenance">KM Due for Maintenance</Label>
+                      <Input id="kmDueMaintenance" name="kmDueMaintenance" type="number" min="0" placeholder="e.g., 50000" />
                     </div>
                   </div>
 
@@ -317,10 +318,10 @@ export default function Maintenance() {
                                 <span>{record.performedBy}</span>
                               </div>
                             )}
-                            {record.nextServiceDue && (
+                            {record.kmDueMaintenance && (
                               <div className="flex items-center gap-2 text-gray-600">
-                                <Calendar className="h-4 w-4" />
-                                <span>Next: {new Date(record.nextServiceDue).toLocaleDateString()}</span>
+                                <Gauge className="h-4 w-4" />
+                                <span>Next service at: {record.kmDueMaintenance} km</span>
                               </div>
                             )}
                           </div>

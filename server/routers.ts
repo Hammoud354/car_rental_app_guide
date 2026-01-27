@@ -106,10 +106,57 @@ export const appRouter = router({
         performedBy: z.string().max(200).optional(),
         garageLocation: z.string().max(300).optional(),
         mileageAtService: z.number().int().optional(),
-        nextServiceDue: z.date().optional(),
+        kmDueMaintenance: z.number().int().optional(),
       }))
       .mutation(async ({ input }) => {
         return await db.createMaintenanceRecord(input);
+      }),
+  }),
+
+  // Rental Contracts Router
+  contracts: router({
+    list: publicProcedure.query(async () => {
+      return await db.getAllRentalContracts();
+    }),
+    
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getRentalContractById(input.id);
+      }),
+    
+    create: publicProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        clientFirstName: z.string().min(1).max(100),
+        clientLastName: z.string().min(1).max(100),
+        clientNationality: z.string().max(100).optional(),
+        drivingLicenseNumber: z.string().min(1).max(100),
+        licenseIssueDate: z.date().optional(),
+        licenseExpiryDate: z.date(),
+        rentalStartDate: z.date(),
+        rentalEndDate: z.date(),
+        signatureData: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createRentalContract(input);
+      }),
+    
+    getDamageMarks: publicProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getDamageMarksByContractId(input.contractId);
+      }),
+    
+    addDamageMark: publicProcedure
+      .input(z.object({
+        contractId: z.number(),
+        xPosition: z.string(),
+        yPosition: z.string(),
+        description: z.string().max(500).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createDamageMark(input);
       }),
   }),
 });

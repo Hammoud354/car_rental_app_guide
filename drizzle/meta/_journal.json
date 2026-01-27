@@ -22,6 +22,13 @@
       "when": 1769552442877,
       "tag": "0002_noisy_peter_parker",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1769553474018,
+      "tag": "0003_sticky_the_hood",
+      "breakpoints": true
     }
   ]
 }

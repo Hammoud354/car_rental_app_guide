@@ -50,3 +50,29 @@
 - [x] Test maintenance CRUD operations
 - [x] Verify maintenance history displays correctly
 - [ ] Create checkpoint and deliver
+
+## Rental Contract System
+
+### Phase 1: Database Schema
+- [x] Replace nextServiceDue with kmDueMaintenance in maintenance records
+- [x] Create rental contracts table
+- [x] Create contract damage marks table
+- [x] Push database migrations
+
+### Phase 2: Contract Form
+- [x] Create Rental Contracts page
+- [x] Build client information form (name, nationality, license)
+- [x] Add rental date range picker
+- [x] Implement vehicle selection
+
+### Phase 3: Car Diagram & Signature
+- [x] Create interactive car damage diagram component
+- [x] Add damage marker functionality
+- [x] Implement signature pad
+- [x] Save damage marks to database
+
+### Phase 4: Testing & Delivery
+- [x] Test contract creation flow
+- [x] Test damage marking and signature
+- [ ] Create checkpoint and deliver
+- [ ] Create checkpoint and deliver

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -47,6 +47,7 @@ export default function Dashboard() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/fleet-management", label: "Fleet", icon: Car },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
+    { href: "/rental-contracts", label: "Contracts", icon: FileText },
   ];
 
   return (

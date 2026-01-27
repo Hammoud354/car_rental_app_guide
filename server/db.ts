@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -161,4 +161,56 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
     throw new Error("Failed to retrieve created maintenance record");
   }
   return created[0];
+}
+
+// Rental Contract Queries
+export async function getAllRentalContracts() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get contracts: database not available");
+    return [];
+  }
+  return await db.select().from(rentalContracts);
+}
+
+export async function getRentalContractById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get contract: database not available");
+    return undefined;
+  }
+  const result = await db.select().from(rentalContracts).where(eq(rentalContracts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function createRentalContract(contract: InsertRentalContract) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const result = await db.insert(rentalContracts).values(contract);
+  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  const created = await db.select().from(rentalContracts).where(eq(rentalContracts.id, insertId)).limit(1);
+  if (created.length === 0) {
+    throw new Error("Failed to retrieve created contract");
+  }
+  return created[0];
+}
+
+export async function getDamageMarksByContractId(contractId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get damage marks: database not available");
+    return [];
+  }
+  return await db.select().from(damageMarks).where(eq(damageMarks.contractId, contractId));
+}
+
+export async function createDamageMark(mark: InsertDamageMark) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const result = await db.insert(damageMarks).values(mark);
+  return result;
 }

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -123,6 +123,7 @@ export default function FleetManagement() {
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/fleet-management", label: "Fleet", icon: Car },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
+    { href: "/rental-contracts", label: "Contracts", icon: FileText },
   ];
 
   return (
