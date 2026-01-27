@@ -65,6 +65,7 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   cost: decimal("cost", { precision: 10, scale: 2 }),
   performedAt: timestamp("performedAt").notNull(),
   performedBy: varchar("performedBy", { length: 200 }),
+  garageLocation: varchar("garageLocation", { length: 300 }),
   mileageAtService: int("mileageAtService"),
   nextServiceDue: timestamp("nextServiceDue"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

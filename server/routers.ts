@@ -104,6 +104,7 @@ export const appRouter = router({
         cost: z.string().optional(),
         performedAt: z.date(),
         performedBy: z.string().max(200).optional(),
+        garageLocation: z.string().max(300).optional(),
         mileageAtService: z.number().int().optional(),
         nextServiceDue: z.date().optional(),
       }))

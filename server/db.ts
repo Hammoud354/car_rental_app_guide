@@ -115,7 +115,12 @@ export async function createVehicle(vehicle: InsertVehicle) {
     throw new Error("Database not available");
   }
   const result = await db.insert(vehicles).values(vehicle);
-  return result;
+  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  const created = await db.select().from(vehicles).where(eq(vehicles.id, insertId)).limit(1);
+  if (created.length === 0) {
+    throw new Error("Failed to retrieve created vehicle");
+  }
+  return created[0];
 }
 
 export async function updateVehicle(id: number, vehicle: Partial<InsertVehicle>) {
@@ -150,5 +155,10 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
     throw new Error("Database not available");
   }
   const result = await db.insert(maintenanceRecords).values(record);
-  return result;
+  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  const created = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, insertId)).limit(1);
+  if (created.length === 0) {
+    throw new Error("Failed to retrieve created maintenance record");
+  }
+  return created[0];
 }

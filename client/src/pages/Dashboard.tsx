@@ -46,6 +46,7 @@ export default function Dashboard() {
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/fleet-management", label: "Fleet", icon: Car },
+    { href: "/maintenance", label: "Maintenance", icon: Wrench },
   ];
 
   return (

@@ -25,3 +25,28 @@
 - [x] Test all CRUD operations
 - [x] Verify data persistence
 - [ ] Create checkpoint and deliver to user
+
+## Maintenance Tracking Feature
+
+### Phase 1: Database Schema
+- [x] Update maintenance records schema with garage location
+- [x] Add kilometer reading field
+- [x] Ensure all maintenance details are captured
+
+### Phase 2: Maintenance UI
+- [x] Create Add Maintenance Record form
+- [x] Add maintenance type selector (Routine, Repair, Inspection, Emergency)
+- [x] Add garage location input
+- [x] Add kilometer reading input
+- [x] Add cost and date fields
+
+### Phase 3: Maintenance History
+- [x] Create maintenance history view for each vehicle
+- [x] Display all past maintenance records
+- [x] Show maintenance timeline
+- [ ] Add edit/delete maintenance records
+
+### Phase 4: Testing & Delivery
+- [x] Test maintenance CRUD operations
+- [x] Verify maintenance history displays correctly
+- [ ] Create checkpoint and deliver

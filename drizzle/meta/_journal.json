@@ -15,6 +15,13 @@
       "when": 1769547445833,
       "tag": "0001_true_jackal",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769552442877,
+      "tag": "0002_noisy_peter_parker",
+      "breakpoints": true
     }
   ]
 }
