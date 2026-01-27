@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CarDamageInspection from "@/components/CarDamageInspection";
+import { DatePicker } from "@/components/DatePicker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -16,6 +17,12 @@ export default function RentalContracts() {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [showInspection, setShowInspection] = useState(false);
   const [contractData, setContractData] = useState<any>(null);
+  
+  // Date states
+  const [licenseIssueDate, setLicenseIssueDate] = useState<Date>();
+  const [licenseExpiryDate, setLicenseExpiryDate] = useState<Date>();
+  const [rentalStartDate, setRentalStartDate] = useState<Date>();
+  const [rentalEndDate, setRentalEndDate] = useState<Date>();
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
@@ -39,11 +46,13 @@ export default function RentalContracts() {
       clientFirstName: formData.get("clientFirstName") as string,
       clientLastName: formData.get("clientLastName") as string,
       clientNationality: formData.get("clientNationality") as string || undefined,
+      clientPhone: formData.get("clientPhone") as string || undefined,
+      clientAddress: formData.get("clientAddress") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
-      licenseIssueDate: formData.get("licenseIssueDate") ? new Date(formData.get("licenseIssueDate") as string) : undefined,
-      licenseExpiryDate: new Date(formData.get("licenseExpiryDate") as string),
-      rentalStartDate: new Date(formData.get("rentalStartDate") as string),
-      rentalEndDate: new Date(formData.get("rentalEndDate") as string),
+      licenseIssueDate,
+      licenseExpiryDate: licenseExpiryDate!,
+      rentalStartDate: rentalStartDate!,
+      rentalEndDate: rentalEndDate!,
     };
     
     setContractData(data);
@@ -197,6 +206,14 @@ export default function RentalContracts() {
                         <Label htmlFor="clientNationality">Nationality</Label>
                         <Input id="clientNationality" name="clientNationality" placeholder="e.g., American, Canadian" />
                       </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="clientPhone">Phone Number</Label>
+                        <Input id="clientPhone" name="clientPhone" type="tel" placeholder="e.g., +1 234 567 8900" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="clientAddress">Address</Label>
+                        <Input id="clientAddress" name="clientAddress" placeholder="Street, City, State, ZIP" />
+                      </div>
                     </div>
                   </div>
 
@@ -210,11 +227,24 @@ export default function RentalContracts() {
                       </div>
                       <div>
                         <Label htmlFor="licenseIssueDate">Issue Date</Label>
-                        <Input id="licenseIssueDate" name="licenseIssueDate" type="date" />
+                        <DatePicker
+                          id="licenseIssueDate"
+                          name="licenseIssueDate"
+                          value={licenseIssueDate}
+                          onChange={setLicenseIssueDate}
+                          placeholder="Select issue date"
+                        />
                       </div>
                       <div>
                         <Label htmlFor="licenseExpiryDate">Expiry Date *</Label>
-                        <Input id="licenseExpiryDate" name="licenseExpiryDate" type="date" required />
+                        <DatePicker
+                          id="licenseExpiryDate"
+                          name="licenseExpiryDate"
+                          value={licenseExpiryDate}
+                          onChange={setLicenseExpiryDate}
+                          placeholder="Select expiry date"
+                          required
+                        />
                       </div>
                     </div>
                   </div>
@@ -225,11 +255,25 @@ export default function RentalContracts() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="rentalStartDate">Start Date *</Label>
-                        <Input id="rentalStartDate" name="rentalStartDate" type="date" required />
+                        <DatePicker
+                          id="rentalStartDate"
+                          name="rentalStartDate"
+                          value={rentalStartDate}
+                          onChange={setRentalStartDate}
+                          placeholder="Select start date"
+                          required
+                        />
                       </div>
                       <div>
-                        <Label htmlFor="rentalEndDate">Return Date *</Label>
-                        <Input id="rentalEndDate" name="rentalEndDate" type="date" required />
+                        <Label htmlFor="rentalEndDate">End Date *</Label>
+                        <DatePicker
+                          id="rentalEndDate"
+                          name="rentalEndDate"
+                          value={rentalEndDate}
+                          onChange={setRentalEndDate}
+                          placeholder="Select end date"
+                          required
+                        />
                       </div>
                     </div>
                   </div>

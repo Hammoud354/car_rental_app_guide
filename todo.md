@@ -76,3 +76,26 @@
 - [x] Test damage marking and signature
 - [ ] Create checkpoint and deliver
 - [ ] Create checkpoint and deliver
+
+## Contract Improvements
+
+### Phase 1: Add Contact Fields
+- [x] Add address field to rental contracts schema
+- [x] Add phone number field to rental contracts schema
+- [x] Update contract form with new fields
+- [x] Push database migration
+
+### Phase 2: Improve Date Inputs
+- [x] Replace basic date inputs with calendar date pickers
+- [x] Add date navigation for easier selection
+
+### Phase 3: Redesign Car Diagram
+- [x] Create more realistic car diagram (better proportions)
+- [x] Add more vehicle details (doors, windows, lights)
+- [x] Improve visual clarity of damage markers
+
+### Phase 4: Testing & Delivery
+- [x] Test new fields save correctly
+- [x] Test date picker functionality
+- [x] Verify improved car diagram
+- [ ] Create checkpoint and deliver

@@ -50,6 +50,8 @@ describe("contracts", () => {
       clientFirstName: "John",
       clientLastName: "Doe",
       clientNationality: "American",
+      clientPhone: "+1 555 123 4567",
+      clientAddress: "123 Main St, New York, NY 10001",
       drivingLicenseNumber: "DL123456",
       licenseIssueDate: new Date("2020-01-01"),
       licenseExpiryDate: new Date("2030-01-01"),
@@ -61,6 +63,8 @@ describe("contracts", () => {
     expect(contract).toBeDefined();
     expect(contract.clientFirstName).toBe("John");
     expect(contract.clientLastName).toBe("Doe");
+    expect(contract.clientPhone).toBe("+1 555 123 4567");
+    expect(contract.clientAddress).toBe("123 Main St, New York, NY 10001");
     expect(contract.drivingLicenseNumber).toBe("DL123456");
     expect(contract.vehicleId).toBe(vehicle.id);
   });

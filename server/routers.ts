@@ -131,6 +131,8 @@ export const appRouter = router({
         clientFirstName: z.string().min(1).max(100),
         clientLastName: z.string().min(1).max(100),
         clientNationality: z.string().max(100).optional(),
+        clientPhone: z.string().max(20).optional(),
+        clientAddress: z.string().optional(),
         drivingLicenseNumber: z.string().min(1).max(100),
         licenseIssueDate: z.date().optional(),
         licenseExpiryDate: z.date(),

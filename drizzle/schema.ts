@@ -83,6 +83,8 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   clientFirstName: varchar("clientFirstName", { length: 100 }).notNull(),
   clientLastName: varchar("clientLastName", { length: 100 }).notNull(),
   clientNationality: varchar("clientNationality", { length: 100 }),
+  clientPhone: varchar("clientPhone", { length: 20 }),
+  clientAddress: text("clientAddress"),
   drivingLicenseNumber: varchar("drivingLicenseNumber", { length: 100 }).notNull(),
   licenseIssueDate: timestamp("licenseIssueDate"),
   licenseExpiryDate: timestamp("licenseExpiryDate").notNull(),

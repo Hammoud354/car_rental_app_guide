@@ -93,44 +93,118 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
             className="relative w-full aspect-[4/3] bg-gray-100 rounded-lg border-2 border-gray-300 cursor-crosshair overflow-hidden"
             onClick={handleCarClick}
           >
-            {/* Simple Car SVG Diagram */}
+            {/* Realistic Car SVG Diagram - Top View */}
             <svg
               viewBox="0 0 800 600"
               className="w-full h-full pointer-events-none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Car Body - Top View */}
+              {/* Car Body - Top View with realistic proportions */}
+              <defs>
+                <linearGradient id="carBodyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style={{stopColor: "#c8c8c8", stopOpacity: 1}} />
+                  <stop offset="50%" style={{stopColor: "#e8e8e8", stopOpacity: 1}} />
+                  <stop offset="100%" style={{stopColor: "#c8c8c8", stopOpacity: 1}} />
+                </linearGradient>
+                <linearGradient id="glassGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style={{stopColor: "#a8d8ff", stopOpacity: 0.7}} />
+                  <stop offset="100%" style={{stopColor: "#6bb6ff", stopOpacity: 0.9}} />
+                </linearGradient>
+              </defs>
+              
               <g>
-                {/* Main Body */}
-                <rect x="250" y="150" width="300" height="300" rx="20" fill="#e0e0e0" stroke="#333" strokeWidth="3"/>
+                {/* Main Car Body Outline */}
+                <path
+                  d="M 300 120 
+                     L 320 100 L 480 100 L 500 120
+                     L 520 140 L 520 200
+                     L 540 220 L 540 380
+                     L 520 400 L 520 460
+                     L 500 480 L 480 500 L 320 500 L 300 480
+                     L 280 460 L 280 400
+                     L 260 380 L 260 220
+                     L 280 200 L 280 140 Z"
+                  fill="url(#carBodyGradient)"
+                  stroke="#2c3e50"
+                  strokeWidth="4"
+                />
                 
-                {/* Windshield */}
-                <rect x="270" y="170" width="260" height="80" rx="10" fill="#b3d9ff" stroke="#333" strokeWidth="2"/>
+                {/* Front Windshield */}
+                <path
+                  d="M 310 125 L 325 110 L 475 110 L 490 125 L 490 180 L 310 180 Z"
+                  fill="url(#glassGradient)"
+                  stroke="#34495e"
+                  strokeWidth="3"
+                />
                 
                 {/* Hood */}
-                <rect x="270" y="260" width="260" height="90" fill="#d0d0d0" stroke="#333" strokeWidth="2"/>
+                <rect x="310" y="190" width="180" height="120" rx="8" fill="#d5d5d5" stroke="#34495e" strokeWidth="2"/>
+                <line x1="400" y1="195" x2="400" y2="305" stroke="#bbb" strokeWidth="1" strokeDasharray="5,5"/>
+                
+                {/* Roof/Cabin */}
+                <rect x="310" y="320" width="180" height="60" rx="5" fill="#e0e0e0" stroke="#34495e" strokeWidth="2"/>
+                
+                {/* Rear Windshield */}
+                <path
+                  d="M 310 390 L 310 420 L 325 435 L 475 435 L 490 420 L 490 390 Z"
+                  fill="url(#glassGradient)"
+                  stroke="#34495e"
+                  strokeWidth="3"
+                />
                 
                 {/* Trunk */}
-                <rect x="270" y="360" width="260" height="70" fill="#d0d0d0" stroke="#333" strokeWidth="2"/>
+                <rect x="310" y="445" width="180" height="40" rx="8" fill="#d5d5d5" stroke="#34495e" strokeWidth="2"/>
                 
-                {/* Wheels */}
-                <ellipse cx="280" cy="200" rx="30" ry="40" fill="#333"/>
-                <ellipse cx="520" cy="200" rx="30" ry="40" fill="#333"/>
-                <ellipse cx="280" cy="400" rx="30" ry="40" fill="#333"/>
-                <ellipse cx="520" cy="400" rx="30" ry="40" fill="#333"/>
+                {/* Front Wheels */}
+                <g>
+                  <ellipse cx="285" cy="240" rx="35" ry="50" fill="#1a1a1a" stroke="#000" strokeWidth="3"/>
+                  <ellipse cx="285" cy="240" rx="25" ry="35" fill="#333" stroke="#666" strokeWidth="2"/>
+                  <ellipse cx="285" cy="240" rx="12" ry="18" fill="#555"/>
+                </g>
+                <g>
+                  <ellipse cx="515" cy="240" rx="35" ry="50" fill="#1a1a1a" stroke="#000" strokeWidth="3"/>
+                  <ellipse cx="515" cy="240" rx="25" ry="35" fill="#333" stroke="#666" strokeWidth="2"/>
+                  <ellipse cx="515" cy="240" rx="12" ry="18" fill="#555"/>
+                </g>
+                
+                {/* Rear Wheels */}
+                <g>
+                  <ellipse cx="285" cy="360" rx="35" ry="50" fill="#1a1a1a" stroke="#000" strokeWidth="3"/>
+                  <ellipse cx="285" cy="360" rx="25" ry="35" fill="#333" stroke="#666" strokeWidth="2"/>
+                  <ellipse cx="285" cy="360" rx="12" ry="18" fill="#555"/>
+                </g>
+                <g>
+                  <ellipse cx="515" cy="360" rx="35" ry="50" fill="#1a1a1a" stroke="#000" strokeWidth="3"/>
+                  <ellipse cx="515" cy="360" rx="25" ry="35" fill="#333" stroke="#666" strokeWidth="2"/>
+                  <ellipse cx="515" cy="360" rx="12" ry="18" fill="#555"/>
+                </g>
                 
                 {/* Side Mirrors */}
-                <rect x="220" y="280" width="25" height="40" rx="5" fill="#999" stroke="#333" strokeWidth="2"/>
-                <rect x="555" y="280" width="25" height="40" rx="5" fill="#999" stroke="#333" strokeWidth="2"/>
+                <ellipse cx="265" cy="300" rx="18" ry="28" fill="#7f8c8d" stroke="#34495e" strokeWidth="2"/>
+                <ellipse cx="535" cy="300" rx="18" ry="28" fill="#7f8c8d" stroke="#34495e" strokeWidth="2"/>
+                
+                {/* Headlights */}
+                <ellipse cx="340" cy="105" rx="15" ry="8" fill="#fff9e6" stroke="#34495e" strokeWidth="2"/>
+                <ellipse cx="460" cy="105" rx="15" ry="8" fill="#fff9e6" stroke="#34495e" strokeWidth="2"/>
+                
+                {/* Taillights */}
+                <ellipse cx="340" cy="495" rx="15" ry="8" fill="#ff4444" stroke="#34495e" strokeWidth="2"/>
+                <ellipse cx="460" cy="495" rx="15" ry="8" fill="#ff4444" stroke="#34495e" strokeWidth="2"/>
+                
+                {/* Door Lines */}
+                <line x1="310" y1="200" x2="310" y2="380" stroke="#95a5a6" strokeWidth="2"/>
+                <line x1="490" y1="200" x2="490" y2="380" stroke="#95a5a6" strokeWidth="2"/>
+                <line x1="395" y1="200" x2="395" y2="380" stroke="#95a5a6" strokeWidth="2" strokeDasharray="4,4"/>
                 
                 {/* Labels */}
-                <text x="400" y="220" textAnchor="middle" fill="#333" fontSize="16" fontWeight="bold">FRONT</text>
-                <text x="400" y="310" textAnchor="middle" fill="#333" fontSize="14">HOOD</text>
-                <text x="400" y="395" textAnchor="middle" fill="#333" fontSize="14">TRUNK</text>
-                <text x="400" y="460" textAnchor="middle" fill="#333" fontSize="16" fontWeight="bold">REAR</text>
+                <text x="400" y="80" textAnchor="middle" fill="#2c3e50" fontSize="20" fontWeight="bold">⬆ FRONT</text>
+                <text x="400" y="250" textAnchor="middle" fill="#555" fontSize="14" fontWeight="600">HOOD</text>
+                <text x="400" y="350" textAnchor="middle" fill="#555" fontSize="12">CABIN</text>
+                <text x="400" y="465" textAnchor="middle" fill="#555" fontSize="14" fontWeight="600">TRUNK</text>
+                <text x="400" y="530" textAnchor="middle" fill="#2c3e50" fontSize="20" fontWeight="bold">REAR ⬇</text>
                 
-                <text x="180" y="320" textAnchor="middle" fill="#333" fontSize="12" transform="rotate(-90 180 320)">LEFT SIDE</text>
-                <text x="620" y="320" textAnchor="middle" fill="#333" fontSize="12" transform="rotate(90 620 320)">RIGHT SIDE</text>
+                <text x="220" y="300" textAnchor="middle" fill="#2c3e50" fontSize="14" fontWeight="600" transform="rotate(-90 220 300)">◀ LEFT SIDE</text>
+                <text x="580" y="300" textAnchor="middle" fill="#2c3e50" fontSize="14" fontWeight="600" transform="rotate(90 580 300)">RIGHT SIDE ▶</text>
               </g>
             </svg>
 
