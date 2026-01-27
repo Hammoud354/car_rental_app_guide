@@ -99,3 +99,28 @@
 - [x] Test date picker functionality
 - [x] Verify improved car diagram
 - [ ] Create checkpoint and deliver
+
+## Pricing & Date Enhancements
+
+### Phase 1: Add Pricing Fields
+- [x] Add dailyRate, totalAmount, discount, finalAmount to contracts schema
+- [x] Add rentalDays field to track duration
+- [x] Push database migration
+
+### Phase 2: Replace Date Pickers
+- [x] Create dropdown selectors for year, month, day
+- [x] Replace calendar pickers with dropdown selectors
+- [x] Add number of days input field
+
+### Phase 3: Implement Calculations
+- [x] Auto-calculate rental duration from date range
+- [x] Auto-calculate return date from start date + days
+- [x] Calculate total amount (days × daily rate)
+- [x] Apply discount and calculate final amount
+- [x] Display all calculations in real-time
+
+### Phase 4: Testing & Delivery
+- [x] Test date calculations
+- [x] Test pricing calculations
+- [x] Verify discount functionality
+- [ ] Create checkpoint and deliver

@@ -138,6 +138,11 @@ export const appRouter = router({
         licenseExpiryDate: z.date(),
         rentalStartDate: z.date(),
         rentalEndDate: z.date(),
+        rentalDays: z.number().int().positive(),
+        dailyRate: z.string(),
+        totalAmount: z.string(),
+        discount: z.string().optional(),
+        finalAmount: z.string(),
         signatureData: z.string().optional(),
       }))
       .mutation(async ({ input }) => {

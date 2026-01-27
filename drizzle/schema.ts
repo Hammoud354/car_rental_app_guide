@@ -90,6 +90,11 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   licenseExpiryDate: timestamp("licenseExpiryDate").notNull(),
   rentalStartDate: timestamp("rentalStartDate").notNull(),
   rentalEndDate: timestamp("rentalEndDate").notNull(),
+  rentalDays: int("rentalDays").notNull(),
+  dailyRate: decimal("dailyRate", { precision: 10, scale: 2 }).notNull(),
+  totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
+  discount: decimal("discount", { precision: 10, scale: 2 }).default("0.00"),
+  finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).notNull(),
   signatureData: text("signatureData"), // Base64 encoded signature image
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

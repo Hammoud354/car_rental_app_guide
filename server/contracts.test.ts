@@ -57,6 +57,11 @@ describe("contracts", () => {
       licenseExpiryDate: new Date("2030-01-01"),
       rentalStartDate: new Date("2026-02-01"),
       rentalEndDate: new Date("2026-02-05"),
+      rentalDays: 4,
+      dailyRate: "50.00",
+      totalAmount: "200.00",
+      discount: "20.00",
+      finalAmount: "180.00",
       signatureData: "data:image/png;base64,test",
     });
 
@@ -66,6 +71,11 @@ describe("contracts", () => {
     expect(contract.clientPhone).toBe("+1 555 123 4567");
     expect(contract.clientAddress).toBe("123 Main St, New York, NY 10001");
     expect(contract.drivingLicenseNumber).toBe("DL123456");
+    expect(contract.rentalDays).toBe(4);
+    expect(contract.dailyRate).toBe("50.00");
+    expect(contract.totalAmount).toBe("200.00");
+    expect(contract.discount).toBe("20.00");
+    expect(contract.finalAmount).toBe("180.00");
     expect(contract.vehicleId).toBe(vehicle.id);
   });
 
@@ -101,6 +111,11 @@ describe("contracts", () => {
       licenseExpiryDate: new Date("2029-12-31"),
       rentalStartDate: new Date("2026-02-10"),
       rentalEndDate: new Date("2026-02-15"),
+      rentalDays: 5,
+      dailyRate: "45.00",
+      totalAmount: "225.00",
+      discount: "0.00",
+      finalAmount: "225.00",
       signatureData: "data:image/png;base64,test",
     });
 

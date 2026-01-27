@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CarDamageInspection from "@/components/CarDamageInspection";
-import { DatePicker } from "@/components/DatePicker";
+import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -24,8 +24,57 @@ export default function RentalContracts() {
   const [rentalStartDate, setRentalStartDate] = useState<Date>();
   const [rentalEndDate, setRentalEndDate] = useState<Date>();
   
+  // Pricing states
+  const [rentalDays, setRentalDays] = useState<number>(1);
+  const [dailyRate, setDailyRate] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(0);
+  const [finalAmount, setFinalAmount] = useState<number>(0);
+  
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
+  
+  // Auto-calculate rental days from date range
+  useEffect(() => {
+    if (rentalStartDate && rentalEndDate) {
+      const diffTime = rentalEndDate.getTime() - rentalStartDate.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) {
+        setRentalDays(diffDays);
+      }
+    }
+  }, [rentalStartDate, rentalEndDate]);
+  
+  // Auto-calculate return date from start date + days
+  useEffect(() => {
+    if (rentalStartDate && rentalDays > 0) {
+      const returnDate = new Date(rentalStartDate);
+      returnDate.setDate(returnDate.getDate() + rentalDays);
+      setRentalEndDate(returnDate);
+    }
+  }, [rentalStartDate, rentalDays]);
+  
+  // Auto-calculate total amount
+  useEffect(() => {
+    const total = dailyRate * rentalDays;
+    setTotalAmount(total);
+  }, [dailyRate, rentalDays]);
+  
+  // Auto-calculate final amount after discount
+  useEffect(() => {
+    const final = Math.max(0, totalAmount - discount);
+    setFinalAmount(final);
+  }, [totalAmount, discount]);
+  
+  // Load daily rate when vehicle is selected
+  useEffect(() => {
+    if (selectedVehicleId) {
+      const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+      if (vehicle && vehicle.dailyRate) {
+        setDailyRate(parseFloat(vehicle.dailyRate));
+      }
+    }
+  }, [selectedVehicleId, vehicles]);
   
   const createContract = trpc.contracts.create.useMutation({
     onSuccess: () => {
@@ -53,6 +102,11 @@ export default function RentalContracts() {
       licenseExpiryDate: licenseExpiryDate!,
       rentalStartDate: rentalStartDate!,
       rentalEndDate: rentalEndDate!,
+      rentalDays,
+      dailyRate: dailyRate.toFixed(2),
+      totalAmount: totalAmount.toFixed(2),
+      discount: discount.toFixed(2),
+      finalAmount: finalAmount.toFixed(2),
     };
     
     setContractData(data);
@@ -226,23 +280,19 @@ export default function RentalContracts() {
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required />
                       </div>
                       <div>
-                        <Label htmlFor="licenseIssueDate">Issue Date</Label>
-                        <DatePicker
+                        <DateDropdownSelector
                           id="licenseIssueDate"
-                          name="licenseIssueDate"
+                          label="Issue Date"
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
-                          placeholder="Select issue date"
                         />
                       </div>
                       <div>
-                        <Label htmlFor="licenseExpiryDate">Expiry Date *</Label>
-                        <DatePicker
+                        <DateDropdownSelector
                           id="licenseExpiryDate"
-                          name="licenseExpiryDate"
+                          label="Expiry Date"
                           value={licenseExpiryDate}
                           onChange={setLicenseExpiryDate}
-                          placeholder="Select expiry date"
                           required
                         />
                       </div>
@@ -254,25 +304,87 @@ export default function RentalContracts() {
                     <h3 className="font-semibold mb-4">Rental Period</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="rentalStartDate">Start Date *</Label>
-                        <DatePicker
+                        <DateDropdownSelector
                           id="rentalStartDate"
-                          name="rentalStartDate"
+                          label="Start Date"
                           value={rentalStartDate}
                           onChange={setRentalStartDate}
-                          placeholder="Select start date"
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="rentalEndDate">End Date *</Label>
-                        <DatePicker
+                        <DateDropdownSelector
                           id="rentalEndDate"
-                          name="rentalEndDate"
+                          label="End Date"
                           value={rentalEndDate}
                           onChange={setRentalEndDate}
-                          placeholder="Select end date"
                           required
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="rentalDays">Number of Days</Label>
+                        <Input
+                          id="rentalDays"
+                          name="rentalDays"
+                          type="number"
+                          min="1"
+                          value={rentalDays}
+                          onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
+                          className="mt-1"
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Or select dates above to auto-calculate
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold mb-4">Pricing</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
+                        <Input
+                          id="dailyRate"
+                          name="dailyRate"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={dailyRate}
+                          onChange={(e) => setDailyRate(parseFloat(e.target.value) || 0)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label>Total Amount ($)</Label>
+                        <Input
+                          type="text"
+                          value={totalAmount.toFixed(2)}
+                          readOnly
+                          className="bg-gray-50"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="discount">Discount ($)</Label>
+                        <Input
+                          id="discount"
+                          name="discount"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max={totalAmount}
+                          value={discount}
+                          onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div>
+                        <Label>Final Amount ($)</Label>
+                        <Input
+                          type="text"
+                          value={finalAmount.toFixed(2)}
+                          readOnly
+                          className="bg-gray-50 font-bold text-lg"
                         />
                       </div>
                     </div>
