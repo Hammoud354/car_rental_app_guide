@@ -259,3 +259,12 @@
 - [x] Test print functionality - button visible and working
 - [x] Test navigation flow after inspection completion - redirects properly
 - [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)
+
+
+## Searchable Client Selection Dropdown
+- [x] Add Combobox component from shadcn/ui (Command + Popover)
+- [x] Replace Select dropdown with Combobox in contract creation form
+- [x] Implement client name filtering as user types
+- [x] Test searchable functionality with multiple clients - working perfectly
+- [x] Verified auto-fill functionality still works after selection
+- [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)

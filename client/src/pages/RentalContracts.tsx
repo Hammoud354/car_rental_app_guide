@@ -7,8 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -36,6 +38,7 @@ export default function RentalContracts() {
   const [discount, setDiscount] = useState<number>(0);
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
@@ -304,38 +307,80 @@ export default function RentalContracts() {
                     </div>
                     <div className="mb-4">
                       <Label htmlFor="clientSelector">Select Existing Client (Optional)</Label>
-                      <Select
-                        value={selectedClientId}
-                        onValueChange={(value) => {
-                          setSelectedClientId(value);
-                          if (value) {
-                            const client = clients.find((c) => c.id === parseInt(value));
-                            if (client) {
-                              // Auto-fill form fields
-                              (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
-                              (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
-                              (document.getElementById("clientNationality") as HTMLInputElement).value = client.nationality || "";
-                              (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
-                              (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
-                              (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
-                              setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
-                              setLicenseExpiryDate(new Date(client.licenseExpiryDate));
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Choose a client or enter new details below" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="new">+ Add New Client</SelectItem>
-                          {clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id.toString()}>
-                              {client.firstName} {client.lastName} - {client.drivingLicenseNumber}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={clientComboboxOpen} onOpenChange={setClientComboboxOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={clientComboboxOpen}
+                            className="w-full justify-between font-normal"
+                          >
+                            {selectedClientId
+                              ? (() => {
+                                  const client = clients.find((c) => c.id.toString() === selectedClientId);
+                                  return client ? `${client.firstName} ${client.lastName} - ${client.drivingLicenseNumber}` : "Choose a client...";
+                                })()
+                              : "Choose a client or type to search..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0" align="start">
+                          <Command>
+                            <CommandInput placeholder="Search clients by name or license..." />
+                            <CommandList>
+                              <CommandEmpty>No client found.</CommandEmpty>
+                              <CommandGroup>
+                                <CommandItem
+                                  value="new"
+                                  onSelect={() => {
+                                    setSelectedClientId("");
+                                    setClientComboboxOpen(false);
+                                    // Clear form fields
+                                    (document.getElementById("clientFirstName") as HTMLInputElement).value = "";
+                                    (document.getElementById("clientLastName") as HTMLInputElement).value = "";
+                                    (document.getElementById("clientNationality") as HTMLInputElement).value = "";
+                                    (document.getElementById("clientPhone") as HTMLInputElement).value = "";
+                                    (document.getElementById("clientAddress") as HTMLInputElement).value = "";
+                                    (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = "";
+                                    setLicenseIssueDate(undefined);
+                                    setLicenseExpiryDate(undefined);
+                                  }}
+                                >
+                                  <Plus className="mr-2 h-4 w-4" />
+                                  Add New Client
+                                </CommandItem>
+                                {clients.map((client) => (
+                                  <CommandItem
+                                    key={client.id}
+                                    value={`${client.firstName} ${client.lastName} ${client.drivingLicenseNumber}`}
+                                    onSelect={() => {
+                                      const value = client.id.toString();
+                                      setSelectedClientId(value);
+                                      setClientComboboxOpen(false);
+                                      // Auto-fill form fields
+                                      (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
+                                      (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
+                                      (document.getElementById("clientNationality") as HTMLInputElement).value = client.nationality || "";
+                                      (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
+                                      (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
+                                      (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
+                                      setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
+                                      setLicenseExpiryDate(new Date(client.licenseExpiryDate));
+                                    }}
+                                  >
+                                    <Check
+                                      className={`mr-2 h-4 w-4 ${
+                                        selectedClientId === client.id.toString() ? "opacity-100" : "opacity-0"
+                                      }`}
+                                    />
+                                    {client.firstName} {client.lastName} - {client.drivingLicenseNumber}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
