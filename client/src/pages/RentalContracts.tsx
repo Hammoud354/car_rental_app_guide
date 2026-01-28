@@ -248,12 +248,15 @@ export default function RentalContracts() {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-semibold">Client Information</h3>
-                      <Link href="/clients">
-                        <Button type="button" variant="outline" size="sm">
-                          <Users className="mr-2 h-4 w-4" />
-                          View Clients
-                        </Button>
-                      </Link>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => window.location.href = '/clients'}
+                      >
+                        <Users className="mr-2 h-4 w-4" />
+                        View Clients
+                      </Button>
                     </div>
                     <div className="mb-4">
                       <Label htmlFor="clientSelector">Select Existing Client (Optional)</Label>

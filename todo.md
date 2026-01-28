@@ -169,3 +169,15 @@
 - [x] Test contract details view
 - [x] Test client selection and auto-fill
 - [ ] Create checkpoint and deliver
+
+
+## Bug Fix - Contracts Page Not Found
+- [x] Check App.tsx for Contracts route
+- [x] Verify RentalContracts component import
+- [x] Test navigation to Contracts page
+
+
+## Bug Fix - Nested Anchor Tags Error
+- [x] Find and fix nested <a> tags in RentalContracts page
+- [x] Replace Link wrapper with Button or div
+- [x] Test page loads correctly
