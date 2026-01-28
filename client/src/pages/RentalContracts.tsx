@@ -245,50 +245,73 @@ export default function RentalContracts() {
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Vehicle Selection */}
-                  <div>
-                    <Label htmlFor="vehicleId">Vehicle *</Label>
-                    <Select name="vehicleId" required onValueChange={setSelectedVehicleId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a vehicle" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {vehicles.map((vehicle) => {
-                          const statusColors = {
-                            Available: "text-green-600",
-                            Rented: "text-red-600",
-                            Maintenance: "text-yellow-600",
-                            "Out of Service": "text-gray-500"
-                          };
-                          const statusEmoji = {
-                            Available: "🟢",
-                            Rented: "🔴",
-                            Maintenance: "🟡",
-                            "Out of Service": "⚫"
-                          };
-                          return (
-                            <SelectItem 
-                              key={vehicle.id} 
-                              value={vehicle.id.toString()}
-                              disabled={vehicle.status !== "Available"}
-                            >
-                              <span className="flex items-center gap-2">
-                                <span>{statusEmoji[vehicle.status]}</span>
-                                <span>{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</span>
-                                <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
-                                  [{vehicle.status}]
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="vehiclePlateNumber">Plate Number *</Label>
+                      <Select 
+                        name="vehicleId" 
+                        required 
+                        onValueChange={(value) => {
+                          setSelectedVehicleId(value);
+                          // Auto-fill vehicle model
+                          const vehicle = vehicles.find(v => v.id.toString() === value);
+                          if (vehicle) {
+                            (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select plate number" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {vehicles.map((vehicle) => {
+                            const statusColors = {
+                              Available: "text-green-600",
+                              Rented: "text-red-600",
+                              Maintenance: "text-yellow-600",
+                              "Out of Service": "text-gray-500"
+                            };
+                            const statusEmoji = {
+                              Available: "🟢",
+                              Rented: "🔴",
+                              Maintenance: "🟡",
+                              "Out of Service": "⚫"
+                            };
+                            return (
+                              <SelectItem 
+                                key={vehicle.id} 
+                                value={vehicle.id.toString()}
+                                disabled={vehicle.status !== "Available"}
+                              >
+                                <span className="flex items-center gap-2">
+                                  <span>{statusEmoji[vehicle.status]}</span>
+                                  <span>{vehicle.plateNumber}</span>
+                                  <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
+                                    [{vehicle.status}]
+                                  </span>
                                 </span>
-                              </span>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                    {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
-                      <p className="text-sm text-amber-600 mt-2 flex items-center gap-1">
-                        <span>⚠️</span>
-                        <span>Warning: This vehicle is not currently available for rent.</span>
-                      </p>
-                    )}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
+                        <p className="text-sm text-amber-600 mt-2 flex items-center gap-1">
+                          <span>⚠️</span>
+                          <span>Vehicle not available</span>
+                        </p>
+                      )}
+                    </div>
+                    <div>
+                      <Label htmlFor="vehicleModel">Car Model *</Label>
+                      <Input 
+                        id="vehicleModel" 
+                        name="vehicleModel" 
+                        placeholder="Select plate number first"
+                        readOnly
+                        className="bg-muted cursor-not-allowed"
+                      />
+                    </div>
                   </div>
 
                   {/* Client Information */}

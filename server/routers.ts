@@ -146,7 +146,28 @@ export const appRouter = router({
         signatureData: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        return await db.createRentalContract(input);
+        // Check if client exists by license number
+        let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber);
+        
+        // If client doesn't exist, create new client record
+        if (!client) {
+          client = await db.createClient({
+            firstName: input.clientFirstName,
+            lastName: input.clientLastName,
+            nationality: input.clientNationality,
+            phone: input.clientPhone,
+            address: input.clientAddress,
+            drivingLicenseNumber: input.drivingLicenseNumber,
+            licenseIssueDate: input.licenseIssueDate,
+            licenseExpiryDate: input.licenseExpiryDate,
+          });
+        }
+        
+        // Create contract with client ID
+        return await db.createRentalContract({
+          ...input,
+          clientId: client.id,
+        });
       }),
     
     getDamageMarks: publicProcedure

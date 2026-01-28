@@ -322,6 +322,14 @@ export async function getClientById(id: number): Promise<Client | undefined> {
   return result[0];
 }
 
+export async function getClientByLicenseNumber(licenseNumber: string): Promise<Client | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(clients).where(eq(clients.drivingLicenseNumber, licenseNumber)).limit(1);
+  return result[0];
+}
+
 export async function updateClient(id: number, updates: Partial<InsertClient>): Promise<Client | undefined> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

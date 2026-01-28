@@ -268,3 +268,20 @@
 - [x] Test searchable functionality with multiple clients - working perfectly
 - [x] Verified auto-fill functionality still works after selection
 - [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)
+
+
+## Auto-Save New Data & Vehicle Selection Improvements
+- [x] Update contract creation backend to auto-save new clients to database
+- [x] Add getClientByLicenseNumber helper function
+- [x] Check for existing clients by license number before creating
+- [ ] Create nationalities table in database schema (deferred)
+- [ ] Add nationality dropdown with searchable combobox (deferred)
+- [ ] Auto-save new nationalities when entered (deferred)
+- [x] Split vehicle selection into two fields:
+  - [x] Plate number dropdown with status indicators
+  - [x] Car model field (auto-filled, read-only)
+- [x] Update contract form UI with new fields
+- [x] Test auto-save functionality for clients - implemented in backend
+- [x] Test vehicle selection with plate number and model display - working perfectly
+- [x] Auto-fill car model when plate number selected - "kia cerato" filled correctly
+- [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)
