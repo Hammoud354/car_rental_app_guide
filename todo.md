@@ -124,3 +124,17 @@
 - [x] Test pricing calculations
 - [x] Verify discount functionality
 - [ ] Create checkpoint and deliver
+
+## Bug Fixes - Rental Contract Calculations
+
+### Issues Reported
+- [x] Total amount not calculating in real-time when rental days or discount changes
+- [x] Rental dates should auto-set from number of days (start = today, end = today + days)
+- [x] Remove requirement to manually select dates when using days input
+
+### Implementation
+- [x] Fix useEffect dependencies for real-time calculation
+- [x] Auto-set rental start date to today when days input changes
+- [x] Auto-calculate rental end date from start date + days
+- [x] Make date selectors optional/read-only when using days input
+- [x] Test all calculation scenarios

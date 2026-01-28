@@ -34,25 +34,21 @@ export default function RentalContracts() {
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
   
-  // Auto-calculate rental days from date range
+  // Auto-set start date to today when dialog opens
   useEffect(() => {
-    if (rentalStartDate && rentalEndDate) {
-      const diffTime = rentalEndDate.getTime() - rentalStartDate.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays > 0) {
-        setRentalDays(diffDays);
-      }
+    if (isCreateDialogOpen && !rentalStartDate) {
+      setRentalStartDate(new Date());
     }
-  }, [rentalStartDate, rentalEndDate]);
+  }, [isCreateDialogOpen]);
   
-  // Auto-calculate return date from start date + days
+  // Auto-calculate return date when days change (only if start date exists)
   useEffect(() => {
     if (rentalStartDate && rentalDays > 0) {
       const returnDate = new Date(rentalStartDate);
       returnDate.setDate(returnDate.getDate() + rentalDays);
       setRentalEndDate(returnDate);
     }
-  }, [rentalStartDate, rentalDays]);
+  }, [rentalDays, rentalStartDate]);
   
   // Auto-calculate total amount
   useEffect(() => {
@@ -303,26 +299,8 @@ export default function RentalContracts() {
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-4">Rental Period</h3>
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <DateDropdownSelector
-                          id="rentalStartDate"
-                          label="Start Date"
-                          value={rentalStartDate}
-                          onChange={setRentalStartDate}
-                          required
-                        />
-                      </div>
-                      <div>
-                        <DateDropdownSelector
-                          id="rentalEndDate"
-                          label="End Date"
-                          value={rentalEndDate}
-                          onChange={setRentalEndDate}
-                          required
-                        />
-                      </div>
                       <div className="col-span-2">
-                        <Label htmlFor="rentalDays">Number of Days</Label>
+                        <Label htmlFor="rentalDays">Number of Rental Days *</Label>
                         <Input
                           id="rentalDays"
                           name="rentalDays"
@@ -331,10 +309,29 @@ export default function RentalContracts() {
                           value={rentalDays}
                           onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
                           className="mt-1"
+                          required
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Or select dates above to auto-calculate
+                          Rental dates will be calculated automatically (Start: Today, End: Today + {rentalDays} days)
                         </p>
+                      </div>
+                      <div>
+                        <Label>Start Date (Auto-set)</Label>
+                        <Input
+                          type="text"
+                          value={rentalStartDate ? rentalStartDate.toLocaleDateString() : ""}
+                          readOnly
+                          className="bg-gray-50"
+                        />
+                      </div>
+                      <div>
+                        <Label>End Date (Auto-calculated)</Label>
+                        <Input
+                          type="text"
+                          value={rentalEndDate ? rentalEndDate.toLocaleDateString() : ""}
+                          readOnly
+                          className="bg-gray-50"
+                        />
                       </div>
                     </div>
                   </div>
