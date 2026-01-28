@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and, lte, gte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -96,7 +96,47 @@ export async function getAllVehicles() {
     console.warn("[Database] Cannot get vehicles: database not available");
     return [];
   }
-  return await db.select().from(vehicles);
+  
+  const now = new Date();
+  
+  // Get all vehicles with their rental status
+  const allVehicles = await db.select().from(vehicles);
+  
+  // Check each vehicle for active rentals
+  const vehiclesWithStatus = await Promise.all(
+    allVehicles.map(async (vehicle) => {
+      // Check if vehicle has an active rental contract
+      const activeRentals = await db
+        .select()
+        .from(rentalContracts)
+        .where(
+          and(
+            eq(rentalContracts.vehicleId, vehicle.id),
+            lte(rentalContracts.rentalStartDate, now),
+            gte(rentalContracts.rentalEndDate, now)
+          )
+        )
+        .limit(1);
+      
+      // If vehicle has an active rental, override status to "Rented"
+      // Unless it's in Maintenance or Out of Service (those take priority)
+      let effectiveStatus = vehicle.status;
+      if (activeRentals.length > 0) {
+        if (vehicle.status === "Available") {
+          effectiveStatus = "Rented";
+        }
+        // If status is Maintenance or Out of Service, keep that status
+        // (maintenance/repairs take priority over rental status)
+      }
+      
+      return {
+        ...vehicle,
+        status: effectiveStatus,
+      };
+    })
+  );
+  
+  return vehiclesWithStatus;
 }
 
 export async function getVehicleById(id: number) {

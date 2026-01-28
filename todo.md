@@ -207,3 +207,14 @@
 - [x] Show status label with color coding next to each vehicle
 - [x] Test the status display - working perfectly
 - [x] All vehicles visible with clear status indicators
+
+
+## Automatic Vehicle Status Updates Based on Rental Contracts
+- [x] Modify backend to check for active rental contracts when fetching vehicles
+- [x] Calculate effective status: if vehicle has active rental (today between start and return date), mark as "Rented"
+- [x] Override manual status with rental-based status (rental takes priority for Available vehicles)
+- [x] Maintenance/Out of Service statuses take priority over rental status
+- [x] Update vehicle list query to include rental status check
+- [x] Test that rented vehicles show as "Rented" in contract form - Kia Rio showing 🔴 correctly
+- [x] Vehicles will automatically return to "Available" after rental period ends
+- [x] All 14 tests passing
