@@ -190,3 +190,11 @@
 - [x] Fix App.tsx Route path syntax issues
 - [x] Test Contracts page loads successfully
 - [x] All tests passing (14/14)
+
+
+## Route Naming Consistency Fix
+- [x] Change /contracts route to /rental-contracts in App.tsx
+- [x] Update all navigation links in sidebar to use /rental-contracts
+- [x] Update Home page navigation links
+- [x] Test all navigation works correctly
+- [x] Verified /rental-contracts route loads successfully

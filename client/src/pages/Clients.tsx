@@ -86,7 +86,7 @@ export default function Clients() {
           <Button 
             variant="ghost" 
             className="w-full justify-start text-white hover:bg-blue-800"
-            onClick={() => window.location.href = '/contracts'}
+            onClick={() => window.location.href = '/rental-contracts'}
           >
             <FileText className="mr-2 h-4 w-4" />
             Contracts
