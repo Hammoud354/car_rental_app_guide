@@ -198,3 +198,12 @@
 - [x] Update Home page navigation links
 - [x] Test all navigation works correctly
 - [x] Verified /rental-contracts route loads successfully
+
+
+## Vehicle Status Display in Contract Form
+- [x] Add vehicle status badges to vehicle selection dropdown
+- [x] Use color-coded indicators (🟢 Available, 🔴 Rented, 🟡 Maintenance, ⚫ Out of Service)
+- [x] Disable non-available vehicles in dropdown (prevents selection)
+- [x] Show status label with color coding next to each vehicle
+- [x] Test the status display - working perfectly
+- [x] All vehicles visible with clear status indicators

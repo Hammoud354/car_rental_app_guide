@@ -233,15 +233,43 @@ export default function RentalContracts() {
                         <SelectValue placeholder="Select a vehicle" />
                       </SelectTrigger>
                       <SelectContent>
-                        {vehicles
-                          .filter((v) => v.status === "Available")
-                          .map((vehicle) => (
-                            <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                              {vehicle.plateNumber} - {vehicle.brand} {vehicle.model} ({vehicle.year})
+                        {vehicles.map((vehicle) => {
+                          const statusColors = {
+                            Available: "text-green-600",
+                            Rented: "text-red-600",
+                            Maintenance: "text-yellow-600",
+                            "Out of Service": "text-gray-500"
+                          };
+                          const statusEmoji = {
+                            Available: "🟢",
+                            Rented: "🔴",
+                            Maintenance: "🟡",
+                            "Out of Service": "⚫"
+                          };
+                          return (
+                            <SelectItem 
+                              key={vehicle.id} 
+                              value={vehicle.id.toString()}
+                              disabled={vehicle.status !== "Available"}
+                            >
+                              <span className="flex items-center gap-2">
+                                <span>{statusEmoji[vehicle.status]}</span>
+                                <span>{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</span>
+                                <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
+                                  [{vehicle.status}]
+                                </span>
+                              </span>
                             </SelectItem>
-                          ))}
+                          );
+                        })}
                       </SelectContent>
                     </Select>
+                    {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
+                      <p className="text-sm text-amber-600 mt-2 flex items-center gap-1">
+                        <span>⚠️</span>
+                        <span>Warning: This vehicle is not currently available for rent.</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* Client Information */}
