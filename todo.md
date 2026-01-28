@@ -314,4 +314,14 @@
 - [x] Fix Complete Contract button to redirect to Fleet Management (/fleet)
 - [x] Test print button functionality
 - [x] Test redirect after completing contract
+- [x] Save checkpoint
+
+
+## Enhanced Print Functionality - Include Contract Details
+- [x] Add contract details section to CarDamageInspection component
+- [x] Include client information (name, license, phone, address)
+- [x] Include vehicle information (plate, brand, model, daily rate)
+- [x] Include rental dates and pricing (start date, end date, days, total, discount, final amount)
+- [x] Ensure all information prints along with car inspection diagram
+- [x] Test print preview shows complete contract + inspection form
 - [ ] Save checkpoint

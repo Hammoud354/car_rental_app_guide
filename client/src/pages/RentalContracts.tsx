@@ -226,6 +226,22 @@ export default function RentalContracts() {
                   setContractData(null);
                   setIsCreateDialogOpen(true);
                 }}
+                contractData={contractData ? {
+                  clientName: `${contractData.clientFirstName} ${contractData.clientLastName}`,
+                  clientLicense: contractData.drivingLicenseNumber,
+                  clientPhone: contractData.clientPhone,
+                  clientAddress: contractData.clientAddress,
+                  vehiclePlate: vehicles.find(v => v.id === contractData.vehicleId)?.plateNumber || '',
+                  vehicleBrand: vehicles.find(v => v.id === contractData.vehicleId)?.brand || '',
+                  vehicleModel: vehicles.find(v => v.id === contractData.vehicleId)?.model || '',
+                  startDate: new Date(contractData.rentalStartDate),
+                  endDate: new Date(contractData.rentalEndDate),
+                  rentalDays: contractData.rentalDays,
+                  dailyRate: parseFloat(contractData.dailyRate),
+                  totalAmount: parseFloat(contractData.totalAmount),
+                  discount: parseFloat(contractData.discount),
+                  finalAmount: parseFloat(contractData.finalAmount),
+                } : undefined}
               />
             </div>
           ) : (

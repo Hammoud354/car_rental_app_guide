@@ -13,12 +13,30 @@ interface DamageMark {
   description: string;
 }
 
+interface ContractData {
+  clientName: string;
+  clientLicense: string;
+  clientPhone?: string;
+  clientAddress?: string;
+  vehiclePlate: string;
+  vehicleBrand: string;
+  vehicleModel: string;
+  startDate: Date;
+  endDate: Date;
+  rentalDays: number;
+  dailyRate: number;
+  totalAmount: number;
+  discount: number;
+  finalAmount: number;
+}
+
 interface CarDamageInspectionProps {
   onComplete: (damageMarks: DamageMark[], signatureData: string) => void;
   onCancel: () => void;
+  contractData?: ContractData;
 }
 
-export default function CarDamageInspection({ onComplete, onCancel }: CarDamageInspectionProps) {
+export default function CarDamageInspection({ onComplete, onCancel, contractData }: CarDamageInspectionProps) {
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
@@ -73,6 +91,106 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
 
   return (
     <div className="space-y-6">
+      {/* Contract Details Section - Printable */}
+      {contractData && (
+        <Card className="print:shadow-none">
+          <CardHeader>
+            <CardTitle className="text-2xl">Rental Contract</CardTitle>
+            <p className="text-sm text-gray-600">Contract Date: {new Date().toLocaleDateString()}</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Client Information */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Client Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-600">Full Name</Label>
+                  <p className="font-medium">{contractData.clientName}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600">License Number</Label>
+                  <p className="font-medium">{contractData.clientLicense}</p>
+                </div>
+                {contractData.clientPhone && (
+                  <div>
+                    <Label className="text-sm text-gray-600">Phone Number</Label>
+                    <p className="font-medium">{contractData.clientPhone}</p>
+                  </div>
+                )}
+                {contractData.clientAddress && (
+                  <div>
+                    <Label className="text-sm text-gray-600">Address</Label>
+                    <p className="font-medium">{contractData.clientAddress}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Vehicle Information */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Vehicle Information</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-600">Plate Number</Label>
+                  <p className="font-medium">{contractData.vehiclePlate}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600">Brand</Label>
+                  <p className="font-medium">{contractData.vehicleBrand}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600">Model</Label>
+                  <p className="font-medium">{contractData.vehicleModel}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Rental Period */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Rental Period</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-600">Start Date</Label>
+                  <p className="font-medium">{contractData.startDate.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600">Return Date</Label>
+                  <p className="font-medium">{contractData.endDate.toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-600">Rental Days</Label>
+                  <p className="font-medium">{contractData.rentalDays} days</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pricing Details */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Pricing Details</h3>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Label className="text-sm text-gray-600">Daily Rate</Label>
+                  <p className="font-medium">${contractData.dailyRate.toFixed(2)}</p>
+                </div>
+                <div className="flex justify-between">
+                  <Label className="text-sm text-gray-600">Total Amount ({contractData.rentalDays} days × ${contractData.dailyRate})</Label>
+                  <p className="font-medium">${contractData.totalAmount.toFixed(2)}</p>
+                </div>
+                {contractData.discount > 0 && (
+                  <div className="flex justify-between">
+                    <Label className="text-sm text-gray-600">Discount</Label>
+                    <p className="font-medium text-green-600">-${contractData.discount.toFixed(2)}</p>
+                  </div>
+                )}
+                <div className="flex justify-between border-t pt-2 mt-2">
+                  <Label className="text-base font-semibold">Final Amount</Label>
+                  <p className="text-lg font-bold text-primary">${contractData.finalAmount.toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {/* Car Damage Diagram */}
       <Card>
         <CardHeader>
