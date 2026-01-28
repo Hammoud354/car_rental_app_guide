@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { X, Trash2 } from "lucide-react";
+import { X, Trash2, Printer } from "lucide-react";
 
 interface DamageMark {
   id: string;
@@ -303,13 +303,24 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+      <div className="flex justify-between items-center">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={() => window.print()}
+          className="flex items-center gap-2"
+        >
+          <Printer className="h-4 w-4" />
+          Print Contract
         </Button>
-        <Button type="button" onClick={handleSubmit} className="bg-orange-500 hover:bg-orange-600">
-          Complete Contract
-        </Button>
+        <div className="flex gap-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={handleSubmit} className="bg-orange-500 hover:bg-orange-600">
+            Complete Contract
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -151,8 +151,10 @@ export default function RentalContracts() {
         });
         setShowInspection(false);
         setContractData(null);
+        setIsCreateDialogOpen(false);
+        toast.success("Contract created successfully!");
         // Redirect to Fleet Management page
-        setLocation("/fleet-management");
+        setLocation("/fleet");
       },
     });
   };

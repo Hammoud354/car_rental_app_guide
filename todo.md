@@ -305,3 +305,13 @@
 - [x] Verify filtering works when typing - filtered to M 653408 and TM-/TMN- plates
 - [x] Feature is working correctly - user needs to click button first to reveal search input
 - [x] Ready to save checkpoint
+
+
+## Add Print Button to Inspection & Fix Redirect
+- [x] Add "Print Contract" button to CarDamageInspection component
+- [x] Position print button next to Cancel and Complete Contract buttons
+- [x] Implement window.print() functionality for printing inspection
+- [x] Fix Complete Contract button to redirect to Fleet Management (/fleet)
+- [x] Test print button functionality
+- [x] Test redirect after completing contract
+- [ ] Save checkpoint
