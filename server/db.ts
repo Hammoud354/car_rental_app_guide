@@ -237,6 +237,42 @@ export async function createRentalContract(contract: InsertRentalContract) {
   return created[0];
 }
 
+export async function renewRentalContract(input: { contractId: number; additionalDays: number; newEndDate: Date }) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Get the existing contract
+  const existing = await db.select().from(rentalContracts).where(eq(rentalContracts.id, input.contractId)).limit(1);
+  if (existing.length === 0) {
+    throw new Error("Contract not found");
+  }
+  
+  const contract = existing[0];
+  const newRentalDays = contract.rentalDays + input.additionalDays;
+  const dailyRateNum = parseFloat(contract.dailyRate);
+  const additionalAmount = dailyRateNum * input.additionalDays;
+  const newTotalAmount = parseFloat(contract.totalAmount) + additionalAmount;
+  const discountNum = parseFloat(contract.discount || "0");
+  const newFinalAmount = newTotalAmount - discountNum;
+  
+  // Update the contract
+  await db
+    .update(rentalContracts)
+    .set({
+      rentalEndDate: input.newEndDate,
+      rentalDays: newRentalDays,
+      totalAmount: newTotalAmount.toFixed(2),
+      finalAmount: newFinalAmount.toFixed(2),
+    })
+    .where(eq(rentalContracts.id, input.contractId));
+  
+  // Return the updated contract
+  const updated = await db.select().from(rentalContracts).where(eq(rentalContracts.id, input.contractId)).limit(1);
+  return updated[0];
+}
+
 export async function getDamageMarksByContractId(contractId: number) {
   const db = await getDb();
   if (!db) {

@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Trash2 } from "lucide-react";
-import SignatureCanvas from "react-signature-canvas";
 
 interface DamageMark {
   id: string;
@@ -23,7 +22,6 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
-  const signatureRef = useRef<SignatureCanvas>(null);
   const carDiagramRef = useRef<HTMLDivElement>(null);
 
   const handleCarClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -65,18 +63,12 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
     }
   };
 
-  const handleClearSignature = () => {
-    signatureRef.current?.clear();
-  };
+
 
   const handleSubmit = () => {
-    if (!signatureRef.current || signatureRef.current.isEmpty()) {
-      alert("Please provide a signature before submitting");
-      return;
-    }
-
-    const signatureData = signatureRef.current.toDataURL();
-    onComplete(damageMarks, signatureData);
+    // No signature validation needed since it's now a printable field
+    // Pass empty string for signatureData since signature will be added when printed
+    onComplete(damageMarks, "");
   };
 
   return (
@@ -278,26 +270,34 @@ export default function CarDamageInspection({ onComplete, onCancel }: CarDamageI
         </CardContent>
       </Card>
 
-      {/* Signature Pad */}
+      {/* Printable Signature Field */}
       <Card>
         <CardHeader>
           <CardTitle>Client Signature</CardTitle>
-          <p className="text-sm text-gray-600">Please sign below to confirm the vehicle condition</p>
+          <p className="text-sm text-gray-600">This contract will be printed for the client to sign with pen</p>
         </CardHeader>
         <CardContent>
-          <div className="border-2 border-gray-300 rounded-lg bg-white">
-            <SignatureCanvas
-              ref={signatureRef}
-              canvasProps={{
-                className: "w-full h-40",
-              }}
-              backgroundColor="white"
-            />
-          </div>
-          <div className="mt-4 flex justify-end">
-            <Button type="button" variant="outline" onClick={handleClearSignature}>
-              Clear Signature
-            </Button>
+          <div className="border-2 border-gray-300 rounded-lg bg-white p-8 space-y-6">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Client Signature:</Label>
+              <div className="border-b-2 border-gray-400 h-20 relative">
+                <span className="absolute bottom-0 left-0 text-xs text-gray-400 italic">Sign here with pen when printed</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Date:</Label>
+                <div className="border-b-2 border-gray-400 h-10 flex items-end pb-1">
+                  <span className="text-sm text-gray-600">{new Date().toLocaleDateString()}</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Print Name:</Label>
+                <div className="border-b-2 border-gray-400 h-10">
+                  <span className="absolute text-xs text-gray-400 italic mt-6">Print full name</span>
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

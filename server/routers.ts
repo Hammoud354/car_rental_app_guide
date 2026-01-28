@@ -165,6 +165,16 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return await db.createDamageMark(input);
       }),
+    
+    renew: publicProcedure
+      .input(z.object({
+        contractId: z.number(),
+        additionalDays: z.number().int().positive(),
+        newEndDate: z.date(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.renewRentalContract(input);
+      }),
   }),
 
   // Client Management Router

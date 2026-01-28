@@ -19,6 +19,8 @@ export default function RentalContracts() {
   const [contractData, setContractData] = useState<any>(null);
   const [selectedContract, setSelectedContract] = useState<any>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false);
+  const [additionalDays, setAdditionalDays] = useState<number>(1);
   
   // Date states
   const [licenseIssueDate, setLicenseIssueDate] = useState<Date>();
@@ -83,6 +85,17 @@ export default function RentalContracts() {
     },
     onError: (error: any) => {
       toast.error(`Failed to create contract: ${error.message}`);
+    },
+  });
+  
+  const renewContract = trpc.contracts.renew.useMutation({
+    onSuccess: () => {
+      toast.success("Contract renewed successfully");
+      setIsRenewDialogOpen(false);
+      setIsDetailsDialogOpen(false);
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to renew contract: ${error.message}`);
     },
   });
 
@@ -678,10 +691,84 @@ export default function RentalContracts() {
               );
             })()}
             <DialogFooter>
+              <Button 
+                onClick={() => {
+                  setAdditionalDays(1);
+                  setIsRenewDialogOpen(true);
+                }} 
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                Renew Contract
+              </Button>
               <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
                 Close
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Renew Contract Dialog */}
+        <Dialog open={isRenewDialogOpen} onOpenChange={setIsRenewDialogOpen}>
+          <DialogContent className="bg-gray-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Renew Contract</DialogTitle>
+            </DialogHeader>
+            {selectedContract && (() => {
+              const currentEndDate = new Date(selectedContract.rentalEndDate);
+              const newEndDate = new Date(currentEndDate);
+              newEndDate.setDate(newEndDate.getDate() + additionalDays);
+              const dailyRateNum = parseFloat(selectedContract.dailyRate);
+              const additionalCost = dailyRateNum * additionalDays;
+              
+              return (
+                <div className="space-y-4">
+                  <div className="bg-gray-700 p-4 rounded-lg space-y-3">
+                    <div>
+                      <div className="text-sm text-gray-400">Current End Date</div>
+                      <div className="font-semibold">{currentEndDate.toLocaleDateString()}</div>
+                    </div>
+                    <div>
+                      <Label htmlFor="additionalDays">Additional Days</Label>
+                      <Input
+                        id="additionalDays"
+                        type="number"
+                        min="1"
+                        value={additionalDays}
+                        onChange={(e) => setAdditionalDays(parseInt(e.target.value) || 1)}
+                        className="bg-gray-600 text-white"
+                      />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-400">New End Date</div>
+                      <div className="font-semibold text-orange-500">{newEndDate.toLocaleDateString()}</div>
+                    </div>
+                    <div className="border-t border-gray-600 pt-3 mt-3">
+                      <div className="text-sm text-gray-400">Daily Rate</div>
+                      <div>${dailyRateNum.toFixed(2)}</div>
+                      <div className="text-sm text-gray-400 mt-2">Additional Cost</div>
+                      <div className="text-xl font-bold text-orange-500">${additionalCost.toFixed(2)}</div>
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button variant="outline" onClick={() => setIsRenewDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        renewContract.mutate({
+                          contractId: selectedContract.id,
+                          additionalDays,
+                          newEndDate,
+                        });
+                      }}
+                      className="bg-orange-600 hover:bg-orange-700"
+                    >
+                      Confirm Renewal
+                    </Button>
+                  </DialogFooter>
+                </div>
+              );
+            })()}
           </DialogContent>
         </Dialog>
       </div>
