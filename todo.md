@@ -295,3 +295,13 @@
 - [x] Verified search filters instantly (typed "M 653" filtered to M 653408)
 - [x] Verified auto-fill still works (car model and daily rate populate correctly)
 - [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)
+
+
+## Fix Plate Number Field Searchability Issue
+- [x] Check current RentalContracts.tsx code for plate number field implementation
+- [x] Verify Combobox is properly implemented (not Select) - using Command + Popover
+- [x] Ensure input field is editable and accepts keyboard input - CommandInput present
+- [x] Test typing in plate number field - successfully typed "M 653"
+- [x] Verify filtering works when typing - filtered to M 653408 and TM-/TMN- plates
+- [x] Feature is working correctly - user needs to click button first to reveal search input
+- [x] Ready to save checkpoint
