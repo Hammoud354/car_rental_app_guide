@@ -9,10 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function RentalContracts() {
+  const [, setLocation] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [showInspection, setShowInspection] = useState(false);
@@ -146,6 +147,8 @@ export default function RentalContracts() {
         });
         setShowInspection(false);
         setContractData(null);
+        // Redirect to Fleet Management page
+        setLocation("/fleet-management");
       },
     });
   };
@@ -691,6 +694,13 @@ export default function RentalContracts() {
               );
             })()}
             <DialogFooter>
+              <Button 
+                onClick={() => window.print()} 
+                variant="outline"
+                className="mr-auto"
+              >
+                🖨️ Print Contract
+              </Button>
               <Button 
                 onClick={() => {
                   setAdditionalDays(1);
