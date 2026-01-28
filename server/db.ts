@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -213,4 +213,50 @@ export async function createDamageMark(mark: InsertDamageMark) {
   }
   const result = await db.insert(damageMarks).values(mark);
   return result;
+}
+
+
+// ===== Client Management =====
+
+export async function createClient(client: InsertClient): Promise<Client> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const result = await db.insert(clients).values(client);
+  const insertId = Number(result[0].insertId);
+  
+  const created = await db.select().from(clients).where(eq(clients.id, insertId)).limit(1);
+  if (!created[0]) throw new Error("Failed to retrieve created client");
+  
+  return created[0];
+}
+
+export async function getAllClients(): Promise<Client[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return await db.select().from(clients);
+}
+
+export async function getClientById(id: number): Promise<Client | undefined> {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
+  return result[0];
+}
+
+export async function updateClient(id: number, updates: Partial<InsertClient>): Promise<Client | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(clients).set(updates).where(eq(clients.id, id));
+  return await getClientById(id);
+}
+
+export async function deleteClient(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(clients).where(eq(clients.id, id));
 }

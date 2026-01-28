@@ -166,6 +166,62 @@ export const appRouter = router({
         return await db.createDamageMark(input);
       }),
   }),
+
+  // Client Management Router
+  clients: router({
+    list: publicProcedure.query(async () => {
+      return await db.getAllClients();
+    }),
+    
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getClientById(input.id);
+      }),
+    
+    create: publicProcedure
+      .input(z.object({
+        firstName: z.string().min(1).max(100),
+        lastName: z.string().min(1).max(100),
+        nationality: z.string().max(100).optional(),
+        phone: z.string().max(20).optional(),
+        address: z.string().optional(),
+        drivingLicenseNumber: z.string().min(1).max(100),
+        licenseIssueDate: z.date().optional(),
+        licenseExpiryDate: z.date(),
+        email: z.string().email().max(320).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createClient(input);
+      }),
+    
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        firstName: z.string().min(1).max(100).optional(),
+        lastName: z.string().min(1).max(100).optional(),
+        nationality: z.string().max(100).optional(),
+        phone: z.string().max(20).optional(),
+        address: z.string().optional(),
+        drivingLicenseNumber: z.string().max(100).optional(),
+        licenseIssueDate: z.date().optional(),
+        licenseExpiryDate: z.date().optional(),
+        email: z.string().email().max(320).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        return await db.updateClient(id, updates);
+      }),
+    
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await db.deleteClient(input.id);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

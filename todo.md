@@ -138,3 +138,34 @@
 - [x] Auto-calculate rental end date from start date + days
 - [x] Make date selectors optional/read-only when using days input
 - [x] Test all calculation scenarios
+
+## Client Management & Contract Details View
+
+### Phase 1: Database Schema
+- [x] Create clients table (firstName, lastName, nationality, phone, address, licenseNumber, licenseIssue, licenseExpiry)
+- [x] Update contracts table to reference clientId instead of storing client data directly
+- [x] Push database migrations
+
+### Phase 2: Client Management UI
+- [x] Create Clients page with client list
+- [x] Add "New Client" button and form
+- [x] Add "View Clients" navigation link
+- [x] Display client details (name, phone, nationality, license)
+
+### Phase 3: Contract Details View
+- [x] Add "View Details" button to each contract in the list
+- [x] Create contract details dialog showing all information
+- [x] Display client info, vehicle info, dates, pricing
+- [x] Show damage diagram and signature
+
+### Phase 4: Client Selection in Contracts
+- [x] Add client selector dropdown in contract form
+- [x] Load existing clients for selection
+- [x] Auto-fill client details when client is selected
+- [x] Keep option to add new client inline
+
+### Phase 5: Testing & Delivery
+- [x] Test client CRUD operations
+- [x] Test contract details view
+- [x] Test client selection and auto-fill
+- [ ] Create checkpoint and deliver

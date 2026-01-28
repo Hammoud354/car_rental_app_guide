@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -17,6 +17,8 @@ export default function RentalContracts() {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [showInspection, setShowInspection] = useState(false);
   const [contractData, setContractData] = useState<any>(null);
+  const [selectedContract, setSelectedContract] = useState<any>(null);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   
   // Date states
   const [licenseIssueDate, setLicenseIssueDate] = useState<Date>();
@@ -30,9 +32,11 @@ export default function RentalContracts() {
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [finalAmount, setFinalAmount] = useState<number>(0);
+  const [selectedClientId, setSelectedClientId] = useState<string>("");
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
+  const { data: clients = [] } = trpc.clients.list.useQuery();
   
   // Auto-set start date to today when dialog opens
   useEffect(() => {
@@ -242,7 +246,50 @@ export default function RentalContracts() {
 
                   {/* Client Information */}
                   <div className="border-t pt-4">
-                    <h3 className="font-semibold mb-4">Client Information</h3>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-semibold">Client Information</h3>
+                      <Link href="/clients">
+                        <Button type="button" variant="outline" size="sm">
+                          <Users className="mr-2 h-4 w-4" />
+                          View Clients
+                        </Button>
+                      </Link>
+                    </div>
+                    <div className="mb-4">
+                      <Label htmlFor="clientSelector">Select Existing Client (Optional)</Label>
+                      <Select
+                        value={selectedClientId}
+                        onValueChange={(value) => {
+                          setSelectedClientId(value);
+                          if (value) {
+                            const client = clients.find((c) => c.id === parseInt(value));
+                            if (client) {
+                              // Auto-fill form fields
+                              (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
+                              (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
+                              (document.getElementById("clientNationality") as HTMLInputElement).value = client.nationality || "";
+                              (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
+                              (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
+                              (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
+                              setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
+                              setLicenseExpiryDate(new Date(client.licenseExpiryDate));
+                            }
+                          }
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose a client or enter new details below" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">+ Add New Client</SelectItem>
+                          {clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id.toString()}>
+                              {client.firstName} {client.lastName} - {client.drivingLicenseNumber}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="clientFirstName">First Name *</Label>
@@ -446,6 +493,20 @@ export default function RentalContracts() {
                           <div>{contract.clientNationality}</div>
                         </div>
                       )}
+                      <div className="mt-4 pt-4 border-t">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => {
+                            setSelectedContract(contract);
+                            setIsDetailsDialogOpen(true);
+                          }}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Details
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -467,6 +528,131 @@ export default function RentalContracts() {
           </>
           )}
         </div>
+
+        {/* Contract Details Dialog */}
+        <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
+            <DialogHeader>
+              <DialogTitle>Contract Details</DialogTitle>
+            </DialogHeader>
+            {selectedContract && (() => {
+              const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+              return (
+                <div className="space-y-6">
+                  {/* Client Information */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Information</h3>
+                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                      <div>
+                        <div className="text-sm text-gray-400">Full Name</div>
+                        <div className="font-semibold">{selectedContract.clientFirstName} {selectedContract.clientLastName}</div>
+                      </div>
+                      {selectedContract.clientNationality && (
+                        <div>
+                          <div className="text-sm text-gray-400">Nationality</div>
+                          <div>{selectedContract.clientNationality}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientPhone && (
+                        <div>
+                          <div className="text-sm text-gray-400">Phone</div>
+                          <div>{selectedContract.clientPhone}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientAddress && (
+                        <div className="col-span-2">
+                          <div className="text-sm text-gray-400">Address</div>
+                          <div>{selectedContract.clientAddress}</div>
+                        </div>
+                      )}
+                      <div>
+                        <div className="text-sm text-gray-400">License Number</div>
+                        <div className="font-mono">{selectedContract.drivingLicenseNumber}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">License Expiry</div>
+                        <div>{new Date(selectedContract.licenseExpiryDate).toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Vehicle Information */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Vehicle Information</h3>
+                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                      <div>
+                        <div className="text-sm text-gray-400">Plate Number</div>
+                        <div className="font-semibold">{vehicle?.plateNumber || "N/A"}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Vehicle</div>
+                        <div>{vehicle ? `${vehicle.brand} ${vehicle.model} (${vehicle.year})` : "Unknown"}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Category</div>
+                        <div>{vehicle?.category || "N/A"}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Color</div>
+                        <div>{vehicle?.color || "N/A"}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rental Period & Pricing */}
+                  <div>
+                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Rental Period & Pricing</h3>
+                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                      <div>
+                        <div className="text-sm text-gray-400">Start Date</div>
+                        <div className="font-semibold">{new Date(selectedContract.rentalStartDate).toLocaleDateString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Return Date</div>
+                        <div className="font-semibold">{new Date(selectedContract.rentalEndDate).toLocaleDateString()}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Rental Days</div>
+                        <div>{selectedContract.rentalDays} days</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Daily Rate</div>
+                        <div>${selectedContract.dailyRate}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Total Amount</div>
+                        <div>${selectedContract.totalAmount}</div>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-400">Discount</div>
+                        <div>${selectedContract.discount || "0.00"}</div>
+                      </div>
+                      <div className="col-span-2">
+                        <div className="text-sm text-gray-400">Final Amount</div>
+                        <div className="text-2xl font-bold text-orange-500">${selectedContract.finalAmount}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Signature */}
+                  {selectedContract.signatureData && (
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Signature</h3>
+                      <div className="bg-gray-700 p-4 rounded-lg">
+                        <img src={selectedContract.signatureData} alt="Client Signature" className="max-w-full h-32 border border-gray-600 rounded" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
+                Close
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

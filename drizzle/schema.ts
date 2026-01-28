@@ -74,20 +74,45 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
 
 export type MaintenanceRecord = typeof maintenanceRecords.$inferSelect;
 export type InsertMaintenanceRecord = typeof maintenanceRecords.$inferInsert;
+
+/**
+ * Clients table for managing rental customers
+ */
+export const clients = mysqlTable("clients", {
+  id: int("id").autoincrement().primaryKey(),
+  firstName: varchar("firstName", { length: 100 }).notNull(),
+  lastName: varchar("lastName", { length: 100 }).notNull(),
+  nationality: varchar("nationality", { length: 100 }),
+  phone: varchar("phone", { length: 20 }),
+  address: text("address"),
+  drivingLicenseNumber: varchar("drivingLicenseNumber", { length: 100 }).notNull(),
+  licenseIssueDate: timestamp("licenseIssueDate"),
+  licenseExpiryDate: timestamp("licenseExpiryDate").notNull(),
+  email: varchar("email", { length: 320 }),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Client = typeof clients.$inferSelect;
+export type InsertClient = typeof clients.$inferInsert;
+
 /**
  * Rental contracts table
  */
 export const rentalContracts = mysqlTable("rentalContracts", {
   id: int("id").autoincrement().primaryKey(),
   vehicleId: int("vehicleId").notNull(),
-  clientFirstName: varchar("clientFirstName", { length: 100 }).notNull(),
-  clientLastName: varchar("clientLastName", { length: 100 }).notNull(),
+  clientId: int("clientId"), // Optional: reference to clients table if using existing client
+  // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients
+  clientFirstName: varchar("clientFirstName", { length: 100 }),
+  clientLastName: varchar("clientLastName", { length: 100 }),
   clientNationality: varchar("clientNationality", { length: 100 }),
   clientPhone: varchar("clientPhone", { length: 20 }),
   clientAddress: text("clientAddress"),
-  drivingLicenseNumber: varchar("drivingLicenseNumber", { length: 100 }).notNull(),
+  drivingLicenseNumber: varchar("drivingLicenseNumber", { length: 100 }),
   licenseIssueDate: timestamp("licenseIssueDate"),
-  licenseExpiryDate: timestamp("licenseExpiryDate").notNull(),
+  licenseExpiryDate: timestamp("licenseExpiryDate"),
   rentalStartDate: timestamp("rentalStartDate").notNull(),
   rentalEndDate: timestamp("rentalEndDate").notNull(),
   rentalDays: int("rentalDays").notNull(),
