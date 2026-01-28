@@ -285,3 +285,13 @@
 - [x] Test vehicle selection with plate number and model display - working perfectly
 - [x] Auto-fill car model when plate number selected - "kia cerato" filled correctly
 - [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)
+
+
+## Searchable Plate Number Field
+- [x] Replace Select dropdown with Combobox for plate number selection
+- [x] Add search functionality to filter vehicles by plate number as user types
+- [x] Maintain status indicators and auto-fill car model functionality
+- [x] Test searchable plate number field - working perfectly
+- [x] Verified search filters instantly (typed "M 653" filtered to M 653408)
+- [x] Verified auto-fill still works (car model and daily rate populate correctly)
+- [x] 13/14 tests passing (1 pre-existing timeout in fleet.list)

@@ -39,6 +39,7 @@ export default function RentalContracts() {
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
+  const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
@@ -248,53 +249,92 @@ export default function RentalContracts() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="vehiclePlateNumber">Plate Number *</Label>
-                      <Select 
-                        name="vehicleId" 
-                        required 
-                        onValueChange={(value) => {
-                          setSelectedVehicleId(value);
-                          // Auto-fill vehicle model
-                          const vehicle = vehicles.find(v => v.id.toString() === value);
-                          if (vehicle) {
-                            (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
-                          }
-                        }}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select plate number" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {vehicles.map((vehicle) => {
-                            const statusColors = {
-                              Available: "text-green-600",
-                              Rented: "text-red-600",
-                              Maintenance: "text-yellow-600",
-                              "Out of Service": "text-gray-500"
-                            };
-                            const statusEmoji = {
-                              Available: "🟢",
-                              Rented: "🔴",
-                              Maintenance: "🟡",
-                              "Out of Service": "⚫"
-                            };
-                            return (
-                              <SelectItem 
-                                key={vehicle.id} 
-                                value={vehicle.id.toString()}
-                                disabled={vehicle.status !== "Available"}
-                              >
-                                <span className="flex items-center gap-2">
-                                  <span>{statusEmoji[vehicle.status]}</span>
-                                  <span>{vehicle.plateNumber}</span>
-                                  <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
-                                    [{vehicle.status}]
-                                  </span>
-                                </span>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectContent>
-                      </Select>
+                      <input type="hidden" name="vehicleId" value={selectedVehicleId} required />
+                      <Popover open={vehicleComboboxOpen} onOpenChange={setVehicleComboboxOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={vehicleComboboxOpen}
+                            className="w-full justify-between font-normal"
+                          >
+                            {selectedVehicleId
+                              ? (() => {
+                                  const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+                                  if (!vehicle) return "Select plate number...";
+                                  const statusEmoji = {
+                                    Available: "🟢",
+                                    Rented: "🔴",
+                                    Maintenance: "🟡",
+                                    "Out of Service": "⚫"
+                                  };
+                                  return (
+                                    <span className="flex items-center gap-2">
+                                      <span>{statusEmoji[vehicle.status]}</span>
+                                      <span>{vehicle.plateNumber}</span>
+                                      <span className="text-xs text-muted-foreground">[{vehicle.status}]</span>
+                                    </span>
+                                  );
+                                })()
+                              : "Select plate number..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[400px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search by plate number..." />
+                            <CommandList>
+                              <CommandEmpty>No vehicle found.</CommandEmpty>
+                              <CommandGroup>
+                                {vehicles.map((vehicle) => {
+                                  const statusColors = {
+                                    Available: "text-green-600",
+                                    Rented: "text-red-600",
+                                    Maintenance: "text-yellow-600",
+                                    "Out of Service": "text-gray-500"
+                                  };
+                                  const statusEmoji = {
+                                    Available: "🟢",
+                                    Rented: "🔴",
+                                    Maintenance: "🟡",
+                                    "Out of Service": "⚫"
+                                  };
+                                  const isDisabled = vehicle.status !== "Available";
+                                  return (
+                                    <CommandItem
+                                      key={vehicle.id}
+                                      value={`${vehicle.plateNumber} ${vehicle.brand} ${vehicle.model}`}
+                                      onSelect={() => {
+                                        if (!isDisabled) {
+                                          setSelectedVehicleId(vehicle.id.toString());
+                                          // Auto-fill vehicle model
+                                          (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
+                                          setVehicleComboboxOpen(false);
+                                        }
+                                      }}
+                                      disabled={isDisabled}
+                                      className={isDisabled ? "opacity-50 cursor-not-allowed" : ""}
+                                    >
+                                      <Check
+                                        className={`mr-2 h-4 w-4 ${
+                                          selectedVehicleId === vehicle.id.toString() ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      <span className="flex items-center gap-2 flex-1">
+                                        <span>{statusEmoji[vehicle.status]}</span>
+                                        <span>{vehicle.plateNumber}</span>
+                                        <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
+                                          [{vehicle.status}]
+                                        </span>
+                                      </span>
+                                    </CommandItem>
+                                  );
+                                })}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
                         <p className="text-sm text-amber-600 mt-2 flex items-center gap-1">
                           <span>⚠️</span>
