@@ -32,16 +32,21 @@ export default function Home() {
               A comprehensive technical analysis of the essential components required to build a scalable, data-driven car rental platform in 2026.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/dashboard">
-                <Button size="lg" className="font-mono bg-primary hover:bg-primary/90 text-primary-foreground border-none">
-                  OPEN DASHBOARD <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-              <Link href="/fleet">
-                <Button size="lg" variant="outline" className="font-mono bg-background/50 backdrop-blur-sm hover:bg-accent/50">
-                  VIEW GUIDE
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                className="font-mono bg-primary hover:bg-primary/90 text-primary-foreground border-none"
+                onClick={() => window.location.href = '/dashboard'}
+              >
+                OPEN DASHBOARD <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="font-mono bg-background/50 backdrop-blur-sm hover:bg-accent/50"
+                onClick={() => window.location.href = '/fleet'}
+              >
+                VIEW GUIDE
+              </Button>
             </div>
           </div>
         </section>

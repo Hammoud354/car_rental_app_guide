@@ -18,18 +18,17 @@ function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-       <Route path={"/"} component={Home} />
-      <Route path={"/clients"} component={Clients} />
-      <Route path={"/contracts"} component={RentalContracts} />
-      <Route path={"/404"} component={NotFound} />
-      <Route path={"/dashboard"} component={Dashboard} />
-      <Route path={"/maintenance"} component={Maintenance} />
-      <Route path={"/fleet"} component={Fleet} />
-      <Route path={"/fleet-management"} component={FleetManagement} />
-      <Route path={"/booking"} component={Booking} />
-      <Route path={"/operations"} component={Operations} />
-      <Route path={"/compliance"} component={Compliance} />
-      <Route path={"/404"} component={NotFound} />
+      <Route path="/" component={Home} />
+      <Route path="/clients" component={Clients} />
+      <Route path="/contracts" component={RentalContracts} />
+      <Route path="/404" component={NotFound} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/maintenance" component={Maintenance} />
+      <Route path="/fleet" component={Fleet} />
+      <Route path="/fleet-management" component={FleetManagement} />
+      <Route path="/booking" component={Booking} />
+      <Route path="/operations" component={Operations} />
+      <Route path="/compliance" component={Compliance} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

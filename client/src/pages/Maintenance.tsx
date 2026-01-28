@@ -98,8 +98,8 @@ export default function Maintenance() {
             const isActive = window.location.pathname === item.href;
             return (
               <Link key={item.href} href={item.href}>
-                <a
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                <div
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
                     isActive
                       ? "bg-blue-700 text-white"
                       : "text-blue-100 hover:bg-blue-500"
@@ -107,7 +107,7 @@ export default function Maintenance() {
                 >
                   <Icon className="h-5 w-5" />
                   <span className="font-medium">{item.label}</span>
-                </a>
+                </div>
               </Link>
             );
           })}

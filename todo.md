@@ -181,3 +181,12 @@
 - [x] Find and fix nested <a> tags in RentalContracts page
 - [x] Replace Link wrapper with Button or div
 - [x] Test page loads correctly
+
+
+## Find All Nested Anchor Tags
+- [x] Search all page files for Link wrapping Button
+- [x] Search for Link inside Link patterns
+- [x] Fix all instances found (Home.tsx, Dashboard.tsx, FleetManagement.tsx, Maintenance.tsx, Clients.tsx)
+- [x] Fix App.tsx Route path syntax issues
+- [x] Test Contracts page loads successfully
+- [x] All tests passing (14/14)

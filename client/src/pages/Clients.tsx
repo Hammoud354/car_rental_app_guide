@@ -59,36 +59,45 @@ export default function Clients() {
         </div>
 
         <nav className="space-y-2 flex-1">
-          <Link href="/dashboard">
-            <Button variant="ghost" className="w-full justify-start text-white hover:bg-blue-800">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Overview
-            </Button>
-          </Link>
-          <Link href="/fleet">
-            <Button variant="ghost" className="w-full justify-start text-white hover:bg-blue-800">
-              <Car className="mr-2 h-4 w-4" />
-              Fleet Management
-            </Button>
-          </Link>
-          <Link href="/maintenance">
-            <Button variant="ghost" className="w-full justify-start text-white hover:bg-blue-800">
-              <Wrench className="mr-2 h-4 w-4" />
-              Maintenance
-            </Button>
-          </Link>
-          <Link href="/contracts">
-            <Button variant="ghost" className="w-full justify-start text-white hover:bg-blue-800">
-              <FileText className="mr-2 h-4 w-4" />
-              Contracts
-            </Button>
-          </Link>
-          <Link href="/clients">
-            <Button variant="default" className="w-full justify-start bg-orange-600 hover:bg-orange-700">
-              <Users className="mr-2 h-4 w-4" />
-              Clients
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-white hover:bg-blue-800"
+            onClick={() => window.location.href = '/dashboard'}
+          >
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Overview
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-white hover:bg-blue-800"
+            onClick={() => window.location.href = '/fleet'}
+          >
+            <Car className="mr-2 h-4 w-4" />
+            Fleet Management
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-white hover:bg-blue-800"
+            onClick={() => window.location.href = '/maintenance'}
+          >
+            <Wrench className="mr-2 h-4 w-4" />
+            Maintenance
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-white hover:bg-blue-800"
+            onClick={() => window.location.href = '/contracts'}
+          >
+            <FileText className="mr-2 h-4 w-4" />
+            Contracts
+          </Button>
+          <Button 
+            variant="default" 
+            className="w-full justify-start bg-orange-600 hover:bg-orange-700"
+          >
+            <Users className="mr-2 h-4 w-4" />
+            Clients
+          </Button>
         </nav>
 
         <div className="mt-auto pt-4 border-t border-blue-800">
