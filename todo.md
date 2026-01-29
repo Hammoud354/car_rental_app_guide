@@ -345,4 +345,12 @@
 - [x] Verify pricing prints: Daily Rate, Total Amount, Discount, Final Amount
 - [x] Verify signature section prints if available
 - [x] Test print preview shows complete contract with all details
+- [x] Save checkpoint
+
+
+## Fix Empty PDF When Printing Contract
+- [x] Investigate why PDF file is empty when printing contract
+- [x] Fix CSS print media query to ensure content is visible in PDF output
+- [x] Simplify print CSS to avoid hiding dialog content
+- [x] Test print to PDF and verify all contract details appear
 - [ ] Save checkpoint
