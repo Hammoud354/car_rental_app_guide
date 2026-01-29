@@ -333,4 +333,16 @@
 - [x] Ensure only the contract details dialog/modal content prints
 - [x] Test print preview shows only individual contract (not entire page)
 - [x] Verify print works for both contract details view and inspection view
+- [x] Save checkpoint
+
+
+## Fix Incomplete Contract Printing - Show All Details
+- [x] Investigate why print preview only shows partial information (Return Date, Daily Rate, Discount)
+- [x] Fix CSS print media query to ensure all contract sections are visible
+- [x] Verify client information prints: Full Name, Address, Phone, Driving License Number, License Expiry, Nationality
+- [x] Verify vehicle information prints: Plate Number, Brand, Model, Year, Category, Color, VIN Number
+- [x] Verify rental period prints: Start Date, Return Date, Rental Days
+- [x] Verify pricing prints: Daily Rate, Total Amount, Discount, Final Amount
+- [x] Verify signature section prints if available
+- [x] Test print preview shows complete contract with all details
 - [ ] Save checkpoint

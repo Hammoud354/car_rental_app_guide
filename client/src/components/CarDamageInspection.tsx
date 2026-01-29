@@ -21,6 +21,8 @@ interface ContractData {
   vehiclePlate: string;
   vehicleBrand: string;
   vehicleModel: string;
+  vehicleColor?: string;
+  vehicleVin?: string;
   startDate: Date;
   endDate: Date;
   rentalDays: number;
@@ -142,6 +144,18 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                   <Label className="text-sm text-gray-600">Model</Label>
                   <p className="font-medium">{contractData.vehicleModel}</p>
                 </div>
+                {contractData.vehicleColor && (
+                  <div>
+                    <Label className="text-sm text-gray-600">Color</Label>
+                    <p className="font-medium">{contractData.vehicleColor}</p>
+                  </div>
+                )}
+                {contractData.vehicleVin && (
+                  <div className="col-span-2">
+                    <Label className="text-sm text-gray-600">VIN Number</Label>
+                    <p className="font-medium font-mono">{contractData.vehicleVin}</p>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -206,63 +206,79 @@
 
 /* Print Styles - Only show contract details dialog content */
 @media print {
-  /* Hide everything by default */
-  body * {
-    visibility: hidden;
+  /* Hide sidebar and navigation */
+  body > div:first-child > div:first-child {
+    display: none !important;
   }
   
-  /* Show only the dialog content */
-  [role="dialog"],
-  [role="dialog"] * {
-    visibility: visible;
+  /* Hide everything except the dialog portal */
+  body > div:not([data-radix-portal]) {
+    display: none !important;
+  }
+  
+  /* Show the dialog portal */
+  [data-radix-portal] {
+    display: block !important;
   }
   
   /* Hide dialog overlay/backdrop */
-  [data-radix-portal] > div:first-child {
+  [data-radix-portal] > div[data-radix-dialog-overlay] {
     display: none !important;
   }
   
-  /* Position dialog content for print */
+  /* Show and position dialog content */
   [role="dialog"] {
-    position: absolute;
-    left: 0;
-    top: 0;
-    margin: 0;
-    max-width: 100%;
-    max-height: 100%;
-    overflow: visible;
-  }
-  
-  /* Hide dialog close button and footer buttons except print button */
-  [role="dialog"] button:not(.print-contract),
-  [role="dialog"] [data-radix-dialog-close] {
-    display: none !important;
-  }
-  
-  /* Hide the print button itself when printing */
-  [role="dialog"] button.print-contract {
-    display: none !important;
-  }
-  
-  /* Ensure white background for printed content */
-  [role="dialog"] {
+    position: static !important;
+    transform: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
     background: white !important;
     color: black !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  /* Hide all buttons in dialog */
+  [role="dialog"] button {
+    display: none !important;
+  }
+  
+  /* Hide dialog close button */
+  [role="dialog"] [data-radix-dialog-close] {
+    display: none !important;
   }
   
   /* Override dark mode colors for print */
   [role="dialog"] .bg-gray-800,
   [role="dialog"] .bg-gray-700 {
     background: white !important;
-    border: 1px solid #ccc !important;
+    border: 1px solid #ddd !important;
   }
   
-  [role="dialog"] .text-white,
-  [role="dialog"] .text-gray-400 {
+  [role="dialog"] .text-white {
     color: black !important;
+  }
+  
+  [role="dialog"] .text-gray-400 {
+    color: #666 !important;
   }
   
   [role="dialog"] .text-orange-500 {
     color: #ff4500 !important;
+  }
+  
+  /* Ensure all content is visible */
+  [role="dialog"] * {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Page break settings */
+  @page {
+    margin: 0.5in;
+    size: letter;
   }
 }

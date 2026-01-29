@@ -234,6 +234,8 @@ export default function RentalContracts() {
                   vehiclePlate: vehicles.find(v => v.id === contractData.vehicleId)?.plateNumber || '',
                   vehicleBrand: vehicles.find(v => v.id === contractData.vehicleId)?.brand || '',
                   vehicleModel: vehicles.find(v => v.id === contractData.vehicleId)?.model || '',
+                  vehicleColor: vehicles.find(v => v.id === contractData.vehicleId)?.color ?? undefined,
+                  vehicleVin: vehicles.find(v => v.id === contractData.vehicleId)?.vin ?? undefined,
                   startDate: new Date(contractData.rentalStartDate),
                   endDate: new Date(contractData.rentalEndDate),
                   rentalDays: contractData.rentalDays,
@@ -769,6 +771,12 @@ export default function RentalContracts() {
                         <div className="text-sm text-gray-400">Color</div>
                         <div>{vehicle?.color || "N/A"}</div>
                       </div>
+                      {vehicle?.vin && (
+                        <div className="col-span-2">
+                          <div className="text-sm text-gray-400">VIN Number</div>
+                          <div className="font-mono">{vehicle.vin}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
