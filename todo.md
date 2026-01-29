@@ -324,4 +324,13 @@
 - [x] Include rental dates and pricing (start date, end date, days, total, discount, final amount)
 - [x] Ensure all information prints along with car inspection diagram
 - [x] Test print preview shows complete contract + inspection form
+- [x] Save checkpoint
+
+
+## Fix Print Button to Print Only Specific Contract
+- [x] Investigate current print button implementation and identify issue
+- [x] Add print-specific CSS media query to hide sidebar, navigation, and contract list
+- [x] Ensure only the contract details dialog/modal content prints
+- [x] Test print preview shows only individual contract (not entire page)
+- [x] Verify print works for both contract details view and inspection view
 - [ ] Save checkpoint

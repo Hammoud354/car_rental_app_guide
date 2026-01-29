@@ -823,7 +823,7 @@ export default function RentalContracts() {
               <Button 
                 onClick={() => window.print()} 
                 variant="outline"
-                className="mr-auto"
+                className="mr-auto print-contract"
               >
                 🖨️ Print Contract
               </Button>
