@@ -205,29 +205,34 @@ export default function RentalContracts() {
     setShowInspection(true);
   };
 
-  const handleInspectionComplete = (damageMarks: any[], signatureData: string) => {
+  const utils = trpc.useUtils();
+  const addDamageMark = trpc.contracts.addDamageMark.useMutation();
+  
+  const handleInspectionComplete = async (damageMarks: any[], signatureData: string) => {
     if (!contractData) return;
     
     createContract.mutate({
       ...contractData,
       signatureData,
     }, {
-      onSuccess: (contract) => {
-        // Save damage marks
-        damageMarks.forEach(mark => {
-          trpc.contracts.addDamageMark.useMutation().mutate({
+      onSuccess: async (contract) => {
+        // Save damage marks sequentially
+        for (const mark of damageMarks) {
+          await addDamageMark.mutateAsync({
             contractId: contract.id,
             xPosition: mark.x.toString(),
             yPosition: mark.y.toString(),
             description: mark.description,
           });
-        });
+        }
+        
+        // Invalidate contracts list to refresh
+        await utils.contracts.list.invalidate();
+        
         setShowInspection(false);
         setContractData(null);
         setIsCreateDialogOpen(false);
         toast.success("Contract created successfully!");
-        // Redirect to Fleet Management page
-        setLocation("/fleet");
       },
     });
   };
