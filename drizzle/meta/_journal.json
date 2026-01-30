@@ -64,6 +64,13 @@
       "when": 1769804054984,
       "tag": "0008_flashy_marten_broadcloak",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1769805237121,
+      "tag": "0009_blue_jubilee",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `rentalContracts` ADD `status` enum('active','completed','overdue') DEFAULT 'active';

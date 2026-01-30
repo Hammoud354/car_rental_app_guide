@@ -392,4 +392,14 @@
 - [x] Generate and update contract numbers for existing contracts
 - [x] Verify all contracts now have unique contract numbers
 - [x] Test that contract numbers display in inspection/print view
+- [x] Save checkpoint
+
+
+## Add Color-Coded Status Badges to Contracts
+- [x] Add status field to rentalContracts schema (enum: active, completed, overdue)
+- [x] Run database migration (pnpm db:push)
+- [x] Create helper function to determine contract status based on dates
+- [x] Add status badges to contracts list with color coding (Active=green, Completed=blue, Overdue=red)
+- [x] Update contract status automatically when viewing contracts list
+- [x] Test status badges display correctly for different contract states
 - [ ] Save checkpoint

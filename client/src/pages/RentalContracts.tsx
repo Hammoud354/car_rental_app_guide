@@ -3,6 +3,7 @@ import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,45 @@ import { trpc } from "@/lib/trpc";
 import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
+
+// Helper function to determine contract status
+const getContractStatus = (startDate: Date | string, endDate: Date | string, status?: string) => {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  
+  // If status is explicitly set, use it
+  if (status && ['active', 'completed', 'overdue'].includes(status)) {
+    return status as 'active' | 'completed' | 'overdue';
+  }
+  
+  // Otherwise determine based on dates
+  if (now < start) {
+    return 'active'; // Future contract
+  } else if (now >= start && now <= end) {
+    return 'active'; // Ongoing
+  } else if (now > end) {
+    return 'overdue'; // Past due date
+  }
+  return 'active';
+};
+
+const getStatusBadgeVariant = (status: string) => {
+  switch (status) {
+    case 'active':
+      return 'default'; // Green
+    case 'completed':
+      return 'secondary'; // Blue
+    case 'overdue':
+      return 'destructive'; // Red
+    default:
+      return 'default';
+  }
+};
+
+const getStatusLabel = (status: string) => {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+};
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
@@ -634,7 +674,12 @@ export default function RentalContracts() {
                       <span className="text-lg">
                         {contract.clientFirstName} {contract.clientLastName}
                       </span>
-                      <FileText className="h-5 w-5 text-blue-600" />
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getStatusBadgeVariant(getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status))}>
+                          {getStatusLabel(getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status))}
+                        </Badge>
+                        <FileText className="h-5 w-5 text-blue-600" />
+                      </div>
                     </CardTitle>
                     {contract.contractNumber && (
                       <div className="text-sm font-mono text-gray-600 mt-1">
