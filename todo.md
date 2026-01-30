@@ -371,4 +371,17 @@
 - [x] Display contract number in car inspection page
 - [x] Include contract number in printed contract
 - [x] Test contract number generation and uniqueness
+- [x] Save checkpoint
+
+
+## Sort Contracts by Newest First
+- [x] Update contracts list query to sort by createdAt DESC
+- [x] Verify newest contracts appear at the top
+- [x] Test sorting works correctly
+
+## Add Read-Only Contract Number Field
+- [x] Add contract number as read-only field in contract details dialog
+- [x] Ensure field is visible and non-editable
+- [x] Style field appropriately as read-only
+- [x] Test contract number displays correctly
 - [ ] Save checkpoint

@@ -725,6 +725,14 @@ export default function RentalContracts() {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
                 <div className="space-y-6">
+                  {/* Contract Number - Read Only */}
+                  {selectedContract.contractNumber && (
+                    <div className="bg-blue-900/30 border border-blue-500/50 p-4 rounded-lg">
+                      <div className="text-sm text-blue-300 mb-1">Contract Number (Read-Only)</div>
+                      <div className="font-mono text-xl font-bold text-blue-400">{selectedContract.contractNumber}</div>
+                    </div>
+                  )}
+                  
                   {/* Client Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Information</h3>
