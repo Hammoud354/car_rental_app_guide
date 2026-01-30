@@ -443,4 +443,10 @@
 - [x] Fix redirect to contracts page after completing inspection
 - [x] Ensure inspection form closes properly
 - [x] Test complete workflow from creation to completion
+- [x] Save checkpoint
+
+## Bug Fix: Print Dialog Cancellation Causes Blank Page
+- [x] Investigate print CSS causing blank page when print is cancelled
+- [x] Fix visibility restoration when print dialog is cancelled
+- [x] Test print and cancel behavior
 - [ ] Save checkpoint
