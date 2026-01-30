@@ -163,11 +163,13 @@ export const appRouter = router({
           });
         }
         
-        // Generate unique contract number
-        const now = new Date();
-        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
-        const timestamp = now.getTime();
-        const contractNumber = `CTR-${dateStr}-${String(timestamp).slice(-4)}`;
+        // Generate simple sequential contract number
+        const existingContracts = await db.getAllRentalContracts();
+        const maxNumber = existingContracts.reduce((max, contract) => {
+          const num = parseInt(contract.contractNumber || '0', 10);
+          return num > max ? num : max;
+        }, 0);
+        const contractNumber = String(maxNumber + 1);
         
         // Create contract with client ID and contract number
         return await db.createRentalContract({

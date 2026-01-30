@@ -426,4 +426,12 @@
 - [x] Combine search and filter logic
 - [x] Add empty state when no results found
 - [x] Test search and filtering functionality
+- [x] Save checkpoint
+
+
+## Simplify Contract Numbers to Sequential Integers
+- [x] Update contract number generation logic to use simple sequential numbers (1, 2, 3, ...)
+- [x] Update existing contracts in database with sequential numbers
+- [x] Test new contract creation uses next sequential number
+- [x] Verify contract numbers display correctly everywhere
 - [ ] Save checkpoint
