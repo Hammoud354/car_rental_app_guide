@@ -449,4 +449,10 @@
 - [x] Investigate print CSS causing blank page when print is cancelled
 - [x] Fix visibility restoration when print dialog is cancelled
 - [x] Test print and cancel behavior
+- [x] Save checkpoint
+
+## Update License Issue Date Range
+- [x] Locate license issue date field in contract form
+- [x] Change year range to start from 1990
+- [x] Test the updated field
 - [ ] Save checkpoint

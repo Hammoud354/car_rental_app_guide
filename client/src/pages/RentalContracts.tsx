@@ -582,6 +582,7 @@ export default function RentalContracts() {
                           label="Issue Date"
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
+                          yearRange={{ start: 1990, end: new Date().getFullYear() }}
                         />
                       </div>
                       <div>
