@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Search } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -81,9 +81,42 @@ export default function RentalContracts() {
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
   const { data: clients = [] } = trpc.clients.list.useQuery();
+  
+  // Filtered contracts based on search and status filter
+  const filteredContracts = useMemo(() => {
+    return contracts.filter((contract: any) => {
+      const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
+      const contractStatus = getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status);
+      
+      // Status filter
+      if (statusFilter !== "all" && contractStatus !== statusFilter) {
+        return false;
+      }
+      
+      // Search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        const clientName = `${contract.clientFirstName} ${contract.clientLastName}`.toLowerCase();
+        const contractNumber = (contract.contractNumber || "").toLowerCase();
+        const vehiclePlate = (vehicle?.plateNumber || "").toLowerCase();
+        
+        return (
+          clientName.includes(query) ||
+          contractNumber.includes(query) ||
+          vehiclePlate.includes(query)
+        );
+      }
+      
+      return true;
+    });
+  }, [contracts, vehicles, searchQuery, statusFilter]);
   
   // Auto-set start date to today when dialog opens
   useEffect(() => {
@@ -663,9 +696,34 @@ export default function RentalContracts() {
             </Dialog>
           </div>
 
+          {/* Search and Filter */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by client name, contract number, or vehicle plate..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-11 rounded-full"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-full sm:w-48 h-11 rounded-full">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Contracts</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Contracts List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contracts.map((contract: any) => {
+            {filteredContracts.map((contract: any) => {
               const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
               return (
                 <Card key={contract.id} className="apple-card border-none">
@@ -740,15 +798,23 @@ export default function RentalContracts() {
             })}
           </div>
 
-          {contracts.length === 0 && (
-            <Card className="p-12 text-center">
-              <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
-              <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
-              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-orange-500 hover:bg-orange-600">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Contract
-              </Button>
+          {filteredContracts.length === 0 && (
+            <Card className="apple-card p-12 text-center col-span-full">
+              <FileText className="h-16 w-16 text-muted-foreground/40 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">
+                {contracts.length === 0 ? "No Contracts Yet" : "No Results Found"}
+              </h3>
+              <p className="text-muted-foreground mb-6">
+                {contracts.length === 0 
+                  ? "Create your first rental contract to get started"
+                  : "Try adjusting your search or filter criteria"}
+              </p>
+              {contracts.length === 0 && (
+                <Button onClick={() => setIsCreateDialogOpen(true)} className="apple-button">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Contract
+                </Button>
+              )}
             </Card>
           )}
           </>
