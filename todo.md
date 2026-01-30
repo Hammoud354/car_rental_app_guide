@@ -384,4 +384,12 @@
 - [x] Ensure field is visible and non-editable
 - [x] Style field appropriately as read-only
 - [x] Test contract number displays correctly
+- [x] Save checkpoint
+
+
+## Backfill Missing Contract Numbers
+- [x] Check database for contracts with NULL contract numbers
+- [x] Generate and update contract numbers for existing contracts
+- [x] Verify all contracts now have unique contract numbers
+- [x] Test that contract numbers display in inspection/print view
 - [ ] Save checkpoint
