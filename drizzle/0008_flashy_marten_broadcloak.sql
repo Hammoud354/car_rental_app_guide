@@ -1,0 +1,1 @@
+ALTER TABLE `rentalContracts` MODIFY COLUMN `contractNumber` varchar(50);

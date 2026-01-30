@@ -14,6 +14,7 @@ interface DamageMark {
 }
 
 interface ContractData {
+  contractNumber?: string;
   clientName: string;
   clientLicense: string;
   clientPhone?: string;
@@ -98,6 +99,9 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
         <Card className="print:shadow-none">
           <CardHeader>
             <CardTitle className="text-2xl">Rental Contract</CardTitle>
+            {contractData.contractNumber && (
+              <p className="text-sm font-mono text-gray-600 mt-1">Contract Number: {contractData.contractNumber}</p>
+            )}
             <p className="text-sm text-gray-600">Contract Date: {new Date().toLocaleDateString()}</p>
           </CardHeader>
           <CardContent className="space-y-6">

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -182,7 +182,14 @@ export default function FleetManagement() {
             <p className="text-muted-foreground mt-2">Manage your vehicle inventory and track maintenance</p>
           </div>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <div className="flex gap-2">
+            <Link href="/">
+              <Button variant="outline" className="font-mono">
+                <Home className="mr-2 h-4 w-4" />
+                RETURN TO HOME
+              </Button>
+            </Link>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
               <Button className="font-mono">
                 <Plus className="mr-2 h-4 w-4" />
@@ -301,6 +308,7 @@ export default function FleetManagement() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {isLoading ? (

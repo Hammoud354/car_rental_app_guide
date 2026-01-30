@@ -227,6 +227,7 @@ export default function RentalContracts() {
                   setIsCreateDialogOpen(true);
                 }}
                 contractData={contractData ? {
+                  contractNumber: contractData.contractNumber,
                   clientName: `${contractData.clientFirstName} ${contractData.clientLastName}`,
                   clientLicense: contractData.drivingLicenseNumber,
                   clientPhone: contractData.clientPhone,
@@ -635,6 +636,11 @@ export default function RentalContracts() {
                       </span>
                       <FileText className="h-5 w-5 text-blue-600" />
                     </CardTitle>
+                    {contract.contractNumber && (
+                      <div className="text-sm font-mono text-gray-600 mt-1">
+                        {contract.contractNumber}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -709,6 +715,11 @@ export default function RentalContracts() {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
+              {selectedContract?.contractNumber && (
+                <div className="text-sm font-mono text-gray-400 mt-2">
+                  Contract Number: {selectedContract.contractNumber}
+                </div>
+              )}
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);

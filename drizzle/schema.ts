@@ -102,6 +102,7 @@ export type InsertClient = typeof clients.$inferInsert;
  */
 export const rentalContracts = mysqlTable("rentalContracts", {
   id: int("id").autoincrement().primaryKey(),
+  contractNumber: varchar("contractNumber", { length: 50 }).unique(),
   vehicleId: int("vehicleId").notNull(),
   clientId: int("clientId"), // Optional: reference to clients table if using existing client
   // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients

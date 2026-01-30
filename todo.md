@@ -353,4 +353,22 @@
 - [x] Fix CSS print media query to ensure content is visible in PDF output
 - [x] Simplify print CSS to avoid hiding dialog content
 - [x] Test print to PDF and verify all contract details appear
+- [x] Save checkpoint
+
+
+## Add Return to Home Button on Fleet Management
+- [x] Add "Return to Home" or "Back to Main Page" button on Fleet Management page header
+- [x] Button should navigate to home page (/)
+- [x] Style button consistently with existing UI
+- [x] Test navigation works correctly
+
+## Implement Unique Contract Numbers
+- [x] Add contractNumber field to rentalContracts schema (varchar, unique, not null)
+- [x] Run database migration (pnpm db:push)
+- [x] Update contract creation logic to auto-generate unique contract numbers (format: CTR-YYYYMMDD-XXXX)
+- [x] Display contract number in contracts list table
+- [x] Display contract number prominently in contract details dialog
+- [x] Display contract number in car inspection page
+- [x] Include contract number in printed contract
+- [x] Test contract number generation and uniqueness
 - [ ] Save checkpoint
