@@ -1,119 +1,144 @@
 import Layout from "@/components/Layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Activity, TrendingUp, Users, AlertTriangle } from "lucide-react";
+import { ArrowRight, Car, FileText, BarChart3, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Home() {
   return (
     <Layout>
-      <div className="space-y-8">
-        {/* Hero Section */}
-        <section className="relative rounded-xl overflow-hidden border border-border/50 group">
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10" />
-          <img 
-            src="/images/hero-dashboard.jpg" 
-            alt="Fleet Dashboard" 
-            className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
-          />
-          <div className="relative z-20 p-8 md:p-12 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              SYSTEM ARCHITECTURE V1.0
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6 leading-tight">
-              THE BLUEPRINT FOR <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">MODERN FLEET OPS</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-xl leading-relaxed">
-              A comprehensive technical analysis of the essential components required to build a scalable, data-driven car rental platform in 2026.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button 
-                size="lg" 
-                className="font-mono bg-primary hover:bg-primary/90 text-primary-foreground border-none"
-                onClick={() => window.location.href = '/dashboard'}
-              >
-                OPEN DASHBOARD <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="font-mono bg-background/50 backdrop-blur-sm hover:bg-accent/50"
-                onClick={() => window.location.href = '/fleet'}
-              >
-                VIEW GUIDE
-              </Button>
+      <div className="space-y-32 py-12">
+        {/* Hero Section - Apple Style */}
+        <section className="text-center max-w-5xl mx-auto px-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
+            <Sparkles className="h-4 w-4" />
+            <span>Introducing the future of fleet management</span>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-semibold tracking-tight mb-6 bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+            Effortless fleet
+            <br />
+            management.
+          </h1>
+          
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed font-light">
+            A beautifully simple platform to manage your rental fleet, track vehicles, and streamline operations.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              size="lg" 
+              className="apple-button text-base h-12 px-8"
+              onClick={() => window.location.href = '/fleet'}
+            >
+              Get started <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="apple-button-secondary text-base h-12 px-8"
+              onClick={() => window.location.href = '/rental-contracts'}
+            >
+              View contracts
+            </Button>
+          </div>
+        </section>
+
+        {/* Feature Cards */}
+        <section className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Link href="/fleet">
+              <Card className="apple-card group cursor-pointer overflow-hidden h-full border-none">
+                <CardContent className="p-8">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <Car className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-3">Fleet Management</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Track your entire vehicle inventory with real-time status updates, maintenance schedules, and availability.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link href="/rental-contracts">
+              <Card className="apple-card group cursor-pointer overflow-hidden h-full border-none">
+                <CardContent className="p-8">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <FileText className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-3">Smart Contracts</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Create, manage, and track rental agreements with digital signatures and automated damage inspection.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Link href="/fleet">
+              <Card className="apple-card group cursor-pointer overflow-hidden h-full border-none">
+                <CardContent className="p-8">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <BarChart3 className="h-7 w-7 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-semibold mb-3">Analytics</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Gain insights into fleet performance, revenue trends, and operational efficiency with powerful analytics.
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </section>
+
+        {/* Stats Section */}
+        <section className="max-w-5xl mx-auto px-4">
+          <div className="glass-effect rounded-3xl p-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div>
+                <div className="text-4xl md:text-5xl font-semibold mb-2 bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  99.9%
+                </div>
+                <div className="text-sm text-muted-foreground">Uptime</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-semibold mb-2 bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  24/7
+                </div>
+                <div className="text-sm text-muted-foreground">Support</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-semibold mb-2 bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  Fast
+                </div>
+                <div className="text-sm text-muted-foreground">Performance</div>
+              </div>
+              <div>
+                <div className="text-4xl md:text-5xl font-semibold mb-2 bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-transparent">
+                  Secure
+                </div>
+                <div className="text-sm text-muted-foreground">Data</div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: "MARKET GROWTH", value: "+15.2%", sub: "YoY Projected", icon: TrendingUp, color: "text-green-500" },
-            { label: "DIGITAL BOOKINGS", value: "73%", sub: "By 2029", icon: Activity, color: "text-blue-500" },
-            { label: "MARKET CAP", value: "$243B", sub: "Global 2030", icon: Users, color: "text-purple-500" },
-            { label: "CRITICAL REQ", value: "FLEET", sub: "Management Core", icon: AlertTriangle, color: "text-orange-500" },
-          ].map((metric, i) => (
-            <Card key={i} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="p-2 rounded-md bg-background/50 border border-border/50">
-                    <metric.icon className={`h-5 w-5 ${metric.color}`} />
-                  </div>
-                  <span className="text-xs font-mono text-muted-foreground">{metric.label}</span>
-                </div>
-                <div className="text-3xl font-bold font-mono tracking-tight mb-1">{metric.value}</div>
-                <div className="text-xs text-muted-foreground font-mono border-l-2 border-primary/20 pl-2">
-                  {metric.sub}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Core Modules Preview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Link href="/fleet">
-            <div className="group cursor-pointer relative h-64 rounded-lg overflow-hidden border border-border/50 hover:border-primary transition-all duration-300">
-              <img src="/images/fleet-lineup.jpg" alt="Fleet" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6 w-full">
-                <div className="text-xs font-mono text-primary mb-2">MODULE 01</div>
-                <h3 className="text-xl font-bold mb-2 group-hover:translate-x-2 transition-transform">Fleet Management</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">Complete vehicle lifecycle tracking, maintenance scheduling, and real-time status monitoring.</p>
-              </div>
-            </div>
-          </Link>
-          
-          <Link href="/booking">
-            <div className="group cursor-pointer relative h-64 rounded-lg overflow-hidden border border-border/50 hover:border-primary transition-all duration-300">
-              <img src="/images/feature-booking.jpg" alt="Booking" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6 w-full">
-                <div className="text-xs font-mono text-primary mb-2">MODULE 02</div>
-                <h3 className="text-xl font-bold mb-2 group-hover:translate-x-2 transition-transform">Booking Engine</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">Seamless customer experience from vehicle discovery to digital contract signing.</p>
-              </div>
-            </div>
-          </Link>
-          
-          <Link href="/operations">
-            <div className="group cursor-pointer relative h-64 rounded-lg overflow-hidden border border-border/50 hover:border-primary transition-all duration-300">
-              <img src="/images/feature-analytics.jpg" alt="Operations" className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity" />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6 w-full">
-                <div className="text-xs font-mono text-primary mb-2">MODULE 03</div>
-                <h3 className="text-xl font-bold mb-2 group-hover:translate-x-2 transition-transform">Operations & Analytics</h3>
-                <p className="text-sm text-muted-foreground line-clamp-2">Data-driven insights, automated workflows, and comprehensive reporting tools.</p>
-              </div>
-            </div>
-          </Link>
-        </div>
+        {/* CTA Section */}
+        <section className="text-center max-w-4xl mx-auto px-4 pb-12">
+          <h2 className="text-4xl md:text-5xl font-semibold tracking-tight mb-6">
+            Ready to transform your fleet?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8 font-light">
+            Start managing your vehicles with elegance and efficiency.
+          </p>
+          <Button 
+            size="lg" 
+            className="apple-button text-base h-12 px-8"
+            onClick={() => window.location.href = '/fleet'}
+          >
+            Get started today <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </section>
       </div>
     </Layout>
   );

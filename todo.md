@@ -402,4 +402,17 @@
 - [x] Add status badges to contracts list with color coding (Active=green, Completed=blue, Overdue=red)
 - [x] Update contract status automatically when viewing contracts list
 - [x] Test status badges display correctly for different contract states
+- [x] Save checkpoint
+
+
+## Redesign Website with Apple-Inspired Minimalistic Theme
+- [x] Update global CSS with Apple-inspired color palette (whites, grays, subtle blues)
+- [x] Change typography to SF Pro-like system fonts
+- [x] Increase white space and padding throughout
+- [x] Add subtle shadows and smooth transitions
+- [x] Redesign Home page with minimalistic hero section
+- [x] Redesign Fleet Management with premium card styling
+- [x] Redesign Rental Contracts with luxurious aesthetic
+- [x] Update buttons and form elements with refined styling
+- [x] Test responsive design and animations
 - [ ] Save checkpoint

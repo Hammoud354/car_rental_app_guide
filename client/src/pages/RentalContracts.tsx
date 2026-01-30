@@ -291,12 +291,12 @@ export default function RentalContracts() {
           <>
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>
-              <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
+              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-2">Contracts</h1>
+              <p className="text-lg text-muted-foreground font-light">Manage rental agreements with elegance</p>
             </div>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-orange-500 hover:bg-orange-600">
+                <Button className="apple-button h-11">
                   <Plus className="h-4 w-4 mr-2" />
                   New Contract
                 </Button>
@@ -668,7 +668,7 @@ export default function RentalContracts() {
             {contracts.map((contract: any) => {
               const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
               return (
-                <Card key={contract.id} className="hover:shadow-lg transition-shadow">
+                <Card key={contract.id} className="apple-card border-none">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span className="text-lg">
