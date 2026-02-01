@@ -415,4 +415,14 @@
 ## Add Rental Contracts to Sidebar Navigation
 - [x] Add Rental Contracts link to Layout component sidebar
 - [x] Test sidebar navigation
+- [x] Save checkpoint
+
+## Implement Contract Return System
+- [x] Add status field to contracts table in database schema (already exists)
+- [x] Update backend with Mark as Returned mutation
+- [x] Add status filtering queries (Active, Returned, Archived)
+- [x] Update UI with status badges on contract cards
+- [x] Add filter tabs (All, Active, Returned, Archived)
+- [x] Add Mark as Returned button to contract cards
+- [x] Test contract return flow
 - [ ] Save checkpoint

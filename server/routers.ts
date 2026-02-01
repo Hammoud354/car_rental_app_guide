@@ -119,6 +119,12 @@ export const appRouter = router({
       return await db.getAllRentalContracts();
     }),
     
+    listByStatus: publicProcedure
+      .input(z.object({ status: z.enum(["Active", "Returned", "Archived"]).optional() }))
+      .query(async ({ input }) => {
+        return await db.getRentalContractsByStatus(input.status);
+      }),
+    
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input }) => {
@@ -195,6 +201,21 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         return await db.renewRentalContract(input);
+      }),
+    
+    markAsReturned: publicProcedure
+      .input(z.object({ contractId: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.markContractAsReturned(input.contractId);
+      }),
+    
+    updateStatus: publicProcedure
+      .input(z.object({
+        contractId: z.number(),
+        status: z.enum(["Active", "Returned", "Archived"]),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.updateContractStatus(input.contractId, input.status);
       }),
   }),
 

@@ -40,10 +40,22 @@ export default function RentalContracts() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<"Active" | "Returned" | "Archived" | undefined>("Active");
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
-  const { data: contracts = [] } = trpc.contracts.list.useQuery();
+  const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
+  const utils = trpc.useUtils();
+  
+  const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
+    onSuccess: () => {
+      toast.success("Contract marked as returned");
+      utils.contracts.listByStatus.invalidate();
+    },
+    onError: (error) => {
+      toast.error("Failed to mark contract as returned: " + error.message);
+    },
+  });
   
   // Auto-set start date to today when dialog opens
   useEffect(() => {
@@ -248,7 +260,7 @@ export default function RentalContracts() {
             </div>
           ) : (
           <>
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>
               <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
@@ -626,8 +638,38 @@ export default function RentalContracts() {
                   </DialogFooter>
                 </form>
               </DialogContent>
-            </Dialog>
+              </Dialog>
             </div>
+          </div>
+          
+          {/* Status Filter Tabs */}
+          <div className="flex gap-2 mb-6 border-b border-border pb-2">
+            <Button
+              variant={statusFilter === "Active" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("Active")}
+              className="relative"
+            >
+              Active
+              {statusFilter === "Active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+            </Button>
+            <Button
+              variant={statusFilter === "Returned" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("Returned")}
+            >
+              Returned
+            </Button>
+            <Button
+              variant={statusFilter === "Archived" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("Archived")}
+            >
+              Archived
+            </Button>
+            <Button
+              variant={!statusFilter ? "default" : "ghost"}
+              onClick={() => setStatusFilter(undefined)}
+            >
+              All
+            </Button>
           </div>
 
           {/* Contracts List */}
@@ -641,7 +683,17 @@ export default function RentalContracts() {
                       <span className="text-lg">
                         {contract.clientFirstName} {contract.clientLastName}
                       </span>
-                      <FileText className="h-5 w-5 text-blue-600" />
+                      <div className="flex items-center gap-2">
+                        {/* Status Badge */}
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          contract.status === "Active" ? "bg-green-100 text-green-800" :
+                          contract.status === "Returned" ? "bg-blue-100 text-blue-800" :
+                          "bg-gray-100 text-gray-800"
+                        }`}>
+                          {contract.status || "Active"}
+                        </span>
+                        <FileText className="h-5 w-5 text-blue-600" />
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -676,7 +728,7 @@ export default function RentalContracts() {
                           <div>{contract.clientNationality}</div>
                         </div>
                       )}
-                      <div className="mt-4 pt-4 border-t">
+                      <div className="mt-4 pt-4 border-t space-y-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -689,6 +741,20 @@ export default function RentalContracts() {
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </Button>
+                        {contract.status === "Active" && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="w-full bg-green-600 hover:bg-green-700"
+                            onClick={() => {
+                              // Mark as Returned mutation
+                              markAsReturnedMutation.mutate({ contractId: contract.id });
+                            }}
+                          >
+                            <Check className="mr-2 h-4 w-4" />
+                            Mark as Returned
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>

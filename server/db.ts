@@ -273,6 +273,59 @@ export async function renewRentalContract(input: { contractId: number; additiona
   return updated[0];
 }
 
+export async function getRentalContractsByStatus(status?: "Active" | "Returned" | "Archived") {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get contracts: database not available");
+    return [];
+  }
+  if (!status) {
+    // Return all contracts if no status specified
+    return await db.select().from(rentalContracts);
+  }
+  return await db.select().from(rentalContracts).where(eq(rentalContracts.status, status));
+}
+
+export async function markContractAsReturned(contractId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  await db
+    .update(rentalContracts)
+    .set({
+      status: "Returned",
+      returnedAt: new Date(),
+    })
+    .where(eq(rentalContracts.id, contractId));
+  
+  // Return the updated contract
+  const updated = await db.select().from(rentalContracts).where(eq(rentalContracts.id, contractId)).limit(1);
+  return updated[0];
+}
+
+export async function updateContractStatus(contractId: number, status: "Active" | "Returned" | "Archived") {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const updateData: any = { status };
+  if (status === "Returned" && !updateData.returnedAt) {
+    updateData.returnedAt = new Date();
+  }
+  
+  await db
+    .update(rentalContracts)
+    .set(updateData)
+    .where(eq(rentalContracts.id, contractId));
+  
+  // Return the updated contract
+  const updated = await db.select().from(rentalContracts).where(eq(rentalContracts.id, contractId)).limit(1);
+  return updated[0];
+}
+
 export async function getDamageMarksByContractId(contractId: number) {
   const db = await getDb();
   if (!db) {

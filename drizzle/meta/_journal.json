@@ -50,6 +50,13 @@
       "when": 1769600542641,
       "tag": "0006_little_george_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1769963645582,
+      "tag": "0007_colorful_power_man",
+      "breakpoints": true
     }
   ]
 }
