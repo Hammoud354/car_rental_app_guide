@@ -254,6 +254,16 @@ export async function getRentalContractsByStatus(status?: "active" | "completed"
   return await db.select().from(rentalContracts).where(eq(rentalContracts.status, status));
 }
 
+export async function getActiveContractsByVehicleId(vehicleId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get active contracts: database not available");
+    return [];
+  }
+  return await db.select().from(rentalContracts)
+    .where(and(eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.status, "active")));
+}
+
 export async function markContractAsReturned(contractId: number) {
   const db = await getDb();
   if (!db) {

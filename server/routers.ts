@@ -162,6 +162,12 @@ export const appRouter = router({
         fuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
       }))
       .mutation(async ({ input }) => {
+        // Check if vehicle already has an active contract
+        const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId);
+        if (activeContracts && activeContracts.length > 0) {
+          throw new Error(`Vehicle is already rented. Active contract exists until ${new Date(activeContracts[0].rentalEndDate).toLocaleDateString()}.`);
+        }
+        
         // Check if client exists by license number
         let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber);
         

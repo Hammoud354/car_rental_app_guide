@@ -67,8 +67,10 @@ export default function RentalContracts() {
   
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
     onSuccess: () => {
-      toast.success("Contract marked as returned");
+      toast.success("Contract marked as completed");
       utils.contracts.listByStatus.invalidate();
+      // Redirect to rental contracts page
+      setLocation("/rental-contracts");
     },
     onError: (error) => {
       toast.error("Failed to mark contract as returned: " + error.message);

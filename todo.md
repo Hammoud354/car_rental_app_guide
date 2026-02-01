@@ -570,3 +570,17 @@
 - [x] Display fuel level in contract details view
 - [x] Test fuel level tracking when creating new contracts
 - [x] Save checkpoint
+
+## Fix Duplicate Active Contracts Bug
+- [x] Add validation to check if vehicle already has an active contract
+- [x] Prevent creating new contract if vehicle is already rented (active status)
+- [x] Check for date overlap conflicts when creating contracts
+- [x] Show error message to user if vehicle is unavailable
+- [x] Test validation with same vehicle and overlapping dates
+
+## Fix Contract Completion Redirect
+- [x] Add redirect to rental contracts page after marking contract as completed
+- [x] Refresh contract list to show updated status
+- [x] Show success toast notification after completion
+- [x] Test redirect behavior after completing contract
+- [x] Save checkpoint
