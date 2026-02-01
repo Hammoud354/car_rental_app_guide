@@ -71,7 +71,12 @@ export default function RentalContracts() {
     },
   });
   
-  // No longer auto-set start date - allow user to select any date including past dates
+  // Auto-set start date to today when dialog opens (but allow user to change to any date)
+  useEffect(() => {
+    if (isCreateDialogOpen && !rentalStartDate) {
+      setRentalStartDate(new Date());
+    }
+  }, [isCreateDialogOpen]);
   
   // Auto-calculate return date when days change (only if start date exists)
   useEffect(() => {

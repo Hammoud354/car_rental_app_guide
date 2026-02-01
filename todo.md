@@ -469,4 +469,10 @@
 - [x] Allow selecting any past date for rental start
 - [x] Ensure date calculations still work correctly with past dates
 - [x] Test creating contract with past rental start date
+- [x] Save checkpoint
+
+## Default Today's Date for Rental Start
+- [x] Add useEffect to set rental start date to today when dialog opens
+- [x] Ensure users can still change to any past or future date
+- [x] Test default date appears and is changeable
 - [ ] Save checkpoint
