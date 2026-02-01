@@ -529,4 +529,12 @@
 - [x] Test all three features work together seamlessly
 - [x] Verify late fees update when status changes to overdue
 - [x] Ensure dashboard widget refreshes after status changes
-- [ ] Save checkpoint
+- [x] Save checkpoint
+
+## Fix Late Fee Display Bug
+- [x] Investigate why late fee shows $0.00 for overdue contracts
+- [x] Fix late fee calculation in backend to properly calculate and store fees
+- [x] Update frontend to display calculated late fee amount
+- [x] Add "Total Amount Due" field showing rental amount + late fee
+- [x] Test late fee display with multiple overdue contracts
+- [x] Save checkpoint

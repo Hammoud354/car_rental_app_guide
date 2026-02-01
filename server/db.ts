@@ -1,4 +1,4 @@
-import { eq, and, lte, gte, lt, sql } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -280,27 +280,32 @@ export async function updateOverdueContracts() {
     return { updated: 0 };
   }
   
-  // Find all active contracts where return date has passed
+  // Find all contracts where return date has passed (both active and already overdue)
   const now = new Date();
   
-  // First, get all active contracts that are overdue
+  // Get all contracts that are overdue or should be overdue
   const overdueContracts = await db
     .select()
     .from(rentalContracts)
     .where(
       and(
-        eq(rentalContracts.status, "active"),
+        or(
+          eq(rentalContracts.status, "active"),
+          eq(rentalContracts.status, "overdue")
+        ),
         lt(rentalContracts.rentalEndDate, now)
       )
     );
   
-  // Update each contract with calculated late fee and send notification
+  // Update each contract with calculated late fee and send notification for newly overdue
   let updatedCount = 0;
   for (const contract of overdueContracts) {
     const daysOverdue = Math.floor((now.getTime() - new Date(contract.rentalEndDate).getTime()) / (1000 * 60 * 60 * 24));
     const dailyRate = parseFloat(contract.dailyRate);
     const lateFeePercentage = parseFloat(contract.lateFeePercentage || "150");
     const lateFee = (dailyRate * (lateFeePercentage / 100) * daysOverdue).toFixed(2);
+    
+    const isNewlyOverdue = contract.status === "active";
     
     await db
       .update(rentalContracts)
@@ -310,15 +315,17 @@ export async function updateOverdueContracts() {
       })
       .where(eq(rentalContracts.id, contract.id));
     
-    // Send notification to owner about overdue contract
-    const { notifyOwner } = await import("./_core/notification");
-    const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, contract.vehicleId)).limit(1);
-    const vehicleInfo = vehicle[0] ? `${vehicle[0].brand} ${vehicle[0].model} (${vehicle[0].plateNumber})` : `Vehicle ID ${contract.vehicleId}`;
-    
-    await notifyOwner({
-      title: `⚠️ Contract Overdue: ${contract.contractNumber}`,
-      content: `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`
-    });
+    // Only send notification for newly overdue contracts (not already marked as overdue)
+    if (isNewlyOverdue) {
+      const { notifyOwner } = await import("./_core/notification");
+      const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, contract.vehicleId)).limit(1);
+      const vehicleInfo = vehicle[0] ? `${vehicle[0].brand} ${vehicle[0].model} (${vehicle[0].plateNumber})` : `Vehicle ID ${contract.vehicleId}`;
+      
+      await notifyOwner({
+        title: `⚠️ Contract Overdue: ${contract.contractNumber}`,
+        content: `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`
+      });
+    }
     
     updatedCount++;
   }
