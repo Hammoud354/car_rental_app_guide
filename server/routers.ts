@@ -124,6 +124,10 @@ export const appRouter = router({
       return await db.updateOverdueContracts();
     }),
     
+    getOverdueStatistics: publicProcedure.query(async () => {
+      return await db.getOverdueStatistics();
+    }),
+    
     listByStatus: publicProcedure
       .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
       .query(async ({ input }) => {

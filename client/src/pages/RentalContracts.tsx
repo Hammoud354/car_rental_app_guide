@@ -1004,6 +1004,20 @@ export default function RentalContracts() {
                         <div className="text-sm text-gray-400">Final Amount</div>
                         <div className="text-2xl font-bold text-orange-500">${selectedContract.finalAmount}</div>
                       </div>
+                      {selectedContract.status === "overdue" && (
+                        <>
+                          <div className="col-span-2 border-t border-gray-600 pt-4">
+                            <div className="text-sm text-red-400">Days Overdue</div>
+                            <div className="text-xl font-bold text-red-500">
+                              {Math.floor((new Date().getTime() - new Date(selectedContract.rentalEndDate).getTime()) / (1000 * 60 * 60 * 24))} days
+                            </div>
+                          </div>
+                          <div className="col-span-2">
+                            <div className="text-sm text-red-400">Late Fee (150% of daily rate)</div>
+                            <div className="text-2xl font-bold text-red-500">${selectedContract.lateFee || "0.00"}</div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 

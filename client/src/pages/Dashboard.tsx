@@ -1,9 +1,58 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText, Home, Clock } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import { Button } from "@/components/ui/button";
+
+function OverdueWidget() {
+  const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery();
+  
+  if (isLoading || !stats || stats.count === 0) return null;
+  
+  return (
+    <Card className="bg-red-50 border-red-200 shadow-md">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-red-600" />
+            </div>
+            <CardTitle className="text-lg font-semibold text-red-900">Overdue Contracts Alert</CardTitle>
+          </div>
+          <Link href="/rental-contracts">
+            <Button variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
+              View All
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+            <div className="text-3xl font-bold text-red-600">{stats.count}</div>
+            <div className="text-sm text-red-700 mt-1">Overdue Contracts</div>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+            <div className="text-3xl font-bold text-red-600">${stats.totalLateFees}</div>
+            <div className="text-sm text-red-700 mt-1">Total Late Fees</div>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+            <div className="text-3xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
+            <div className="text-sm text-red-700 mt-1">Avg Days Overdue</div>
+          </div>
+        </div>
+        <div className="mt-4 p-3 bg-red-100 rounded-lg flex items-start gap-2">
+          <Clock className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-red-800">
+            <strong>Action Required:</strong> {stats.count} contract{stats.count > 1 ? 's' : ''} {stats.count > 1 ? 'are' : 'is'} overdue. Contact clients immediately to arrange returns and collect late fees.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
@@ -122,6 +171,9 @@ export default function Dashboard() {
               </button>
             </Link>
           </div>
+
+          {/* Overdue Contracts Alert Widget */}
+          <OverdueWidget />
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

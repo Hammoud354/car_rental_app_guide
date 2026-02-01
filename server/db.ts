@@ -282,9 +282,11 @@ export async function updateOverdueContracts() {
   
   // Find all active contracts where return date has passed
   const now = new Date();
-  const result = await db
-    .update(rentalContracts)
-    .set({ status: "overdue" })
+  
+  // First, get all active contracts that are overdue
+  const overdueContracts = await db
+    .select()
+    .from(rentalContracts)
     .where(
       and(
         eq(rentalContracts.status, "active"),
@@ -292,7 +294,62 @@ export async function updateOverdueContracts() {
       )
     );
   
-  return { updated: result[0]?.affectedRows || 0 };
+  // Update each contract with calculated late fee and send notification
+  let updatedCount = 0;
+  for (const contract of overdueContracts) {
+    const daysOverdue = Math.floor((now.getTime() - new Date(contract.rentalEndDate).getTime()) / (1000 * 60 * 60 * 24));
+    const dailyRate = parseFloat(contract.dailyRate);
+    const lateFeePercentage = parseFloat(contract.lateFeePercentage || "150");
+    const lateFee = (dailyRate * (lateFeePercentage / 100) * daysOverdue).toFixed(2);
+    
+    await db
+      .update(rentalContracts)
+      .set({ 
+        status: "overdue",
+        lateFee: lateFee
+      })
+      .where(eq(rentalContracts.id, contract.id));
+    
+    // Send notification to owner about overdue contract
+    const { notifyOwner } = await import("./_core/notification");
+    const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, contract.vehicleId)).limit(1);
+    const vehicleInfo = vehicle[0] ? `${vehicle[0].brand} ${vehicle[0].model} (${vehicle[0].plateNumber})` : `Vehicle ID ${contract.vehicleId}`;
+    
+    await notifyOwner({
+      title: `⚠️ Contract Overdue: ${contract.contractNumber}`,
+      content: `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`
+    });
+    
+    updatedCount++;
+  }
+  
+  return { updated: updatedCount };
+}
+
+export async function getOverdueStatistics() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get overdue statistics: database not available");
+    return { count: 0, totalLateFees: "0.00", avgDaysOverdue: 0 };
+  }
+  
+  const overdueContracts = await db
+    .select()
+    .from(rentalContracts)
+    .where(eq(rentalContracts.status, "overdue"));
+  
+  const count = overdueContracts.length;
+  const totalLateFees = overdueContracts.reduce((sum, contract) => sum + parseFloat(contract.lateFee || "0"), 0).toFixed(2);
+  
+  const now = new Date();
+  const totalDaysOverdue = overdueContracts.reduce((sum, contract) => {
+    const daysOverdue = Math.floor((now.getTime() - new Date(contract.rentalEndDate).getTime()) / (1000 * 60 * 60 * 24));
+    return sum + daysOverdue;
+  }, 0);
+  
+  const avgDaysOverdue = count > 0 ? Math.round(totalDaysOverdue / count) : 0;
+  
+  return { count, totalLateFees, avgDaysOverdue };
 }
 
 export async function updateContractStatus(contractId: number, status: "active" | "completed" | "overdue") {

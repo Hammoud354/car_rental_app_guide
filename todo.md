@@ -504,4 +504,29 @@
 - [x] Update contract status from 'active' to 'overdue' automatically
 - [x] Call the update procedure when contracts list is loaded
 - [x] Test with contracts that have past return dates
+- [x] Save checkpoint
+
+## Late Fee Calculator
+- [x] Add lateFee and lateFeePercentage fields to rentalContracts schema
+- [x] Create function to calculate late fees (150% of daily rate × days overdue)
+- [x] Update overdue contracts procedure to calculate and store late fees
+- [x] Display late fees in contract details for overdue contracts
+- [x] Test late fee calculation with overdue contracts
+
+## Overdue Dashboard Widget
+- [x] Create getOverdueStatistics backend procedure
+- [x] Add OverdueWidget component to Dashboard page
+- [x] Display total overdue contracts, total late fees, and average days overdue
+- [x] Add "View All" button to navigate to rental contracts page
+- [x] Test widget displays correctly with overdue contracts
+
+## Overdue Notifications
+- [x] Update updateOverdueContracts to send notifications when contracts become overdue
+- [x] Include contract details, client info, vehicle info, and late fees in notification
+- [x] Test notifications are sent when contracts become overdue
+
+## Integration & Testing
+- [x] Test all three features work together seamlessly
+- [x] Verify late fees update when status changes to overdue
+- [x] Ensure dashboard widget refreshes after status changes
 - [ ] Save checkpoint
