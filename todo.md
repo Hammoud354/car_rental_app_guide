@@ -410,4 +410,9 @@
 - [x] Add HOME button to Booking page
 - [x] Add HOME button to Maintenance page
 - [x] Test HOME button on all pages
+- [x] Save checkpoint
+
+## Add Rental Contracts to Sidebar Navigation
+- [x] Add Rental Contracts link to Layout component sidebar
+- [x] Test sidebar navigation
 - [ ] Save checkpoint
