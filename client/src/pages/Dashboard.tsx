@@ -51,15 +51,15 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-600 text-white flex flex-col">
-        <div className="p-6 border-b border-blue-500">
+      <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
+        <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center gap-2">
             <Car className="h-8 w-8" />
             <div>
-              <h1 className="text-xl font-bold">FleetMaster</h1>
-              <p className="text-xs text-blue-200">Premium Car Rentals</p>
+            <h1 className="text-xl font-bold text-sidebar-foreground">FleetMaster</h1>
+            <p className="text-xs text-muted-foreground">Premium Car Rentals</p>
             </div>
           </div>
         </div>
@@ -73,8 +73,8 @@ export default function Dashboard() {
                 <div
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
                     isActive
-                      ? "bg-blue-700 text-white"
-                      : "text-blue-100 hover:bg-blue-500"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                   }`}
                 >
                   <Icon className="h-5 w-5" />
@@ -85,11 +85,11 @@ export default function Dashboard() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-blue-500">
+        <div className="p-4 border-t border-sidebar-border">
           {user ? (
             <button
               onClick={() => logout()}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-500 transition-colors w-full"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors w-full"
             >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Sign Out</span>
@@ -97,7 +97,7 @@ export default function Dashboard() {
           ) : (
             <a
               href={getLoginUrl()}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-500 transition-colors"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
             >
               <LogOut className="h-5 w-5" />
               <span className="font-medium">Sign In</span>
@@ -111,57 +111,57 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Dashboard Overview</h2>
-            <p className="text-gray-600 mt-1">Welcome back to FleetMaster. Here's what's happening today.</p>
+            <h2 className="text-3xl font-bold text-foreground">Dashboard Overview</h2>
+            <p className="text-muted-foreground mt-1">Welcome back to FleetMaster. Here's what's happening today.</p>
           </div>
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Total Fleet</CardTitle>
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Car className="h-5 w-5 text-blue-600" />
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Fleet</CardTitle>
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <Car className="h-5 w-5 text-primary" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{totalFleet}</div>
+                <div className="text-3xl font-bold text-foreground">{totalFleet}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Revenue (Est.)</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Revenue (Est.)</CardTitle>
                 <div className="p-2 bg-green-100 rounded-lg">
                   <DollarSign className="h-5 w-5 text-green-600" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-gray-900">${(estimatedRevenue / 1000).toFixed(1)}k</div>
+                <div className="text-3xl font-bold text-foreground">${(estimatedRevenue / 1000).toFixed(1)}k</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">In Maintenance</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">In Maintenance</CardTitle>
                 <div className="p-2 bg-red-100 rounded-lg">
                   <Wrench className="h-5 w-5 text-red-600" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{inMaintenance}</div>
+                <div className="text-3xl font-bold text-foreground">{inMaintenance}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600">Expiring Docs</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Expiring Docs</CardTitle>
                 <div className="p-2 bg-yellow-100 rounded-lg">
                   <AlertTriangle className="h-5 w-5 text-yellow-600" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-gray-900">{expiringDocs}</div>
+                <div className="text-3xl font-bold text-foreground">{expiringDocs}</div>
               </CardContent>
             </Card>
           </div>
@@ -169,10 +169,10 @@ export default function Dashboard() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Fleet Status */}
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900">Fleet Status</CardTitle>
-                <p className="text-sm text-gray-600">Current availability of vehicles</p>
+                <CardTitle className="text-lg font-semibold text-foreground">Fleet Status</CardTitle>
+                <p className="text-sm text-muted-foreground">Current availability of vehicles</p>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center space-y-6">
@@ -219,15 +219,15 @@ export default function Dashboard() {
                   <div className="flex flex-wrap gap-4 justify-center">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Available</span>
+                      <span className="text-sm text-muted-foreground">Available</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Rented</span>
+                      <div className="w-3 h-3 bg-primary rounded-full"></div>
+                      <span className="text-sm text-muted-foreground">Rented</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-sm text-gray-600">Maintenance</span>
+                      <span className="text-sm text-muted-foreground">Maintenance</span>
                     </div>
                   </div>
                 </div>
@@ -235,29 +235,29 @@ export default function Dashboard() {
             </Card>
 
             {/* Fleet Composition */}
-            <Card className="bg-white shadow-sm">
+            <Card className="bg-card shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg font-semibold text-gray-900">Fleet Composition</CardTitle>
-                <p className="text-sm text-gray-600">Distribution by vehicle category</p>
+                <CardTitle className="text-lg font-semibold text-foreground">Fleet Composition</CardTitle>
+                <p className="text-sm text-muted-foreground">Distribution by vehicle category</p>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {Object.entries(categories).map(([category, count]) => (
                     <div key={category} className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">{category}</span>
-                        <span className="font-medium text-gray-900">{count}</span>
+                        <span className="text-muted-foreground">{category}</span>
+                        <span className="font-medium text-foreground">{count}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div
-                          className="bg-blue-600 h-3 rounded-full transition-all"
+                        <div className="w-full bg-secondary rounded-full h-3">
+                          <div
+                            className="bg-primary h-3 rounded-full transition-all"
                           style={{ width: `${(count / maxCategoryCount) * 100}%` }}
                         ></div>
                       </div>
                     </div>
                   ))}
                   {Object.keys(categories).length === 0 && (
-                    <p className="text-center text-gray-500 py-8">No vehicles in fleet yet</p>
+                    <p className="text-center text-muted-foreground py-8">No vehicles in fleet yet</p>
                   )}
                 </div>
               </CardContent>

@@ -366,4 +366,11 @@
 - [x] Update headline and messaging for customers
 - [x] Add customer-focused CTAs (Browse Cars, Book Now)
 - [x] Test customer-facing design
+- [x] Save checkpoint
+
+## Restore Light Apple-Style Minimalistic Theme
+- [x] Review current theme configuration in App.tsx and index.css
+- [x] Restore light theme with Apple-style minimalism
+- [x] Ensure theme persists across all pages
+- [x] Test theme consistency
 - [ ] Save checkpoint
