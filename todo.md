@@ -433,4 +433,11 @@
 - [x] Add bulk action buttons (Mark as Returned, Archive)
 - [x] Add select all/deselect all functionality
 - [x] Test bulk actions with multiple contracts
+- [x] Save checkpoint
+
+## Add Bulk Action Confirmation Dialog
+- [x] Add confirmation dialog state and UI component
+- [x] Show list of affected contracts in dialog
+- [x] Add confirm/cancel buttons
+- [x] Test confirmation flow
 - [ ] Save checkpoint

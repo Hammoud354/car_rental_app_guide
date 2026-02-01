@@ -42,6 +42,8 @@ export default function RentalContracts() {
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"Active" | "Returned" | "Archived" | undefined>("Active");
   const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [pendingBulkAction, setPendingBulkAction] = useState<"Returned" | "Archived" | null>(null);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
@@ -676,10 +678,8 @@ export default function RentalContracts() {
                   size="sm"
                   className="bg-green-600 hover:bg-green-700"
                   onClick={() => {
-                    bulkUpdateMutation.mutate({
-                      contractIds: selectedContracts,
-                      status: "Returned",
-                    });
+                    setPendingBulkAction("Returned");
+                    setConfirmDialogOpen(true);
                   }}
                   disabled={bulkUpdateMutation.isPending}
                 >
@@ -690,10 +690,8 @@ export default function RentalContracts() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    bulkUpdateMutation.mutate({
-                      contractIds: selectedContracts,
-                      status: "Archived",
-                    });
+                    setPendingBulkAction("Archived");
+                    setConfirmDialogOpen(true);
                   }}
                   disabled={bulkUpdateMutation.isPending}
                 >
@@ -1087,6 +1085,62 @@ export default function RentalContracts() {
                 </div>
               );
             })()}
+          </DialogContent>
+        </Dialog>
+        
+        {/* Bulk Action Confirmation Dialog */}
+        <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Bulk Action</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-sm text-gray-600 mb-4">
+                You are about to {pendingBulkAction === "Returned" ? "mark as returned" : "archive"} {selectedContracts.length} contract(s).
+              </p>
+              <div className="max-h-48 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                <p className="text-xs font-semibold text-gray-700 mb-2">Affected Contracts:</p>
+                <ul className="space-y-1">
+                  {selectedContracts.map(contractId => {
+                    const contract = contracts.find((c: any) => c.id === contractId);
+                    const vehicle = vehicles.find((v: any) => v.id === contract?.vehicleId);
+                    return contract ? (
+                      <li key={contractId} className="text-sm py-1.5 px-2 bg-white rounded border">
+                        {contract.clientFirstName} {contract.clientLastName} - {vehicle?.brand} {vehicle?.model}
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setConfirmDialogOpen(false);
+                  setPendingBulkAction(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className={pendingBulkAction === "Returned" ? "bg-green-600 hover:bg-green-700" : ""}
+                onClick={() => {
+                  if (pendingBulkAction) {
+                    bulkUpdateMutation.mutate({
+                      contractIds: selectedContracts,
+                      status: pendingBulkAction,
+                    });
+                  }
+                  setConfirmDialogOpen(false);
+                  setPendingBulkAction(null);
+                }}
+                disabled={bulkUpdateMutation.isPending}
+              >
+                Confirm
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
