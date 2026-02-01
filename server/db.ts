@@ -302,7 +302,7 @@ export async function updateOverdueContracts() {
   for (const contract of overdueContracts) {
     const daysOverdue = Math.floor((now.getTime() - new Date(contract.rentalEndDate).getTime()) / (1000 * 60 * 60 * 24));
     const dailyRate = parseFloat(contract.dailyRate);
-    const lateFeePercentage = parseFloat(contract.lateFeePercentage || "150");
+    const lateFeePercentage = parseFloat(contract.lateFeePercentage || "100");
     const lateFee = (dailyRate * (lateFeePercentage / 100) * daysOverdue).toFixed(2);
     
     const isNewlyOverdue = contract.status === "active";

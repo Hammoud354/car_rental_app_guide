@@ -1,0 +1,37 @@
+{
+  "query": "SELECT id, contractNumber, status, dailyRate, lateFee, lateFeePercentage, rentalEndDate FROM rentalContracts WHERE status = 'overdue' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, contractNumber, status, dailyRate, lateFee, lateFeePercentage, rentalEndDate FROM rentalContracts WHERE status = 'overdue' LIMIT 5;",
+  "rows": [
+    {
+      "id": "180012",
+      "contractNumber": "39",
+      "status": "overdue",
+      "dailyRate": "50.00",
+      "lateFee": "150.00",
+      "lateFeePercentage": "150.00",
+      "rentalEndDate": "2026-01-29 23:18:03"
+    },
+    {
+      "id": "270003",
+      "contractNumber": "52",
+      "status": "overdue",
+      "dailyRate": "45.00",
+      "lateFee": "67.50",
+      "lateFeePercentage": "150.00",
+      "rentalEndDate": "2026-01-31 20:16:39"
+    },
+    {
+      "id": "270014",
+      "contractNumber": "63",
+      "status": "overdue",
+      "dailyRate": "50.00",
+      "lateFee": "75.00",
+      "lateFeePercentage": "150.00",
+      "rentalEndDate": "2026-01-31 21:21:58"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcontractNumber\tstatus\tdailyRate\tlateFee\tlateFeePercentage\trentalEndDate\n180012\t39\toverdue\t50.00\t150.00\t150.00\t2026-01-29 23:18:03\n270003\t52\toverdue\t45.00\t67.50\t150.00\t2026-01-31 20:16:39\n270014\t63\toverdue\t50.00\t75.00\t150.00\t2026-01-31 21:21:58\n",
+  "stderr": "",
+  "execution_time_ms": 1908
+}

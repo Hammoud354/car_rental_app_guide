@@ -538,3 +538,10 @@
 - [x] Add "Total Amount Due" field showing rental amount + late fee
 - [x] Test late fee display with multiple overdue contracts
 - [x] Save checkpoint
+
+## Change Late Fee Calculation to 100%
+- [x] Update backend late fee calculation from 150% to 100% of daily rate
+- [x] Update frontend display text to show "100% of daily rate" instead of "150%"
+- [x] Update database lateFeePercentage field to store 100 instead of 150
+- [x] Test late fee calculation with overdue contracts
+- [x] Save checkpoint

@@ -1013,7 +1013,7 @@ export default function RentalContracts() {
                             </div>
                           </div>
                           <div className="col-span-2">
-                            <div className="text-sm text-red-400">Late Fee (150% of daily rate)</div>
+                            <div className="text-sm text-red-400">Late Fee (100% of daily rate)</div>
                             <div className="text-2xl font-bold text-red-500">${selectedContract.lateFee || "0.00"}</div>
                           </div>
                           <div className="col-span-4 border-t border-border/50 pt-4 mt-4">
