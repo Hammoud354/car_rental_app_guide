@@ -395,4 +395,10 @@
 - [x] Add Contacts navigation item to sidebar
 - [x] Update Layout component with Contacts link
 - [x] Test updated sidebar
+- [x] Save checkpoint
+
+## Add Home Button to Fleet Management Page
+- [x] Add Home button to Fleet Management page header
+- [x] Configure button to redirect to landing page (/)
+- [x] Test Home button functionality
 - [ ] Save checkpoint
