@@ -154,7 +154,11 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (!db) {
     throw new Error("Database not available");
   }
-  const result = await db.insert(vehicles).values(vehicle);
+  // Filter out undefined values to prevent database errors
+  const cleanedVehicle = Object.fromEntries(
+    Object.entries(vehicle).filter(([_, value]) => value !== undefined)
+  ) as InsertVehicle;
+  const result = await db.insert(vehicles).values(cleanedVehicle);
   const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
   const created = await db.select().from(vehicles).where(eq(vehicles.id, insertId)).limit(1);
   if (created.length === 0) {

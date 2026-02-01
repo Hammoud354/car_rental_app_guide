@@ -440,4 +440,10 @@
 - [x] Show list of affected contracts in dialog
 - [x] Add confirm/cancel buttons
 - [x] Test confirmation flow
+- [x] Save checkpoint
+
+## Fix Vehicle Creation Error
+- [x] Investigate vehicle creation form data handling (missing date fields causing undefined values)
+- [x] Fix backend mutation to properly receive and insert form data (filter undefined values)
+- [x] Test vehicle creation with all fields
 - [ ] Save checkpoint
