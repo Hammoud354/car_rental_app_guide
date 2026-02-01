@@ -446,4 +446,12 @@
 - [x] Investigate vehicle creation form data handling (missing date fields causing undefined values)
 - [x] Fix backend mutation to properly receive and insert form data (filter undefined values)
 - [x] Test vehicle creation with all fields
+- [x] Save checkpoint
+
+## Fix Vehicle Not Appearing After Creation
+- [x] Check database to verify vehicle was inserted (231 vehicles exist!)
+- [x] Investigate getAllVehicles query (N+1 problem: 231 separate queries causing timeout)
+- [x] Check frontend display logic
+- [x] Fix display issue (removed N+1 query, simplified to single SELECT)
+- [x] Test vehicle creation and visibility (all 231 vehicles now displaying!)
 - [ ] Save checkpoint

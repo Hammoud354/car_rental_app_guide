@@ -97,46 +97,10 @@ export async function getAllVehicles() {
     return [];
   }
   
-  const now = new Date();
-  
-  // Get all vehicles with their rental status
+  // Simply return all vehicles without checking rental status
+  // The status field in the database should be kept up-to-date when contracts are created/updated
   const allVehicles = await db.select().from(vehicles);
-  
-  // Check each vehicle for active rentals
-  const vehiclesWithStatus = await Promise.all(
-    allVehicles.map(async (vehicle) => {
-      // Check if vehicle has an active rental contract
-      const activeRentals = await db
-        .select()
-        .from(rentalContracts)
-        .where(
-          and(
-            eq(rentalContracts.vehicleId, vehicle.id),
-            lte(rentalContracts.rentalStartDate, now),
-            gte(rentalContracts.rentalEndDate, now)
-          )
-        )
-        .limit(1);
-      
-      // If vehicle has an active rental, override status to "Rented"
-      // Unless it's in Maintenance or Out of Service (those take priority)
-      let effectiveStatus = vehicle.status;
-      if (activeRentals.length > 0) {
-        if (vehicle.status === "Available") {
-          effectiveStatus = "Rented";
-        }
-        // If status is Maintenance or Out of Service, keep that status
-        // (maintenance/repairs take priority over rental status)
-      }
-      
-      return {
-        ...vehicle,
-        status: effectiveStatus,
-      };
-    })
-  );
-  
-  return vehiclesWithStatus;
+  return allVehicles;
 }
 
 export async function getVehicleById(id: number) {
