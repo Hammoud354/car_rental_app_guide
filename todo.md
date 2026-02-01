@@ -554,3 +554,11 @@
 - [x] Integrate WhatsApp sending into updateOverdueContracts function
 - [x] Test WhatsApp notifications when contracts become overdue
 - [x] Save checkpoint
+
+## Fix Late Fee Calculation Bug - Incorrect Days Overdue
+- [x] Investigate why late fee shows $60 instead of $40 for 1 day overdue
+- [x] Check days overdue calculation logic in updateOverdueContracts
+- [x] Fix calculation to correctly count overdue days
+- [x] Test with contract: Start 31/01/2026, Return 01/02/2026, 1 day overdue
+- [x] Verify correct calculation: $40 rental + $40 late fee = $80 total
+- [x] Save checkpoint
