@@ -389,4 +389,10 @@
 - [x] Keep only: Overview, Fleet Management, Reservations
 - [x] Update Layout component navigation
 - [x] Test updated sidebar
+- [x] Save checkpoint
+
+## Add Contacts Page to Sidebar
+- [x] Add Contacts navigation item to sidebar
+- [x] Update Layout component with Contacts link
+- [x] Test updated sidebar
 - [ ] Save checkpoint
