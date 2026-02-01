@@ -1,2 +1,0 @@
-ALTER TABLE `rentalContracts` ADD `contractNumber` varchar(50) NOT NULL;--> statement-breakpoint
-ALTER TABLE `rentalContracts` ADD CONSTRAINT `rentalContracts_contractNumber_unique` UNIQUE(`contractNumber`);

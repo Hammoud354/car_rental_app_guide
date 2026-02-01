@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -175,24 +175,18 @@ export default function FleetManagement() {
       {/* Main Content */}
       <main className="flex-1 p-8">
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-2">Fleet</h1>
-            <p className="text-lg text-muted-foreground font-light">Manage your vehicle inventory with ease</p>
+            <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">Fleet Operations</div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Fleet Management</h1>
+            <p className="text-muted-foreground mt-2">Manage your vehicle inventory and track maintenance</p>
           </div>
           
-          <div className="flex gap-3">
-            <Link href="/">
-              <Button variant="outline" className="rounded-full px-6 h-11">
-                <Home className="mr-2 h-4 w-4" />
-                Home
-              </Button>
-            </Link>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="apple-button h-11">
+              <Button className="font-mono">
                 <Plus className="mr-2 h-4 w-4" />
-                Add Vehicle
+                ADD VEHICLE
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -307,7 +301,6 @@ export default function FleetManagement() {
               </form>
             </DialogContent>
           </Dialog>
-          </div>
         </div>
 
         {isLoading ? (
@@ -318,7 +311,7 @@ export default function FleetManagement() {
         ) : vehicles && vehicles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {vehicles.map((vehicle) => (
-              <Card key={vehicle.id} className="apple-card border-none">
+              <Card key={vehicle.id} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>

@@ -102,7 +102,6 @@ export type InsertClient = typeof clients.$inferInsert;
  */
 export const rentalContracts = mysqlTable("rentalContracts", {
   id: int("id").autoincrement().primaryKey(),
-  contractNumber: varchar("contractNumber", { length: 50 }).unique(),
   vehicleId: int("vehicleId").notNull(),
   clientId: int("clientId"), // Optional: reference to clients table if using existing client
   // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients
@@ -121,7 +120,6 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
   discount: decimal("discount", { precision: 10, scale: 2 }).default("0.00"),
   finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).notNull(),
-  status: mysqlEnum("status", ["active", "completed", "overdue"]).default("active"),
   signatureData: text("signatureData"), // Base64 encoded signature image
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

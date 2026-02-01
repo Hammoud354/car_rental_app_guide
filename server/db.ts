@@ -1,4 +1,4 @@
-import { eq, and, lte, gte, sql, desc } from "drizzle-orm";
+import { eq, and, lte, gte, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -210,7 +210,7 @@ export async function getAllRentalContracts() {
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  return await db.select().from(rentalContracts).orderBy(desc(rentalContracts.createdAt));
+  return await db.select().from(rentalContracts);
 }
 
 export async function getRentalContractById(id: number) {

@@ -1,9 +1,8 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,48 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Search } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-
-// Helper function to determine contract status
-const getContractStatus = (startDate: Date | string, endDate: Date | string, status?: string) => {
-  const now = new Date();
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  
-  // If status is explicitly set, use it
-  if (status && ['active', 'completed', 'overdue'].includes(status)) {
-    return status as 'active' | 'completed' | 'overdue';
-  }
-  
-  // Otherwise determine based on dates
-  if (now < start) {
-    return 'active'; // Future contract
-  } else if (now >= start && now <= end) {
-    return 'active'; // Ongoing
-  } else if (now > end) {
-    return 'overdue'; // Past due date
-  }
-  return 'active';
-};
-
-const getStatusBadgeVariant = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'default'; // Green
-    case 'completed':
-      return 'secondary'; // Blue
-    case 'overdue':
-      return 'destructive'; // Red
-    default:
-      return 'default';
-  }
-};
-
-const getStatusLabel = (status: string) => {
-  return status.charAt(0).toUpperCase() + status.slice(1);
-};
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
@@ -81,42 +41,9 @@ export default function RentalContracts() {
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   
-  // Search and filter states
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.list.useQuery();
   const { data: clients = [] } = trpc.clients.list.useQuery();
-  
-  // Filtered contracts based on search and status filter
-  const filteredContracts = useMemo(() => {
-    return contracts.filter((contract: any) => {
-      const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
-      const contractStatus = getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status);
-      
-      // Status filter
-      if (statusFilter !== "all" && contractStatus !== statusFilter) {
-        return false;
-      }
-      
-      // Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const clientName = `${contract.clientFirstName} ${contract.clientLastName}`.toLowerCase();
-        const contractNumber = (contract.contractNumber || "").toLowerCase();
-        const vehiclePlate = (vehicle?.plateNumber || "").toLowerCase();
-        
-        return (
-          clientName.includes(query) ||
-          contractNumber.includes(query) ||
-          vehiclePlate.includes(query)
-        );
-      }
-      
-      return true;
-    });
-  }, [contracts, vehicles, searchQuery, statusFilter]);
   
   // Auto-set start date to today when dialog opens
   useEffect(() => {
@@ -205,34 +132,29 @@ export default function RentalContracts() {
     setShowInspection(true);
   };
 
-  const utils = trpc.useUtils();
-  const addDamageMark = trpc.contracts.addDamageMark.useMutation();
-  
-  const handleInspectionComplete = async (damageMarks: any[], signatureData: string) => {
+  const handleInspectionComplete = (damageMarks: any[], signatureData: string) => {
     if (!contractData) return;
     
     createContract.mutate({
       ...contractData,
       signatureData,
     }, {
-      onSuccess: async (contract) => {
-        // Save damage marks sequentially
-        for (const mark of damageMarks) {
-          await addDamageMark.mutateAsync({
+      onSuccess: (contract) => {
+        // Save damage marks
+        damageMarks.forEach(mark => {
+          trpc.contracts.addDamageMark.useMutation().mutate({
             contractId: contract.id,
             xPosition: mark.x.toString(),
             yPosition: mark.y.toString(),
             description: mark.description,
           });
-        }
-        
-        // Invalidate contracts list to refresh
-        await utils.contracts.list.invalidate();
-        
+        });
         setShowInspection(false);
         setContractData(null);
         setIsCreateDialogOpen(false);
         toast.success("Contract created successfully!");
+        // Redirect to Fleet Management page
+        setLocation("/fleet");
       },
     });
   };
@@ -305,7 +227,6 @@ export default function RentalContracts() {
                   setIsCreateDialogOpen(true);
                 }}
                 contractData={contractData ? {
-                  contractNumber: contractData.contractNumber,
                   clientName: `${contractData.clientFirstName} ${contractData.clientLastName}`,
                   clientLicense: contractData.drivingLicenseNumber,
                   clientPhone: contractData.clientPhone,
@@ -329,12 +250,12 @@ export default function RentalContracts() {
           <>
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-2">Contracts</h1>
-              <p className="text-lg text-muted-foreground font-light">Manage rental agreements with elegance</p>
+              <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>
+              <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
             </div>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="apple-button h-11">
+                <Button className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="h-4 w-4 mr-2" />
                   New Contract
                 </Button>
@@ -582,7 +503,6 @@ export default function RentalContracts() {
                           label="Issue Date"
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
-                          yearRange={{ start: 1990, end: new Date().getFullYear() }}
                         />
                       </div>
                       <div>
@@ -702,54 +622,19 @@ export default function RentalContracts() {
             </Dialog>
           </div>
 
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by client name, contract number, or vehicle plate..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 rounded-full"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-full sm:w-48 h-11 rounded-full">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Contracts</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="overdue">Overdue</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {/* Contracts List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredContracts.map((contract: any) => {
+            {contracts.map((contract: any) => {
               const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
               return (
-                <Card key={contract.id} className="apple-card border-none">
+                <Card key={contract.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span className="text-lg">
                         {contract.clientFirstName} {contract.clientLastName}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={getStatusBadgeVariant(getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status))}>
-                          {getStatusLabel(getContractStatus(contract.rentalStartDate, contract.rentalEndDate, contract.status))}
-                        </Badge>
-                        <FileText className="h-5 w-5 text-blue-600" />
-                      </div>
+                      <FileText className="h-5 w-5 text-blue-600" />
                     </CardTitle>
-                    {contract.contractNumber && (
-                      <div className="text-sm font-mono text-gray-600 mt-1">
-                        {contract.contractNumber}
-                      </div>
-                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -804,23 +689,15 @@ export default function RentalContracts() {
             })}
           </div>
 
-          {filteredContracts.length === 0 && (
-            <Card className="apple-card p-12 text-center col-span-full">
-              <FileText className="h-16 w-16 text-muted-foreground/40 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">
-                {contracts.length === 0 ? "No Contracts Yet" : "No Results Found"}
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                {contracts.length === 0 
-                  ? "Create your first rental contract to get started"
-                  : "Try adjusting your search or filter criteria"}
-              </p>
-              {contracts.length === 0 && (
-                <Button onClick={() => setIsCreateDialogOpen(true)} className="apple-button">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Contract
-                </Button>
-              )}
+          {contracts.length === 0 && (
+            <Card className="p-12 text-center">
+              <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
+              <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
+              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-orange-500 hover:bg-orange-600">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Contract
+              </Button>
             </Card>
           )}
           </>
@@ -832,24 +709,11 @@ export default function RentalContracts() {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
-              {selectedContract?.contractNumber && (
-                <div className="text-sm font-mono text-gray-400 mt-2">
-                  Contract Number: {selectedContract.contractNumber}
-                </div>
-              )}
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
                 <div className="space-y-6">
-                  {/* Contract Number - Read Only */}
-                  {selectedContract.contractNumber && (
-                    <div className="bg-blue-900/30 border border-blue-500/50 p-4 rounded-lg">
-                      <div className="text-sm text-blue-300 mb-1">Contract Number (Read-Only)</div>
-                      <div className="font-mono text-xl font-bold text-blue-400">{selectedContract.contractNumber}</div>
-                    </div>
-                  )}
-                  
                   {/* Client Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Information</h3>

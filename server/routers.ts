@@ -163,19 +163,10 @@ export const appRouter = router({
           });
         }
         
-        // Generate simple sequential contract number
-        const existingContracts = await db.getAllRentalContracts();
-        const maxNumber = existingContracts.reduce((max, contract) => {
-          const num = parseInt(contract.contractNumber || '0', 10);
-          return num > max ? num : max;
-        }, 0);
-        const contractNumber = String(maxNumber + 1);
-        
-        // Create contract with client ID and contract number
+        // Create contract with client ID
         return await db.createRentalContract({
           ...input,
           clientId: client.id,
-          contractNumber,
         });
       }),
     

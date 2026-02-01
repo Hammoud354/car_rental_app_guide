@@ -13,7 +13,6 @@ interface DateDropdownSelectorProps {
   value?: Date;
   onChange: (date: Date | undefined) => void;
   required?: boolean;
-  yearRange?: { start: number; end: number };
 }
 
 export function DateDropdownSelector({
@@ -22,12 +21,9 @@ export function DateDropdownSelector({
   value,
   onChange,
   required = false,
-  yearRange,
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
-  const startYear = yearRange?.start ?? currentYear - 10;
-  const endYear = yearRange?.end ?? currentYear + 9;
-  const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i).reverse();
+  const years = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
   const months = [
     { value: 0, label: "January" },
     { value: 1, label: "February" },
