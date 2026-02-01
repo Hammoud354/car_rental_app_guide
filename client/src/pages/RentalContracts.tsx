@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -253,7 +253,14 @@ export default function RentalContracts() {
               <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>
               <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
             </div>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <div className="flex gap-3">
+              <Link href="/">
+                <Button variant="outline" className="font-mono">
+                  <Home className="mr-2 h-4 w-4" />
+                  HOME
+                </Button>
+              </Link>
+              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="h-4 w-4 mr-2" />
@@ -620,6 +627,7 @@ export default function RentalContracts() {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Contracts List */}

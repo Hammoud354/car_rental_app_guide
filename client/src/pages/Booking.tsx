@@ -1,18 +1,28 @@
 import Layout from "@/components/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Smartphone, CreditCard, Calendar, FileSignature, Zap, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Smartphone, CreditCard, Calendar, FileSignature, Zap, Search, Home } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Booking() {
   return (
     <Layout>
       <div className="space-y-8">
-        <div className="flex flex-col gap-2">
-          <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 02</div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Booking Engine Architecture</h1>
-          <p className="text-muted-foreground max-w-2xl">
-            The customer-facing interface designed for conversion. This module manages availability, pricing logic, and the secure transaction flow.
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 02</div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Booking Engine Architecture</h1>
+            <p className="text-muted-foreground max-w-2xl">
+              The customer-facing interface designed for conversion. This module manages availability, pricing logic, and the secure transaction flow.
+            </p>
+          </div>
+          <Link href="/">
+            <Button variant="outline" className="font-mono">
+              <Home className="mr-2 h-4 w-4" />
+              HOME
+            </Button>
+          </Link>
         </div>
 
         {/* User Flow Visualization */}

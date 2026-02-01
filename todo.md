@@ -401,4 +401,13 @@
 - [x] Add Home button to Fleet Management page header
 - [x] Configure button to redirect to landing page (/)
 - [x] Test Home button functionality
+- [x] Save checkpoint
+
+## Add HOME Button to All Pages
+- [x] Identify all pages needing HOME button (Dashboard, RentalContracts, Booking, Maintenance)
+- [x] Add HOME button to Dashboard page
+- [x] Add HOME button to Rental Contracts page
+- [x] Add HOME button to Booking page
+- [x] Add HOME button to Maintenance page
+- [x] Test HOME button on all pages
 - [ ] Save checkpoint

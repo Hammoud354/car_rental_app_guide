@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
@@ -110,9 +110,17 @@ export default function Dashboard() {
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div>
-            <h2 className="text-3xl font-bold text-foreground">Dashboard Overview</h2>
-            <p className="text-muted-foreground mt-1">Welcome back to FleetMaster. Here's what's happening today.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground">Dashboard Overview</h2>
+              <p className="text-muted-foreground mt-1">Welcome back to FleetMaster. Here's what's happening today.</p>
+            </div>
+            <Link href="/">
+              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background hover:bg-accent transition-colors">
+                <Home className="h-4 w-4" />
+                <span className="font-medium">HOME</span>
+              </button>
+            </Link>
           </div>
 
           {/* Metric Cards */}

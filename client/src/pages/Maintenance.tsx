@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText } from "lucide-react";
+import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -134,7 +134,14 @@ export default function Maintenance() {
               <p className="text-gray-600 mt-1">Track and manage vehicle maintenance records</p>
             </div>
             
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <div className="flex gap-3">
+              <Link href="/">
+                <Button variant="outline" className="font-mono">
+                  <Home className="mr-2 h-4 w-4" />
+                  HOME
+                </Button>
+              </Link>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-blue-600 hover:bg-blue-700">
                   <Plus className="mr-2 h-4 w-4" />
@@ -228,6 +235,7 @@ export default function Maintenance() {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
           </div>
 
           {/* Vehicle List with Maintenance Info */}
