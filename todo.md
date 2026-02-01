@@ -373,4 +373,12 @@
 - [x] Restore light theme with Apple-style minimalism
 - [x] Ensure theme persists across all pages
 - [x] Test theme consistency
+- [x] Save checkpoint
+
+## Redesign Landing Page for Agency Management Focus
+- [x] Change messaging from customer rental to agency operations
+- [x] Update headline to focus on fleet management and operations
+- [x] Replace customer CTAs with agency management actions
+- [x] Update features to highlight agency tools (tracking, contracts, maintenance)
+- [x] Test updated landing page
 - [ ] Save checkpoint
