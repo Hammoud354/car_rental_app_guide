@@ -326,6 +326,28 @@ export async function updateContractStatus(contractId: number, status: "Active" 
   return updated[0];
 }
 
+export async function bulkUpdateContractStatus(contractIds: number[], status: "Active" | "Returned" | "Archived") {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const updateData: any = { status };
+  if (status === "Returned") {
+    updateData.returnedAt = new Date();
+  }
+  
+  // Update all contracts with the given IDs
+  for (const contractId of contractIds) {
+    await db
+      .update(rentalContracts)
+      .set(updateData)
+      .where(eq(rentalContracts.id, contractId));
+  }
+  
+  return { success: true, updatedCount: contractIds.length };
+}
+
 export async function getDamageMarksByContractId(contractId: number) {
   const db = await getDb();
   if (!db) {

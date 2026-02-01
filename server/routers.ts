@@ -217,6 +217,15 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return await db.updateContractStatus(input.contractId, input.status);
       }),
+    
+    bulkUpdateStatus: publicProcedure
+      .input(z.object({
+        contractIds: z.array(z.number()),
+        status: z.enum(["Active", "Returned", "Archived"]),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.bulkUpdateContractStatus(input.contractIds, input.status);
+      }),
   }),
 
   // Client Management Router

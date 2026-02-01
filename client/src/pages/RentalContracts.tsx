@@ -41,6 +41,7 @@ export default function RentalContracts() {
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<"Active" | "Returned" | "Archived" | undefined>("Active");
+  const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
@@ -54,6 +55,17 @@ export default function RentalContracts() {
     },
     onError: (error) => {
       toast.error("Failed to mark contract as returned: " + error.message);
+    },
+  });
+  
+  const bulkUpdateMutation = trpc.contracts.bulkUpdateStatus.useMutation({
+    onSuccess: (data) => {
+      toast.success(`${data.updatedCount} contract(s) updated successfully`);
+      setSelectedContracts([]);
+      utils.contracts.listByStatus.invalidate();
+    },
+    onError: (error) => {
+      toast.error("Failed to update contracts: " + error.message);
     },
   });
   
@@ -642,6 +654,55 @@ export default function RentalContracts() {
             </div>
           </div>
           
+          {/* Bulk Actions Bar */}
+          {selectedContracts.length > 0 && (
+            <div className="flex items-center justify-between mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center gap-4">
+                <span className="font-semibold text-blue-900">
+                  {selectedContracts.length} contract(s) selected
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedContracts([])}
+                  className="text-blue-700 hover:text-blue-900"
+                >
+                  Clear Selection
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => {
+                    bulkUpdateMutation.mutate({
+                      contractIds: selectedContracts,
+                      status: "Returned",
+                    });
+                  }}
+                  disabled={bulkUpdateMutation.isPending}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Mark as Returned
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    bulkUpdateMutation.mutate({
+                      contractIds: selectedContracts,
+                      status: "Archived",
+                    });
+                  }}
+                  disabled={bulkUpdateMutation.isPending}
+                >
+                  Archive
+                </Button>
+              </div>
+            </div>
+          )}
+          
           {/* Status Filter Tabs */}
           <div className="flex gap-2 mb-6 border-b border-border pb-2">
             <Button
@@ -672,17 +733,56 @@ export default function RentalContracts() {
             </Button>
           </div>
 
+          {/* Select All Checkbox */}
+          {contracts.length > 0 && (
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="checkbox"
+                id="select-all"
+                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                checked={selectedContracts.length === contracts.length && contracts.length > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedContracts(contracts.map((c: any) => c.id));
+                  } else {
+                    setSelectedContracts([]);
+                  }
+                }}
+              />
+              <label htmlFor="select-all" className="text-sm font-medium text-gray-700 cursor-pointer">
+                Select All ({contracts.length})
+              </label>
+            </div>
+          )}
+          
           {/* Contracts List */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {contracts.map((contract: any) => {
               const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
               return (
-                <Card key={contract.id} className="hover:shadow-lg transition-shadow">
+                <Card key={contract.id} className={`hover:shadow-lg transition-shadow ${
+                  selectedContracts.includes(contract.id) ? "ring-2 ring-primary" : ""
+                }`}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span className="text-lg">
-                        {contract.clientFirstName} {contract.clientLastName}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          checked={selectedContracts.includes(contract.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedContracts([...selectedContracts, contract.id]);
+                            } else {
+                              setSelectedContracts(selectedContracts.filter(id => id !== contract.id));
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <span className="text-lg">
+                          {contract.clientFirstName} {contract.clientLastName}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2">
                         {/* Status Badge */}
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${

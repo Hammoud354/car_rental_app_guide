@@ -425,4 +425,12 @@
 - [x] Add filter tabs (All, Active, Returned, Archived)
 - [x] Add Mark as Returned button to contract cards
 - [x] Test contract return flow
+- [x] Save checkpoint
+
+## Implement Bulk Contract Actions
+- [x] Add bulk status update mutation to backend
+- [x] Add checkbox selection to contract cards
+- [x] Add bulk action buttons (Mark as Returned, Archive)
+- [x] Add select all/deselect all functionality
+- [x] Test bulk actions with multiple contracts
 - [ ] Save checkpoint
