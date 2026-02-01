@@ -40,10 +40,10 @@ export default function RentalContracts() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<"Active" | "Returned" | "Archived" | undefined>("Active");
+  const [statusFilter, setStatusFilter] = useState<"active" | "completed" | "overdue" | undefined>("active");
   const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [pendingBulkAction, setPendingBulkAction] = useState<"Returned" | "Archived" | null>(null);
+  const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
@@ -681,19 +681,19 @@ export default function RentalContracts() {
                   size="sm"
                   className="bg-green-600 hover:bg-green-700"
                   onClick={() => {
-                    setPendingBulkAction("Returned");
+                    setPendingBulkAction("completed");
                     setConfirmDialogOpen(true);
                   }}
                   disabled={bulkUpdateMutation.isPending}
                 >
                   <Check className="mr-2 h-4 w-4" />
-                  Mark as Returned
+                  Mark as completed
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setPendingBulkAction("Archived");
+                    setPendingBulkAction("overdue");
                     setConfirmDialogOpen(true);
                   }}
                   disabled={bulkUpdateMutation.isPending}
@@ -707,24 +707,24 @@ export default function RentalContracts() {
           {/* Status Filter Tabs */}
           <div className="flex gap-2 mb-6 border-b border-border pb-2">
             <Button
-              variant={statusFilter === "Active" ? "default" : "ghost"}
-              onClick={() => setStatusFilter("Active")}
+              variant={statusFilter === "active" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("active")}
               className="relative"
             >
-              Active
-              {statusFilter === "Active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+              active
+              {statusFilter === "active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
-              variant={statusFilter === "Returned" ? "default" : "ghost"}
-              onClick={() => setStatusFilter("Returned")}
+              variant={statusFilter === "completed" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("completed")}
             >
-              Returned
+              completed
             </Button>
             <Button
-              variant={statusFilter === "Archived" ? "default" : "ghost"}
-              onClick={() => setStatusFilter("Archived")}
+              variant={statusFilter === "overdue" ? "default" : "ghost"}
+              onClick={() => setStatusFilter("overdue")}
             >
-              Archived
+              overdue
             </Button>
             <Button
               variant={!statusFilter ? "default" : "ghost"}
@@ -787,11 +787,11 @@ export default function RentalContracts() {
                       <div className="flex items-center gap-2">
                         {/* Status Badge */}
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          contract.status === "Active" ? "bg-green-100 text-green-800" :
-                          contract.status === "Returned" ? "bg-blue-100 text-blue-800" :
+                          contract.status === "active" ? "bg-green-100 text-green-800" :
+                          contract.status === "completed" ? "bg-blue-100 text-blue-800" :
                           "bg-gray-100 text-gray-800"
                         }`}>
-                          {contract.status || "Active"}
+                          {contract.status || "active"}
                         </span>
                         <FileText className="h-5 w-5 text-blue-600" />
                       </div>
@@ -842,18 +842,18 @@ export default function RentalContracts() {
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </Button>
-                        {contract.status === "Active" && (
+                        {contract.status === "active" && (
                           <Button
                             variant="default"
                             size="sm"
                             className="w-full bg-green-600 hover:bg-green-700"
                             onClick={() => {
-                              // Mark as Returned mutation
+                              // Mark as completed mutation
                               markAsReturnedMutation.mutate({ contractId: contract.id });
                             }}
                           >
                             <Check className="mr-2 h-4 w-4" />
-                            Mark as Returned
+                            Mark as completed
                           </Button>
                         )}
                       </div>
@@ -1099,7 +1099,7 @@ export default function RentalContracts() {
             </DialogHeader>
             <div className="py-4">
               <p className="text-sm text-gray-600 mb-4">
-                You are about to {pendingBulkAction === "Returned" ? "mark as returned" : "archive"} {selectedContracts.length} contract(s).
+                You are about to {pendingBulkAction === "completed" ? "mark as returned" : "archive"} {selectedContracts.length} contract(s).
               </p>
               <div className="max-h-48 overflow-y-auto border rounded-md p-3 bg-gray-50">
                 <p className="text-xs font-semibold text-gray-700 mb-2">Affected Contracts:</p>
@@ -1128,7 +1128,7 @@ export default function RentalContracts() {
               </Button>
               <Button
                 variant="default"
-                className={pendingBulkAction === "Returned" ? "bg-green-600 hover:bg-green-700" : ""}
+                className={pendingBulkAction === "completed" ? "bg-green-600 hover:bg-green-700" : ""}
                 onClick={() => {
                   if (pendingBulkAction) {
                     bulkUpdateMutation.mutate({

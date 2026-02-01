@@ -1,0 +1,45 @@
+{
+  "query": "SELECT * FROM __drizzle_migrations ORDER BY created_at DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM __drizzle_migrations ORDER BY created_at DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "263368",
+      "hash": "4f1125dc46d61d88daab6fd9d81165ec74ad51bc86e03c843adbf8008cd66ae4",
+      "created_at": "1769600542641"
+    },
+    {
+      "id": "233371",
+      "hash": "47fa5b9f74aee25da782f06791b8cef9acb90168cf32291c40f75ad82679798d",
+      "created_at": "1769555410471"
+    },
+    {
+      "id": "233370",
+      "hash": "53b6540221f1fed3230fe0d12c5f97e6ae3f97fc284257d73134b044ee4a1ee9",
+      "created_at": "1769554502547"
+    },
+    {
+      "id": "233369",
+      "hash": "d7565cbaba1693825707ef486b224980d5998544f1ec764af083714b2fd631da",
+      "created_at": "1769553474018"
+    },
+    {
+      "id": "233368",
+      "hash": "e9ca17c33951106dcb0655b4af1bd6bb6a0c1aab16175682a6ca0f401b11bfb6",
+      "created_at": "1769552442877"
+    },
+    {
+      "id": "2",
+      "hash": "8917310adaccb8114ccdbb71fdd1d8ef0bccd759bf241c453eeaaf9df921af59",
+      "created_at": "1769547445833"
+    },
+    {
+      "id": "1",
+      "hash": "814a08e40d7fc2bcfd458759d18319198ca8ae394f2fa15617a78678e9c9c93b",
+      "created_at": "1769547356459"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\thash\tcreated_at\n263368\t4f1125dc46d61d88daab6fd9d81165ec74ad51bc86e03c843adbf8008cd66ae4\t1769600542641\n233371\t47fa5b9f74aee25da782f06791b8cef9acb90168cf32291c40f75ad82679798d\t1769555410471\n233370\t53b6540221f1fed3230fe0d12c5f97e6ae3f97fc284257d73134b044ee4a1ee9\t1769554502547\n233369\td7565cbaba1693825707ef486b224980d5998544f1ec764af083714b2fd631da\t1769553474018\n233368\te9ca17c33951106dcb0655b4af1bd6bb6a0c1aab16175682a6ca0f401b11bfb6\t1769552442877\n2\t8917310adaccb8114ccdbb71fdd1d8ef0bccd759bf241c453eeaaf9df921af59\t1769547445833\n1\t814a08e40d7fc2bcfd458759d18319198ca8ae394f2fa15617a78678e9c9c93b\t1769547356459\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}

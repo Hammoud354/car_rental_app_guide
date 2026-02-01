@@ -120,7 +120,7 @@ export const appRouter = router({
     }),
     
     listByStatus: publicProcedure
-      .input(z.object({ status: z.enum(["Active", "Returned", "Archived"]).optional() }))
+      .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
       .query(async ({ input }) => {
         return await db.getRentalContractsByStatus(input.status);
       }),
@@ -170,9 +170,29 @@ export const appRouter = router({
         }
         
         // Create contract with client ID
+        // Pass null for optional fields so Drizzle inserts NULL
+        // Generate unique contract number
+        const contractNumber = `CTR-${Date.now()}`;
+        
         return await db.createRentalContract({
-          ...input,
+          vehicleId: input.vehicleId,
           clientId: client.id,
+          clientFirstName: input.clientFirstName,
+          clientLastName: input.clientLastName,
+          clientNationality: input.clientNationality || null,
+          clientPhone: input.clientPhone || null,
+          clientAddress: input.clientAddress || null,
+          drivingLicenseNumber: input.drivingLicenseNumber,
+          licenseExpiryDate: input.licenseExpiryDate,
+          rentalStartDate: input.rentalStartDate,
+          rentalEndDate: input.rentalEndDate,
+          rentalDays: input.rentalDays,
+          dailyRate: input.dailyRate,
+          totalAmount: input.totalAmount,
+          discount: input.discount || "0.00",
+          finalAmount: input.finalAmount,
+          contractNumber,
+          signatureData: input.signatureData || null,
         });
       }),
     
@@ -212,7 +232,7 @@ export const appRouter = router({
     updateStatus: publicProcedure
       .input(z.object({
         contractId: z.number(),
-        status: z.enum(["Active", "Returned", "Archived"]),
+        status: z.enum(["active", "completed", "overdue"]),
       }))
       .mutation(async ({ input }) => {
         return await db.updateContractStatus(input.contractId, input.status);
@@ -221,7 +241,7 @@ export const appRouter = router({
     bulkUpdateStatus: publicProcedure
       .input(z.object({
         contractIds: z.array(z.number()),
-        status: z.enum(["Active", "Returned", "Archived"]),
+        status: z.enum(["active", "completed", "overdue"]),
       }))
       .mutation(async ({ input }) => {
         return await db.bulkUpdateContractStatus(input.contractIds, input.status);

@@ -57,6 +57,13 @@
       "when": 1769963645582,
       "tag": "0007_colorful_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1769978902975,
+      "tag": "0008_first_talon",
+      "breakpoints": true
     }
   ]
 }

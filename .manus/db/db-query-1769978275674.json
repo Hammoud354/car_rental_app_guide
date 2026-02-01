@@ -1,0 +1,40 @@
+{
+  "query": "SHOW CREATE TABLE rentalContracts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SHOW CREATE TABLE rentalContracts;",
+  "rows": [
+    {
+      "Table": "rentalContracts",
+      "Create Table": "CREATE TABLE `rentalContracts` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `vehicleId` int(11) NOT NULL,",
+    "  `clientFirstName` varchar(100) DEFAULT NULL,",
+    "  `clientLastName` varchar(100) DEFAULT NULL,",
+    "  `clientNationality` varchar(100) DEFAULT NULL,",
+    "  `drivingLicenseNumber` varchar(100) DEFAULT NULL,",
+    "  `licenseIssueDate` timestamp NULL DEFAULT NULL,",
+    "  `licenseExpiryDate` timestamp NULL DEFAULT NULL,",
+    "  `rentalStartDate` timestamp NOT NULL,",
+    "  `rentalEndDate` timestamp NOT NULL,",
+    "  `signatureData` text DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `clientPhone` varchar(20) DEFAULT NULL,",
+    "  `clientAddress` text DEFAULT NULL,",
+    "  `rentalDays` int(11) NOT NULL,",
+    "  `dailyRate` decimal(10,2) NOT NULL,",
+    "  `totalAmount` decimal(10,2) NOT NULL,",
+    "  `discount` decimal(10,2) DEFAULT '0.00',",
+    "  `finalAmount` decimal(10,2) NOT NULL,",
+    "  `clientId` int(11) DEFAULT NULL,",
+    "  `contractNumber` varchar(50) NOT NULL,",
+    "  `status` enum('active','completed','overdue') DEFAULT 'active',",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=300001"
+  ],
+  "stdout": "Table\tCreate Table\nrentalContracts\tCREATE TABLE `rentalContracts` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `vehicleId` int(11) NOT NULL,\n  `clientFirstName` varchar(100) DEFAULT NULL,\n  `clientLastName` varchar(100) DEFAULT NULL,\n  `clientNationality` varchar(100) DEFAULT NULL,\n  `drivingLicenseNumber` varchar(100) DEFAULT NULL,\n  `licenseIssueDate` timestamp NULL DEFAULT NULL,\n  `licenseExpiryDate` timestamp NULL DEFAULT NULL,\n  `rentalStartDate` timestamp NOT NULL,\n  `rentalEndDate` timestamp NOT NULL,\n  `signatureData` text DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `clientPhone` varchar(20) DEFAULT NULL,\n  `clientAddress` text DEFAULT NULL,\n  `rentalDays` int(11) NOT NULL,\n  `dailyRate` decimal(10,2) NOT NULL,\n  `totalAmount` decimal(10,2) NOT NULL,\n  `discount` decimal(10,2) DEFAULT '0.00',\n  `finalAmount` decimal(10,2) NOT NULL,\n  `clientId` int(11) DEFAULT NULL,\n  `contractNumber` varchar(50) NOT NULL,\n  `status` enum('active','completed','overdue') DEFAULT 'active',\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=300001\n",
+  "stderr": "",
+  "execution_time_ms": 1579
+}

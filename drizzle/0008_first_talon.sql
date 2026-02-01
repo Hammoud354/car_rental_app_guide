@@ -1,0 +1,2 @@
+ALTER TABLE `rentalContracts` MODIFY COLUMN `status` enum('active','completed','overdue') NOT NULL DEFAULT 'active';--> statement-breakpoint
+ALTER TABLE `rentalContracts` ADD `contractNumber` varchar(50) NOT NULL;

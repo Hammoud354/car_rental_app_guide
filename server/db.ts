@@ -241,7 +241,7 @@ export async function renewRentalContract(input: { contractId: number; additiona
   return updated[0];
 }
 
-export async function getRentalContractsByStatus(status?: "Active" | "Returned" | "Archived") {
+export async function getRentalContractsByStatus(status?: "active" | "completed" | "overdue") {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts: database not available");
@@ -263,7 +263,7 @@ export async function markContractAsReturned(contractId: number) {
   await db
     .update(rentalContracts)
     .set({
-      status: "Returned",
+      status: "completed",
       returnedAt: new Date(),
     })
     .where(eq(rentalContracts.id, contractId));
@@ -273,14 +273,14 @@ export async function markContractAsReturned(contractId: number) {
   return updated[0];
 }
 
-export async function updateContractStatus(contractId: number, status: "Active" | "Returned" | "Archived") {
+export async function updateContractStatus(contractId: number, status: "active" | "completed" | "overdue") {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
   
   const updateData: any = { status };
-  if (status === "Returned" && !updateData.returnedAt) {
+  if (status === "completed" && !updateData.returnedAt) {
     updateData.returnedAt = new Date();
   }
   
@@ -294,14 +294,14 @@ export async function updateContractStatus(contractId: number, status: "Active" 
   return updated[0];
 }
 
-export async function bulkUpdateContractStatus(contractIds: number[], status: "Active" | "Returned" | "Archived") {
+export async function bulkUpdateContractStatus(contractIds: number[], status: "active" | "completed" | "overdue") {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
   
   const updateData: any = { status };
-  if (status === "Returned") {
+  if (status === "completed") {
     updateData.returnedAt = new Date();
   }
   

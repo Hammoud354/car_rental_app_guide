@@ -1,0 +1,18 @@
+{
+  "query": "SHOW COLUMNS FROM rentalContracts WHERE Field = 'status';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SHOW COLUMNS FROM rentalContracts WHERE Field = 'status';",
+  "rows": [
+    {
+      "Field": "status",
+      "Type": "enum('active','completed','overdue')",
+      "Null": "YES",
+      "Key": "",
+      "Default": "active",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nstatus\tenum('active','completed','overdue')\tYES\t\tactive\t\n",
+  "stderr": "",
+  "execution_time_ms": 1652
+}

@@ -475,4 +475,18 @@
 - [x] Add useEffect to set rental start date to today when dialog opens
 - [x] Ensure users can still change to any past or future date
 - [x] Test default date appears and is changeable
+- [x] Save checkpoint
+
+## Fix Contract Creation Database Error
+- [ ] Investigate signatureData field error in rental contract creation
+- [ ] Check database schema for rentalContracts table
+- [ ] Fix the insert query issue
+- [ ] Test contract creation with inspection signature
+- [ ] Save checkpoint
+
+## Fix Contract Creation Database Error
+- [x] Investigate database schema and contract creation logic
+- [x] Fix schema drift between Drizzle and database (missing returnedAt column)
+- [x] Add returnedAt column to database
+- [x] Test contract creation with inspection
 - [ ] Save checkpoint
