@@ -545,3 +545,12 @@
 - [x] Update database lateFeePercentage field to store 100 instead of 150
 - [x] Test late fee calculation with overdue contracts
 - [x] Save checkpoint
+
+## WhatsApp Notifications for Overdue Contracts
+- [x] Research WhatsApp notification services (Twilio WhatsApp API)
+- [x] Install Twilio SDK
+- [x] Create WhatsApp notification helper function in backend
+- [x] Add phone number configuration (+96176354131)
+- [x] Integrate WhatsApp sending into updateOverdueContracts function
+- [x] Test WhatsApp notifications when contracts become overdue
+- [x] Save checkpoint

@@ -318,12 +318,21 @@ export async function updateOverdueContracts() {
     // Only send notification for newly overdue contracts (not already marked as overdue)
     if (isNewlyOverdue) {
       const { notifyOwner } = await import("./_core/notification");
+      const { sendWhatsApp } = await import("./_core/whatsapp");
       const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, contract.vehicleId)).limit(1);
       const vehicleInfo = vehicle[0] ? `${vehicle[0].brand} ${vehicle[0].model} (${vehicle[0].plateNumber})` : `Vehicle ID ${contract.vehicleId}`;
       
+      const notificationMessage = `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`;
+      
+      // Send in-app notification
       await notifyOwner({
         title: `⚠️ Contract Overdue: ${contract.contractNumber}`,
-        content: `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`
+        content: notificationMessage
+      });
+      
+      // Send WhatsApp notification
+      await sendWhatsApp({
+        message: `🚨 *RENTAL OVERDUE ALERT*\n\n📋 Contract: ${contract.contractNumber}\n👤 Client: ${contract.clientFirstName} ${contract.clientLastName}\n🚗 Vehicle: ${vehicleInfo}\n⏰ Days Overdue: ${daysOverdue}\n💰 Late Fee: $${lateFee}\n\n⚠️ *Action Required:* Contact client immediately to arrange vehicle return!`
       });
     }
     
