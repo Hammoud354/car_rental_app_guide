@@ -462,4 +462,11 @@
 - [x] Implement client-side filtering by model
 - [x] Add search icon and clear button
 - [x] Test search with various queries
+- [x] Save checkpoint
+
+## Allow Past Date Rentals
+- [x] Remove restriction on rental start date (currently defaults to today)
+- [x] Allow selecting any past date for rental start
+- [x] Ensure date calculations still work correctly with past dates
+- [x] Test creating contract with past rental start date
 - [ ] Save checkpoint

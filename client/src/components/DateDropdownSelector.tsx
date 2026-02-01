@@ -23,7 +23,8 @@ export function DateDropdownSelector({
   required = false,
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 20 }, (_, i) => currentYear - 10 + i);
+  // Allow years from 1990 to 10 years in the future for flexibility
+  const years = Array.from({ length: currentYear - 1990 + 11 }, (_, i) => 1990 + i);
   const months = [
     { value: 0, label: "January" },
     { value: 1, label: "February" },

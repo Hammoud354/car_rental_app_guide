@@ -71,12 +71,7 @@ export default function RentalContracts() {
     },
   });
   
-  // Auto-set start date to today when dialog opens
-  useEffect(() => {
-    if (isCreateDialogOpen && !rentalStartDate) {
-      setRentalStartDate(new Date());
-    }
-  }, [isCreateDialogOpen]);
+  // No longer auto-set start date - allow user to select any date including past dates
   
   // Auto-calculate return date when days change (only if start date exists)
   useEffect(() => {
@@ -554,7 +549,19 @@ export default function RentalContracts() {
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-4">Rental Period</h3>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="col-span-2">
+                      <div>
+                        <DateDropdownSelector
+                          id="rentalStartDate"
+                          label="Rental Start Date *"
+                          value={rentalStartDate}
+                          onChange={setRentalStartDate}
+                          required
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          You can select any date, including past dates
+                        </p>
+                      </div>
+                      <div>
                         <Label htmlFor="rentalDays">Number of Rental Days *</Label>
                         <Input
                           id="rentalDays"
@@ -567,19 +574,10 @@ export default function RentalContracts() {
                           required
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Rental dates will be calculated automatically (Start: Today, End: Today + {rentalDays} days)
+                          End date will be calculated automatically
                         </p>
                       </div>
-                      <div>
-                        <Label>Start Date (Auto-set)</Label>
-                        <Input
-                          type="text"
-                          value={rentalStartDate ? rentalStartDate.toLocaleDateString() : ""}
-                          readOnly
-                          className="bg-gray-50"
-                        />
-                      </div>
-                      <div>
+                      <div className="col-span-2">
                         <Label>End Date (Auto-calculated)</Label>
                         <Input
                           type="text"
