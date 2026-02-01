@@ -1,0 +1,1 @@
+ALTER TABLE `rentalContracts` ADD `fuelLevel` enum('Empty','1/4','1/2','3/4','Full') DEFAULT 'Full';

@@ -562,3 +562,11 @@
 - [x] Test with contract: Start 31/01/2026, Return 01/02/2026, 1 day overdue
 - [x] Verify correct calculation: $40 rental + $40 late fee = $80 total
 - [x] Save checkpoint
+
+## Add Fuel Level Indicator to Car Inspection
+- [x] Add fuelLevel field to database schema (rentalContracts table)
+- [x] Update inspection UI to show fuel level gauge/indicator
+- [x] Add fuel level options (Empty, 1/4, 1/2, 3/4, Full)
+- [x] Display fuel level in contract details view
+- [x] Test fuel level tracking when creating new contracts
+- [x] Save checkpoint

@@ -122,6 +122,7 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).notNull(),
   contractNumber: varchar("contractNumber", { length: 50 }).notNull(),
   signatureData: text("signatureData"), // Base64 encoded signature image
+  fuelLevel: mysqlEnum("fuelLevel", ["Empty", "1/4", "1/2", "3/4", "Full"]).default("Full"), // Fuel level at rental start
   lateFeePercentage: decimal("lateFeePercentage", { precision: 5, scale: 2 }).default("150.00"), // Percentage of daily rate for late fees (default 150%)
   lateFee: decimal("lateFee", { precision: 10, scale: 2 }).default("0.00"), // Calculated late fee amount
   status: mysqlEnum("status", ["active", "completed", "overdue"]).default("active").notNull(),

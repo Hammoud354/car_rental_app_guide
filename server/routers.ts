@@ -159,6 +159,7 @@ export const appRouter = router({
         discount: z.string().optional(),
         finalAmount: z.string(),
         signatureData: z.string().optional(),
+        fuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
       }))
       .mutation(async ({ input }) => {
         // Check if client exists by license number
@@ -202,6 +203,7 @@ export const appRouter = router({
           finalAmount: input.finalAmount,
           contractNumber,
           signatureData: input.signatureData || null,
+          fuelLevel: input.fuelLevel || "Full",
         });
       }),
     

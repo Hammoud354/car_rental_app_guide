@@ -33,7 +33,7 @@ interface ContractData {
 }
 
 interface CarDamageInspectionProps {
-  onComplete: (damageMarks: DamageMark[], signatureData: string) => void;
+  onComplete: (damageMarks: DamageMark[], signatureData: string, fuelLevel: string) => void;
   onCancel: () => void;
   contractData?: ContractData;
 }
@@ -42,6 +42,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
+  const [fuelLevel, setFuelLevel] = useState<string>("Full");
   const carDiagramRef = useRef<HTMLDivElement>(null);
 
   const handleCarClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -88,7 +89,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
   const handleSubmit = () => {
     // No signature validation needed since it's now a printable field
     // Pass empty string for signatureData since signature will be added when printed
-    onComplete(damageMarks, "");
+    onComplete(damageMarks, "", fuelLevel);
   };
 
   return (
@@ -399,6 +400,59 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
               </div>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Fuel Level Indicator */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Fuel Level at Rental Start</CardTitle>
+          <p className="text-sm text-gray-600">Select the current fuel level in the vehicle</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              {["Empty", "1/4", "1/2", "3/4", "Full"].map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => setFuelLevel(level)}
+                  className={`flex-1 py-3 px-4 rounded-lg border-2 transition-all ${
+                    fuelLevel === level
+                      ? "border-primary bg-primary/10 font-semibold"
+                      : "border-gray-300 hover:border-gray-400"
+                  }`}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+            {/* Visual Fuel Gauge */}
+            <div className="mt-4">
+              <div className="relative h-12 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
+                <div
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-500 to-green-500 transition-all duration-300"
+                  style={{
+                    width:
+                      fuelLevel === "Empty"
+                        ? "0%"
+                        : fuelLevel === "1/4"
+                        ? "25%"
+                        : fuelLevel === "1/2"
+                        ? "50%"
+                        : fuelLevel === "3/4"
+                        ? "75%"
+                        : "100%",
+                  }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-semibold text-gray-700 drop-shadow-md">
+                    {fuelLevel}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

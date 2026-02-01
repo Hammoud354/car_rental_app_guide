@@ -175,12 +175,13 @@ export default function RentalContracts() {
     setShowInspection(true);
   };
 
-  const handleInspectionComplete = (damageMarks: any[], signatureData: string) => {
+  const handleInspectionComplete = (damageMarks: any[], signatureData: string, fuelLevel: string) => {
     if (!contractData) return;
     
     createContract.mutate({
       ...contractData,
       signatureData,
+      fuelLevel,
     }, {
       onSuccess: (contract) => {
         // Save damage marks
