@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Car, BarChart3, Settings, FileText, Shield, Menu, X } from "lucide-react";
+import { Car, BarChart3, FileText, Menu, X, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -10,11 +10,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: "/", label: "Overview", icon: BarChart3 },
-    { href: "/fleet", label: "Fleet Guide", icon: FileText },
     { href: "/fleet-management", label: "Fleet Management", icon: Car },
-    { href: "/booking", label: "Booking System", icon: FileText },
-    { href: "/operations", label: "Operations", icon: Settings },
-    { href: "/compliance", label: "Compliance", icon: Shield },
+    { href: "/booking", label: "Reservations", icon: Calendar },
   ];
 
   return (

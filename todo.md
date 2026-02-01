@@ -381,4 +381,12 @@
 - [x] Replace customer CTAs with agency management actions
 - [x] Update features to highlight agency tools (tracking, contracts, maintenance)
 - [x] Test updated landing page
+- [x] Save checkpoint
+
+## Clean Up Sidebar Navigation
+- [x] Remove unnecessary pages: Compliance, Fleet Guide, Operations
+- [x] Rename "Booking System" to "Reservations"
+- [x] Keep only: Overview, Fleet Management, Reservations
+- [x] Update Layout component navigation
+- [x] Test updated sidebar
 - [ ] Save checkpoint
