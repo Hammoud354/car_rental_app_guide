@@ -1,4 +1,4 @@
-import { eq, and, lte, gte, sql } from "drizzle-orm";
+import { eq, and, lte, gte, lt, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -271,6 +271,28 @@ export async function markContractAsReturned(contractId: number) {
   // Return the updated contract
   const updated = await db.select().from(rentalContracts).where(eq(rentalContracts.id, contractId)).limit(1);
   return updated[0];
+}
+
+export async function updateOverdueContracts() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot update overdue contracts: database not available");
+    return { updated: 0 };
+  }
+  
+  // Find all active contracts where return date has passed
+  const now = new Date();
+  const result = await db
+    .update(rentalContracts)
+    .set({ status: "overdue" })
+    .where(
+      and(
+        eq(rentalContracts.status, "active"),
+        lt(rentalContracts.rentalEndDate, now)
+      )
+    );
+  
+  return { updated: result[0]?.affectedRows || 0 };
 }
 
 export async function updateContractStatus(contractId: number, status: "active" | "completed" | "overdue") {

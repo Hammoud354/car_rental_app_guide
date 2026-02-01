@@ -50,6 +50,21 @@ export default function RentalContracts() {
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const utils = trpc.useUtils();
   
+  // Mutation to update overdue contracts
+  const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();
+  
+  // Check for overdue contracts when component mounts or status filter changes
+  useEffect(() => {
+    updateOverdueMutation.mutate(undefined, {
+      onSuccess: (result) => {
+        if (result.updated > 0) {
+          console.log(`Updated ${result.updated} overdue contracts`);
+          utils.contracts.listByStatus.invalidate();
+        }
+      },
+    });
+  }, [statusFilter]);
+  
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
     onSuccess: () => {
       toast.success("Contract marked as returned");

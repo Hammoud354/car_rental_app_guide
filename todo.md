@@ -496,4 +496,12 @@
 - [x] Check cache invalidation after contract renewal
 - [x] Fix return date display in active contract list
 - [x] Test contract renewal and verify updated date shows immediately
+- [x] Save checkpoint
+
+## Automatic Overdue Status Update
+- [x] Create backend tRPC procedure to check and update overdue contracts
+- [x] Add SQL query to find active contracts with past return dates
+- [x] Update contract status from 'active' to 'overdue' automatically
+- [x] Call the update procedure when contracts list is loaded
+- [x] Test with contracts that have past return dates
 - [ ] Save checkpoint

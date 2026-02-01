@@ -119,6 +119,11 @@ export const appRouter = router({
       return await db.getAllRentalContracts();
     }),
     
+    updateOverdueContracts: publicProcedure.mutation(async () => {
+      // Update contracts that are active but have passed their return date
+      return await db.updateOverdueContracts();
+    }),
+    
     listByStatus: publicProcedure
       .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
       .query(async ({ input }) => {
