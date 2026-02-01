@@ -112,6 +112,7 @@ export default function RentalContracts() {
   const createContract = trpc.contracts.create.useMutation({
     onSuccess: () => {
       toast.success("Contract created successfully");
+      utils.contracts.list.invalidate(); // Refresh contract list
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
@@ -122,6 +123,7 @@ export default function RentalContracts() {
   const renewContract = trpc.contracts.renew.useMutation({
     onSuccess: () => {
       toast.success("Contract renewed successfully");
+      utils.contracts.list.invalidate(); // Refresh contract list
       setIsRenewDialogOpen(false);
       setIsDetailsDialogOpen(false);
     },

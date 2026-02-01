@@ -489,4 +489,11 @@
 - [x] Fix schema drift between Drizzle and database (missing returnedAt column)
 - [x] Add returnedAt column to database
 - [x] Test contract creation with inspection
+- [x] Save checkpoint
+
+## Fix Contract Renewal Display Issue
+- [x] Investigate why updated return date doesn't display after renewal
+- [x] Check cache invalidation after contract renewal
+- [x] Fix return date display in active contract list
+- [x] Test contract renewal and verify updated date shows immediately
 - [ ] Save checkpoint
