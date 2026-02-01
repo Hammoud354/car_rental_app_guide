@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText, Home, Search, X } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -17,8 +17,20 @@ export default function FleetManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: vehicles, isLoading, refetch } = trpc.fleet.list.useQuery();
+  
+  // Filter vehicles based on search query
+  const filteredVehicles = vehicles?.filter((vehicle) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      vehicle.plateNumber.toLowerCase().includes(query) ||
+      vehicle.model.toLowerCase().includes(query) ||
+      vehicle.brand.toLowerCase().includes(query)
+    );
+  });
   const createMutation = trpc.fleet.create.useMutation({
     onSuccess: () => {
       toast.success("Vehicle added successfully");
@@ -312,14 +324,34 @@ export default function FleetManagement() {
           </div>
         </div>
 
+        {/* Search Bar */}
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search by plate number or model..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 pr-10"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+
         {isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             <p className="mt-4 text-muted-foreground">Loading vehicles...</p>
           </div>
-        ) : vehicles && vehicles.length > 0 ? (
+        ) : filteredVehicles && filteredVehicles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {vehicles.map((vehicle) => (
+            {filteredVehicles.map((vehicle) => (
               <Card key={vehicle.id} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">
@@ -380,6 +412,17 @@ export default function FleetManagement() {
               </Card>
             ))}
           </div>
+        ) : searchQuery ? (
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
+            <CardContent className="py-12 text-center">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-bold mb-2">No Results Found</h3>
+              <p className="text-muted-foreground mb-6">No vehicles match your search query "{searchQuery}"</p>
+              <Button onClick={() => setSearchQuery("")} variant="outline">
+                Clear Search
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardContent className="py-12 text-center">
