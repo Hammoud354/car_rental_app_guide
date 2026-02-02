@@ -1,0 +1,40 @@
+{
+  "query": "SELECT contractNumber FROM rentalContracts ORDER BY id DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT contractNumber FROM rentalContracts ORDER BY id DESC LIMIT 10;",
+  "rows": [
+    {
+      "contractNumber": "CTR-1769988353512"
+    },
+    {
+      "contractNumber": "CTR-1769987368629"
+    },
+    {
+      "contractNumber": "CTR-1769987355951"
+    },
+    {
+      "contractNumber": "CTR-1769987260385"
+    },
+    {
+      "contractNumber": "CTR-1769986955632"
+    },
+    {
+      "contractNumber": "CTR-1769985640626"
+    },
+    {
+      "contractNumber": "65"
+    },
+    {
+      "contractNumber": "64"
+    },
+    {
+      "contractNumber": "63"
+    },
+    {
+      "contractNumber": "62"
+    }
+  ],
+  "messages": [],
+  "stdout": "contractNumber\nCTR-1769988353512\nCTR-1769987368629\nCTR-1769987355951\nCTR-1769987260385\nCTR-1769986955632\nCTR-1769985640626\n65\n64\n63\n62\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

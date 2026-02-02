@@ -600,3 +600,10 @@
 - [x] Ensure contract number is prominently visible in both locations
 - [x] Test contract number display
 - [x] Save checkpoint
+
+## Change Contract Number Format to Sequential
+- [x] Update contract number generation from timestamp-based to sequential (CTR-001, CTR-002, etc.)
+- [x] Query database to get the highest existing contract number
+- [x] Increment and format new contract numbers with leading zeros
+- [x] Test new contract number format
+- [x] Save checkpoint

@@ -187,8 +187,18 @@ export const appRouter = router({
         
         // Create contract with client ID
         // Pass null for optional fields so Drizzle inserts NULL
-        // Generate unique contract number
-        const contractNumber = `CTR-${Date.now()}`;
+        // Generate sequential contract number
+        const existingContracts = await db.getAllRentalContracts();
+        const maxNumber = existingContracts.reduce((max, contract) => {
+          const match = contract.contractNumber.match(/CTR-(\d+)/);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            return num > max ? num : max;
+          }
+          return max;
+        }, 0);
+        const nextNumber = maxNumber + 1;
+        const contractNumber = `CTR-${String(nextNumber).padStart(3, '0')}`;
         
         return await db.createRentalContract({
           vehicleId: input.vehicleId,
