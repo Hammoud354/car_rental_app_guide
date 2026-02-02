@@ -637,3 +637,14 @@
 - [x] Add transition animations for better visual feedback
 - [x] Test button interactions and animations
 - [x] Save checkpoint
+
+## Enhance Maintenance System with Specific Types and Garage Dates
+- [x] Add specific maintenance types to dropdown: Oil Change, Brake Pads Change, Oil + Filter
+- [x] Update database schema to add garageEntryDate and garageExitDate fields
+- [x] Run database migration to apply schema changes
+- [x] Update maintenance form to include garage entry date field
+- [x] Update maintenance form to include garage exit date field
+- [x] Update backend validation to handle new date fields
+- [x] Update maintenance list/details view to display garage dates
+- [x] Test creating maintenance records with all new fields
+- [x] Save checkpoint

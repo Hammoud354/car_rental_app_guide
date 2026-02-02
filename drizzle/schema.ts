@@ -60,7 +60,15 @@ export type InsertVehicle = typeof vehicles.$inferInsert;
 export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   id: int("id").autoincrement().primaryKey(),
   vehicleId: int("vehicleId").notNull(),
-  maintenanceType: mysqlEnum("maintenanceType", ["Routine", "Repair", "Inspection", "Emergency"]).notNull(),
+  maintenanceType: mysqlEnum("maintenanceType", [
+    "Routine", 
+    "Repair", 
+    "Inspection", 
+    "Emergency",
+    "Oil Change",
+    "Brake Pads Change",
+    "Oil + Filter"
+  ]).notNull(),
   description: text("description").notNull(),
   cost: decimal("cost", { precision: 10, scale: 2 }),
   performedAt: timestamp("performedAt").notNull(),
@@ -68,6 +76,8 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   garageLocation: varchar("garageLocation", { length: 300 }),
   mileageAtService: int("mileageAtService"),
   kmDueMaintenance: int("kmDueMaintenance"),
+  garageEntryDate: timestamp("garageEntryDate"), // Date when vehicle entered the garage
+  garageExitDate: timestamp("garageExitDate"), // Date when vehicle exited the garage
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

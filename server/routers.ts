@@ -99,7 +99,7 @@ export const appRouter = router({
     addMaintenanceRecord: publicProcedure
       .input(z.object({
         vehicleId: z.number(),
-        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency"]),
+        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"]),
         description: z.string().min(1),
         cost: z.string().optional(),
         performedAt: z.date(),
@@ -107,6 +107,8 @@ export const appRouter = router({
         garageLocation: z.string().max(300).optional(),
         mileageAtService: z.number().int().optional(),
         kmDueMaintenance: z.number().int().optional(),
+        garageEntryDate: z.date().optional(),
+        garageExitDate: z.date().optional(),
       }))
       .mutation(async ({ input }) => {
         return await db.createMaintenanceRecord(input);

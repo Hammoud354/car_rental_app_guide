@@ -53,6 +53,8 @@ export default function Maintenance() {
       garageLocation: formData.get("garageLocation") as string || undefined,
       mileageAtService: formData.get("mileageAtService") ? parseInt(formData.get("mileageAtService") as string) : undefined,
       kmDueMaintenance: formData.get("kmDueMaintenance") ? parseInt(formData.get("kmDueMaintenance") as string) : undefined,
+      garageEntryDate: formData.get("garageEntryDate") ? new Date(formData.get("garageEntryDate") as string) : undefined,
+      garageExitDate: formData.get("garageExitDate") ? new Date(formData.get("garageExitDate") as string) : undefined,
     });
   };
 
@@ -184,6 +186,9 @@ export default function Maintenance() {
                           <SelectItem value="Repair">Repair</SelectItem>
                           <SelectItem value="Inspection">Inspection</SelectItem>
                           <SelectItem value="Emergency">Emergency</SelectItem>
+                          <SelectItem value="Oil Change">Oil Change</SelectItem>
+                          <SelectItem value="Brake Pads Change">Brake Pads Change</SelectItem>
+                          <SelectItem value="Oil + Filter">Oil + Filter</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -206,6 +211,17 @@ export default function Maintenance() {
                     <div>
                       <Label htmlFor="performedBy">Performed By</Label>
                       <Input id="performedBy" name="performedBy" placeholder="Technician name" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="garageEntryDate">Garage Entry Date</Label>
+                      <Input id="garageEntryDate" name="garageEntryDate" type="date" />
+                    </div>
+                    <div>
+                      <Label htmlFor="garageExitDate">Garage Exit Date</Label>
+                      <Input id="garageExitDate" name="garageExitDate" type="date" />
                     </div>
                   </div>
 
