@@ -37,6 +37,7 @@ export default function RentalContracts() {
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [finalAmount, setFinalAmount] = useState<number>(0);
+  const [pickupKm, setPickupKm] = useState<number>(0);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
@@ -44,6 +45,9 @@ export default function RentalContracts() {
   const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
+  const [returnInspectionOpen, setReturnInspectionOpen] = useState(false);
+  const [selectedContractForReturn, setSelectedContractForReturn] = useState<number | null>(null);
+  const [returnKm, setReturnKm] = useState<number>(0);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
@@ -182,6 +186,7 @@ export default function RentalContracts() {
       totalAmount: totalAmount.toFixed(2),
       discount: discount.toFixed(2),
       finalAmount: finalAmount.toFixed(2),
+      pickupKm,
     };
     
     setContractData(data);
@@ -628,6 +633,23 @@ export default function RentalContracts() {
 
                   {/* Pricing */}
                   <div className="border-t pt-4">
+                    <h3 className="font-semibold mb-4">Vehicle Inspection</h3>
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div>
+                        <Label htmlFor="pickupKm">Pickup Odometer (KM) *</Label>
+                        <Input
+                          id="pickupKm"
+                          name="pickupKm"
+                          type="number"
+                          min="0"
+                          value={pickupKm}
+                          onChange={(e) => setPickupKm(parseInt(e.target.value) || 0)}
+                          placeholder="Enter current odometer reading"
+                          required
+                        />
+                      </div>
+                    </div>
+
                     <h3 className="font-semibold mb-4">Pricing</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -880,8 +902,10 @@ export default function RentalContracts() {
                             size="sm"
                             className="w-full bg-green-600 hover:bg-green-700"
                             onClick={() => {
-                              // Mark as completed mutation
-                              markAsReturnedMutation.mutate({ contractId: contract.id });
+                              // Open return inspection dialog
+                              setSelectedContractForReturn(contract.id);
+                              setReturnKm(0);
+                              setReturnInspectionOpen(true);
                             }}
                           >
                             <Check className="mr-2 h-4 w-4" />
@@ -1235,6 +1259,87 @@ export default function RentalContracts() {
                 disabled={bulkUpdateMutation.isPending}
               >
                 Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Return Inspection Dialog */}
+        <Dialog open={returnInspectionOpen} onOpenChange={setReturnInspectionOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Return Inspection</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <p className="text-sm text-gray-600">
+                Please enter the odometer reading at vehicle return to complete the contract.
+              </p>
+              <div>
+                <Label htmlFor="returnKm">Return Odometer (KM) *</Label>
+                <Input
+                  id="returnKm"
+                  type="number"
+                  min="0"
+                  value={returnKm}
+                  onChange={(e) => setReturnKm(parseInt(e.target.value) || 0)}
+                  placeholder="Enter current odometer reading"
+                  required
+                />
+              </div>
+              {selectedContractForReturn && (() => {
+                const contract = contracts.find(c => c.id === selectedContractForReturn);
+                if (contract && contract.pickupKm && returnKm > 0) {
+                  const kmDriven = returnKm - contract.pickupKm;
+                  return (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="text-sm space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Pickup KM:</span>
+                          <span className="font-semibold">{contract.pickupKm} km</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Return KM:</span>
+                          <span className="font-semibold">{returnKm} km</span>
+                        </div>
+                        <div className="flex justify-between border-t border-blue-300 pt-1 mt-1">
+                          <span className="text-gray-600">Total Driven:</span>
+                          <span className="font-bold text-blue-600">{kmDriven} km</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setReturnInspectionOpen(false);
+                  setSelectedContractForReturn(null);
+                  setReturnKm(0);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="default"
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  if (selectedContractForReturn && returnKm > 0) {
+                    markAsReturnedMutation.mutate({ 
+                      contractId: selectedContractForReturn,
+                      returnKm 
+                    });
+                    setReturnInspectionOpen(false);
+                    setSelectedContractForReturn(null);
+                    setReturnKm(0);
+                  }
+                }}
+                disabled={returnKm <= 0 || markAsReturnedMutation.isPending}
+              >
+                {markAsReturnedMutation.isPending ? "Completing..." : "Complete Contract"}
               </Button>
             </DialogFooter>
           </DialogContent>

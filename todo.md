@@ -657,3 +657,16 @@
 - [x] Add visual indicators for high maintenance cost vehicles
 - [x] Test cost calculation with multiple maintenance records
 - [x] Save checkpoint
+
+## Add Odometer Tracking to Rental Contracts
+- [x] Update database schema to add pickupKm and returnKm fields to rental contracts
+- [x] Run database migration to apply schema changes
+- [x] Add "Pickup KM" field to contract creation form
+- [x] Create return inspection dialog that pops up when marking contract as completed
+- [x] Add "Return KM" field to return inspection dialog
+- [x] Update backend createContract procedure to accept pickupKm
+- [x] Update backend completeContract procedure to accept returnKm
+- [x] Display pickup and return KM in contract details view
+- [x] Calculate total KM driven during rental (returnKm - pickupKm)
+- [x] Test complete odometer tracking flow (create → complete)
+- [x] Save checkpoint

@@ -162,6 +162,7 @@ export const appRouter = router({
         finalAmount: z.string(),
         signatureData: z.string().optional(),
         fuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
+        pickupKm: z.number().int().optional(),
       }))
       .mutation(async ({ input }) => {
         // Check if vehicle already has an active contract
@@ -253,9 +254,12 @@ export const appRouter = router({
       }),
     
     markAsReturned: publicProcedure
-      .input(z.object({ contractId: z.number() }))
+      .input(z.object({ 
+        contractId: z.number(),
+        returnKm: z.number().optional()
+      }))
       .mutation(async ({ input }) => {
-        return await db.markContractAsReturned(input.contractId);
+        return await db.markContractAsReturned(input.contractId, input.returnKm);
       }),
     
     delete: publicProcedure
