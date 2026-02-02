@@ -357,6 +357,142 @@ export const appRouter = router({
         return await db.getVehicleFinancialDetails(input.vehicleId);
       }),
   }),
+
+  // Export Router
+  export: router({
+    profitabilityExcel: publicProcedure.query(async ({ ctx }) => {
+      const XLSX = await import('xlsx');
+      const vehicles = await db.getVehicleProfitabilityAnalytics();
+      
+      // Prepare data for Excel
+      const data = vehicles.map((v: any) => ({
+        'Plate Number': v.plateNumber,
+        'Brand': v.brand,
+        'Model': v.model,
+        'Year': v.year,
+        'Total Revenue': `$${v.totalRevenue.toFixed(2)}`,
+        'Maintenance Cost': `$${v.totalMaintenanceCost.toFixed(2)}`,
+        'Insurance Cost': `$${v.insuranceCost.toFixed(2)}`,
+        'Net Profit': `$${v.netProfit.toFixed(2)}`,
+        'Profit Margin': `${v.profitMargin.toFixed(1)}%`,
+        'Number of Rentals': v.rentalCount
+      }));
+      
+      // Create workbook and worksheet
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(data);
+      
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 15 }, // Plate Number
+        { wch: 12 }, // Brand
+        { wch: 12 }, // Model
+        { wch: 6 },  // Year
+        { wch: 15 }, // Total Revenue
+        { wch: 18 }, // Maintenance Cost
+        { wch: 15 }, // Insurance Cost
+        { wch: 12 }, // Net Profit
+        { wch: 14 }, // Profit Margin
+        { wch: 18 }  // Number of Rentals
+      ];
+      
+      XLSX.utils.book_append_sheet(wb, ws, 'Profitability Report');
+      
+      // Generate buffer
+      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+      
+      // Set response headers
+      ctx.res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      ctx.res.setHeader('Content-Disposition', `attachment; filename="profitability-report-${new Date().toISOString().split('T')[0]}.xlsx"`);
+      ctx.res.send(buffer);
+      
+      return { success: true };
+    }),
+    
+    profitabilityPDF: publicProcedure.query(async ({ ctx }) => {
+      const PDFDocument = (await import('pdfkit')).default;
+      const vehicles = await db.getVehicleProfitabilityAnalytics();
+      
+      // Create PDF document
+      const doc = new PDFDocument({ margin: 50 });
+      
+      // Set response headers
+      ctx.res.setHeader('Content-Type', 'application/pdf');
+      ctx.res.setHeader('Content-Disposition', `attachment; filename="profitability-report-${new Date().toISOString().split('T')[0]}.pdf"`);
+      
+      // Pipe PDF to response
+      doc.pipe(ctx.res);
+      
+      // Add title
+      doc.fontSize(20).text('Vehicle Profitability Report', { align: 'center' });
+      doc.moveDown();
+      doc.fontSize(12).text(`Generated: ${new Date().toLocaleDateString()}`, { align: 'center' });
+      doc.moveDown(2);
+      
+      // Calculate totals
+      const totals = vehicles.reduce((acc: { revenue: number; maintenance: number; insurance: number; profit: number }, v: any) => ({
+        revenue: acc.revenue + v.totalRevenue,
+        maintenance: acc.maintenance + v.totalMaintenanceCost,
+        insurance: acc.insurance + v.insuranceCost,
+        profit: acc.profit + v.netProfit
+      }), { revenue: 0, maintenance: 0, insurance: 0, profit: 0 });
+      
+      // Add summary section
+      doc.fontSize(14).text('Fleet Summary', { underline: true });
+      doc.moveDown(0.5);
+      doc.fontSize(11);
+      doc.text(`Total Revenue: $${totals.revenue.toFixed(2)}`);
+      doc.text(`Total Maintenance: $${totals.maintenance.toFixed(2)}`);
+      doc.text(`Total Insurance: $${totals.insurance.toFixed(2)}`);
+      doc.text(`Net Profit: $${totals.profit.toFixed(2)}`);
+      doc.text(`Profit Margin: ${((totals.profit / totals.revenue) * 100).toFixed(1)}%`);
+      doc.moveDown(2);
+      
+      // Add vehicle details table
+      doc.fontSize(14).text('Vehicle Details', { underline: true });
+      doc.moveDown(0.5);
+      doc.fontSize(9);
+      
+      // Table header
+      const tableTop = doc.y;
+      doc.text('Vehicle', 50, tableTop, { width: 100 });
+      doc.text('Revenue', 150, tableTop, { width: 70, align: 'right' });
+      doc.text('Maintenance', 220, tableTop, { width: 70, align: 'right' });
+      doc.text('Insurance', 290, tableTop, { width: 70, align: 'right' });
+      doc.text('Net Profit', 360, tableTop, { width: 70, align: 'right' });
+      doc.text('Margin', 430, tableTop, { width: 60, align: 'right' });
+      doc.text('Rentals', 490, tableTop, { width: 50, align: 'right' });
+      
+      doc.moveTo(50, tableTop + 15).lineTo(540, tableTop + 15).stroke();
+      doc.moveDown(0.5);
+      
+      // Table rows
+      vehicles.forEach((v: any, i: number) => {
+        const y = doc.y;
+        
+        // Check if we need a new page
+        if (y > 700) {
+          doc.addPage();
+          doc.fontSize(9);
+        }
+        
+        doc.text(`${v.plateNumber} (${v.brand} ${v.model})`, 50, doc.y, { width: 100 });
+        doc.text(`$${v.totalRevenue.toFixed(2)}`, 150, y, { width: 70, align: 'right' });
+        doc.text(`$${v.totalMaintenanceCost.toFixed(2)}`, 220, y, { width: 70, align: 'right' });
+        doc.text(`$${v.insuranceCost.toFixed(2)}`, 290, y, { width: 70, align: 'right' });
+        doc.text(`$${v.netProfit.toFixed(2)}`, 360, y, { width: 70, align: 'right' });
+        doc.text(`${v.profitMargin.toFixed(1)}%`, 430, y, { width: 60, align: 'right' });
+        doc.text(`${v.rentalCount}`, 490, y, { width: 50, align: 'right' });
+        
+        doc.moveDown(0.5);
+      });
+      
+      // Finalize PDF
+      doc.end();
+      
+      return { success: true };
+    })
+  }),
 });
 
 export type AppRouter = typeof appRouter;

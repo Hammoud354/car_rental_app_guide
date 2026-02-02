@@ -712,3 +712,14 @@
 - [x] Fix any text overflow or cramped spacing issues
 - [x] Test dialog readability and layout
 - [x] Save checkpoint
+
+## Export Profitability Reports (PDF & Excel)
+- [x] Install required libraries (xlsx for Excel, pdfkit or similar for PDF)
+- [x] Create backend endpoint to export profitability data as Excel
+- [x] Create backend endpoint to export profitability data as PDF
+- [x] Add Export to Excel button to profitability dashboard
+- [x] Add Export to PDF button to profitability dashboard
+- [x] Format exported reports with proper headers, styling, and branding
+- [x] Test Excel export with real data
+- [x] Test PDF export with real data
+- [x] Save checkpoint
