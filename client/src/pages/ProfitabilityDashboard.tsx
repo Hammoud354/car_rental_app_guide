@@ -279,22 +279,22 @@ export default function ProfitabilityDashboard() {
               <div>
                 <h3 className="font-semibold text-lg mb-3">Rental History ({vehicleDetails.contracts.length})</h3>
                 <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
+                  <table className="w-full">
                     <thead className="bg-muted">
                       <tr>
-                        <th className="text-left p-2">Contract #</th>
-                        <th className="text-left p-2">Start Date</th>
-                        <th className="text-left p-2">End Date</th>
-                        <th className="text-right p-2">Amount</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">Contract #</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">Start Date</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">End Date</th>
+                        <th className="text-right px-4 py-3 font-semibold text-sm">Amount</th>
                       </tr>
                     </thead>
                     <tbody>
                       {vehicleDetails.contracts.slice(0, 10).map((contract) => (
-                        <tr key={contract.id} className="border-t">
-                          <td className="p-2">{contract.contractNumber}</td>
-                          <td className="p-2">{new Date(contract.rentalStartDate).toLocaleDateString()}</td>
-                          <td className="p-2">{new Date(contract.rentalEndDate).toLocaleDateString()}</td>
-                          <td className="text-right p-2 font-medium">${Number(contract.finalAmount).toFixed(2)}</td>
+                        <tr key={contract.id} className="border-t hover:bg-muted/50 transition-colors">
+                          <td className="px-4 py-3 text-sm">{contract.contractNumber}</td>
+                          <td className="px-4 py-3 text-sm">{new Date(contract.rentalStartDate).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-sm">{new Date(contract.rentalEndDate).toLocaleDateString()}</td>
+                          <td className="text-right px-4 py-3 text-sm font-medium">${Number(contract.finalAmount).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -306,26 +306,26 @@ export default function ProfitabilityDashboard() {
               <div>
                 <h3 className="font-semibold text-lg mb-3">Maintenance History ({vehicleDetails.maintenanceRecords.length})</h3>
                 <div className="border rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
+                  <table className="w-full">
                     <thead className="bg-muted">
                       <tr>
-                        <th className="text-left p-2">Date</th>
-                        <th className="text-left p-2">Type</th>
-                        <th className="text-left p-2">Description</th>
-                        <th className="text-right p-2">Cost</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">Date</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">Type</th>
+                        <th className="text-left px-4 py-3 font-semibold text-sm">Description</th>
+                        <th className="text-right px-4 py-3 font-semibold text-sm">Cost</th>
                       </tr>
                     </thead>
                     <tbody>
                       {vehicleDetails.maintenanceRecords.slice(0, 10).map((record) => (
-                        <tr key={record.id} className="border-t">
-                          <td className="p-2">{new Date(record.performedAt).toLocaleDateString()}</td>
-                          <td className="p-2">
-                            <span className="inline-flex px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                        <tr key={record.id} className="border-t hover:bg-muted/50 transition-colors">
+                          <td className="px-4 py-3 text-sm">{new Date(record.performedAt).toLocaleDateString()}</td>
+                          <td className="px-4 py-3 text-sm">
+                            <span className="inline-flex px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">
                               {record.maintenanceType}
                             </span>
                           </td>
-                          <td className="p-2">{record.description || '-'}</td>
-                          <td className="text-right p-2 font-medium">${Number(record.cost).toFixed(2)}</td>
+                          <td className="px-4 py-3 text-sm">{record.description || '-'}</td>
+                          <td className="text-right px-4 py-3 text-sm font-medium">${Number(record.cost).toFixed(2)}</td>
                         </tr>
                       ))}
                     </tbody>

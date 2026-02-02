@@ -704,3 +704,11 @@
 - [x] Validate insurance cost input (must be non-negative number)
 - [x] Test insurance cost updates reflect in profitability calculations
 - [x] Save checkpoint
+
+## Fix Financial Details Dialog Layout
+- [x] Improve table header typography and sizing
+- [x] Add proper cell padding to rental and maintenance history tables
+- [x] Ensure consistent font sizes across all elements
+- [x] Fix any text overflow or cramped spacing issues
+- [x] Test dialog readability and layout
+- [x] Save checkpoint
