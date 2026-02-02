@@ -81,6 +81,7 @@ export default function FleetManagement() {
       mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+      insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       notes: formData.get("notes") as string || undefined,
     });
   };
@@ -105,6 +106,7 @@ export default function FleetManagement() {
         mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
         vin: formData.get("vin") as string || undefined,
         insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+        insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         notes: formData.get("notes") as string || undefined,
       },
     });
@@ -303,6 +305,11 @@ export default function FleetManagement() {
                 <div>
                   <Label htmlFor="insurancePolicyNumber">Insurance Policy Number</Label>
                   <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
+                </div>
+
+                <div>
+                  <Label htmlFor="insuranceCost">Annual Insurance Cost ($)</Label>
+                  <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" />
                 </div>
 
                 <div>
@@ -534,6 +541,11 @@ export default function FleetManagement() {
                 <div>
                   <Label htmlFor="edit-insurancePolicyNumber">Insurance Policy Number</Label>
                   <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-insuranceCost">Annual Insurance Cost ($)</Label>
+                  <Input id="edit-insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.insuranceCost || ""} />
                 </div>
 
                 <div>

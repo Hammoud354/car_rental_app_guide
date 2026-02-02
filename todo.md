@@ -695,3 +695,12 @@
 - [ ] Show revenue trend chart for each vehicle
 - [x] Test profitability calculations with real data
 - [x] Save checkpoint
+
+## Insurance Cost Management
+- [x] Add insurance cost input field to vehicle creation form
+- [x] Add insurance cost update dialog/form for existing vehicles
+- [x] Update backend to handle insurance cost updates
+- [x] Add "Update Insurance" button to vehicle cards or profitability dashboard
+- [x] Validate insurance cost input (must be non-negative number)
+- [x] Test insurance cost updates reflect in profitability calculations
+- [x] Save checkpoint
