@@ -1059,43 +1059,52 @@ export default function RentalContracts() {
                 </div>
               );
             })()}
-            <DialogFooter>
-              <div className="flex w-full justify-between">
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => window.print()} 
-                    variant="outline"
-                    className="print-contract"
-                  >
-                    🖨️ Print Contract
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      if (selectedContract && window.confirm(`Are you sure you want to delete contract ${selectedContract.contractNumber}? This action cannot be undone.`)) {
-                        deleteContract.mutate({ contractId: selectedContract.id });
-                      }
-                    }} 
-                    variant="destructive"
-                  >
-                    🗑️ Delete Contract
-                  </Button>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => {
-                      setAdditionalDays(1);
-                      setIsRenewDialogOpen(true);
-                    }} 
-                    className="bg-orange-600 hover:bg-orange-700"
-                  >
-                    Renew Contract
-                  </Button>
-                  <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-                    Close
-                  </Button>
-                </div>
+            <div className="mt-6 pt-4 border-t border-gray-700">
+              {/* Button grid layout - 2x2 on mobile, single row on desktop */}
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:justify-between sm:items-center">
+                {/* Left side action buttons */}
+                <Button 
+                  onClick={() => window.print()} 
+                  variant="outline"
+                  className="print-contract col-span-1"
+                  size="default"
+                >
+                  🖨️ Print
+                </Button>
+                <Button 
+                  onClick={() => {
+                    if (selectedContract && window.confirm(`Are you sure you want to delete contract ${selectedContract.contractNumber}? This action cannot be undone.`)) {
+                      deleteContract.mutate({ contractId: selectedContract.id });
+                    }
+                  }} 
+                  variant="destructive"
+                  className="col-span-1"
+                  size="default"
+                >
+                  🗑️ Delete
+                </Button>
+                
+                {/* Right side navigation buttons */}
+                <Button 
+                  onClick={() => {
+                    setAdditionalDays(1);
+                    setIsRenewDialogOpen(true);
+                  }} 
+                  className="bg-orange-600 hover:bg-orange-700 text-white col-span-1"
+                  size="default"
+                >
+                  Renew
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDetailsDialogOpen(false)}
+                  className="col-span-1"
+                  size="default"
+                >
+                  Close
+                </Button>
               </div>
-            </DialogFooter>
+            </div>
           </DialogContent>
         </Dialog>
         

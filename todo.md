@@ -621,4 +621,11 @@
 - [x] Add "Delete Contract" button to contract details dialog
 - [x] Add confirmation dialog before deleting
 - [x] Test deleting a contract
-- [ ] Save checkpoint
+- [x] Save checkpoint
+
+## Fix Overlapping Buttons in Contract Details Dialog
+- [x] Redesign button layout to prevent overlapping
+- [x] Improve button spacing and visual hierarchy
+- [x] Make buttons more eye-friendly with better colors and sizing
+- [x] Test button layout on contract details dialog
+- [x] Save checkpoint
