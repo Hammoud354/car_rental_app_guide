@@ -44,6 +44,7 @@ export const vehicles = mysqlTable("vehicles", {
   vin: varchar("vin", { length: 17 }),
   insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 100 }),
   insuranceExpiryDate: timestamp("insuranceExpiryDate"),
+  insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Annual or total insurance cost
   registrationExpiryDate: timestamp("registrationExpiryDate"),
   photoUrl: text("photoUrl"),
   notes: text("notes"),

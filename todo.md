@@ -680,3 +680,18 @@
 - [x] Test alert appears when return KM >= kmDueMaintenance
 - [x] Test alert doesn't appear when return KM < kmDueMaintenance
 - [x] Save checkpoint
+
+## Vehicle Profitability Dashboard
+- [x] Create backend query to calculate total revenue per vehicle (sum of all completed rental contracts)
+- [x] Create backend query to calculate total maintenance costs per vehicle
+- [x] Add insurance cost tracking field to vehicles table
+- [x] Calculate net profit per vehicle (revenue - maintenance - insurance)
+- [x] Create Dashboard page with vehicle profitability overview table
+- [x] Show key metrics: Total Revenue, Maintenance Costs, Insurance Costs, Net Profit
+- [x] Add profit margin percentage calculation
+- [x] Add color-coded profit indicators (green for profitable, red for loss)
+- [x] Implement individual vehicle detail view with financial breakdown
+- [ ] Add date range filter for financial analysis (all time, this year, this month)
+- [ ] Show revenue trend chart for each vehicle
+- [x] Test profitability calculations with real data
+- [x] Save checkpoint

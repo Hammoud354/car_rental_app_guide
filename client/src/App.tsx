@@ -14,6 +14,7 @@ import Compliance from "./pages/Compliance";
 import FleetManagement from "./pages/FleetManagement";
 import Dashboard from "./pages/Dashboard";
 import Maintenance from "./pages/Maintenance";
+import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -23,6 +24,7 @@ function Router() {
       <Route path="/rental-contracts" component={RentalContracts} />
       <Route path="/404" component={NotFound} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/profitability" component={ProfitabilityDashboard} />
       <Route path="/maintenance" component={Maintenance} />
       <Route path="/fleet" component={Fleet} />
       <Route path="/fleet-management" component={FleetManagement} />

@@ -21,9 +21,9 @@ export default function Home() {
               <Button 
                 size="lg" 
                 className="text-lg px-8"
-                onClick={() => window.location.href = '/dashboard'}
+                onClick={() => window.location.href = '/profitability'}
               >
-                Open Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                View Profitability <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
                 size="lg" 

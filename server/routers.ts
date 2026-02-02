@@ -342,6 +342,19 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  // Profitability Analytics Router
+  analytics: router({
+    vehicleProfitability: publicProcedure.query(async () => {
+      return await db.getVehicleProfitabilityAnalytics();
+    }),
+    
+    vehicleFinancialDetails: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getVehicleFinancialDetails(input.vehicleId);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

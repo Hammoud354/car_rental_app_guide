@@ -1,0 +1,1 @@
+ALTER TABLE `vehicles` ADD `insuranceCost` decimal(10,2);

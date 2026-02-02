@@ -557,3 +557,135 @@ export async function deleteClient(id: number): Promise<void> {
   
   await db.delete(clients).where(eq(clients.id, id));
 }
+
+// Vehicle Profitability Analytics
+export async function getVehicleProfitabilityAnalytics() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Get all vehicles with their financial data
+  const allVehicles = await db.select().from(vehicles);
+  
+  const analytics = await Promise.all(
+    allVehicles.map(async (vehicle) => {
+      // Calculate total revenue from completed contracts
+      const completedContracts = await db
+        .select()
+        .from(rentalContracts)
+        .where(
+          and(
+            eq(rentalContracts.vehicleId, vehicle.id),
+            eq(rentalContracts.status, "completed")
+          )
+        );
+      
+      const totalRevenue = completedContracts.reduce(
+        (sum, contract) => sum + Number(contract.finalAmount || 0),
+        0
+      );
+      
+      // Calculate total maintenance costs
+      const maintenanceHistory = await db
+        .select()
+        .from(maintenanceRecords)
+        .where(eq(maintenanceRecords.vehicleId, vehicle.id));
+      
+      const totalMaintenanceCost = maintenanceHistory.reduce(
+        (sum, record) => sum + Number(record.cost || 0),
+        0
+      );
+      
+      // Get insurance cost
+      const insuranceCost = Number(vehicle.insuranceCost || 0);
+      
+      // Calculate net profit
+      const netProfit = totalRevenue - totalMaintenanceCost - insuranceCost;
+      
+      // Calculate profit margin percentage
+      const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+      
+      return {
+        vehicleId: vehicle.id,
+        plateNumber: vehicle.plateNumber,
+        brand: vehicle.brand,
+        model: vehicle.model,
+        year: vehicle.year,
+        category: vehicle.category,
+        totalRevenue,
+        totalMaintenanceCost,
+        insuranceCost,
+        netProfit,
+        profitMargin,
+        rentalCount: completedContracts.length,
+        maintenanceCount: maintenanceHistory.length,
+      };
+    })
+  );
+  
+  return analytics;
+}
+
+export async function getVehicleFinancialDetails(vehicleId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Get vehicle info
+  const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, vehicleId)).limit(1);
+  
+  if (!vehicle || vehicle.length === 0) {
+    throw new Error("Vehicle not found");
+  }
+  
+  // Get all completed contracts
+  const completedContracts = await db
+    .select()
+    .from(rentalContracts)
+    .where(
+      and(
+        eq(rentalContracts.vehicleId, vehicleId),
+        eq(rentalContracts.status, "completed")
+      )
+    )
+    .orderBy(desc(rentalContracts.rentalStartDate));
+  
+  // Get all maintenance records
+  const maintenanceHistory = await db
+    .select()
+    .from(maintenanceRecords)
+    .where(eq(maintenanceRecords.vehicleId, vehicleId))
+    .orderBy(desc(maintenanceRecords.performedAt));
+  
+  // Calculate totals
+  const totalRevenue = completedContracts.reduce(
+    (sum, contract) => sum + Number(contract.finalAmount || 0),
+    0
+  );
+  
+  const totalMaintenanceCost = maintenanceHistory.reduce(
+    (sum, record) => sum + Number(record.cost || 0),
+    0
+  );
+  
+  const insuranceCost = Number(vehicle[0].insuranceCost || 0);
+  const netProfit = totalRevenue - totalMaintenanceCost - insuranceCost;
+  const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+  
+  return {
+    vehicle: vehicle[0],
+    summary: {
+      totalRevenue,
+      totalMaintenanceCost,
+      insuranceCost,
+      netProfit,
+      profitMargin,
+      rentalCount: completedContracts.length,
+      maintenanceCount: maintenanceHistory.length,
+    },
+    contracts: completedContracts,
+    maintenanceRecords: maintenanceHistory,
+  };
+}
