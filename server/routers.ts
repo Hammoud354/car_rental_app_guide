@@ -343,6 +343,18 @@ export const appRouter = router({
         await db.deleteClient(input.id);
         return { success: true };
       }),
+    
+    getByLicenseNumber: publicProcedure
+      .input(z.object({ licenseNumber: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getClientByLicenseNumber(input.licenseNumber);
+      }),
+    
+    getContracts: publicProcedure
+      .input(z.object({ clientId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getRentalContractsByClientId(input.clientId);
+      }),
   }),
 
   // Profitability Analytics Router

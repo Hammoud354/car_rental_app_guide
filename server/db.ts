@@ -280,6 +280,17 @@ export async function getActiveContractsByVehicleId(vehicleId: number) {
     .where(and(eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.status, "active")));
 }
 
+export async function getRentalContractsByClientId(clientId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get contracts by client: database not available");
+    return [];
+  }
+  return await db.select().from(rentalContracts)
+    .where(eq(rentalContracts.clientId, clientId))
+    .orderBy(desc(rentalContracts.rentalStartDate));
+}
+
 export async function markContractAsReturned(contractId: number, returnKm?: number) {
   const db = await getDb();
   if (!db) {

@@ -730,3 +730,31 @@
 - [x] Test with various number sizes (small, medium, large values)
 - [x] Improve card responsive design for better number display
 - [x] Save checkpoint
+
+## Client Management System
+- [ ] Create clients database table with fields (name, email, phone, address, nationality, ID number, license number)
+- [ ] Run database migration to create clients table
+- [ ] Create backend CRUD procedures for clients (list, create, update, delete)
+- [ ] Create Clients page UI with client list table
+- [ ] Add "Add Client" form dialog with all client fields
+- [ ] Add "Edit Client" functionality
+- [ ] Add "Delete Client" functionality with confirmation
+- [ ] Add client search/filter functionality
+- [ ] Link clients to rental contracts (add clientId foreign key to contracts)
+- [ ] Update contract creation form to select from existing clients
+- [ ] Add "View Contracts" button in client list to see client's rental history
+- [ ] Add client details dialog showing contact info and contract history
+- [ ] Test complete client management workflow
+- [ ] Save checkpoint
+
+
+## Client Management CRUD Operations & Contract Integration
+- [x] Add client CRUD backend procedures (create, update, delete, list, getById)
+- [x] Add getContractsByClientId query to link clients with rental history
+- [x] Enhance Clients page with full CRUD UI (View Details, Edit, Delete buttons)
+- [x] Add "View Contracts" button to each client card
+- [x] Create rental history dialog showing all contracts for a client
+- [x] Display contract statistics (total contracts, active contracts, total revenue)
+- [x] Test View Contracts functionality - working perfectly with 3 contracts for John Doe
+- [x] Test search functionality - filters correctly by name (tested with "mohammad")
+- [x] Verify client-contract integration - seamless linking between systems
