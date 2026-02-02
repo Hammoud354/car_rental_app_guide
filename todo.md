@@ -648,3 +648,12 @@
 - [x] Update maintenance list/details view to display garage dates
 - [x] Test creating maintenance records with all new fields
 - [x] Save checkpoint
+
+## Calculate and Display Total Maintenance Costs
+- [x] Add backend function to calculate total maintenance cost per vehicle
+- [x] Update vehicle list query to include total maintenance costs
+- [x] Display total maintenance cost in vehicle cards on maintenance page
+- [x] Show total cost summary in maintenance history dialog
+- [x] Add visual indicators for high maintenance cost vehicles
+- [x] Test cost calculation with multiple maintenance records
+- [x] Save checkpoint

@@ -100,7 +100,23 @@ export async function getAllVehicles() {
   // Simply return all vehicles without checking rental status
   // The status field in the database should be kept up-to-date when contracts are created/updated
   const allVehicles = await db.select().from(vehicles);
-  return allVehicles;
+  
+  // Calculate total maintenance cost for each vehicle
+  const vehiclesWithCosts = await Promise.all(
+    allVehicles.map(async (vehicle) => {
+      const records = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.vehicleId, vehicle.id));
+      const totalMaintenanceCost = records.reduce((sum, record) => {
+        const cost = record.cost ? parseFloat(record.cost.toString()) : 0;
+        return sum + cost;
+      }, 0);
+      return {
+        ...vehicle,
+        totalMaintenanceCost: totalMaintenanceCost.toFixed(2)
+      };
+    })
+  );
+  
+  return vehiclesWithCosts;
 }
 
 export async function getVehicleById(id: number) {

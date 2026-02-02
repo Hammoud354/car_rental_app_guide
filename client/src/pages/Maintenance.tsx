@@ -277,6 +277,12 @@ export default function Maintenance() {
                       <Gauge className="h-4 w-4" />
                       <span>Current: {vehicle.mileage || 0} km</span>
                     </div>
+                    {(vehicle as any).totalMaintenanceCost && parseFloat((vehicle as any).totalMaintenanceCost) > 0 && (
+                      <div className="flex items-center gap-2 text-gray-900 font-semibold">
+                        <span className="text-blue-600">💰</span>
+                        <span>Total Maintenance: ${(vehicle as any).totalMaintenanceCost}</span>
+                      </div>
+                    )}
                   </div>
 
                   <Button
@@ -301,6 +307,28 @@ export default function Maintenance() {
                     Maintenance History - {vehicles?.find(v => v.id === viewingHistory)?.plateNumber}
                   </DialogTitle>
                 </DialogHeader>
+                
+                {/* Total Cost Summary */}
+                {maintenanceRecords && maintenanceRecords.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">💰</span>
+                        <span className="text-sm font-medium text-gray-600">Total Maintenance Cost</span>
+                      </div>
+                      <span className="text-2xl font-bold text-blue-600">
+                        ${maintenanceRecords.reduce((sum, record) => {
+                          const cost = record.cost ? parseFloat(record.cost.toString()) : 0;
+                          return sum + cost;
+                        }, 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      Based on {maintenanceRecords.length} maintenance record{maintenanceRecords.length !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                )}
+                
                 <div className="space-y-4">
                   {maintenanceRecords && maintenanceRecords.length > 0 ? (
                     maintenanceRecords.map((record) => (
