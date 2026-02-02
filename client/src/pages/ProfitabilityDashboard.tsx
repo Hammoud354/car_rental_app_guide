@@ -264,33 +264,33 @@ export default function ProfitabilityDashboard() {
               {/* Summary Cards */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
-                  <CardContent className="pt-4">
-                    <div className="text-sm text-muted-foreground">Total Revenue</div>
-                    <div className="text-xl font-bold text-green-600 mt-1">
+                  <CardContent className="pt-4 px-4">
+                    <div className="text-sm text-muted-foreground mb-2">Total Revenue</div>
+                    <div className="text-lg font-bold text-green-600 break-words">
                       ${vehicleDetails.summary.totalRevenue.toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="pt-4">
-                    <div className="text-sm text-muted-foreground">Maintenance</div>
-                    <div className="text-xl font-bold text-orange-600 mt-1">
+                  <CardContent className="pt-4 px-4">
+                    <div className="text-sm text-muted-foreground mb-2">Maintenance</div>
+                    <div className="text-lg font-bold text-orange-600 break-words">
                       ${vehicleDetails.summary.totalMaintenanceCost.toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="pt-4">
-                    <div className="text-sm text-muted-foreground">Insurance</div>
-                    <div className="text-xl font-bold text-blue-600 mt-1">
+                  <CardContent className="pt-4 px-4">
+                    <div className="text-sm text-muted-foreground mb-2">Insurance</div>
+                    <div className="text-lg font-bold text-blue-600 break-words">
                       ${vehicleDetails.summary.insuranceCost.toFixed(2)}
                     </div>
                   </CardContent>
                 </Card>
                 <Card>
-                  <CardContent className="pt-4">
-                    <div className="text-sm text-muted-foreground">Net Profit</div>
-                    <div className={`text-xl font-bold mt-1 ${vehicleDetails.summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <CardContent className="pt-4 px-4">
+                    <div className="text-sm text-muted-foreground mb-2">Net Profit</div>
+                    <div className={`text-lg font-bold break-words ${vehicleDetails.summary.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                       ${vehicleDetails.summary.netProfit.toFixed(2)}
                     </div>
                   </CardContent>
