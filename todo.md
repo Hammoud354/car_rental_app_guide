@@ -614,3 +614,11 @@
 - [x] Update existing timestamp-based contract (CTR-1769988353513) to CTR-001
 - [x] Test creating new contract to verify sequential numbering works
 - [x] Save checkpoint
+
+## Add Delete Contract Functionality
+- [x] Create delete contract backend procedure in routers.ts
+- [x] Add delete contract database helper function in db.ts
+- [x] Add "Delete Contract" button to contract details dialog
+- [x] Add confirmation dialog before deleting
+- [x] Test deleting a contract
+- [ ] Save checkpoint

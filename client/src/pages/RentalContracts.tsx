@@ -144,6 +144,18 @@ export default function RentalContracts() {
       setIsRenewDialogOpen(false);
       setIsDetailsDialogOpen(false);
     },
+    onError: (error) => {
+      toast.error(`Failed to renew contract: ${error.message}`);
+    },
+  });
+  
+  const deleteContract = trpc.contracts.delete.useMutation({
+    onSuccess: () => {
+      toast.success("Contract deleted successfully");
+      utils.contracts.list.invalidate(); // Refresh contract list
+      utils.contracts.listByStatus.invalidate();
+      setIsDetailsDialogOpen(false);
+    },
     onError: (error: any) => {
       toast.error(`Failed to renew contract: ${error.message}`);
     },
@@ -1048,25 +1060,41 @@ export default function RentalContracts() {
               );
             })()}
             <DialogFooter>
-              <Button 
-                onClick={() => window.print()} 
-                variant="outline"
-                className="mr-auto print-contract"
-              >
-                🖨️ Print Contract
-              </Button>
-              <Button 
-                onClick={() => {
-                  setAdditionalDays(1);
-                  setIsRenewDialogOpen(true);
-                }} 
-                className="bg-orange-600 hover:bg-orange-700"
-              >
-                Renew Contract
-              </Button>
-              <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-                Close
-              </Button>
+              <div className="flex w-full justify-between">
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => window.print()} 
+                    variant="outline"
+                    className="print-contract"
+                  >
+                    🖨️ Print Contract
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      if (selectedContract && window.confirm(`Are you sure you want to delete contract ${selectedContract.contractNumber}? This action cannot be undone.`)) {
+                        deleteContract.mutate({ contractId: selectedContract.id });
+                      }
+                    }} 
+                    variant="destructive"
+                  >
+                    🗑️ Delete Contract
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => {
+                      setAdditionalDays(1);
+                      setIsRenewDialogOpen(true);
+                    }} 
+                    className="bg-orange-600 hover:bg-orange-700"
+                  >
+                    Renew Contract
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
+                    Close
+                  </Button>
+                </div>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>

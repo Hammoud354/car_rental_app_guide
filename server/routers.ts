@@ -256,6 +256,12 @@ export const appRouter = router({
         return await db.markContractAsReturned(input.contractId);
       }),
     
+    delete: publicProcedure
+      .input(z.object({ contractId: z.number() }))
+      .mutation(async ({ input }) => {
+        return await db.deleteRentalContract(input.contractId);
+      }),
+    
     updateStatus: publicProcedure
       .input(z.object({
         contractId: z.number(),

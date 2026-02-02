@@ -277,10 +277,21 @@ export async function markContractAsReturned(contractId: number) {
       returnedAt: new Date(),
     })
     .where(eq(rentalContracts.id, contractId));
+}
+
+export async function deleteRentalContract(contractId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
   
-  // Return the updated contract
-  const updated = await db.select().from(rentalContracts).where(eq(rentalContracts.id, contractId)).limit(1);
-  return updated[0];
+  // Delete associated damage marks first
+  await db.delete(damageMarks).where(eq(damageMarks.contractId, contractId));
+  
+  // Then delete the contract
+  await db.delete(rentalContracts).where(eq(rentalContracts.id, contractId));
+  
+  return { success: true };
 }
 
 export async function updateOverdueContracts() {
