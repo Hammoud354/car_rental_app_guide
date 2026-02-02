@@ -670,3 +670,13 @@
 - [x] Calculate total KM driven during rental (returnKm - pickupKm)
 - [x] Test complete odometer tracking flow (create → complete)
 - [x] Save checkpoint
+
+## Maintenance Alert System on Contract Completion
+- [x] Create backend query to check if vehicle has maintenance due based on kmDueMaintenance
+- [x] Compare return KM with vehicle's kmDueMaintenance field
+- [x] Show alert/warning in return inspection dialog if maintenance is due or overdue
+- [x] Display maintenance alert message with specific KM information
+- [x] Add visual indicator (warning icon, colored banner) for maintenance alerts
+- [x] Test alert appears when return KM >= kmDueMaintenance
+- [x] Test alert doesn't appear when return KM < kmDueMaintenance
+- [x] Save checkpoint

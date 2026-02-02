@@ -70,8 +70,18 @@ export default function RentalContracts() {
   }, [statusFilter]);
   
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Contract marked as completed");
+      
+      // Show maintenance alert if due
+      if (data.maintenanceAlert && data.maintenanceAlert.isDue) {
+        const alert = data.maintenanceAlert;
+        toast.warning(
+          `⚠️ MAINTENANCE DUE: ${alert.vehiclePlate} (${alert.vehicleModel}) has reached ${alert.currentKm} km. Maintenance was due at ${alert.maintenanceDueKm} km (${alert.kmOverdue} km overdue).`,
+          { duration: 10000 }
+        );
+      }
+      
       utils.contracts.listByStatus.invalidate();
       // Redirect to rental contracts page
       setLocation("/rental-contracts");

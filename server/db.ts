@@ -1,4 +1,4 @@
-import { eq, and, or, lte, gte, lt, sql } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -286,6 +286,41 @@ export async function markContractAsReturned(contractId: number, returnKm?: numb
     throw new Error("Database not available");
   }
   
+  // Get the contract to find the vehicle
+  const contract = await db.select().from(rentalContracts)
+    .where(eq(rentalContracts.id, contractId))
+    .limit(1);
+  
+  if (!contract || contract.length === 0) {
+    throw new Error("Contract not found");
+  }
+  
+  // Get the vehicle info
+  const vehicle = await db.select().from(vehicles)
+    .where(eq(vehicles.id, contract[0].vehicleId))
+    .limit(1);
+  
+  // Check if there's a maintenance record with kmDueMaintenance set for this vehicle
+  const maintenanceRecord = await db.select().from(maintenanceRecords)
+    .where(eq(maintenanceRecords.vehicleId, contract[0].vehicleId))
+    .orderBy(desc(maintenanceRecords.kmDueMaintenance))
+    .limit(1);
+  
+  let maintenanceAlert = null;
+  if (vehicle && vehicle.length > 0 && maintenanceRecord && maintenanceRecord.length > 0 && maintenanceRecord[0].kmDueMaintenance && returnKm) {
+    const kmDue = maintenanceRecord[0].kmDueMaintenance;
+    if (returnKm >= kmDue) {
+      maintenanceAlert = {
+        isDue: true,
+        vehiclePlate: vehicle[0].plateNumber,
+        vehicleModel: vehicle[0].model,
+        currentKm: returnKm,
+        maintenanceDueKm: kmDue,
+        kmOverdue: returnKm - kmDue
+      };
+    }
+  }
+  
   await db
     .update(rentalContracts)
     .set({
@@ -294,6 +329,8 @@ export async function markContractAsReturned(contractId: number, returnKm?: numb
       ...(returnKm !== undefined && { returnKm }),
     })
     .where(eq(rentalContracts.id, contractId));
+  
+  return { success: true, maintenanceAlert };
 }
 
 export async function deleteRentalContract(contractId: number) {
