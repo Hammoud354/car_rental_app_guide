@@ -127,8 +127,8 @@ export default function RentalContracts() {
   }, [selectedVehicleId, vehicles]);
   
   const createContract = trpc.contracts.create.useMutation({
-    onSuccess: () => {
-      toast.success("Contract created successfully");
+    onSuccess: (data) => {
+      toast.success(`Contract created successfully! Contract Number: ${data.contractNumber}`);
       utils.contracts.list.invalidate(); // Refresh contract list
       setIsCreateDialogOpen(false);
     },
@@ -909,6 +909,11 @@ export default function RentalContracts() {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
                 <div className="space-y-6">
+                  {/* Contract Number */}
+                  <div className="bg-orange-600/20 border border-orange-500 p-4 rounded-lg">
+                    <div className="text-sm text-orange-400">Contract Number</div>
+                    <div className="text-2xl font-bold font-mono text-orange-500">{selectedContract.contractNumber}</div>
+                  </div>
                   {/* Client Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Information</h3>

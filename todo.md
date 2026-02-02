@@ -592,3 +592,11 @@
 - [x] Fix data format or validation pattern issue
 - [x] Test fleet management page after fix
 - [x] Save checkpoint
+
+## Add Contract Number Display
+- [x] Investigate current contract number (contractId) implementation in database
+- [x] Add contract number display to contract details dialog
+- [x] Add contract number display during contract creation flow
+- [x] Ensure contract number is prominently visible in both locations
+- [x] Test contract number display
+- [x] Save checkpoint
