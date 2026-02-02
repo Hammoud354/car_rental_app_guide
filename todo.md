@@ -607,3 +607,10 @@
 - [x] Increment and format new contract numbers with leading zeros
 - [x] Test new contract number format
 - [x] Save checkpoint
+
+## Fix Contract Number Still Using Timestamp
+- [x] Restart server to apply code changes
+- [x] Verify sequential numbering code is correct in routers.ts
+- [x] Update existing timestamp-based contract (CTR-1769988353513) to CTR-001
+- [x] Test creating new contract to verify sequential numbering works
+- [x] Save checkpoint
