@@ -1123,3 +1123,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Each reservation should appear as single block on start date only
 - [x] Updated getReservationsForDay to compare only start date with check date
 - [x] Reservations now appear only on rental start date, not spanning entire period
+
+
+## Add Duration Indicator to Reservation Blocks
+- [x] Calculate rental duration (days) for each reservation
+- [x] Add small clock icon with duration number to reservation blocks
+- [x] Position icon non-intrusively in top-right corner with white background
+- [x] Duration displays as "Xd" format (e.g., "10d" for 10 days)
+- [x] Icon has subtle shadow for visibility

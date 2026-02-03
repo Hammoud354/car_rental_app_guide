@@ -2,7 +2,7 @@ import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle, Clock } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -151,16 +151,28 @@ export default function Reservations() {
                       {day}
                     </div>
                     <div className="space-y-1">
-                      {dayReservations.map((reservation, idx) => (
+                      {dayReservations.map((reservation, idx) => {
+                        // Calculate rental duration in days
+                        const startDate = new Date(reservation.rentalStartDate);
+                        const endDate = new Date(reservation.rentalEndDate);
+                        const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                        
+                        return (
                         <Link key={reservation.id} href={`/rental-contracts`}>
                           <div
-                            className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow ${
+                            className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow relative ${
                               reservation.hasConflict
                                 ? "bg-red-100 border-2 border-red-500 text-red-900"
                                 : `border ${getRandomColor(idx)}`
                             }`}
                             title={reservation.hasConflict ? `⚠️ Conflict: This vehicle has ${reservation.conflictCount} overlapping reservation(s)` : ""}
                           >
+                            {/* Duration indicator in top-right corner */}
+                            <div className="absolute top-1 right-1 flex items-center gap-0.5 bg-white/90 px-1 py-0.5 rounded text-[9px] font-semibold text-gray-700 shadow-sm">
+                              <Clock className="h-2.5 w-2.5" />
+                              <span>{durationDays}d</span>
+                            </div>
+                            
                             <div className="flex items-center justify-between gap-1 mb-1">
                               <div className="flex items-center gap-1">
                                 <Car className="h-3 w-3" />
@@ -187,7 +199,8 @@ export default function Reservations() {
                             )}
                           </div>
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
