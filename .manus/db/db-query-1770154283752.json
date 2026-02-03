@@ -1,0 +1,14 @@
+{
+  "query": "SELECT username, password FROM users WHERE username = 'testuser123';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT username, password FROM users WHERE username = 'testuser123';",
+  "rows": [
+    {
+      "username": "testuser123",
+      "password": "testpass123"
+    }
+  ],
+  "messages": [],
+  "stdout": "username\tpassword\ntestuser123\ttestpass123\n",
+  "stderr": "",
+  "execution_time_ms": 1495
+}

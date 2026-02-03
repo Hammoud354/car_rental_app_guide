@@ -1003,3 +1003,23 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Route now shows landing page instead of 404
 - [x] Tested /login route - successfully displays landing page
 - [x] No more 404 errors
+
+
+## Implement Optional Authentication System - COMPLETED ✅
+- [x] Install cookie-parser middleware (already installed)
+- [x] Create Sign Up page with form fields: username, email, full name, phone (with international code), country, password
+- [x] Create Sign In page with username/password fields
+- [x] Update backend authentication procedures to work with cookie-parser
+- [x] Added getUserById function to db.ts for fetching users by ID
+- [x] Updated context.ts to handle user-{id} cookie format and fetch user from database
+- [x] Add proper session management with cookie-based sessions (user-{id} format)
+- [x] Add user profile display in navigation (when logged in) - shows user name in top right
+- [x] Add logout functionality with dropdown menu (Dashboard, Sign Out)
+- [x] Make authentication optional - website works for both authenticated and anonymous users
+- [x] Ensure authenticated users see only their own data (ctx.user?.id || 1)
+- [x] Test complete flow: sign up → dashboard → logout → sign in → dashboard
+- [x] Verify no crashes or unexpected logouts occur - all working perfectly
+- [x] Verify session persists across page navigations - tested Dashboard, Fleet, Contracts
+- [x] Password hashing implemented in signup and login procedures
+- [x] Session cookies properly set, sent, and read by server
+- [x] MinimalLayout updated to show user profile or Sign In/Sign Up buttons

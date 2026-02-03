@@ -15,23 +15,39 @@ export async function createContext(
   let user: User | null = null;
 
   try {
-    // Check for simple session cookie first
+    // Check for session cookie first
     const sessionCookie = opts.req.cookies?.[COOKIE_NAME];
-    if (sessionCookie === 'simple-session-mo') {
-      // Return a mock user for simple authentication
-      user = {
-        id: 1,
-        openId: 'mo',
-        name: 'Mo',
-        email: 'mo@rental.os',
-        loginMethod: 'simple',
-        role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastSignedIn: new Date(),
-      } as User;
-    } else {
-      // Fall back to OAuth authentication
+    
+    if (sessionCookie) {
+      // Check if it's a user-{id} format cookie
+      if (sessionCookie.startsWith('user-')) {
+        const userId = parseInt(sessionCookie.replace('user-', ''), 10);
+        if (!isNaN(userId)) {
+          // Fetch user from database
+          const { getUserById } = await import('../db');
+          const dbUser = await getUserById(userId);
+          if (dbUser) {
+            user = dbUser;
+          }
+        }
+      } else if (sessionCookie === 'simple-session-mo') {
+        // Legacy simple session support
+        user = {
+          id: 1,
+          openId: 'mo',
+          name: 'Mo',
+          email: 'mo@rental.os',
+          loginMethod: 'simple',
+          role: 'admin',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastSignedIn: new Date(),
+        } as User;
+      }
+    }
+    
+    // If no session cookie or user not found, fall back to OAuth
+    if (!user) {
       user = await sdk.authenticateRequest(opts.req);
     }
   } catch (error) {

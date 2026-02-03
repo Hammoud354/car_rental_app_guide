@@ -16,24 +16,33 @@ export const appRouter = router({
         password: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Simple login: username "Mo" (case-insensitive), password "mo"
-        if (input.username.toLowerCase() === 'mo' && input.password === 'mo') {
-          // Create a simple session cookie
-          const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie(COOKIE_NAME, 'simple-session-mo', {
-            ...cookieOptions,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          });
-          return {
-            success: true,
-            user: {
-              id: 1,
-              name: 'Mo',
-              email: 'mo@rental.os',
-            },
-          };
+        // Find user by username
+        const user = await db.getUserByUsername(input.username);
+        if (!user) {
+          throw new Error('Invalid username or password');
         }
-        throw new Error('Invalid username or password');
+
+        // Verify password (in production, use bcrypt.compare)
+        if (user.password !== input.password) {
+          throw new Error('Invalid username or password');
+        }
+
+        // Create session cookie
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, `user-${user.id}`, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            username: user.username,
+          },
+        };
       }),
     signUp: publicProcedure
       .input(z.object({
@@ -94,13 +103,13 @@ export const appRouter = router({
   // Fleet Management Router
   fleet: router({
     list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllVehicles(1);
+      return await db.getAllVehicles(ctx.user?.id || 1);
     }),
     
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input, ctx }) => {
-        return await db.getVehicleById(input.id, 1);
+        return await db.getVehicleById(input.id, ctx.user?.id || 1);
       }),
     
     create: publicProcedure
@@ -125,7 +134,7 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        return await db.createVehicle({ ...input, userId: 1 });
+        return await db.createVehicle({ ...input, userId: ctx.user?.id || 1 });
       }),
     
     update: publicProcedure
@@ -153,21 +162,21 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input, ctx }) => {
-        await db.updateVehicle(input.id, 1, input.data);
+        await db.updateVehicle(input.id, ctx.user?.id || 1, input.data);
         return { success: true };
       }),
     
     delete: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        await db.deleteVehicle(input.id, 1);
+        await db.deleteVehicle(input.id, ctx.user?.id || 1);
         return { success: true };
       }),
     
     getMaintenanceRecords: publicProcedure
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {
-        return await db.getMaintenanceRecordsByVehicleId(input.vehicleId, 1);
+        return await db.getMaintenanceRecordsByVehicleId(input.vehicleId, ctx.user?.id || 1);
       }),
     
     addMaintenanceRecord: publicProcedure
@@ -185,14 +194,14 @@ export const appRouter = router({
         garageExitDate: z.date().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        return await db.createMaintenanceRecord({ ...input, userId: 1 });
+        return await db.createMaintenanceRecord({ ...input, userId: ctx.user?.id || 1 });
       }),
   }),
 
   // Rental Contracts Router
   contracts: router({
     list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllRentalContracts(1);
+      return await db.getAllRentalContracts(ctx.user?.id || 1);
     }),
     
     updateOverdueContracts: publicProcedure.mutation(async () => {
@@ -246,7 +255,7 @@ export const appRouter = router({
         }
         
         // Check if client exists by license number
-        let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber, 1);
+        let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber, ctx.user?.id || 1);
         
         // If client doesn't exist, create new client record
         if (!client) {
@@ -266,7 +275,7 @@ export const appRouter = router({
         // Create contract with client ID
         // Pass null for optional fields so Drizzle inserts NULL
         // Generate sequential contract number
-        const existingContracts = await db.getAllRentalContracts(1);
+        const existingContracts = await db.getAllRentalContracts(ctx.user?.id || 1);
         const maxNumber = existingContracts.reduce((max, contract) => {
           const match = contract.contractNumber.match(/CTR-(\d+)/);
           if (match) {
@@ -366,13 +375,13 @@ export const appRouter = router({
   // Client Management Router
   clients: router({
     list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllClients(1);
+      return await db.getAllClients(ctx.user?.id || 1);
     }),
     
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input, ctx }) => {
-        return await db.getClientById(input.id, 1);
+        return await db.getClientById(input.id, ctx.user?.id || 1);
       }),
     
     create: publicProcedure
@@ -389,7 +398,7 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        return await db.createClient({ ...input, userId: 1 });
+        return await db.createClient({ ...input, userId: ctx.user?.id || 1 });
       }),
     
     update: publicProcedure
@@ -414,7 +423,7 @@ export const appRouter = router({
     delete: publicProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        await db.deleteClient(input.id, 1);
+        await db.deleteClient(input.id, ctx.user?.id || 1);
         return { success: true };
       }),
     
@@ -634,7 +643,7 @@ export const appRouter = router({
   }),
   settings: router({
     get: publicProcedure.query(async ({ ctx }) => {
-      const settings = await db.getCompanySettings(1);
+      const settings = await db.getCompanySettings(ctx.user?.id || 1);
       return settings;
     }),
     update: publicProcedure

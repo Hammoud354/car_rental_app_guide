@@ -711,6 +711,14 @@ export async function getUserByUsername(username: string) {
   return result[0];
 }
 
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return result[0];
+}
+
 export async function createUser(userData: {
   username: string;
   password: string;
