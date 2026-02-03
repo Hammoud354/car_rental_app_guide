@@ -1066,3 +1066,27 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Analysis navigation item visible in top navigation bar
 - [x] Page displays profitability metrics, maintenance records, and rental history
 - [x] Ready to use once vehicles are added to fleet
+
+
+## Create Reservations Section with Calendar View
+- [x] Add "Reservations" navigation item in navigation bar
+- [x] Create Reservations page component with calendar layout
+- [x] Create backend procedure to fetch future rental contracts (start date > today)
+- [x] Display calendar with month view
+- [x] Show reservation blocks on calendar dates with:
+  - [x] Vehicle information (brand, model, plate number)
+  - [x] Client name
+  - [x] Client phone number
+- [x] Color-code reservation blocks by vehicle or status
+- [x] Make reservation blocks clickable to view full contract details
+- [x] Link to Contracts page for creating new reservations
+- [x] Add navigation controls (previous/next month)
+- [x] Added getFutureReservations function to server/db.ts
+- [x] Added contracts.getFutureReservations procedure to server/routers.ts
+- [x] Created Reservations.tsx with full calendar UI
+- [x] Test calendar with future contract data
+- [x] Calendar displays month view with navigation controls
+- [x] Today is highlighted in blue
+- [x] Calendar legend shows Today, Past Date, Future Date
+- [x] Create New Reservation button links to Contracts page
+- [x] Ready to display future reservations when contracts are created

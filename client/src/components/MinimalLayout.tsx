@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Building2, BarChart3, FileText, Wrench, Users, User, LogOut, TrendingUp } from "lucide-react";
+import { Building2, BarChart3, FileText, Wrench, Users, User, LogOut, TrendingUp, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import {
@@ -31,6 +31,7 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { href: "/fleet-management", label: "Fleet", icon: BarChart3 },
     { href: "/rental-contracts", label: "Contracts", icon: FileText },
+    { href: "/reservations", label: "Reservations", icon: CalendarDays },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
     { href: "/clients", label: "Clients", icon: Users },
     { href: "/analysis", label: "Analysis", icon: TrendingUp },

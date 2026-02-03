@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Analysis from "./pages/Analysis";
+import Reservations from "./pages/Reservations";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/compliance" component={Compliance} />
       <Route path="/settings" component={Settings} />
       <Route path="/analysis" component={Analysis} />
+      <Route path="/reservations" component={Reservations} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

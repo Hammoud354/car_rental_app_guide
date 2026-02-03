@@ -938,3 +938,58 @@ export async function getVehicleAnalysis(vehicleId: number, userId: number) {
     totalContracts: contracts.length,
   };
 }
+
+
+// Get future reservations for calendar view
+export async function getFutureReservations(month: number, year: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get future reservations: database not available");
+    return [];
+  }
+
+  // Get first and last day of the month
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0, 23, 59, 59);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Get all contracts that overlap with this month and are in the future or current
+  const contracts = await db.select({
+    id: rentalContracts.id,
+    vehicleId: rentalContracts.vehicleId,
+    rentalStartDate: rentalContracts.rentalStartDate,
+    rentalEndDate: rentalContracts.rentalEndDate,
+    clientFirstName: rentalContracts.clientFirstName,
+    clientLastName: rentalContracts.clientLastName,
+    clientPhone: rentalContracts.clientPhone,
+    status: rentalContracts.status,
+    vehicleBrand: vehicles.brand,
+    vehicleModel: vehicles.model,
+    vehiclePlateNumber: vehicles.plateNumber,
+  })
+  .from(rentalContracts)
+  .leftJoin(vehicles, eq(rentalContracts.vehicleId, vehicles.id))
+  .where(and(
+    eq(rentalContracts.userId, userId),
+    // Contract overlaps with the month
+    sql`${rentalContracts.rentalStartDate} <= ${lastDay}`,
+    sql`${rentalContracts.rentalEndDate} >= ${firstDay}`,
+    // Contract end date is in the future or today
+    sql`${rentalContracts.rentalEndDate} >= ${today}`
+  ))
+  .orderBy(rentalContracts.rentalStartDate);
+
+  return contracts.map(contract => ({
+    id: contract.id,
+    vehicleId: contract.vehicleId,
+    rentalStartDate: contract.rentalStartDate,
+    rentalEndDate: contract.rentalEndDate,
+    clientName: `${contract.clientFirstName} ${contract.clientLastName}`,
+    clientPhone: contract.clientPhone || "N/A",
+    status: contract.status,
+    vehicleBrand: contract.vehicleBrand || "Unknown",
+    vehicleModel: contract.vehicleModel || "Unknown",
+    vehiclePlateNumber: contract.vehiclePlateNumber || "N/A",
+  }));
+}

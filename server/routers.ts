@@ -376,6 +376,15 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return await db.bulkUpdateContractStatus(input.contractIds, input.status);
       }),
+
+    getFutureReservations: publicProcedure
+      .input(z.object({
+        month: z.number().min(1).max(12),
+        year: z.number(),
+      }))
+      .query(async ({ input, ctx }) => {
+        return await db.getFutureReservations(input.month, input.year, ctx.user?.id || 1);
+      }),
   }),
 
   // Client Management Router
