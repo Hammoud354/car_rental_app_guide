@@ -197,3 +197,27 @@ export const carModels = mysqlTable("carModels", {
 
 export type CarModel = typeof carModels.$inferSelect;
 export type InsertCarModel = typeof carModels.$inferInsert;
+
+
+/**
+ * Company Settings table - stores company information for contracts
+ */
+export const companySettings = mysqlTable("companySettings", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // One settings record per user
+  companyName: varchar("companyName", { length: 255 }).notNull(),
+  logo: text("logo"), // S3 URL for company logo
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  taxId: varchar("taxId", { length: 100 }),
+  website: varchar("website", { length: 255 }),
+  termsAndConditions: text("termsAndConditions"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CompanySettings = typeof companySettings.$inferSelect;
+export type InsertCompanySettings = typeof companySettings.$inferInsert;

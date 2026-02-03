@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -179,6 +179,14 @@ export default function Clients() {
           >
             <Users className="mr-2 h-4 w-4" />
             Clients
+          </Button>
+          <Button 
+            variant="ghost" 
+            className="w-full justify-start text-gray-700 hover:bg-gray-100"
+            onClick={() => window.location.href = '/settings'}
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
           </Button>
         </nav>
 

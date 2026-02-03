@@ -862,3 +862,15 @@
 - [x] Add Sign out button to Clients sidebar
 - [ ] Create Company Settings page with logo upload
 - [ ] Update contract PDF to include company logo and info from settings
+
+
+## Company Settings Page
+- [ ] Create companySettings database table (id, userId, companyName, logo, address, city, country, phone, email, taxId, website, termsAndConditions)
+- [ ] Add database helper functions for company settings (getCompanySettings, updateCompanySettings)
+- [ ] Create backend procedures (settings.get, settings.update)
+- [ ] Build Company Settings page UI with form fields
+- [ ] Implement logo upload functionality using S3 storage
+- [ ] Add Settings link to all page navigations
+- [ ] Test settings CRUD operations
+- [ ] Update rental contract PDF to include company logo and info from settings
+- [ ] Test contract PDF generation with company branding

@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home } from "lucide-react";
+import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -238,6 +238,7 @@ export default function RentalContracts() {
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
     { href: "/rental-contracts", label: "Contracts", icon: FileText },
     { href: "/clients", label: "Clients", icon: Users },
+    { href: "/settings", label: "Settings", icon: Settings },
   ];
 
   return (

@@ -15,6 +15,7 @@ import FleetManagement from "./pages/FleetManagement";
 import Dashboard from "./pages/Dashboard";
 import Maintenance from "./pages/Maintenance";
 import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
+import Settings from "./pages/Settings";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/booking" component={Booking} />
       <Route path="/operations" component={Operations} />
       <Route path="/compliance" component={Compliance} />
+      <Route path="/settings" component={Settings} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -809,4 +809,51 @@ export async function populateCarMakersForCountry(country: string) {
   }
   
   return await getCarMakersByCountry(country);
+}
+
+
+// ========================================
+// Company Settings Functions
+// ========================================
+
+/**
+ * Get company settings for a specific user
+ */
+export async function getCompanySettings(userId: number): Promise<CompanySettings | null> {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db.select().from(companySettings).where(eq(companySettings.userId, userId));
+  return results[0] || null;
+}
+
+/**
+ * Create or update company settings for a user
+ */
+export async function upsertCompanySettings(data: InsertCompanySettings): Promise<CompanySettings> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Check if settings already exist for this user
+  const existing = await getCompanySettings(data.userId);
+
+  if (existing) {
+    // Update existing settings
+    await db.update(companySettings)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(companySettings.userId, data.userId));
+    
+    const updated = await getCompanySettings(data.userId);
+    if (!updated) throw new Error("Failed to retrieve updated settings");
+    return updated;
+  } else {
+    // Create new settings
+    const result = await db.insert(companySettings).values(data);
+    const newSettings = await getCompanySettings(data.userId);
+    if (!newSettings) throw new Error("Failed to retrieve new settings");
+    return newSettings;
+  }
 }

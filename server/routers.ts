@@ -630,6 +630,32 @@ export const appRouter = router({
         return await db.populateCarMakersForCountry(input.country);
       }),
   }),
+  settings: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const settings = await db.getCompanySettings(ctx.user.id);
+      return settings;
+    }),
+    update: protectedProcedure
+      .input(z.object({
+        companyName: z.string(),
+        logo: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        country: z.string().optional(),
+        phone: z.string().optional(),
+        email: z.string().email().optional(),
+        taxId: z.string().optional(),
+        website: z.string().optional(),
+        termsAndConditions: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const settings = await db.upsertCompanySettings({
+          userId: ctx.user.id,
+          ...input,
+        });
+        return settings;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
