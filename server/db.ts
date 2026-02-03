@@ -868,3 +868,73 @@ export async function upsertCompanySettings(data: InsertCompanySettings): Promis
     return newSettings;
   }
 }
+
+
+// Vehicle Analysis
+export async function getVehicleAnalysis(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get vehicle analysis: database not available");
+    return null;
+  }
+
+  // Get vehicle details
+  const vehicle = await getVehicleById(vehicleId, userId);
+  if (!vehicle) {
+    return null;
+  }
+
+  // Get maintenance records
+  const maintenance = await db.select().from(maintenanceRecords)
+    .where(and(
+      eq(maintenanceRecords.vehicleId, vehicleId),
+      eq(maintenanceRecords.userId, userId)
+    ))
+    .orderBy(desc(maintenanceRecords.performedAt));
+
+  // Get rental contracts
+  const contracts = await db.select().from(rentalContracts)
+    .where(and(
+      eq(rentalContracts.vehicleId, vehicleId),
+      eq(rentalContracts.userId, userId)
+    ))
+    .orderBy(desc(rentalContracts.rentalStartDate));
+
+  // Calculate totals
+  const totalMaintenanceCost = maintenance.reduce((sum, record) => {
+    const cost = parseFloat(record.cost || "0");
+    return sum + cost;
+  }, 0);
+
+  const totalRevenue = contracts.reduce((sum, contract) => {
+    const amount = parseFloat(contract.finalAmount || contract.totalAmount || "0");
+    return sum + amount;
+  }, 0);
+
+  const insuranceCost = parseFloat(vehicle.insuranceCost || "0");
+  const netProfit = totalRevenue - totalMaintenanceCost - insuranceCost;
+
+  return {
+    vehicle,
+    maintenanceRecords: maintenance.map(record => ({
+      id: record.id,
+      type: record.maintenanceType,
+      description: record.description,
+      cost: parseFloat(record.cost || "0"),
+      date: record.performedAt,
+      mileage: record.mileageAtService || 0,
+    })),
+    rentalContracts: contracts.map(contract => ({
+      id: contract.id,
+      startDate: contract.rentalStartDate,
+      endDate: contract.rentalEndDate,
+      totalCost: parseFloat(contract.finalAmount || contract.totalAmount || "0"),
+      status: contract.status,
+    })),
+    totalMaintenanceCost,
+    totalRevenue,
+    insuranceCost,
+    netProfit,
+    totalContracts: contracts.length,
+  };
+}

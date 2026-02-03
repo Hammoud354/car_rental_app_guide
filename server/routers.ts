@@ -196,6 +196,12 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         return await db.createMaintenanceRecord({ ...input, userId: ctx.user?.id || 1 });
       }),
+
+    getAnalysis: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehicleAnalysis(input.vehicleId, ctx.user?.id || 1);
+      }),
   }),
 
   // Rental Contracts Router

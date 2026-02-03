@@ -1044,3 +1044,25 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Logged in: Shows user profile button with dropdown (Dashboard, Sign Out)
 - [x] Logged out: Shows Sign In and Sign Up buttons
 - [x] Landing page adapts correctly based on authentication status
+
+
+## Create Vehicle Analysis Section
+- [x] Add "Analysis" navigation item next to Fleet, Contracts, Clients, Maintenance
+- [x] Create Analysis page component with vehicle selector dropdown
+- [x] Create backend procedure to fetch vehicle analysis data (maintenance records, costs, insurance, revenue)
+- [x] Display vehicle profitability metrics:
+  - [x] Total revenue generated from rentals
+  - [x] Total maintenance costs
+  - [x] Insurance policy costs
+  - [x] Net profit/loss
+  - [x] Profitability percentage
+- [x] Show maintenance records history for selected vehicle
+- [x] Show rental contracts history for selected vehicle
+- [x] Add profit/loss indicator (green for profitable, red for loss)
+- [x] Added getVehicleAnalysis function to server/db.ts
+- [x] Added fleet.getAnalysis procedure to server/routers.ts
+- [x] Created Analysis.tsx page with complete UI
+- [x] Test Analysis page - working correctly with vehicle selector
+- [x] Analysis navigation item visible in top navigation bar
+- [x] Page displays profitability metrics, maintenance records, and rental history
+- [x] Ready to use once vehicles are added to fleet
