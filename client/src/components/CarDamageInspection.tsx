@@ -488,25 +488,37 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
         </CardContent>
       </Card>
 
+      {/* Print Instructions */}
+      <Card className="bg-blue-50 border-blue-200">
+        <CardContent className="pt-6">
+          <div className="flex items-start gap-3">
+            <Printer className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div className="flex-1">
+              <h4 className="font-semibold text-blue-900 mb-1">Ready to Print</h4>
+              <p className="text-sm text-blue-700 mb-3">
+                Click the button below to print this contract or save it as PDF. The printed version includes all contract details, vehicle inspection diagram, and signature fields.
+              </p>
+              <Button 
+                type="button" 
+                onClick={() => window.print()}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+              >
+                <Printer className="h-4 w-4" />
+                Print Contract / Save as PDF
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Action Buttons */}
-      <div className="flex justify-between items-center">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={() => window.print()}
-          className="flex items-center gap-2"
-        >
-          <Printer className="h-4 w-4" />
-          Print Contract
+      <div className="flex justify-end gap-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
         </Button>
-        <div className="flex gap-4">
-          <Button type="button" variant="outline" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={handleSubmit} className="bg-orange-500 hover:bg-orange-600">
-            Complete Contract
-          </Button>
-        </div>
+        <Button type="button" onClick={handleSubmit} className="bg-black hover:bg-gray-800 text-white">
+          Complete Contract
+        </Button>
       </div>
     </div>
   );

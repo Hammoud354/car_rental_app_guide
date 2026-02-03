@@ -206,6 +206,12 @@
 
 /* Print Styles - Only show contract details dialog content */
 @media print {
+  /* Reset page margins for better PDF output */
+  @page {
+    margin: 0.5in;
+    size: A4;
+  }
+  
   /* Hide everything by default */
   body * {
     visibility: hidden !important;
@@ -240,16 +246,29 @@
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
+    page-break-after: auto !important;
   }
   
   /* Hide all buttons in dialog */
   [role="dialog"] button {
     visibility: hidden !important;
+    display: none !important;
   }
   
   /* Hide dialog close button */
   [role="dialog"] [data-radix-dialog-close] {
     visibility: hidden !important;
+    display: none !important;
+  }
+  
+  /* Prevent page breaks inside important sections */
+  [role="dialog"] .space-y-6 > div {
+    page-break-inside: avoid !important;
+  }
+  
+  /* Ensure car diagram doesn't break across pages */
+  [role="dialog"] svg {
+    page-break-inside: avoid !important;
   }
   
   /* Override dark mode colors for print */
