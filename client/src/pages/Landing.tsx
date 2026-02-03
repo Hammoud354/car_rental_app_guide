@@ -1,9 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import { Building2, FileText, BarChart3, Shield, Clock, Users } from "lucide-react";
+import { Building2, FileText, BarChart3, Shield, Clock, Users, User, LogOut } from "lucide-react";
+import { trpc } from "@/lib/trpc";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const { data: user } = trpc.auth.me.useQuery();
+  const logoutMutation = trpc.auth.logout.useMutation({
+    onSuccess: () => {
+      toast.success("Signed out successfully");
+      window.location.href = "/";
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -16,18 +37,42 @@ export default function Landing() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline"
-              onClick={() => setLocation("/signin")}
-            >
-              Sign In
-            </Button>
-            <Button 
-              className="bg-gray-900 hover:bg-gray-800 text-white"
-              onClick={() => setLocation("/signup")}
-            >
-              Sign Up
-            </Button>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    {user.name || user.username}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={() => setLocation("/signin")}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  className="bg-gray-900 hover:bg-gray-800 text-white"
+                  onClick={() => setLocation("/signup")}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>

@@ -1033,3 +1033,14 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Landing page shows Sign In and Sign Up buttons in top right
 - [x] Internal pages (Dashboard, Fleet, etc.) only show user profile when logged in
 - [x] Navigation bar on internal pages is clean without auth buttons
+
+
+## BUG - Landing Page Shows Sign In/Sign Up When Already Logged In - FIXED ✅
+- [x] When logged in user clicks logo and goes to landing page, Sign In/Sign Up buttons appear
+- [x] Landing page now checks authentication status with trpc.auth.me.useQuery()
+- [x] If user is logged in, show user profile dropdown instead of auth buttons
+- [x] If user is logged out, show Sign In/Sign Up buttons
+- [x] Test both logged in and logged out states on landing page
+- [x] Logged in: Shows user profile button with dropdown (Dashboard, Sign Out)
+- [x] Logged out: Shows Sign In and Sign Up buttons
+- [x] Landing page adapts correctly based on authentication status
