@@ -1027,3 +1027,17 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Fixed authentication state detection by using window.location.href for redirect
 - [x] Full page reload ensures cookie is properly sent with next request
 - [x] Ready for user testing
+
+
+## CRITICAL BUG - Session Lost After Few Seconds on Dashboard - FIXED ✅
+- [x] User logs in successfully and reaches dashboard
+- [x] After a few seconds, user is redirected back to login page
+- [x] Root cause: Express server missing cookie-parser middleware
+- [x] Server logs showed "Cookies received: []" - no cookies being read
+- [x] Installed cookie-parser package (pnpm add cookie-parser @types/cookie-parser)
+- [x] Added app.use(cookieParser()) to server/_core/index.ts before tRPC middleware
+- [x] Session cookies now properly received and parsed by Express
+- [x] Tested complete authentication flow: signup → login → dashboard → navigate all pages
+- [x] User stays logged in without any redirects
+- [x] Removed debugging logs from context.ts
+- [x] Ready to save checkpoint
