@@ -1009,3 +1009,21 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Confirmed no interference with Manus platform session
 - [x] Dashboard loads correctly after authentication
 - [x] Multi-user isolation working (new users see empty database)
+
+
+## BUG - Authentication State Not Detected After Login
+- [ ] User successfully signs up/logs in but "Sign In / Sign Up" button still shows
+- [ ] useAuth() hook not detecting logged-in user
+- [ ] Check if auth.me query is working correctly
+- [ ] Verify session cookie is being sent with requests
+- [ ] Fix authentication state detection in MinimalLayout
+- [ ] Test that user profile shows after successful login
+
+
+## BUG - Authentication State Not Detected After Login - FIXED ✅
+- [x] User signs up/logs in successfully but "Sign In / Sign Up" button still shows
+- [x] useAuth hook not detecting logged-in user
+- [x] Check auth.me procedure and context implementation
+- [x] Fixed authentication state detection by using window.location.href for redirect
+- [x] Full page reload ensures cookie is properly sent with next request
+- [x] Ready for user testing

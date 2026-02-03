@@ -7,9 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { trpc } from "@/lib/trpc";
 import { Building2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 export default function Login() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
   const [loginData, setLoginData] = useState({ username: "", password: "" });
   const [signupData, setSignupData] = useState({
     username: "",
@@ -24,6 +27,7 @@ export default function Login() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
       toast({ title: "Success", description: "Logged in successfully!" });
+      // Use full page reload to ensure cookie is sent with next request
       window.location.href = "/dashboard";
     },
     onError: (error) => {
@@ -34,6 +38,7 @@ export default function Login() {
   const signupMutation = trpc.auth.signUp.useMutation({
     onSuccess: () => {
       toast({ title: "Success", description: "Account created successfully!" });
+      // Use full page reload to ensure cookie is sent with next request
       window.location.href = "/dashboard";
     },
     onError: (error) => {
