@@ -35,6 +35,13 @@ export default function FleetManagement() {
   const [editSelectedModelId, setEditSelectedModelId] = useState<number | null>(null);
   const [editMakerOpen, setEditMakerOpen] = useState(false);
   const [editModelOpen, setEditModelOpen] = useState(false);
+  
+  // Custom maker/model dialog states
+  const [isCustomMakerDialogOpen, setIsCustomMakerDialogOpen] = useState(false);
+  const [isCustomModelDialogOpen, setIsCustomModelDialogOpen] = useState(false);
+  const [customMakerName, setCustomMakerName] = useState("");
+  const [customModelName, setCustomModelName] = useState("");
+  const [customModelMakerId, setCustomModelMakerId] = useState<number | null>(null);
 
   const { data: vehicles, isLoading, refetch } = trpc.fleet.list.useQuery();
   
@@ -112,6 +119,34 @@ export default function FleetManagement() {
     },
     onError: (error) => {
       toast.error(`Failed to delete vehicle: ${error.message}`);
+    },
+  });
+  
+  const createCustomMakerMutation = trpc.carMakers.createCustomMaker.useMutation({
+    onSuccess: (newMaker) => {
+      toast.success("Custom maker added successfully");
+      setIsCustomMakerDialogOpen(false);
+      setCustomMakerName("");
+      setSelectedMakerId(newMaker.id);
+      // Refetch makers to include the new one
+      window.location.reload(); // Simple reload to refresh data
+    },
+    onError: (error) => {
+      toast.error(`Failed to add custom maker: ${error.message}`);
+    },
+  });
+  
+  const createCustomModelMutation = trpc.carMakers.createCustomModel.useMutation({
+    onSuccess: (newModel) => {
+      toast.success("Custom model added successfully");
+      setIsCustomModelDialogOpen(false);
+      setCustomModelName("");
+      setSelectedModelId(newModel.id);
+      // Refetch models to include the new one
+      window.location.reload(); // Simple reload to refresh data
+    },
+    onError: (error) => {
+      toast.error(`Failed to add custom model: ${error.message}`);
     },
   });
 
@@ -284,7 +319,7 @@ export default function FleetManagement() {
                             <CommandItem
                               onSelect={() => {
                                 setMakerOpen(false);
-                                toast.info("Custom maker functionality coming soon!");
+                                setIsCustomMakerDialogOpen(true);
                               }}
                               className="border-t mt-2 pt-2 text-primary font-medium"
                             >
@@ -339,7 +374,8 @@ export default function FleetManagement() {
                             <CommandItem
                               onSelect={() => {
                                 setModelOpen(false);
-                                toast.info("Custom model functionality coming soon!");
+                                setCustomModelMakerId(selectedMakerId);
+                                setIsCustomModelDialogOpen(true);
                               }}
                               className="border-t mt-2 pt-2 text-primary font-medium"
                             >
@@ -622,7 +658,7 @@ export default function FleetManagement() {
                             <CommandItem
                               onSelect={() => {
                                 setEditMakerOpen(false);
-                                toast.info("Custom maker functionality coming soon!");
+                                setIsCustomMakerDialogOpen(true);
                               }}
                               className="border-t mt-2 pt-2 text-primary font-medium"
                             >
@@ -677,7 +713,8 @@ export default function FleetManagement() {
                             <CommandItem
                               onSelect={() => {
                                 setEditModelOpen(false);
-                                toast.info("Custom model functionality coming soon!");
+                                setCustomModelMakerId(editSelectedMakerId);
+                                setIsCustomModelDialogOpen(true);
                               }}
                               className="border-t mt-2 pt-2 text-primary font-medium"
                             >
@@ -784,6 +821,111 @@ export default function FleetManagement() {
         )}
       </div>
       </div>
+      
+      {/* Custom Maker Dialog */}
+      <Dialog open={isCustomMakerDialogOpen} onOpenChange={setIsCustomMakerDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Custom Car Maker</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!customMakerName.trim()) {
+              toast.error("Please enter a maker name");
+              return;
+            }
+            createCustomMakerMutation.mutate({
+              name: customMakerName,
+              country: "Lebanon", // Should be from user context
+            });
+          }}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="custom-maker-name">Maker Name *</Label>
+                <Input 
+                  id="custom-maker-name" 
+                  value={customMakerName}
+                  onChange={(e) => setCustomMakerName(e.target.value)}
+                  placeholder="e.g., Tesla, BYD, Rivian"
+                  required 
+                />
+              </div>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsCustomMakerDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createCustomMakerMutation.isPending}>
+                {createCustomMakerMutation.isPending ? "Adding..." : "Add Maker"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Custom Model Dialog */}
+      <Dialog open={isCustomModelDialogOpen} onOpenChange={setIsCustomModelDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Custom Car Model</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!customModelName.trim()) {
+              toast.error("Please enter a model name");
+              return;
+            }
+            if (!customModelMakerId) {
+              toast.error("Please select a maker first");
+              return;
+            }
+            createCustomModelMutation.mutate({
+              makerId: customModelMakerId,
+              modelName: customModelName,
+            });
+          }}>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="custom-model-maker">Car Maker *</Label>
+                <Select 
+                  value={customModelMakerId?.toString() || ""}
+                  onValueChange={(value) => setCustomModelMakerId(parseInt(value))}
+                  required
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select maker" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {carMakers?.map((maker) => (
+                      <SelectItem key={maker.id} value={maker.id.toString()}>
+                        {maker.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="custom-model-name">Model Name *</Label>
+                <Input 
+                  id="custom-model-name" 
+                  value={customModelName}
+                  onChange={(e) => setCustomModelName(e.target.value)}
+                  placeholder="e.g., Model S, Seal, R1T"
+                  required 
+                />
+              </div>
+            </div>
+            <DialogFooter className="mt-4">
+              <Button type="button" variant="outline" onClick={() => setIsCustomModelDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createCustomModelMutation.isPending}>
+                {createCustomModelMutation.isPending ? "Adding..." : "Add Model"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </MinimalLayout>
   );
 }

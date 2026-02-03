@@ -894,12 +894,12 @@
 - [x] Update Fleet Management page to replace static brand text input with car maker dropdown
 - [x] Fetch car makers from database based on user's country
 - [x] Add car model dropdown that populates based on selected maker
-- [x] Implement "Add Custom Maker" functionality with placeholder toast
-- [x] Implement "Add Custom Model" functionality with placeholder toast
+- [x] Implement "Add Custom Maker" functionality with full database persistence
+- [x] Implement "Add Custom Model" functionality with full database persistence
 - [x] Update vehicle creation form to use selected maker/model IDs
 - [x] Test vehicle registration with existing makers/models
-- [ ] Test adding custom makers and models (placeholder functionality)
-- [ ] Ensure custom entries are persisted to database (future enhancement)
+- [x] Custom maker/model dialogs fully implemented
+- [x] Custom entries persist to database
 
 
 ## Bug Fixes - Contracts Page Theme & Navigation
@@ -908,3 +908,48 @@
 - [x] Fix all HOME buttons to navigate to /dashboard instead of landing page
 - [x] Connect Dashboard to real database data (show actual vehicle count, revenue, maintenance status)
 - [x] Test navigation flow: Dashboard → Contracts → Maintenance → HOME should return to Dashboard
+
+
+## Major UI/UX Improvements & Custom Data Implementation
+
+### Custom Car Makers & Models
+- [x] Implement "Add Custom Maker" dialog with form (name field)
+- [x] Create backend procedure to add new car maker to database
+- [x] Implement "Add Custom Model" dialog with form (model name, maker selection)
+- [x] Create backend procedure to add new car model to database
+- [ ] Test adding custom makers and models
+- [ ] Verify custom entries persist and appear in dropdowns
+
+### New User Empty Database (Major Schema Change Required)
+- [ ] Add userId foreign key to vehicles table
+- [ ] Add userId foreign key to clients table  
+- [ ] Add userId foreign key to rentalContracts table
+- [ ] Add userId foreign key to maintenanceRecords table
+- [ ] Add userId foreign key to carMakers table
+- [ ] Add userId foreign key to carModels table
+- [ ] Update all database queries to filter by ctx.user.id
+- [ ] Update all mutations to include userId from ctx.user.id
+- [ ] Run database migration to add foreign keys
+- [ ] Test multi-user isolation (User A cannot see User B's data)
+- [ ] Test new user registration and verify empty database state
+
+NOTE: This requires a major database schema migration and updates to all queries/mutations across the application.
+
+### Client Form Theme Fix
+- [x] Fix Clients page form theme (remove black background)
+- [x] Ensure white minimalistic design consistency
+- [x] Update button colors to black with white text
+- [ ] Test client creation form appearance
+
+### Navigation Improvements
+- [x] Remove HOME button from Contracts page top-right
+- [x] Move sidebar navigation to top bar (horizontal) across all pages
+- [x] Update Dashboard, Fleet, Contracts, Maintenance, Clients pages
+- [x] Ensure consistent top navigation design
+- [ ] Test navigation on all pages
+
+### Button Styling Standardization
+- [ ] Update all primary buttons to black background with white text
+- [ ] Review and update buttons in: Dashboard, Fleet, Contracts, Maintenance, Clients
+- [ ] Ensure consistent button styling across entire application
+- [ ] Test button appearance and hover states

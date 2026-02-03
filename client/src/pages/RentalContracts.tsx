@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import MinimalLayout from "@/components/MinimalLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Button } from "@/components/ui/button";
@@ -242,51 +243,7 @@ export default function RentalContracts() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <Building2 className="h-8 w-8 text-gray-900" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Car Rental Management System</h1>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    (item.href === "/rental-contracts" || (item.href === "/dashboard" && window.location.pathname === "/dashboard"))
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        <div className="p-4 border-t border-gray-200">
-          <Button
-            onClick={() => setLocation("/")}
-            variant="outline"
-            className="w-full"
-          >
-            Sign out
-          </Button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 overflow-auto">
-        <div className="p-8">
+    <MinimalLayout>
           {showInspection ? (
             <div>
               <div className="mb-6">
@@ -328,12 +285,6 @@ export default function RentalContracts() {
               <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
             </div>
             <div className="flex gap-3">
-              <Link href="/">
-                <Button variant="outline" className="font-mono">
-                  <Home className="mr-2 h-4 w-4" />
-                  HOME
-                </Button>
-              </Link>
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gray-900 hover:bg-gray-800">
@@ -944,7 +895,6 @@ export default function RentalContracts() {
           )}
           </>
           )}
-        </div>
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
@@ -1355,7 +1305,6 @@ export default function RentalContracts() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
-    </div>
+    </MinimalLayout>
   );
 }

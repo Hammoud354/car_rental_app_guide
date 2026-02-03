@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import MinimalLayout from "@/components/MinimalLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -138,71 +139,7 @@ export default function Clients() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <Building2 className="h-8 w-8 text-gray-900" />
-            <h1 className="text-2xl font-bold text-gray-900">Car Rental Management System</h1>
-          </div>
-        </div>
-
-        <nav className="space-y-2 flex-1">
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-gray-700 hover:bg-gray-100"
-            onClick={() => window.location.href = '/dashboard'}
-          >
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            HOME
-          </Button>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-gray-700 hover:bg-gray-100"
-            onClick={() => window.location.href = '/fleet'}
-          >
-            <Building2 className="mr-2 h-4 w-4" />
-            Fleet
-          </Button>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-gray-700 hover:bg-gray-100"
-            onClick={() => window.location.href = '/rental-contracts'}
-          >
-            <FileText className="mr-2 h-4 w-4" />
-            Contracts
-          </Button>
-          <Button 
-            variant="default" 
-            className="w-full justify-start bg-gray-900 hover:bg-gray-800 text-white"
-          >
-            <Users className="mr-2 h-4 w-4" />
-            Clients
-          </Button>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-gray-700 hover:bg-gray-100"
-            onClick={() => window.location.href = '/settings'}
-          >
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
-          </Button>
-        </nav>
-
-        <div className="mt-auto pt-4 border-t border-gray-200">
-          <Button
-            onClick={() => window.location.href = "/"}
-            variant="outline"
-            className="w-full"
-          >
-            Sign out
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8 bg-gray-50">
+    <MinimalLayout>
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
@@ -210,12 +147,12 @@ export default function Clients() {
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-orange-600 hover:bg-orange-700">
+              <Button className="bg-gray-900 hover:bg-gray-800 text-white">
                 <Plus className="mr-2 h-4 w-4" />
                 New Client
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Client</DialogTitle>
               </DialogHeader>
@@ -226,27 +163,27 @@ export default function Clients() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
-                      <Input id="firstName" name="firstName" required className="bg-gray-700 border-gray-600" />
+                      <Input id="firstName" name="firstName" required className="" />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Last Name *</Label>
-                      <Input id="lastName" name="lastName" required className="bg-gray-700 border-gray-600" />
+                      <Input id="lastName" name="lastName" required className="" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="nationality">Nationality</Label>
-                      <Input id="nationality" name="nationality" placeholder="e.g., American, Canadian" className="bg-gray-700 border-gray-600" />
+                      <Input id="nationality" name="nationality" placeholder="e.g., American, Canadian" className="" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="bg-gray-700 border-gray-600" />
+                      <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" name="email" type="email" placeholder="client@example.com" className="bg-gray-700 border-gray-600" />
+                      <Input id="email" name="email" type="email" placeholder="client@example.com" className="" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="address">Address</Label>
-                      <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="bg-gray-700 border-gray-600" />
+                      <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="" />
                     </div>
                   </div>
                 </div>
@@ -257,7 +194,7 @@ export default function Clients() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                      <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="bg-gray-700 border-gray-600" />
+                      <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="" />
                     </div>
                     <div>
                       <DateDropdownSelector
@@ -282,7 +219,7 @@ export default function Clients() {
                 {/* Notes */}
                 <div className="border-t border-gray-700 pt-4">
                   <Label htmlFor="notes">Notes</Label>
-                  <Input id="notes" name="notes" placeholder="Additional information about the client" className="bg-gray-700 border-gray-600" />
+                  <Input id="notes" name="notes" placeholder="Additional information about the client" className="" />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
@@ -441,11 +378,10 @@ export default function Clients() {
             )}
           </Card>
         )}
-      </main>
 
       {/* Edit Client Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Client</DialogTitle>
           </DialogHeader>
@@ -462,7 +398,7 @@ export default function Clients() {
                       name="firstName" 
                       defaultValue={selectedClient.firstName}
                       required 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div>
@@ -472,7 +408,7 @@ export default function Clients() {
                       name="lastName" 
                       defaultValue={selectedClient.lastName}
                       required 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -482,7 +418,7 @@ export default function Clients() {
                       name="nationality" 
                       defaultValue={selectedClient.nationality || ""}
                       placeholder="e.g., American, Canadian" 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -493,7 +429,7 @@ export default function Clients() {
                       type="tel" 
                       defaultValue={selectedClient.phone || ""}
                       placeholder="e.g., +1 234 567 8900" 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -504,7 +440,7 @@ export default function Clients() {
                       type="email" 
                       defaultValue={selectedClient.email || ""}
                       placeholder="client@example.com" 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -514,7 +450,7 @@ export default function Clients() {
                       name="address" 
                       defaultValue={selectedClient.address || ""}
                       placeholder="Street, City, State, ZIP" 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                 </div>
@@ -531,7 +467,7 @@ export default function Clients() {
                       name="drivingLicenseNumber" 
                       defaultValue={selectedClient.drivingLicenseNumber}
                       required 
-                      className="bg-gray-700 border-gray-600" 
+                      className="" 
                     />
                   </div>
                   <div>
@@ -562,7 +498,7 @@ export default function Clients() {
                   name="notes" 
                   defaultValue={selectedClient.notes || ""}
                   placeholder="Additional information about the client" 
-                  className="bg-gray-700 border-gray-600" 
+                  className="" 
                 />
               </div>
 
@@ -581,7 +517,7 @@ export default function Clients() {
 
       {/* View Details Dialog */}
       <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-2xl bg-gray-800 text-white">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Client Details</DialogTitle>
           </DialogHeader>
@@ -641,7 +577,7 @@ export default function Clients() {
 
       {/* View Contracts Dialog */}
       <Dialog open={isContractsDialogOpen} onOpenChange={setIsContractsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               Rental History - {selectedClient?.firstName} {selectedClient?.lastName}
@@ -657,7 +593,7 @@ export default function Clients() {
               ) : (
                 <div className="space-y-3">
                   {clientContracts.map((contract: any) => (
-                    <Card key={contract.id} className="bg-gray-700 border-gray-600">
+                    <Card key={contract.id} className="">
                       <CardContent className="p-4">
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
@@ -741,6 +677,6 @@ export default function Clients() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </MinimalLayout>
   );
 }

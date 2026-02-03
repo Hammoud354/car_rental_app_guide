@@ -11,6 +11,7 @@ import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
+import MinimalLayout from "@/components/MinimalLayout";
 
 export default function Maintenance() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -81,54 +82,7 @@ export default function Maintenance() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <Car className="h-8 w-8 text-gray-900" />
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">Car Rental Management System</h1>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4">
-          <div className="space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = window.location.pathname === item.href;
-              return (
-                <Link key={item.href} href={item.href}>
-                  <div
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                      isActive
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-700 hover:bg-gray-100"
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </nav>
-
-        <div className="p-4 border-t border-gray-200">
-          <Button
-            onClick={() => window.location.href = '/'}
-            variant="outline"
-            className="w-full"
-          >
-            Sign out
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+    <MinimalLayout>
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -392,7 +346,6 @@ export default function Maintenance() {
             </Dialog>
           )}
         </div>
-      </main>
-    </div>
+    </MinimalLayout>
   );
 }

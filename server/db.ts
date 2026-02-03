@@ -762,16 +762,20 @@ export async function createCarMaker(data: { name: string; country: string; isCu
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(carMakers).values(data);
-  return result;
+  await db.insert(carMakers).values(data);
+  // Fetch the newly created maker
+  const [newMaker] = await db.select().from(carMakers).where(eq(carMakers.name, data.name)).orderBy(desc(carMakers.id)).limit(1);
+  return newMaker;
 }
 
 export async function createCarModel(data: { makerId: number; modelName: string; year?: number; isCustom: boolean; userId?: number }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(carModels).values(data);
-  return result;
+  await db.insert(carModels).values(data);
+  // Fetch the newly created model
+  const [newModel] = await db.select().from(carModels).where(and(eq(carModels.makerId, data.makerId), eq(carModels.modelName, data.modelName))).orderBy(desc(carModels.id)).limit(1);
+  return newModel;
 }
 
 export async function populateCarMakersForCountry(country: string) {
