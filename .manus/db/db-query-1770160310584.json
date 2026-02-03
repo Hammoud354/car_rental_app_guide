@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, mileage) VALUES (1, 'TEST-001', 'Toyota', 'Camry', 2024, 'Silver', 'Midsize', 'Available', 50.00, 15000);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, mileage) VALUES (1, 'TEST-001', 'Toyota', 'Camry', 2024, 'Silver', 'Midsize', 'Available', 50.00, 15000);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1584
+}

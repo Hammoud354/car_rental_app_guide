@@ -1,0 +1,16 @@
+{
+  "query": "SELECT DISTINCT userId FROM rentalContracts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT DISTINCT userId FROM rentalContracts;",
+  "rows": [
+    {
+      "userId": "0"
+    },
+    {
+      "userId": "1110017"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\n0\n1110017\n",
+  "stderr": "",
+  "execution_time_ms": 1530
+}

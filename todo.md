@@ -1131,3 +1131,12 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Position icon non-intrusively in top-right corner with white background
 - [x] Duration displays as "Xd" format (e.g., "10d" for 10 days)
 - [x] Icon has subtle shadow for visibility
+
+
+## Add Detailed Tooltip to Reservation Blocks
+- [ ] Add shadcn/ui Tooltip component to reservation blocks
+- [ ] Display exact start and end dates in readable format
+- [ ] Show total rental cost
+- [ ] Show contract ID for reference
+- [ ] Format tooltip with proper styling and spacing
+- [ ] Test tooltip on hover

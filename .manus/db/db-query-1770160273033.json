@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, userId, vehicleId, clientFirstName, clientLastName, rentalStartDate, rentalEndDate, status FROM rentalContracts LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, vehicleId, clientFirstName, clientLastName, rentalStartDate, rentalEndDate, status FROM rentalContracts LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "0",
+      "vehicleId": "30038",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-05 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "2",
+      "userId": "0",
+      "vehicleId": "30043",
+      "clientFirstName": "Jane",
+      "clientLastName": "Smith",
+      "rentalStartDate": "2026-02-10 00:00:00",
+      "rentalEndDate": "2026-03-02 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "3",
+      "userId": "0",
+      "vehicleId": "30054",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-10 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "4",
+      "userId": "0",
+      "vehicleId": "30059",
+      "clientFirstName": "Jane",
+      "clientLastName": "Smith",
+      "rentalStartDate": "2026-02-10 00:00:00",
+      "rentalEndDate": "2026-04-05 23:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "5",
+      "userId": "0",
+      "vehicleId": "30062",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-05 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "6",
+      "userId": "0",
+      "vehicleId": "30067",
+      "clientFirstName": "Jane",
+      "clientLastName": "Smith",
+      "rentalStartDate": "2026-02-10 00:00:00",
+      "rentalEndDate": "2026-02-15 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "7",
+      "userId": "0",
+      "vehicleId": "30071",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-05 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "8",
+      "userId": "0",
+      "vehicleId": "30078",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-05 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "9",
+      "userId": "0",
+      "vehicleId": "30083",
+      "clientFirstName": "Jane",
+      "clientLastName": "Smith",
+      "rentalStartDate": "2026-02-10 00:00:00",
+      "rentalEndDate": "2026-02-15 00:00:00",
+      "status": "completed"
+    },
+    {
+      "id": "30001",
+      "userId": "0",
+      "vehicleId": "90001",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "rentalStartDate": "2026-02-01 00:00:00",
+      "rentalEndDate": "2026-02-05 00:00:00",
+      "status": "completed"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tvehicleId\tclientFirstName\tclientLastName\trentalStartDate\trentalEndDate\tstatus\n1\t0\t30038\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-05 00:00:00\tcompleted\n2\t0\t30043\tJane\tSmith\t2026-02-10 00:00:00\t2026-03-02 00:00:00\tcompleted\n3\t0\t30054\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-10 00:00:00\tcompleted\n4\t0\t30059\tJane\tSmith\t2026-02-10 00:00:00\t2026-04-05 23:00:00\tcompleted\n5\t0\t30062\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-05 00:00:00\tcompleted\n6\t0\t30067\tJane\tSmith\t2026-02-10 00:00:00\t2026-02-15 00:00:00\tcompleted\n7\t0\t30071\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-05 00:00:00\tcompleted\n8\t0\t30078\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-05 00:00:00\tcompleted\n9\t0\t30083\tJane\tSmith\t2026-02-10 00:00:00\t2026-02-15 00:00:00\tcompleted\n30001\t0\t90001\tJohn\tDoe\t2026-02-01 00:00:00\t2026-02-05 00:00:00\tcompleted\n",
+  "stderr": "",
+  "execution_time_ms": 1584
+}

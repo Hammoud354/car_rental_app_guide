@@ -1,9 +1,10 @@
 import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+
 import { trpc } from "@/lib/trpc";
 import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle, Clock } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
 
 export default function Reservations() {
@@ -157,16 +158,24 @@ export default function Reservations() {
                         const endDate = new Date(reservation.rentalEndDate);
                         const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
                         
+                        // Format dates for display
+                        const formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        const formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        
+                        // Create tooltip text
+                        const tooltipText = `Contract #${reservation.id}\nVehicle: ${reservation.vehicleBrand} ${reservation.vehicleModel}\nStart: ${formattedStartDate}\nEnd: ${formattedEndDate}\nDuration: ${durationDays} day${durationDays > 1 ? 's' : ''}\nTotal Cost: $${reservation.totalCost?.toFixed(2) || 'N/A'}\nClient: ${reservation.clientName}\nPhone: ${reservation.clientPhone}`;
+                        
                         return (
-                        <Link key={reservation.id} href={`/rental-contracts`}>
-                          <div
-                            className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow relative ${
-                              reservation.hasConflict
-                                ? "bg-red-100 border-2 border-red-500 text-red-900"
-                                : `border ${getRandomColor(idx)}`
-                            }`}
-                            title={reservation.hasConflict ? `⚠️ Conflict: This vehicle has ${reservation.conflictCount} overlapping reservation(s)` : ""}
-                          >
+                            <div
+                              key={reservation.id}
+                              onClick={() => window.location.href = '/rental-contracts'}
+                              title={tooltipText}
+                              className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow relative ${
+                                reservation.hasConflict
+                                  ? "bg-red-100 border-2 border-red-500 text-red-900"
+                                  : `border ${getRandomColor(idx)}`
+                              }`}
+                            >
                             {/* Duration indicator in top-right corner */}
                             <div className="absolute top-1 right-1 flex items-center gap-0.5 bg-white/90 px-1 py-0.5 rounded text-[9px] font-semibold text-gray-700 shadow-sm">
                               <Clock className="h-2.5 w-2.5" />
@@ -197,14 +206,12 @@ export default function Reservations() {
                                 ⚠️ {reservation.conflictCount} conflict{reservation.conflictCount > 1 ? 's' : ''}
                               </div>
                             )}
-                          </div>
-                        </Link>
+                            </div>
                         );
                       })}
                     </div>
                   </div>
-                );
-              })}
+                );              })}
             </div>
           </CardContent>
         </Card>
