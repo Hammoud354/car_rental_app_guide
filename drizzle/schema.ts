@@ -35,6 +35,7 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const vehicles = mysqlTable("vehicles", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
   plateNumber: varchar("plateNumber", { length: 20 }).notNull().unique(),
   brand: varchar("brand", { length: 100 }).notNull(),
   model: varchar("model", { length: 100 }).notNull(),
@@ -65,6 +66,7 @@ export type InsertVehicle = typeof vehicles.$inferInsert;
  */
 export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
   vehicleId: int("vehicleId").notNull(),
   maintenanceType: mysqlEnum("maintenanceType", [
     "Routine", 
@@ -96,6 +98,7 @@ export type InsertMaintenanceRecord = typeof maintenanceRecords.$inferInsert;
  */
 export const clients = mysqlTable("clients", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
   firstName: varchar("firstName", { length: 100 }).notNull(),
   lastName: varchar("lastName", { length: 100 }).notNull(),
   nationality: varchar("nationality", { length: 100 }),
@@ -118,6 +121,7 @@ export type InsertClient = typeof clients.$inferInsert;
  */
 export const rentalContracts = mysqlTable("rentalContracts", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
   vehicleId: int("vehicleId").notNull(),
   clientId: int("clientId"), // Optional: reference to clients table if using existing client
   // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients
@@ -157,6 +161,7 @@ export type InsertRentalContract = typeof rentalContracts.$inferInsert;
  */
 export const damageMarks = mysqlTable("damageMarks", {
   id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
   contractId: int("contractId").notNull(),
   xPosition: decimal("xPosition", { precision: 5, scale: 2 }).notNull(), // Percentage position
   yPosition: decimal("yPosition", { precision: 5, scale: 2 }).notNull(), // Percentage position

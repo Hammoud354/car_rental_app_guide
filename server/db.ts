@@ -91,16 +91,15 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // Vehicle Management Queries
-export async function getAllVehicles() {
+export async function getAllVehicles(userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicles: database not available");
     return [];
   }
   
-  // Simply return all vehicles without checking rental status
-  // The status field in the database should be kept up-to-date when contracts are created/updated
-  const allVehicles = await db.select().from(vehicles);
+  // Return only vehicles belonging to the specified user
+  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
   
   // Calculate total maintenance cost for each vehicle
   const vehiclesWithCosts = await Promise.all(
@@ -120,13 +119,13 @@ export async function getAllVehicles() {
   return vehiclesWithCosts;
 }
 
-export async function getVehicleById(id: number) {
+export async function getVehicleById(id: number, userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicle: database not available");
     return undefined;
   }
-  const result = await db.select().from(vehicles).where(eq(vehicles.id, id)).limit(1);
+  const result = await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -148,30 +147,30 @@ export async function createVehicle(vehicle: InsertVehicle) {
   return created[0];
 }
 
-export async function updateVehicle(id: number, vehicle: Partial<InsertVehicle>) {
+export async function updateVehicle(id: number, userId: number, vehicle: Partial<InsertVehicle>) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
-  await db.update(vehicles).set(vehicle).where(eq(vehicles.id, id));
+  await db.update(vehicles).set(vehicle).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
 }
 
-export async function deleteVehicle(id: number) {
+export async function deleteVehicle(id: number, userId: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
-  await db.delete(vehicles).where(eq(vehicles.id, id));
+  await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
 }
 
 // Maintenance Records Queries
-export async function getMaintenanceRecordsByVehicleId(vehicleId: number) {
+export async function getMaintenanceRecordsByVehicleId(vehicleId: number, userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get maintenance records: database not available");
     return [];
   }
-  return await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.vehicleId, vehicleId));
+  return await db.select().from(maintenanceRecords).where(and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId)));
 }
 
 export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
@@ -189,13 +188,13 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
 }
 
 // Rental Contract Queries
-export async function getAllRentalContracts() {
+export async function getAllRentalContracts(userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  return await db.select().from(rentalContracts);
+  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
 }
 
 export async function getRentalContractById(id: number) {
@@ -532,42 +531,42 @@ export async function createClient(client: InsertClient): Promise<Client> {
   return created[0];
 }
 
-export async function getAllClients(): Promise<Client[]> {
+export async function getAllClients(userId: number): Promise<Client[]> {
   const db = await getDb();
   if (!db) return [];
   
-  return await db.select().from(clients);
+  return await db.select().from(clients).where(eq(clients.userId, userId));
 }
 
-export async function getClientById(id: number): Promise<Client | undefined> {
+export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
+  const result = await db.select().from(clients).where(and(eq(clients.id, id), eq(clients.userId, userId))).limit(1);
   return result[0];
 }
 
-export async function getClientByLicenseNumber(licenseNumber: string): Promise<Client | undefined> {
+export async function getClientByLicenseNumber(licenseNumber: string, userId: number): Promise<Client | undefined> {
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(clients).where(eq(clients.drivingLicenseNumber, licenseNumber)).limit(1);
+  const result = await db.select().from(clients).where(and(eq(clients.drivingLicenseNumber, licenseNumber), eq(clients.userId, userId))).limit(1);
   return result[0];
 }
 
-export async function updateClient(id: number, updates: Partial<InsertClient>): Promise<Client | undefined> {
+export async function updateClient(id: number, userId: number, updates: Partial<InsertClient>): Promise<Client | undefined> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.update(clients).set(updates).where(eq(clients.id, id));
-  return await getClientById(id);
+  await db.update(clients).set(updates).where(and(eq(clients.id, id), eq(clients.userId, userId)));
+  return await getClientById(id, userId);
 }
 
-export async function deleteClient(id: number): Promise<void> {
+export async function deleteClient(id: number, userId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.delete(clients).where(eq(clients.id, id));
+  await db.delete(clients).where(and(eq(clients.id, id), eq(clients.userId, userId)));
 }
 
 // Vehicle Profitability Analytics
