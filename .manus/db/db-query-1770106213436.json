@@ -1,0 +1,42 @@
+{
+  "query": "SELECT * FROM users LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM users LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "eaoa7aHG4W4zHjNjYNHFcY",
+      "name": "Mohammad Hammoud",
+      "email": "sq9txcnykj@privaterelay.appleid.com",
+      "loginMethod": "apple",
+      "role": "admin",
+      "createdAt": "2026-01-28 08:49:47",
+      "updatedAt": "2026-02-03 08:08:06",
+      "lastSignedIn": "2026-02-03 08:08:06",
+      "username": "",
+      "password": "NULL",
+      "phone": "NULL",
+      "countryCode": "NULL",
+      "country": "NULL"
+    },
+    {
+      "id": "990016",
+      "openId": "5HANethK6yyJBGGbZaNzUd",
+      "name": "Walid El Tayeh",
+      "email": "walid.eltayeh@air.global",
+      "loginMethod": "email",
+      "role": "user",
+      "createdAt": "2026-02-02 20:37:01",
+      "updatedAt": "2026-02-02 20:37:29",
+      "lastSignedIn": "2026-02-02 20:37:29",
+      "username": "",
+      "password": "NULL",
+      "phone": "NULL",
+      "countryCode": "NULL",
+      "country": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\temail\tloginMethod\trole\tcreatedAt\tupdatedAt\tlastSignedIn\tusername\tpassword\tphone\tcountryCode\tcountry\n1\teaoa7aHG4W4zHjNjYNHFcY\tMohammad Hammoud\tsq9txcnykj@privaterelay.appleid.com\tapple\tadmin\t2026-01-28 08:49:47\t2026-02-03 08:08:06\t2026-02-03 08:08:06\t\tNULL\tNULL\tNULL\tNULL\n990016\t5HANethK6yyJBGGbZaNzUd\tWalid El Tayeh\twalid.eltayeh@air.global\temail\tuser\t2026-02-02 20:37:01\t2026-02-02 20:37:29\t2026-02-02 20:37:29\t\tNULL\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1554
+}

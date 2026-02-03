@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -32,6 +32,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   try {
     const values: InsertUser = {
       openId: user.openId,
+      username: user.username || `oauth_${user.openId}`, // Generate username from openId if not provided
     };
     const updateSet: Record<string, unknown> = {};
 
@@ -699,4 +700,113 @@ export async function getVehicleFinancialDetails(vehicleId: number) {
     contracts: completedContracts,
     maintenanceRecords: maintenanceHistory,
   };
+}
+
+
+// User Management Functions
+export async function getUserByUsername(username: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(users).where(eq(users.username, username)).limit(1);
+  return result[0];
+}
+
+export async function createUser(userData: {
+  username: string;
+  password: string;
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(users).values({
+    username: userData.username,
+    password: userData.password,
+    name: userData.name,
+    email: userData.email,
+    phone: userData.phone,
+    country: userData.country,
+    role: 'user',
+  });
+  
+  // Return the created user
+  const newUser = await getUserByUsername(userData.username);
+  if (!newUser) throw new Error("Failed to create user");
+  
+  return newUser;
+}
+
+
+// Car Makers and Models Management
+export async function getCarMakersByCountry(country: string) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select().from(carMakers).where(eq(carMakers.country, country));
+  return result;
+}
+
+export async function getCarModelsByMaker(makerId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const result = await db.select().from(carModels).where(eq(carModels.makerId, makerId));
+  return result;
+}
+
+export async function createCarMaker(data: { name: string; country: string; isCustom: boolean; userId?: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(carMakers).values(data);
+  return result;
+}
+
+export async function createCarModel(data: { makerId: number; modelName: string; year?: number; isCustom: boolean; userId?: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(carModels).values(data);
+  return result;
+}
+
+export async function populateCarMakersForCountry(country: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if makers already exist for this country
+  const existing = await getCarMakersByCountry(country);
+  if (existing.length > 0) {
+    return existing; // Already populated
+  }
+  
+  // Import car data
+  const { getCarMakersByCountry: getCarData } = await import('./carData');
+  const carData = getCarData(country);
+  
+  // Insert makers and their models
+  for (const maker of carData) {
+    const makerResult = await db.insert(carMakers).values({
+      name: maker.name,
+      country: maker.country,
+      isCustom: false,
+    });
+    
+    const makerId = Number(makerResult[0].insertId);
+    
+    // Insert models for this maker
+    for (const modelName of maker.popularModels) {
+      await db.insert(carModels).values({
+        makerId,
+        modelName,
+        isCustom: false,
+      });
+    }
+  }
+  
+  return await getCarMakersByCountry(country);
 }

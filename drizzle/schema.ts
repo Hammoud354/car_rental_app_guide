@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -12,9 +12,14 @@ export const users = mysqlTable("users", {
    */
   id: int("id").autoincrement().primaryKey(),
   /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
+  openId: varchar("openId", { length: 64 }).unique(),
+  username: varchar("username", { length: 100 }).notNull().unique(),
+  password: varchar("password", { length: 255 }), // Hashed password
   name: text("name"),
   email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  countryCode: varchar("countryCode", { length: 10 }), // e.g., +1, +961
+  country: varchar("country", { length: 100 }), // Country where system is managed
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -161,3 +166,34 @@ export const damageMarks = mysqlTable("damageMarks", {
 
 export type DamageMark = typeof damageMarks.$inferSelect;
 export type InsertDamageMark = typeof damageMarks.$inferInsert;
+
+/**
+ * Car makers table - stores car manufacturers by country
+ */
+export const carMakers = mysqlTable("carMakers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  country: varchar("country", { length: 100 }).notNull(), // Country where this maker is available
+  isCustom: boolean("isCustom").default(false).notNull(), // True if added by user
+  userId: int("userId"), // User who added this custom maker
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CarMaker = typeof carMakers.$inferSelect;
+export type InsertCarMaker = typeof carMakers.$inferInsert;
+
+/**
+ * Car models/SKUs table - stores car models for each maker
+ */
+export const carModels = mysqlTable("carModels", {
+  id: int("id").autoincrement().primaryKey(),
+  makerId: int("makerId").notNull(), // Foreign key to carMakers
+  modelName: varchar("modelName", { length: 100 }).notNull(),
+  year: int("year"), // Optional year for specific model years
+  isCustom: boolean("isCustom").default(false).notNull(), // True if added by user
+  userId: int("userId"), // User who added this custom model
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CarModel = typeof carModels.$inferSelect;
+export type InsertCarModel = typeof carModels.$inferInsert;

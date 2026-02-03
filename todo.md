@@ -782,3 +782,28 @@
 - [x] Test login flow - username "Mo" (case-insensitive) and password "mo" working
 - [x] Test sign out functionality - redirects to landing page successfully
 - [x] Verify theme consistency - Apple-style minimalism applied across all pages
+
+
+## Sign-Up and Sign-In System with Country-Based Car Data
+- [ ] Design database schema for enhanced user registration (username, password, phone with country code, country)
+- [ ] Create countries table with country names and codes
+- [ ] Create carMakers table (id, name, country, isCustom)
+- [ ] Create carModels/SKUs table (id, makerId, modelName, year, isCustom)
+- [x] Research and compile car makers by country (Lebanon, UAE, USA, Saudi Arabia, Egypt, Jordan)
+- [x] Research and compile popular car models/SKUs for each maker (created carData.ts with 100+ models)
+- [x] Create sign-up UI component with tabs (Sign In / Sign Up)
+- [x] Add username, password, name, email, phone number (with country code selector), and country fields to sign-up form
+- [x] Implement backend user registration procedure (auth.signUp with auto car maker population)
+- [x] Create backend procedure to fetch car makers by country (carMakers.getByCountry)
+- [x] Create backend procedure to fetch car models by maker (carMakers.getModelsByMaker)
+- [x] Add backend procedures for creating custom makers and models (carMakers.createCustomMaker/Model)
+- [x] Add database helper functions (getUserByUsername, createUser, populateCarMakersForCountry, etc.)
+- [ ] Add "Add Custom Maker" functionality in vehicle registration form
+- [ ] Add "Add Custom Model" functionality in vehicle registration form
+- [ ] Update vehicle registration form with dynamic maker/model dropdowns
+- [ ] Sync custom makers/models to database for future use
+- [ ] Test complete sign-up flow
+- [ ] Test sign-in flow
+- [ ] Test country-based car data population
+- [ ] Test custom maker/model addition
+- [ ] Save checkpoint

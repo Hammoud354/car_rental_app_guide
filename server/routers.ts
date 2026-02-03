@@ -35,6 +35,53 @@ export const appRouter = router({
         }
         throw new Error('Invalid username or password');
       }),
+    signUp: publicProcedure
+      .input(z.object({
+        username: z.string().min(3),
+        password: z.string().min(3),
+        name: z.string(),
+        email: z.string().email(),
+        phone: z.string(),
+        countryCode: z.string(),
+        country: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Check if username already exists
+        const existingUser = await db.getUserByUsername(input.username);
+        if (existingUser) {
+          throw new Error('Username already exists');
+        }
+
+        // Create new user
+        const newUser = await db.createUser({
+          username: input.username,
+          password: input.password, // In production, hash this!
+          name: input.name,
+          email: input.email,
+          phone: `${input.countryCode}${input.phone}`,
+          country: input.country,
+        });
+
+        // Populate car makers and models for the user's country
+        try {
+          await db.populateCarMakersForCountry(input.country);
+        } catch (error) {
+          console.error('Failed to populate car makers:', error);
+          // Continue even if population fails
+        }
+
+        // Auto-login after signup
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, `user-${newUser.id}`, {
+          ...cookieOptions,
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        return {
+          success: true,
+          user: newUser,
+        };
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -529,6 +576,59 @@ export const appRouter = router({
       
       return { success: true };
     })
+  }),
+
+  // Car Makers and Models Router
+  carMakers: router({
+    getByCountry: publicProcedure
+      .input(z.object({ country: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getCarMakersByCountry(input.country);
+      }),
+    
+    getModelsByMaker: publicProcedure
+      .input(z.object({ makerId: z.number() }))
+      .query(async ({ input }) => {
+        return await db.getCarModelsByMaker(input.makerId);
+      }),
+    
+    createCustomMaker: publicProcedure
+      .input(z.object({
+        name: z.string(),
+        country: z.string(),
+        userId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createCarMaker({
+          name: input.name,
+          country: input.country,
+          isCustom: true,
+          userId: input.userId,
+        });
+      }),
+    
+    createCustomModel: publicProcedure
+      .input(z.object({
+        makerId: z.number(),
+        modelName: z.string(),
+        year: z.number().optional(),
+        userId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createCarModel({
+          makerId: input.makerId,
+          modelName: input.modelName,
+          year: input.year,
+          isCustom: true,
+          userId: input.userId,
+        });
+      }),
+    
+    populateForCountry: publicProcedure
+      .input(z.object({ country: z.string() }))
+      .mutation(async ({ input }) => {
+        return await db.populateCarMakersForCountry(input.country);
+      }),
   }),
 });
 

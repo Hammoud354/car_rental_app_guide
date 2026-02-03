@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -9,24 +11,84 @@ import { Car, FileText, BarChart3, Zap } from "lucide-react";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  
+  // Sign In state
+  const [signInUsername, setSignInUsername] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signInError, setSignInError] = useState("");
+  
+  // Sign Up state
+  const [signUpUsername, setSignUpUsername] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [signUpName, setSignUpName] = useState("");
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpPhone, setSignUpPhone] = useState("");
+  const [signUpCountryCode, setSignUpCountryCode] = useState("+961"); // Default to Lebanon
+  const [signUpCountry, setSignUpCountry] = useState("Lebanon");
+  const [signUpError, setSignUpError] = useState("");
   
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
       setLocation("/dashboard");
     },
     onError: (err) => {
-      setError(err.message);
+      setSignInError(err.message);
     },
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  const signUpMutation = trpc.auth.signUp.useMutation({
+    onSuccess: () => {
+      // After successful sign-up, automatically log in
+      setLocation("/dashboard");
+    },
+    onError: (err) => {
+      setSignUpError(err.message);
+    },
+  });
+
+  const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    loginMutation.mutate({ username, password });
+    setSignInError("");
+    loginMutation.mutate({ username: signInUsername, password: signInPassword });
   };
+
+  const handleSignUp = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignUpError("");
+    signUpMutation.mutate({
+      username: signUpUsername,
+      password: signUpPassword,
+      name: signUpName,
+      email: signUpEmail,
+      phone: signUpPhone,
+      countryCode: signUpCountryCode,
+      country: signUpCountry,
+    });
+  };
+
+  const countryCodes = [
+    { code: "+1", name: "USA/Canada" },
+    { code: "+961", name: "Lebanon" },
+    { code: "+971", name: "UAE" },
+    { code: "+966", name: "Saudi Arabia" },
+    { code: "+20", name: "Egypt" },
+    { code: "+962", name: "Jordan" },
+    { code: "+44", name: "UK" },
+    { code: "+33", name: "France" },
+    { code: "+49", name: "Germany" },
+  ];
+
+  const countries = [
+    "Lebanon",
+    "United Arab Emirates",
+    "United States",
+    "Saudi Arabia",
+    "Egypt",
+    "Jordan",
+    "United Kingdom",
+    "France",
+    "Germany",
+  ];
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] text-[#1d1d1f]">
@@ -51,52 +113,186 @@ export default function Landing() {
             </p>
           </div>
 
-          {/* Login Card */}
+          {/* Sign In / Sign Up Tabs */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
             <Card className="max-w-md mx-auto p-8 bg-white/80 backdrop-blur-xl border-gray-200/50 shadow-2xl">
-              <form onSubmit={handleLogin} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="username" className="text-sm font-medium text-gray-700">
-                    Username
-                  </Label>
-                  <Input
-                    id="username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Enter username"
-                    className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                    required
-                  />
-                </div>
+              <Tabs defaultValue="signin" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="signin">Sign In</TabsTrigger>
+                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                </TabsList>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password"
-                    className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
-                    required
-                  />
-                </div>
+                {/* Sign In Tab */}
+                <TabsContent value="signin">
+                  <form onSubmit={handleSignIn} className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-username" className="text-sm font-medium text-gray-700">
+                        Username
+                      </Label>
+                      <Input
+                        id="signin-username"
+                        type="text"
+                        value={signInUsername}
+                        onChange={(e) => setSignInUsername(e.target.value)}
+                        placeholder="Enter username"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-password" className="text-sm font-medium text-gray-700">
+                        Password
+                      </Label>
+                      <Input
+                        id="signin-password"
+                        type="password"
+                        value={signInPassword}
+                        onChange={(e) => setSignInPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
 
-                {error && (
-                  <p className="text-sm text-red-600 text-center">{error}</p>
-                )}
+                    {signInError && (
+                      <p className="text-sm text-red-600 text-center">{signInError}</p>
+                    )}
 
-                <Button
-                  type="submit"
-                  disabled={loginMutation.isPending}
-                  className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-all duration-200"
-                >
-                  {loginMutation.isPending ? "Signing in..." : "Sign in"}
-                </Button>
-              </form>
+                    <Button
+                      type="submit"
+                      disabled={loginMutation.isPending}
+                      className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-all duration-200"
+                    >
+                      {loginMutation.isPending ? "Signing in..." : "Sign in"}
+                    </Button>
+                  </form>
+                </TabsContent>
+                
+                {/* Sign Up Tab */}
+                <TabsContent value="signup">
+                  <form onSubmit={handleSignUp} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-username" className="text-sm font-medium text-gray-700">
+                        Username
+                      </Label>
+                      <Input
+                        id="signup-username"
+                        type="text"
+                        value={signUpUsername}
+                        onChange={(e) => setSignUpUsername(e.target.value)}
+                        placeholder="Choose a username"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password" className="text-sm font-medium text-gray-700">
+                        Password
+                      </Label>
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        value={signUpPassword}
+                        onChange={(e) => setSignUpPassword(e.target.value)}
+                        placeholder="Create a password"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-name" className="text-sm font-medium text-gray-700">
+                        Full Name
+                      </Label>
+                      <Input
+                        id="signup-name"
+                        type="text"
+                        value={signUpName}
+                        onChange={(e) => setSignUpName(e.target.value)}
+                        placeholder="Enter your full name"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email" className="text-sm font-medium text-gray-700">
+                        Email
+                      </Label>
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        value={signUpEmail}
+                        onChange={(e) => setSignUpEmail(e.target.value)}
+                        placeholder="your@email.com"
+                        className="h-12 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-gray-700">
+                        Phone Number
+                      </Label>
+                      <div className="flex gap-2">
+                        <Select value={signUpCountryCode} onValueChange={setSignUpCountryCode}>
+                          <SelectTrigger className="w-32 h-12 bg-white border-gray-300">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {countryCodes.map((cc) => (
+                              <SelectItem key={cc.code} value={cc.code}>
+                                {cc.code} {cc.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          id="signup-phone"
+                          type="tel"
+                          value={signUpPhone}
+                          onChange={(e) => setSignUpPhone(e.target.value)}
+                          placeholder="1234567890"
+                          className="h-12 flex-1 bg-white border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-country" className="text-sm font-medium text-gray-700">
+                        Country (Where will you manage your fleet?)
+                      </Label>
+                      <Select value={signUpCountry} onValueChange={setSignUpCountry}>
+                        <SelectTrigger className="h-12 bg-white border-gray-300">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {countries.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {signUpError && (
+                      <p className="text-sm text-red-600 text-center">{signUpError}</p>
+                    )}
+
+                    <Button
+                      type="submit"
+                      disabled={signUpMutation.isPending}
+                      className="w-full h-12 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-xl transition-all duration-200"
+                    >
+                      {signUpMutation.isPending ? "Creating account..." : "Sign up"}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
             </Card>
           </div>
         </div>
