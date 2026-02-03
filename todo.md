@@ -1090,3 +1090,17 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Calendar legend shows Today, Past Date, Future Date
 - [x] Create New Reservation button links to Contracts page
 - [x] Ready to display future reservations when contracts are created
+
+
+## Add Automatic Conflict Detection to Reservations Calendar
+- [x] Update getFutureReservations to detect overlapping reservations for same vehicle
+- [x] Add conflict flag to reservation data returned by backend (hasConflict, conflictCount, conflictingContracts)
+- [x] Update calendar UI to display conflict warnings with red border (bg-red-100 border-2 border-red-500)
+- [x] Add warning icon (AlertTriangle) to conflicting reservation blocks
+- [x] Add tooltip showing conflict details (hover shows conflict count)
+- [x] Display conflict count badge at bottom of reservation block
+- [x] Test conflict detection - working correctly
+- [x] Conflicting reservations display with red background and border
+- [x] Warning icon and conflict count visible on calendar blocks
+- [x] Backend detects overlapping date ranges for same vehicle
+- [x] Ready to use - conflicts will be automatically flagged when contracts overlap

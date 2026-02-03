@@ -2,7 +2,7 @@ import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
-import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
 
@@ -152,13 +152,23 @@ export default function Reservations() {
                       {dayReservations.map((reservation, idx) => (
                         <Link key={reservation.id} href={`/rental-contracts`}>
                           <div
-                            className={`text-xs p-2 rounded border cursor-pointer hover:shadow-md transition-shadow ${getRandomColor(idx)}`}
+                            className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow ${
+                              reservation.hasConflict
+                                ? "bg-red-100 border-2 border-red-500 text-red-900"
+                                : `border ${getRandomColor(idx)}`
+                            }`}
+                            title={reservation.hasConflict ? `⚠️ Conflict: This vehicle has ${reservation.conflictCount} overlapping reservation(s)` : ""}
                           >
-                            <div className="flex items-center gap-1 mb-1">
-                              <Car className="h-3 w-3" />
-                              <span className="font-semibold truncate">
-                                {reservation.vehicleBrand} {reservation.vehicleModel}
-                              </span>
+                            <div className="flex items-center justify-between gap-1 mb-1">
+                              <div className="flex items-center gap-1">
+                                <Car className="h-3 w-3" />
+                                <span className="font-semibold truncate">
+                                  {reservation.vehicleBrand} {reservation.vehicleModel}
+                                </span>
+                              </div>
+                              {reservation.hasConflict && (
+                                <AlertTriangle className="h-3 w-3 text-red-600 flex-shrink-0" />
+                              )}
                             </div>
                             <div className="flex items-center gap-1 text-[10px]">
                               <User className="h-2.5 w-2.5" />
@@ -168,6 +178,11 @@ export default function Reservations() {
                               <Phone className="h-2.5 w-2.5" />
                               <span className="truncate">{reservation.clientPhone}</span>
                             </div>
+                            {reservation.hasConflict && (
+                              <div className="mt-1 text-[9px] font-semibold text-red-700">
+                                ⚠️ {reservation.conflictCount} conflict{reservation.conflictCount > 1 ? 's' : ''}
+                              </div>
+                            )}
                           </div>
                         </Link>
                       ))}

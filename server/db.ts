@@ -980,16 +980,38 @@ export async function getFutureReservations(month: number, year: number, userId:
   ))
   .orderBy(rentalContracts.rentalStartDate);
 
-  return contracts.map(contract => ({
-    id: contract.id,
-    vehicleId: contract.vehicleId,
-    rentalStartDate: contract.rentalStartDate,
-    rentalEndDate: contract.rentalEndDate,
-    clientName: `${contract.clientFirstName} ${contract.clientLastName}`,
-    clientPhone: contract.clientPhone || "N/A",
-    status: contract.status,
-    vehicleBrand: contract.vehicleBrand || "Unknown",
-    vehicleModel: contract.vehicleModel || "Unknown",
-    vehiclePlateNumber: contract.vehiclePlateNumber || "N/A",
-  }));
+  // Detect conflicts: check if any vehicle has overlapping reservations
+  const reservationsWithConflicts = contracts.map(contract => {
+    // Find other contracts for the same vehicle that overlap with this one
+    const conflicts = contracts.filter(other => 
+      other.id !== contract.id && 
+      other.vehicleId === contract.vehicleId &&
+      // Check if date ranges overlap
+      new Date(other.rentalStartDate) <= new Date(contract.rentalEndDate) &&
+      new Date(other.rentalEndDate) >= new Date(contract.rentalStartDate)
+    );
+
+    return {
+      id: contract.id,
+      vehicleId: contract.vehicleId,
+      rentalStartDate: contract.rentalStartDate,
+      rentalEndDate: contract.rentalEndDate,
+      clientName: `${contract.clientFirstName} ${contract.clientLastName}`,
+      clientPhone: contract.clientPhone || "N/A",
+      status: contract.status,
+      vehicleBrand: contract.vehicleBrand || "Unknown",
+      vehicleModel: contract.vehicleModel || "Unknown",
+      vehiclePlateNumber: contract.vehiclePlateNumber || "N/A",
+      hasConflict: conflicts.length > 0,
+      conflictCount: conflicts.length,
+      conflictingContracts: conflicts.map(c => ({
+        id: c.id,
+        startDate: c.rentalStartDate,
+        endDate: c.rentalEndDate,
+        clientName: `${c.clientFirstName} ${c.clientLastName}`,
+      })),
+    };
+  });
+
+  return reservationsWithConflicts;
 }
