@@ -995,3 +995,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Ensure all pages are accessible without login (Dashboard, Fleet, Contracts, Clients)
 - [x] Verify navigation works across all pages
 - [x] All pages load without authentication errors
+
+
+## BUG - /login Route Returns 404 Error - FIXED ✅
+- [x] Route /login?from_webdev=1 returns 404 error
+- [x] Added /login route to App.tsx that renders Landing component
+- [x] Route now shows landing page instead of 404
+- [x] Tested /login route - successfully displays landing page
+- [x] No more 404 errors
