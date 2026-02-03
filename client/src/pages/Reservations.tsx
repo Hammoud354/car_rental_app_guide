@@ -53,7 +53,7 @@ export default function Reservations() {
     calendarDays.push(day);
   }
 
-  // Get reservations for a specific day
+  // Get reservations for a specific day (only show on start date)
   const getReservationsForDay = (day: number) => {
     if (!reservations) return [];
     
@@ -61,10 +61,12 @@ export default function Reservations() {
     
     return reservations.filter(reservation => {
       const startDate = new Date(reservation.rentalStartDate);
-      const endDate = new Date(reservation.rentalEndDate);
+      startDate.setHours(0, 0, 0, 0);
       const checkDate = new Date(dateStr);
+      checkDate.setHours(0, 0, 0, 0);
       
-      return checkDate >= startDate && checkDate <= endDate;
+      // Only show reservation on its start date
+      return startDate.getTime() === checkDate.getTime();
     });
   };
 

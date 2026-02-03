@@ -1115,3 +1115,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Added User ID display to profile dropdown for easy identification
 - [ ] User needs to check their User ID from dropdown
 - [ ] Update contract's userId to match logged-in user's ID
+
+
+## Update Calendar to Show Reservations Only on Start Date
+- [x] Modify Reservations.tsx to display reservations only on rental start date
+- [x] Remove logic that spans reservations across entire rental period
+- [x] Each reservation should appear as single block on start date only
+- [x] Updated getReservationsForDay to compare only start date with check date
+- [x] Reservations now appear only on rental start date, not spanning entire period
