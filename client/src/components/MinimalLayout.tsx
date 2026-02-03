@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import Breadcrumb from "./Breadcrumb";
 
 export default function MinimalLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
@@ -107,6 +108,7 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        <Breadcrumb />
         {children}
       </main>
     </div>

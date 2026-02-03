@@ -1140,3 +1140,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [ ] Show contract ID for reference
 - [ ] Format tooltip with proper styling and spacing
 - [ ] Test tooltip on hover
+
+
+## Breadcrumb Navigation
+- [x] Create Breadcrumb component with dynamic path generation
+- [x] Integrate breadcrumbs into MinimalLayout (top nav layout)
+- [x] Add breadcrumb items based on current route
+- [x] Test breadcrumb navigation on all pages
+- [ ] Create checkpoint and deliver
