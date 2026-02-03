@@ -42,7 +42,21 @@ export default function Landing() {
       setLocation("/dashboard");
     },
     onError: (err) => {
-      setSignUpError(err.message);
+      // Parse tRPC validation errors
+      try {
+        const errorData = JSON.parse(err.message);
+        if (Array.isArray(errorData)) {
+          const fieldErrors = errorData.map((e: any) => {
+            const field = e.path?.[0] || 'Field';
+            return `${field}: ${e.message}`;
+          }).join(', ');
+          setSignUpError(fieldErrors);
+        } else {
+          setSignUpError(err.message);
+        }
+      } catch {
+        setSignUpError(err.message);
+      }
     },
   });
 
