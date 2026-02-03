@@ -1,19 +1,9 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Building2, BarChart3, FileText, Calendar, Users, LogOut, Wrench } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
+import { Building2, BarChart3, FileText, Wrench, Users } from "lucide-react";
 
 export default function MinimalLayout({ children }: { children: React.ReactNode }) {
-  const [location, setLocation] = useLocation();
-  const { user } = useAuth();
-  const logoutMutation = trpc.auth.logout.useMutation({
-    onSuccess: () => {
-      window.location.href = "/";
-    },
-  });
+  const [location] = useLocation();
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
@@ -23,10 +13,6 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
     { href: "/clients", label: "Clients", icon: Users },
   ];
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
-
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
       {/* Top Navigation Bar */}
@@ -34,7 +20,7 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/dashboard">
+            <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center group-hover:bg-gray-800 transition-colors">
                   <Building2 className="h-5 w-5 text-white" />
@@ -64,29 +50,8 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
               })}
             </div>
 
-            {/* User Menu */}
-            <div className="flex items-center gap-3">
-              {user && (
-                <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-gray-100">
-                  <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center">
-                    <span className="text-xs font-medium text-white">
-                      {user.name?.[0]?.toUpperCase() || 'M'}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium text-gray-900">{user.name}</span>
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                disabled={logoutMutation.isPending}
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                {logoutMutation.isPending ? "Signing out..." : "Sign out"}
-              </Button>
-            </div>
+            {/* Empty space for balance */}
+            <div className="w-24"></div>
           </div>
         </div>
       </nav>

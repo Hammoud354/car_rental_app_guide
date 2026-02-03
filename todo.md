@@ -982,3 +982,16 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Test print preview shows complete professional contract
 - [x] Test "Save as PDF" functionality in browser
 - [x] PDF output is clean and ready for archival/legal use
+
+
+## Remove Login System and Create Public Landing Page
+- [x] Remove authentication requirements from all pages
+- [x] Update Landing.tsx to remove login dialog
+- [x] Update MinimalLayout to remove useAuth and logout button
+- [x] Change all protectedProcedure to publicProcedure in server/routers.ts
+- [x] Replace ctx.user.id with default user ID (1) in all queries
+- [x] Fix duplicate publicProcedure import in routers.ts
+- [x] Test that website opens directly on landing page
+- [x] Ensure all pages are accessible without login (Dashboard, Fleet, Contracts, Clients)
+- [x] Verify navigation works across all pages
+- [x] All pages load without authentication errors

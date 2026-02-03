@@ -1,103 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { trpc } from "@/lib/trpc";
-import { useState } from "react";
 import { useLocation } from "wouter";
 import { Building2, FileText, BarChart3, Shield, Clock, Users } from "lucide-react";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
-  const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  
-  // Sign In state
-  const [signInUsername, setSignInUsername] = useState("");
-  const [signInPassword, setSignInPassword] = useState("");
-  const [signInError, setSignInError] = useState("");
-  
-  // Sign Up state
-  const [signUpUsername, setSignUpUsername] = useState("");
-  const [signUpPassword, setSignUpPassword] = useState("");
-  const [signUpName, setSignUpName] = useState("");
-  const [signUpEmail, setSignUpEmail] = useState("");
-  const [signUpPhone, setSignUpPhone] = useState("");
-  const [signUpCountryCode, setSignUpCountryCode] = useState("+961");
-  const [signUpCountry, setSignUpCountry] = useState("Lebanon");
-  const [signUpError, setSignUpError] = useState("");
-  
-  const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      setAuthDialogOpen(false);
-      setLocation("/dashboard");
-    },
-    onError: (err) => {
-      setSignInError(err.message);
-    },
-  });
-
-  const signUpMutation = trpc.auth.signUp.useMutation({
-    onSuccess: () => {
-      setAuthDialogOpen(false);
-      setLocation("/dashboard");
-    },
-    onError: (err) => {
-      try {
-        const errorData = JSON.parse(err.message);
-        if (Array.isArray(errorData)) {
-          const fieldErrors = errorData.map((e: any) => {
-            const field = e.path?.[0] || 'Field';
-            return `${field}: ${e.message}`;
-          }).join(', ');
-          setSignUpError(fieldErrors);
-        } else {
-          setSignUpError(err.message);
-        }
-      } catch {
-        setSignUpError(err.message);
-      }
-    },
-  });
-
-  const handleSignIn = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSignInError("");
-    loginMutation.mutate({ username: signInUsername, password: signInPassword });
-  };
-
-  const handleSignUp = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSignUpError("");
-    signUpMutation.mutate({
-      username: signUpUsername,
-      password: signUpPassword,
-      name: signUpName,
-      email: signUpEmail,
-      phone: signUpPhone,
-      countryCode: signUpCountryCode,
-      country: signUpCountry,
-    });
-  };
-
-  const countryCodes = [
-    { code: "+1", name: "USA/Canada" },
-    { code: "+961", name: "Lebanon" },
-    { code: "+971", name: "UAE" },
-    { code: "+966", name: "Saudi Arabia" },
-    { code: "+20", name: "Egypt" },
-    { code: "+962", name: "Jordan" },
-  ];
-
-  const countries = [
-    "Lebanon",
-    "United Arab Emirates",
-    "United States",
-    "Saudi Arabia",
-    "Egypt",
-    "Jordan",
-  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -109,171 +15,12 @@ export default function Landing() {
             <span className="text-xl font-semibold text-gray-900">Car Rental Management System</span>
           </div>
           
-          <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                Sign In / Sign Up
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Welcome to Car Rental Management System</DialogTitle>
-              </DialogHeader>
-              
-              <Tabs defaultValue="signin" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="signin">
-                  <form onSubmit={handleSignIn} className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-username">Username</Label>
-                      <Input
-                        id="signin-username"
-                        type="text"
-                        value={signInUsername}
-                        onChange={(e) => setSignInUsername(e.target.value)}
-                        placeholder="Enter username"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="signin-password">Password</Label>
-                      <Input
-                        id="signin-password"
-                        type="password"
-                        value={signInPassword}
-                        onChange={(e) => setSignInPassword(e.target.value)}
-                        placeholder="Enter password"
-                        required
-                      />
-                    </div>
-
-                    {signInError && (
-                      <p className="text-sm text-red-600">{signInError}</p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      disabled={loginMutation.isPending}
-                      className="w-full bg-gray-900 hover:bg-gray-800"
-                    >
-                      {loginMutation.isPending ? "Signing in..." : "Sign in"}
-                    </Button>
-                  </form>
-                </TabsContent>
-                
-                <TabsContent value="signup">
-                  <form onSubmit={handleSignUp} className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-username">Username</Label>
-                      <Input
-                        id="signup-username"
-                        type="text"
-                        value={signUpUsername}
-                        onChange={(e) => setSignUpUsername(e.target.value)}
-                        placeholder="Choose a username"
-                        required
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        value={signUpPassword}
-                        onChange={(e) => setSignUpPassword(e.target.value)}
-                        placeholder="Create a password"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">Full Name</Label>
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        value={signUpName}
-                        onChange={(e) => setSignUpName(e.target.value)}
-                        placeholder="Enter your full name"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-email">Email</Label>
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        value={signUpEmail}
-                        onChange={(e) => setSignUpEmail(e.target.value)}
-                        placeholder="your@email.com"
-                        required
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Phone Number</Label>
-                      <div className="flex gap-2">
-                        <Select value={signUpCountryCode} onValueChange={setSignUpCountryCode}>
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {countryCodes.map((cc) => (
-                              <SelectItem key={cc.code} value={cc.code}>
-                                {cc.code} {cc.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Input
-                          type="tel"
-                          value={signUpPhone}
-                          onChange={(e) => setSignUpPhone(e.target.value)}
-                          placeholder="Phone number"
-                          required
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Country (Where will you manage your fleet?)</Label>
-                      <Select value={signUpCountry} onValueChange={setSignUpCountry}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {countries.map((country) => (
-                            <SelectItem key={country} value={country}>
-                              {country}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {signUpError && (
-                      <p className="text-sm text-red-600">{signUpError}</p>
-                    )}
-
-                    <Button
-                      type="submit"
-                      disabled={signUpMutation.isPending}
-                      className="w-full bg-gray-900 hover:bg-gray-800"
-                    >
-                      {signUpMutation.isPending ? "Creating account..." : "Sign up"}
-                    </Button>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-gray-900 hover:bg-gray-800 text-white"
+            onClick={() => setLocation("/dashboard")}
+          >
+            Go to Dashboard
+          </Button>
         </div>
       </nav>
 
@@ -292,7 +39,7 @@ export default function Landing() {
             <Button 
               size="lg" 
               className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-lg"
-              onClick={() => setAuthDialogOpen(true)}
+              onClick={() => setLocation("/dashboard")}
             >
               Get Started
             </Button>
@@ -373,9 +120,9 @@ export default function Landing() {
           <Button 
             size="lg" 
             className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-lg"
-            onClick={() => setAuthDialogOpen(true)}
+            onClick={() => setLocation("/dashboard")}
           >
-            Start Free Trial
+            Explore Dashboard
           </Button>
         </div>
       </section>
