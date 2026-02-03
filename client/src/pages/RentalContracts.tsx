@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 
@@ -234,7 +234,7 @@ export default function RentalContracts() {
 
   const navItems = [
     { href: "/dashboard", label: "HOME", icon: Home },
-    { href: "/fleet-management", label: "Fleet", icon: Car },
+    { href: "/fleet-management", label: "Fleet", icon: BarChart3 },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
     { href: "/rental-contracts", label: "Contracts", icon: FileText },
     { href: "/clients", label: "Clients", icon: Users },
@@ -247,9 +247,9 @@ export default function RentalContracts() {
       <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Car className="h-8 w-8 text-gray-900" />
+            <Building2 className="h-8 w-8 text-gray-900" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Rental.OS</h1>
+              <h1 className="text-xl font-bold text-gray-900">Car Rental Management System</h1>
             </div>
           </div>
         </div>
@@ -336,7 +336,7 @@ export default function RentalContracts() {
               </Link>
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-orange-500 hover:bg-orange-600">
+                <Button className="bg-gray-900 hover:bg-gray-800">
                   <Plus className="h-4 w-4 mr-2" />
                   New Contract
                 </Button>
@@ -936,7 +936,7 @@ export default function RentalContracts() {
               <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
               <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
-              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-orange-500 hover:bg-orange-600">
+              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-gray-900 hover:bg-gray-800">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Contract
               </Button>
@@ -957,13 +957,13 @@ export default function RentalContracts() {
               return (
                 <div className="space-y-6">
                   {/* Contract Number */}
-                  <div className="bg-orange-600/20 border border-orange-500 p-4 rounded-lg">
-                    <div className="text-sm text-orange-400">Contract Number</div>
-                    <div className="text-2xl font-bold font-mono text-orange-500">{selectedContract.contractNumber}</div>
+                  <div className="bg-gray-100 border border-gray-300 p-4 rounded-lg">
+                    <div className="text-sm text-gray-600">Contract Number</div>
+                    <div className="text-2xl font-bold font-mono text-gray-900">{selectedContract.contractNumber}</div>
                   </div>
                   {/* Client Information */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Information</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Client Information</h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
                       <div>
                         <div className="text-sm text-gray-400">Full Name</div>
@@ -1000,7 +1000,7 @@ export default function RentalContracts() {
 
                   {/* Vehicle Information */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Vehicle Information</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Vehicle Information</h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
                       <div>
                         <div className="text-sm text-gray-400">Plate Number</div>
@@ -1029,7 +1029,7 @@ export default function RentalContracts() {
 
                   {/* Rental Period & Pricing */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 text-orange-500">Rental Period & Pricing</h3>
+                    <h3 className="font-semibold text-lg mb-3 text-gray-900">Rental Period & Pricing</h3>
                     <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
                       <div>
                         <div className="text-sm text-gray-400">Start Date</div>
@@ -1057,7 +1057,7 @@ export default function RentalContracts() {
                       </div>
                       <div className="col-span-2">
                         <div className="text-sm text-gray-400">Final Amount</div>
-                        <div className="text-2xl font-bold text-orange-500">${selectedContract.finalAmount}</div>
+                        <div className="text-2xl font-bold text-gray-900">${selectedContract.finalAmount}</div>
                       </div>
                       {selectedContract.status === "overdue" && (
                         <>
@@ -1085,7 +1085,7 @@ export default function RentalContracts() {
                   {/* Signature */}
                   {selectedContract.signatureData && (
                     <div>
-                      <h3 className="font-semibold text-lg mb-3 text-orange-500">Client Signature</h3>
+                      <h3 className="font-semibold text-lg mb-3 text-gray-900">Client Signature</h3>
                       <div className="bg-gray-700 p-4 rounded-lg">
                         <img src={selectedContract.signatureData} alt="Client Signature" className="max-w-full h-32 border border-gray-600 rounded" />
                       </div>
@@ -1136,7 +1136,7 @@ export default function RentalContracts() {
                     setAdditionalDays(1);
                     setIsRenewDialogOpen(true);
                   }} 
-                  className="bg-orange-600 hover:bg-orange-700 text-white col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/50"
+                  className="bg-gray-900 hover:bg-gray-800 text-white col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg"
                   size="default"
                 >
                   Renew
@@ -1187,13 +1187,13 @@ export default function RentalContracts() {
                     </div>
                     <div>
                       <div className="text-sm text-gray-400">New End Date</div>
-                      <div className="font-semibold text-orange-500">{newEndDate.toLocaleDateString()}</div>
+                      <div className="font-semibold text-gray-900">{newEndDate.toLocaleDateString()}</div>
                     </div>
                     <div className="border-t border-gray-600 pt-3 mt-3">
                       <div className="text-sm text-gray-400">Daily Rate</div>
                       <div>${dailyRateNum.toFixed(2)}</div>
                       <div className="text-sm text-gray-400 mt-2">Additional Cost</div>
-                      <div className="text-xl font-bold text-orange-500">${additionalCost.toFixed(2)}</div>
+                      <div className="text-xl font-bold text-gray-900">${additionalCost.toFixed(2)}</div>
                     </div>
                   </div>
                   <DialogFooter>
@@ -1208,7 +1208,7 @@ export default function RentalContracts() {
                           newEndDate,
                         });
                       }}
-                      className="bg-orange-600 hover:bg-orange-700"
+                      className="bg-gray-900 hover:bg-gray-800"
                     >
                       Confirm Renewal
                     </Button>

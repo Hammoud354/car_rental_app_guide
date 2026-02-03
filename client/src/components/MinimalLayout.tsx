@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Car, BarChart3, FileText, Calendar, Users, LogOut } from "lucide-react";
+import { Building2, BarChart3, FileText, Calendar, Users, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -17,7 +17,7 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
 
   const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-    { href: "/fleet-management", label: "Fleet", icon: Car },
+    { href: "/fleet-management", label: "Fleet", icon: BarChart3 },
     { href: "/rental-contracts", label: "Contracts", icon: FileText },
     { href: "/booking", label: "Reservations", icon: Calendar },
     { href: "/clients", label: "Clients", icon: Users },
@@ -37,9 +37,9 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
             <Link href="/dashboard">
               <div className="flex items-center gap-2 cursor-pointer group">
                 <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center group-hover:bg-gray-800 transition-colors">
-                  <Car className="h-5 w-5 text-white" />
+                  <Building2 className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-lg font-semibold text-gray-900">Rental.OS</span>
+                <span className="text-lg font-semibold text-gray-900">Car Rental Management System</span>
               </div>
             </Link>
 

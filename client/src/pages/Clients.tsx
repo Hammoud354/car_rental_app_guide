@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Car, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -143,8 +143,8 @@ export default function Clients() {
       <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
-            <Car className="h-8 w-8 text-gray-900" />
-            <h1 className="text-2xl font-bold text-gray-900">Rental.OS</h1>
+            <Building2 className="h-8 w-8 text-gray-900" />
+            <h1 className="text-2xl font-bold text-gray-900">Car Rental Management System</h1>
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function Clients() {
             className="w-full justify-start text-gray-700 hover:bg-gray-100"
             onClick={() => window.location.href = '/fleet'}
           >
-            <Car className="mr-2 h-4 w-4" />
+            <Building2 className="mr-2 h-4 w-4" />
             Fleet
           </Button>
           <Button 

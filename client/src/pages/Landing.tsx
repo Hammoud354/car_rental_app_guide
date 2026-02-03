@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Car, FileText, BarChart3, Shield, Clock, Users } from "lucide-react";
+import { Building2, FileText, BarChart3, Shield, Clock, Users } from "lucide-react";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -105,8 +105,8 @@ export default function Landing() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Car className="h-8 w-8 text-gray-900" />
-            <span className="text-xl font-semibold text-gray-900">Rental.OS</span>
+            <Building2 className="h-8 w-8 text-gray-900" />
+            <span className="text-xl font-semibold text-gray-900">Car Rental Management System</span>
           </div>
           
           <Dialog open={authDialogOpen} onOpenChange={setAuthDialogOpen}>
@@ -117,7 +117,7 @@ export default function Landing() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
-                <DialogTitle>Welcome to Rental.OS</DialogTitle>
+                <DialogTitle>Welcome to Car Rental Management System</DialogTitle>
               </DialogHeader>
               
               <Tabs defaultValue="signin" className="w-full">
@@ -305,7 +305,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg border border-gray-200">
-              <Car className="h-12 w-12 text-gray-900 mb-4" />
+              <Building2 className="h-12 w-12 text-gray-900 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-3">Fleet Control</h3>
               <p className="text-gray-600">
                 Track vehicle status, maintenance schedules, and insurance expiry dates
@@ -368,7 +368,7 @@ export default function Landing() {
             Ready to transform your fleet operations?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join agencies worldwide who trust Rental.OS to manage their fleet efficiently.
+            Join agencies worldwide who trust Car Rental Management System to manage their fleet efficiently.
           </p>
           <Button 
             size="lg" 
@@ -383,7 +383,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="border-t border-gray-200 py-8 px-6">
         <div className="max-w-7xl mx-auto text-center text-gray-600">
-          <p>© 2026 Rental.OS. All rights reserved.</p>
+          <p>© 2026 Car Rental Management System. All rights reserved.</p>
         </div>
       </footer>
     </div>

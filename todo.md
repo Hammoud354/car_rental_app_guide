@@ -874,3 +874,17 @@
 - [ ] Test settings CRUD operations
 - [ ] Update rental contract PDF to include company logo and info from settings
 - [ ] Test contract PDF generation with company branding
+
+
+## Branding Update & Contracts Theme Fix
+- [ ] Replace all instances of "Rental.OS" with "Car Rental Management System"
+- [ ] Remove all car logo icons from the application
+- [ ] Update Landing page branding
+- [ ] Update MinimalLayout branding
+- [ ] Update RentalContracts page branding
+- [ ] Update Clients page branding
+- [ ] Update Dashboard page branding
+- [ ] Update Settings page branding
+- [ ] Fix Contracts section theme to match Dashboard clean design
+- [ ] Ensure white backgrounds, clean buttons, consistent fonts across Contracts page
+- [ ] Test all pages for consistent branding and theme
