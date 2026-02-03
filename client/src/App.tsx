@@ -16,11 +16,13 @@ import Dashboard from "./pages/Dashboard";
 import Maintenance from "./pages/Maintenance";
 import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/login" component={Login} />
       <Route path="/clients" component={Clients} />
       <Route path="/rental-contracts" component={RentalContracts} />
       <Route path="/404" component={NotFound} />

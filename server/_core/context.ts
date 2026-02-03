@@ -15,27 +15,27 @@ export async function createContext(
   let user: User | null = null;
 
   try {
-    // Check for simple session cookie first
+    // Check for session cookie
     const sessionCookie = opts.req.cookies?.[COOKIE_NAME];
-    if (sessionCookie === 'simple-session-mo') {
-      // Return a mock user for simple authentication
-      user = {
-        id: 1,
-        openId: 'mo',
-        name: 'Mo',
-        email: 'mo@rental.os',
-        loginMethod: 'simple',
-        role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lastSignedIn: new Date(),
-      } as User;
-    } else {
-      // Fall back to OAuth authentication
-      user = await sdk.authenticateRequest(opts.req);
+    
+    if (sessionCookie) {
+      // Handle hardcoded 'Mo' user for testing
+      if (sessionCookie === 'simple-session-mo') {
+        const { getUserById } = await import("../db");
+        user = await getUserById(1);
+      }
+      // Handle regular user sessions: user-{id}
+      else if (sessionCookie.startsWith('user-')) {
+        const userId = parseInt(sessionCookie.replace('user-', ''));
+        if (!isNaN(userId)) {
+          const { getUserById } = await import("../db");
+          user = await getUserById(userId);
+        }
+      }
     }
   } catch (error) {
     // Authentication is optional for public procedures.
+    console.error('[Auth] Failed to authenticate:', error);
     user = null;
   }
 

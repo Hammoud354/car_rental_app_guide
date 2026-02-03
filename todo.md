@@ -992,14 +992,20 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Fixed cookie domain configuration in cookies.ts
 - [x] Uncommented domain setting to enable proper cookie persistence
 - [x] Restarted server to apply changes
-- [x] Ready for user testing
-
-
-## CRITICAL BUG - OAuth Flow Logs User Out of Manus - FIXED ✅
-- [x] Signing into the website logs the user out of Manus platform itself
-- [x] Check OAuth callback redirect URL configuration
-- [x] Review OAuth state management and session handling
-- [x] Removed domain setting from cookies to prevent affecting parent domain
-- [x] Changed sameSite from "none" to "lax" for better security
-- [x] Cookie now only applies to app subdomain, not entire manus.computer domain
-- [x] Manus platform session remains active during app authentication
+- [x] Ready for use## CRITICAL BUG - Manus OAuth Conflicts with Platform Session - FIXED ✅
+- [x] Root cause identified: App uses Manus OAuth which conflicts with main Manus platform session
+- [x] When accessing protected pages (Fleet, etc), app redirects to Manus OAuth login
+- [x] This OAuth redirect logs user out of main Manus platform
+- [x] Tried fixing cookie domain and sameSite settings - didn't resolve conflict
+- [x] SOLUTION: Implemented standalone username/password authentication
+- [x] Removed Manus OAuth dependency completely
+- [x] Created simple login/signup system that doesn't interfere with Manus platform
+- [x] Updated context.ts to use session cookies instead of OAuth
+- [x] Created Login page with username/password forms
+- [x] Updated main.tsx to redirect to /login instead of OAuth
+- [x] Updated MinimalLayout to show Sign In button when not authenticated
+- [x] Test login/signup flow and verify no Manus platform interference
+- [x] Successfully logged in with username/password without OAuth redirect
+- [x] Confirmed no interference with Manus platform session
+- [x] Dashboard loads correctly after authentication
+- [x] Multi-user isolation working (new users see empty database)
