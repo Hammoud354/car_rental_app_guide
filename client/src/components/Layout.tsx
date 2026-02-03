@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { href: "/fleet-management", label: "Fleet Management", icon: Car },
     { href: "/booking", label: "Reservations", icon: Calendar },
     { href: "/rental-contracts", label: "Rental Contracts", icon: FileText },
-    { href: "/contacts", label: "Contacts", icon: Users },
+    { href: "/clients", label: "Clients", icon: Users },
   ];
 
   return (

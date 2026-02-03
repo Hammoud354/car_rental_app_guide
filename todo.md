@@ -758,3 +758,11 @@
 - [x] Test View Contracts functionality - working perfectly with 3 contracts for John Doe
 - [x] Test search functionality - filters correctly by name (tested with "mohammad")
 - [x] Verify client-contract integration - seamless linking between systems
+
+
+## Fix Navigation to Clients Page
+- [x] Check if Clients link exists in DashboardLayout sidebar
+- [x] Found issue: Layout.tsx had "Contacts" linking to /contacts instead of /clients
+- [x] Updated Layout.tsx navigation to use "Clients" and /clients route
+- [x] Verified /clients route exists in App.tsx
+- [x] Test clicking Clients link from different pages - successfully navigates to /clients
