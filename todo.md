@@ -993,3 +993,13 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Uncommented domain setting to enable proper cookie persistence
 - [x] Restarted server to apply changes
 - [x] Ready for user testing
+
+
+## CRITICAL BUG - OAuth Flow Logs User Out of Manus - FIXED ✅
+- [x] Signing into the website logs the user out of Manus platform itself
+- [x] Check OAuth callback redirect URL configuration
+- [x] Review OAuth state management and session handling
+- [x] Removed domain setting from cookies to prevent affecting parent domain
+- [x] Changed sameSite from "none" to "lax" for better security
+- [x] Cookie now only applies to app subdomain, not entire manus.computer domain
+- [x] Manus platform session remains active during app authentication
