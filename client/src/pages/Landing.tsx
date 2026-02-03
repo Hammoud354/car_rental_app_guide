@@ -15,12 +15,20 @@ export default function Landing() {
             <span className="text-xl font-semibold text-gray-900">Car Rental Management System</span>
           </div>
           
-          <Button 
-            className="bg-gray-900 hover:bg-gray-800 text-white"
-            onClick={() => setLocation("/dashboard")}
-          >
-            Go to Dashboard
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              variant="outline"
+              onClick={() => setLocation("/signin")}
+            >
+              Sign In
+            </Button>
+            <Button 
+              className="bg-gray-900 hover:bg-gray-800 text-white"
+              onClick={() => setLocation("/signup")}
+            >
+              Sign Up
+            </Button>
+          </div>
         </div>
       </nav>
 

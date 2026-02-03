@@ -1023,3 +1023,13 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Password hashing implemented in signup and login procedures
 - [x] Session cookies properly set, sent, and read by server
 - [x] MinimalLayout updated to show user profile or Sign In/Sign Up buttons
+
+
+## Move Sign In/Sign Up Buttons to Landing Page Only
+- [x] Remove Sign In and Sign Up buttons from MinimalLayout navigation bar
+- [x] Add Sign In and Sign Up buttons to Landing page navigation
+- [x] Ensure buttons only appear on landing page, not on internal pages
+- [x] Test button placement on landing page and internal pages
+- [x] Landing page shows Sign In and Sign Up buttons in top right
+- [x] Internal pages (Dashboard, Fleet, etc.) only show user profile when logged in
+- [x] Navigation bar on internal pages is clean without auth buttons

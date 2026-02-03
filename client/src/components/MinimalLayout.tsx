@@ -72,9 +72,9 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
               })}
             </div>
 
-            {/* User Profile / Auth Buttons */}
-            <div className="flex items-center gap-2">
-              {user ? (
+            {/* User Profile (only show if logged in) */}
+            {user && (
+              <div className="flex items-center gap-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
@@ -94,21 +94,8 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
-                <div className="flex gap-2">
-                  <Link href="/signin">
-                    <Button variant="outline" size="sm">
-                      Sign In
-                    </Button>
-                  </Link>
-                  <Link href="/signup">
-                    <Button size="sm">
-                      Sign Up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>
