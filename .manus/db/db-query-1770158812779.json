@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, brand, model, plateNumber, userId FROM vehicles LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, brand, model, plateNumber, userId FROM vehicles LIMIT 5;",
+  "rows": [
+    {
+      "id": "30007",
+      "brand": "Toyota",
+      "model": "Camry",
+      "plateNumber": "TEST-1769552593815",
+      "userId": "0"
+    },
+    {
+      "id": "30009",
+      "brand": "Honda",
+      "model": "Accord",
+      "plateNumber": "UPD-52594045",
+      "userId": "0"
+    },
+    {
+      "id": "30013",
+      "brand": "Toyota",
+      "model": "Camry",
+      "plateNumber": "TEST-1769552669049",
+      "userId": "0"
+    },
+    {
+      "id": "30015",
+      "brand": "Honda",
+      "model": "Accord",
+      "plateNumber": "UPD-52669275",
+      "userId": "0"
+    },
+    {
+      "id": "30017",
+      "brand": "Toyota",
+      "model": "Camry",
+      "plateNumber": "TEST-1769552701940",
+      "userId": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbrand\tmodel\tplateNumber\tuserId\n30007\tToyota\tCamry\tTEST-1769552593815\t0\n30009\tHonda\tAccord\tUPD-52594045\t0\n30013\tToyota\tCamry\tTEST-1769552669049\t0\n30015\tHonda\tAccord\tUPD-52669275\t0\n30017\tToyota\tCamry\tTEST-1769552701940\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1610
+}

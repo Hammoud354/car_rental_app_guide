@@ -86,6 +86,9 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                      User ID: {user.id}
+                    </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
                       Dashboard

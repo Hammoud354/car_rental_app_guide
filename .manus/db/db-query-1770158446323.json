@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, vehicleId, clientFirstName, clientLastName, rentalStartDate, rentalEndDate, status, createdAt FROM rentalContracts WHERE rentalStartDate >= '2026-02-20' ORDER BY createdAt DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, vehicleId, clientFirstName, clientLastName, rentalStartDate, rentalEndDate, status, createdAt FROM rentalContracts WHERE rentalStartDate >= '2026-02-20' ORDER BY createdAt DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "390001",
+      "vehicleId": "390001",
+      "clientFirstName": "mohammad",
+      "clientLastName": "hmd",
+      "rentalStartDate": "2026-02-22 22:00:00",
+      "rentalEndDate": "2026-03-04 22:00:00",
+      "status": "active",
+      "createdAt": "2026-02-03 22:37:34"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tvehicleId\tclientFirstName\tclientLastName\trentalStartDate\trentalEndDate\tstatus\tcreatedAt\n390001\t390001\tmohammad\thmd\t2026-02-22 22:00:00\t2026-03-04 22:00:00\tactive\t2026-02-03 22:37:34\n",
+  "stderr": "",
+  "execution_time_ms": 1639
+}

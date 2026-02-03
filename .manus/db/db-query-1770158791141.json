@@ -1,0 +1,42 @@
+{
+  "query": "SELECT * FROM rentalContracts WHERE rentalStartDate >= '2026-02-20' ORDER BY createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM rentalContracts WHERE rentalStartDate >= '2026-02-20' ORDER BY createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "390001",
+      "vehicleId": "390001",
+      "clientFirstName": "mohammad",
+      "clientLastName": "hmd",
+      "clientNationality": "lebanese",
+      "drivingLicenseNumber": "8934783",
+      "licenseIssueDate": "NULL",
+      "licenseExpiryDate": "2030-12-31 22:00:00",
+      "rentalStartDate": "2026-02-22 22:00:00",
+      "rentalEndDate": "2026-03-04 22:00:00",
+      "signatureData": "NULL",
+      "createdAt": "2026-02-03 22:37:34",
+      "updatedAt": "2026-02-03 22:37:34",
+      "clientPhone": "0302309",
+      "clientAddress": "beirut",
+      "rentalDays": "10",
+      "dailyRate": "40.00",
+      "totalAmount": "400.00",
+      "discount": "0.00",
+      "finalAmount": "400.00",
+      "clientId": "330001",
+      "contractNumber": "CTR-001",
+      "status": "active",
+      "returnedAt": "NULL",
+      "lateFeePercentage": "150.00",
+      "lateFee": "0.00",
+      "fuelLevel": "Full",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tvehicleId\tclientFirstName\tclientLastName\tclientNationality\tdrivingLicenseNumber\tlicenseIssueDate\tlicenseExpiryDate\trentalStartDate\trentalEndDate\tsignatureData\tcreatedAt\tupdatedAt\tclientPhone\tclientAddress\trentalDays\tdailyRate\ttotalAmount\tdiscount\tfinalAmount\tclientId\tcontractNumber\tstatus\treturnedAt\tlateFeePercentage\tlateFee\tfuelLevel\tpickupKm\treturnKm\tuserId\n390001\t390001\tmohammad\thmd\tlebanese\t8934783\tNULL\t2030-12-31 22:00:00\t2026-02-22 22:00:00\t2026-03-04 22:00:00\tNULL\t2026-02-03 22:37:34\t2026-02-03 22:37:34\t0302309\tbeirut\t10\t40.00\t400.00\t0.00\t400.00\t330001\tCTR-001\tactive\tNULL\t150.00\t0.00\tFull\tNULL\tNULL\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1516
+}

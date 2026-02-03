@@ -1,0 +1,21 @@
+{
+  "query": "SELECT rc.id, rc.userId, rc.vehicleId, rc.rentalStartDate, rc.rentalEndDate, rc.clientFirstName, v.brand, v.model, v.plateNumber FROM rentalContracts rc LEFT JOIN vehicles v ON rc.vehicleId = v.id WHERE rc.rentalStartDate >= '2026-02-20' ORDER BY rc.createdAt DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT rc.id, rc.userId, rc.vehicleId, rc.rentalStartDate, rc.rentalEndDate, rc.clientFirstName, v.brand, v.model, v.plateNumber FROM rentalContracts rc LEFT JOIN vehicles v ON rc.vehicleId = v.id WHERE rc.rentalStartDate >= '2026-02-20' ORDER BY rc.createdAt DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "390001",
+      "userId": "1",
+      "vehicleId": "390001",
+      "rentalStartDate": "2026-02-22 22:00:00",
+      "rentalEndDate": "2026-03-04 22:00:00",
+      "clientFirstName": "mohammad",
+      "brand": "Kia",
+      "model": "Cerato",
+      "plateNumber": "M 646463"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tvehicleId\trentalStartDate\trentalEndDate\tclientFirstName\tbrand\tmodel\tplateNumber\n390001\t1\t390001\t2026-02-22 22:00:00\t2026-03-04 22:00:00\tmohammad\tKia\tCerato\tM 646463\n",
+  "stderr": "",
+  "execution_time_ms": 1539
+}

@@ -1,0 +1,46 @@
+{
+  "query": "SELECT id, username, name, createdAt FROM users WHERE name LIKE '%mohammad%' OR username LIKE '%mohammad%' ORDER BY createdAt DESC;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, name, createdAt FROM users WHERE name LIKE '%mohammad%' OR username LIKE '%mohammad%' ORDER BY createdAt DESC;",
+  "rows": [
+    {
+      "id": "1110017",
+      "username": "mohhh",
+      "name": "mohammad hammoud",
+      "createdAt": "2026-02-03 22:11:39"
+    },
+    {
+      "id": "1110016",
+      "username": "mohh",
+      "name": "mohammad hammoud",
+      "createdAt": "2026-02-03 22:05:09"
+    },
+    {
+      "id": "1110014",
+      "username": "mohammadf",
+      "name": "mohammad hammoud",
+      "createdAt": "2026-02-03 21:52:14"
+    },
+    {
+      "id": "1110009",
+      "username": "moh",
+      "name": "mohammad hammoud",
+      "createdAt": "2026-02-03 20:48:31"
+    },
+    {
+      "id": "1110006",
+      "username": "mohammadfh",
+      "name": "Mohammad Hammoud",
+      "createdAt": "2026-02-03 20:23:55"
+    },
+    {
+      "id": "1110001",
+      "username": "mfh",
+      "name": "mohammad hammoud",
+      "createdAt": "2026-02-03 19:45:40"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\tcreatedAt\n1110017\tmohhh\tmohammad hammoud\t2026-02-03 22:11:39\n1110016\tmohh\tmohammad hammoud\t2026-02-03 22:05:09\n1110014\tmohammadf\tmohammad hammoud\t2026-02-03 21:52:14\n1110009\tmoh\tmohammad hammoud\t2026-02-03 20:48:31\n1110006\tmohammadfh\tMohammad Hammoud\t2026-02-03 20:23:55\n1110001\tmfh\tmohammad hammoud\t2026-02-03 19:45:40\n",
+  "stderr": "",
+  "execution_time_ms": 1541
+}

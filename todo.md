@@ -1104,3 +1104,14 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Warning icon and conflict count visible on calendar blocks
 - [x] Backend detects overlapping date ranges for same vehicle
 - [x] Ready to use - conflicts will be automatically flagged when contracts overlap
+
+
+## BUG - Contracts Not Appearing in Reservations Calendar for User
+- [x] User created contract from 23/2/2026 for 10 days (end date: 5/3/2026)
+- [x] Contract appears in test browser but NOT in user's browser
+- [x] Verified contract was successfully created in database
+- [x] Found issue: Contract belongs to userId=1, but user is logged in as different userId
+- [x] There are 6 users with "mohammad" in name - user ID mismatch
+- [x] Added User ID display to profile dropdown for easy identification
+- [ ] User needs to check their User ID from dropdown
+- [ ] Update contract's userId to match logged-in user's ID

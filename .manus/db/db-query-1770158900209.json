@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, username, name FROM users WHERE name LIKE '%mohammad%' OR username LIKE '%mohammad%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, name FROM users WHERE name LIKE '%mohammad%' OR username LIKE '%mohammad%';",
+  "rows": [
+    {
+      "id": "1110001",
+      "username": "mfh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110006",
+      "username": "mohammadfh",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "1110009",
+      "username": "moh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110014",
+      "username": "mohammadf",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110016",
+      "username": "mohh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110017",
+      "username": "mohhh",
+      "name": "mohammad hammoud"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\n1110001\tmfh\tmohammad hammoud\n1110006\tmohammadfh\tMohammad Hammoud\n1110009\tmoh\tmohammad hammoud\n1110014\tmohammadf\tmohammad hammoud\n1110016\tmohh\tmohammad hammoud\n1110017\tmohhh\tmohammad hammoud\n",
+  "stderr": "",
+  "execution_time_ms": 1559
+}
