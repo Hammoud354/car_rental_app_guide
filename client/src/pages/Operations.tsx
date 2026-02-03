@@ -1,11 +1,11 @@
-import Layout from "@/components/Layout";
+import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, LineChart, PieChart, Activity, ClipboardCheck, AlertTriangle, MapPin, Shield } from "lucide-react";
 
 export default function Operations() {
   return (
-    <Layout>
+    <MinimalLayout>
       <div className="space-y-8">
         <div className="flex flex-col gap-2">
           <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 03</div>
@@ -202,6 +202,6 @@ export default function Operations() {
           </TabsContent>
         </Tabs>
       </div>
-    </Layout>
+    </MinimalLayout>
   );
 }

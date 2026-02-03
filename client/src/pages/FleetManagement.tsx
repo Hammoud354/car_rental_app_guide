@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, LayoutDashboard, LogOut, FileText, Home, Search, X } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X } from "lucide-react";
+import MinimalLayout from "@/components/MinimalLayout";
 import { Link } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -133,61 +134,9 @@ export default function FleetManagement() {
     }
   };
 
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/fleet-management", label: "Fleet", icon: Car },
-    { href: "/maintenance", label: "Maintenance", icon: Wrench },
-    { href: "/rental-contracts", label: "Contracts", icon: FileText },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-blue-600 text-white flex flex-col">
-        <div className="p-6 border-b border-blue-500">
-          <div className="flex items-center gap-2">
-            <Car className="h-8 w-8" />
-            <div>
-              <h1 className="text-xl font-bold">FleetMaster</h1>
-              <p className="text-xs text-blue-200">Premium Car Rentals</p>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = window.location.pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-blue-700 text-white"
-                      : "text-blue-100 hover:bg-blue-500"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-blue-500">
-          <button
-            onClick={() => window.location.href = '/'}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-500 transition-colors w-full"
-          >
-            <LogOut className="h-5 w-5" />
-            <span className="font-medium">Sign Out</span>
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
+    <MinimalLayout>
+      <div className="container py-8">
       <div className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -197,12 +146,7 @@ export default function FleetManagement() {
           </div>
           
           <div className="flex gap-3">
-            <Link href="/">
-              <Button variant="outline" className="font-mono">
-                <Home className="mr-2 h-4 w-4" />
-                HOME
-              </Button>
-            </Link>
+
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
@@ -566,7 +510,7 @@ export default function FleetManagement() {
           </Dialog>
         )}
       </div>
-      </main>
-    </div>
+      </div>
+    </MinimalLayout>
   );
 }

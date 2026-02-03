@@ -814,3 +814,23 @@
 - [x] Improved error parsing to extract field names and validation messages
 - [x] Form state management verified - all fields properly initialized and updated
 - [x] Issue was user not filling Username/Password fields at top of form
+
+
+## Landing Page Redesign & Layout Consistency
+- [ ] Redesign landing page to be more professional (less childish)
+- [ ] Move Sign In/Sign Up to top-right corner buttons instead of center form
+- [ ] Create professional hero section with business-focused messaging
+- [ ] Fix layout inconsistency - ensure MinimalLayout used on all authenticated pages
+- [ ] Fix home button navigation - should go to dashboard, not landing page
+- [ ] Test navigation flow across all pages
+
+
+## Landing Page Redesign & Layout Consistency Fix
+- [x] Redesign landing page with professional, minimalistic layout (Apple-style, business-focused)
+- [x] Add Sign In / Sign Up button in top-right corner of landing page
+- [x] Remove inline sign-in form from landing page (now in modal dialog)
+- [x] Fix layout inconsistency - ensure MinimalLayout used across all pages
+- [x] Update FleetManagement.tsx to use MinimalLayout instead of custom sidebar
+- [x] Update Fleet.tsx and other pages to use MinimalLayout
+- [x] Fix home button navigation - logo now goes to /dashboard when authenticated
+- [x] Test navigation flow - landing -> sign in -> dashboard -> fleet -> logo -> dashboard (all working)

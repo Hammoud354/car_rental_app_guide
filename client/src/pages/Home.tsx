@@ -1,10 +1,10 @@
-import Layout from "@/components/Layout";
+import MinimalLayout from "@/components/MinimalLayout";
 import { Button } from "@/components/ui/button";
 import { Car, FileText, Wrench, BarChart3, ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <Layout>
+    <MinimalLayout>
       <div className="space-y-16 pb-16">
         {/* Hero Section */}
         <div className="min-h-[60vh] flex items-center justify-center">
@@ -101,6 +101,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </Layout>
+    </MinimalLayout>
   );
 }

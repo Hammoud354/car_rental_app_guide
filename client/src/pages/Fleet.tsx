@@ -1,4 +1,4 @@
-import Layout from "@/components/Layout";
+import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -6,7 +6,7 @@ import { CheckCircle2, AlertCircle, Clock, Database, Camera, FileText } from "lu
 
 export default function Fleet() {
   return (
-    <Layout>
+    <MinimalLayout>
       <div className="space-y-8">
         <div className="flex flex-col gap-2">
           <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 01</div>
@@ -112,6 +112,6 @@ export default function Fleet() {
           ))}
         </div>
       </div>
-    </Layout>
+    </MinimalLayout>
   );
 }
