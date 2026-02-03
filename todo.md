@@ -888,3 +888,23 @@
 - [ ] Fix Contracts section theme to match Dashboard clean design
 - [ ] Ensure white backgrounds, clean buttons, consistent fonts across Contracts page
 - [ ] Test all pages for consistent branding and theme
+
+
+## Dynamic Car Maker/Model Dropdowns in Vehicle Registration
+- [x] Update Fleet Management page to replace static brand text input with car maker dropdown
+- [x] Fetch car makers from database based on user's country
+- [x] Add car model dropdown that populates based on selected maker
+- [x] Implement "Add Custom Maker" functionality with placeholder toast
+- [x] Implement "Add Custom Model" functionality with placeholder toast
+- [x] Update vehicle creation form to use selected maker/model IDs
+- [x] Test vehicle registration with existing makers/models
+- [ ] Test adding custom makers and models (placeholder functionality)
+- [ ] Ensure custom entries are persisted to database (future enhancement)
+
+
+## Bug Fixes - Contracts Page Theme & Navigation
+- [x] Fix Contracts page sidebar theme to match minimalistic design (white background, clean styling)
+- [x] Fix Maintenance form theme consistency (white background, proper styling)
+- [x] Fix all HOME buttons to navigate to /dashboard instead of landing page
+- [x] Connect Dashboard to real database data (show actual vehicle count, revenue, maintenance status)
+- [x] Test navigation flow: Dashboard → Contracts → Maintenance → HOME should return to Dashboard

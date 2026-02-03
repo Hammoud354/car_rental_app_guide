@@ -83,46 +83,47 @@ export default function Maintenance() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-600 text-white flex flex-col">
-        <div className="p-6 border-b border-blue-500">
-          <div className="flex items-center gap-2">
-            <Car className="h-8 w-8" />
+      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <Car className="h-8 w-8 text-gray-900" />
             <div>
-              <h1 className="text-xl font-bold">FleetMaster</h1>
-              <p className="text-xs text-blue-200">Premium Car Rentals</p>
+              <h1 className="text-xl font-bold text-gray-900">Car Rental Management System</h1>
             </div>
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = window.location.pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-blue-700 text-white"
-                      : "text-blue-100 hover:bg-blue-500"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
+        <nav className="flex-1 p-4">
+          <div className="space-y-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = window.location.pathname === item.href;
+              return (
+                <Link key={item.href} href={item.href}>
+                  <div
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
+                      isActive
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </nav>
 
-        <div className="p-4 border-t border-blue-500">
-          <button
+        <div className="p-4 border-t border-gray-200">
+          <Button
             onClick={() => window.location.href = '/'}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-blue-100 hover:bg-blue-500 transition-colors w-full"
+            variant="outline"
+            className="w-full"
           >
-            <LogOut className="h-5 w-5" />
-            <span className="font-medium">Sign Out</span>
-          </button>
+            Sign out
+          </Button>
         </div>
       </aside>
 
@@ -137,7 +138,7 @@ export default function Maintenance() {
             </div>
             
             <div className="flex gap-3">
-              <Link href="/">
+              <Link href="/dashboard">
                 <Button variant="outline" className="font-mono">
                   <Home className="mr-2 h-4 w-4" />
                   HOME
@@ -145,7 +146,7 @@ export default function Maintenance() {
               </Link>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700">
+                <Button className="bg-gray-900 hover:bg-gray-800">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Maintenance Record
                 </Button>

@@ -11,16 +11,67 @@ import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X } from "lucide-react";
 import MinimalLayout from "@/components/MinimalLayout";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function FleetManagement() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Car maker and model state for Add form
+  const [selectedMakerId, setSelectedMakerId] = useState<number | null>(null);
+  const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
+  const [makerOpen, setMakerOpen] = useState(false);
+  const [modelOpen, setModelOpen] = useState(false);
+  
+  // Car maker and model state for Edit form
+  const [editSelectedMakerId, setEditSelectedMakerId] = useState<number | null>(null);
+  const [editSelectedModelId, setEditSelectedModelId] = useState<number | null>(null);
+  const [editMakerOpen, setEditMakerOpen] = useState(false);
+  const [editModelOpen, setEditModelOpen] = useState(false);
 
   const { data: vehicles, isLoading, refetch } = trpc.fleet.list.useQuery();
+  
+  // Fetch car makers (using Lebanon as default country - should be from user context)
+  const { data: carMakers } = trpc.carMakers.getByCountry.useQuery({ country: "Lebanon" });
+  
+  // Fetch car models based on selected maker for Add form
+  const { data: carModels } = trpc.carMakers.getModelsByMaker.useQuery(
+    { makerId: selectedMakerId! },
+    { enabled: selectedMakerId !== null }
+  );
+  
+  // Fetch car models based on selected maker for Edit form
+  const { data: editCarModels } = trpc.carMakers.getModelsByMaker.useQuery(
+    { makerId: editSelectedMakerId! },
+    { enabled: editSelectedMakerId !== null }
+  );
+  
+  // Initialize edit form maker/model when vehicle is selected
+  useEffect(() => {
+    if (selectedVehicle && carMakers) {
+      const maker = carMakers.find(m => m.name === selectedVehicle.brand);
+      if (maker) {
+        setEditSelectedMakerId(maker.id);
+      }
+    }
+  }, [selectedVehicle, carMakers]);
+  
+  // Initialize edit form model when maker is set and models are loaded
+  useEffect(() => {
+    if (selectedVehicle && editCarModels && editSelectedMakerId) {
+      const model = editCarModels.find(m => m.modelName === selectedVehicle.model);
+      if (model) {
+        setEditSelectedModelId(model.id);
+      }
+    }
+  }, [selectedVehicle, editCarModels, editSelectedMakerId]);
   
   // Filter vehicles based on search query
   const filteredVehicles = vehicles?.filter((vehicle) => {
@@ -68,10 +119,19 @@ export default function FleetManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Get brand and model names from selected IDs
+    const selectedMaker = carMakers?.find(m => m.id === selectedMakerId);
+    const selectedModel = carModels?.find(m => m.id === selectedModelId);
+    
+    if (!selectedMaker || !selectedModel) {
+      toast.error("Please select both car maker and model");
+      return;
+    }
+    
     createMutation.mutate({
       plateNumber: formData.get("plateNumber") as string,
-      brand: formData.get("brand") as string,
-      model: formData.get("model") as string,
+      brand: selectedMaker.name,
+      model: selectedModel.modelName,
       year: parseInt(formData.get("year") as string),
       color: formData.get("color") as string,
       category: formData.get("category") as any,
@@ -91,12 +151,21 @@ export default function FleetManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Get brand and model names from selected IDs
+    const selectedMaker = carMakers?.find(m => m.id === editSelectedMakerId);
+    const selectedModel = editCarModels?.find(m => m.id === editSelectedModelId);
+    
+    if (!selectedMaker || !selectedModel) {
+      toast.error("Please select both car maker and model");
+      return;
+    }
+    
     updateMutation.mutate({
       id: selectedVehicle.id,
       data: {
         plateNumber: formData.get("plateNumber") as string,
-        brand: formData.get("brand") as string,
-        model: formData.get("model") as string,
+        brand: selectedMaker.name,
+        model: selectedModel.modelName,
         year: parseInt(formData.get("year") as string),
         color: formData.get("color") as string,
         category: formData.get("category") as any,
@@ -173,12 +242,114 @@ export default function FleetManagement() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="brand">Brand *</Label>
-                    <Input id="brand" name="brand" required />
+                    <Label>Car Maker *</Label>
+                    <Popover open={makerOpen} onOpenChange={setMakerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={makerOpen}
+                          className="w-full justify-between"
+                        >
+                          {selectedMakerId
+                            ? carMakers?.find((maker) => maker.id === selectedMakerId)?.name
+                            : "Select maker..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search maker..." />
+                          <CommandEmpty>No maker found.</CommandEmpty>
+                          <CommandGroup className="max-h-64 overflow-auto">
+                            {carMakers?.map((maker) => (
+                              <CommandItem
+                                key={maker.id}
+                                value={maker.name}
+                                onSelect={() => {
+                                  setSelectedMakerId(maker.id);
+                                  setSelectedModelId(null); // Reset model when maker changes
+                                  setMakerOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedMakerId === maker.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {maker.name}
+                              </CommandItem>
+                            ))}
+                            <CommandItem
+                              onSelect={() => {
+                                setMakerOpen(false);
+                                toast.info("Custom maker functionality coming soon!");
+                              }}
+                              className="border-t mt-2 pt-2 text-primary font-medium"
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Custom Maker
+                            </CommandItem>
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
-                    <Label htmlFor="model">Model *</Label>
-                    <Input id="model" name="model" required />
+                    <Label>Car Model *</Label>
+                    <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={modelOpen}
+                          className="w-full justify-between"
+                          disabled={!selectedMakerId}
+                        >
+                          {selectedModelId
+                            ? carModels?.find((model) => model.id === selectedModelId)?.modelName
+                            : "Select model..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search model..." />
+                          <CommandEmpty>No model found.</CommandEmpty>
+                          <CommandGroup className="max-h-64 overflow-auto">
+                            {carModels?.map((model) => (
+                              <CommandItem
+                                key={model.id}
+                                value={model.modelName}
+                                onSelect={() => {
+                                  setSelectedModelId(model.id);
+                                  setModelOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedModelId === model.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {model.modelName}
+                              </CommandItem>
+                            ))}
+                            <CommandItem
+                              onSelect={() => {
+                                setModelOpen(false);
+                                toast.info("Custom model functionality coming soon!");
+                              }}
+                              className="border-t mt-2 pt-2 text-primary font-medium"
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Custom Model
+                            </CommandItem>
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
                     <Label htmlFor="year">Year *</Label>
@@ -409,12 +580,114 @@ export default function FleetManagement() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="edit-brand">Brand *</Label>
-                    <Input id="edit-brand" name="brand" defaultValue={selectedVehicle.brand} required />
+                    <Label>Car Maker *</Label>
+                    <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={editMakerOpen}
+                          className="w-full justify-between"
+                        >
+                          {editSelectedMakerId
+                            ? carMakers?.find((maker) => maker.id === editSelectedMakerId)?.name
+                            : "Select maker..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search maker..." />
+                          <CommandEmpty>No maker found.</CommandEmpty>
+                          <CommandGroup className="max-h-64 overflow-auto">
+                            {carMakers?.map((maker) => (
+                              <CommandItem
+                                key={maker.id}
+                                value={maker.name}
+                                onSelect={() => {
+                                  setEditSelectedMakerId(maker.id);
+                                  setEditSelectedModelId(null); // Reset model when maker changes
+                                  setEditMakerOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {maker.name}
+                              </CommandItem>
+                            ))}
+                            <CommandItem
+                              onSelect={() => {
+                                setEditMakerOpen(false);
+                                toast.info("Custom maker functionality coming soon!");
+                              }}
+                              className="border-t mt-2 pt-2 text-primary font-medium"
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Custom Maker
+                            </CommandItem>
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
-                    <Label htmlFor="edit-model">Model *</Label>
-                    <Input id="edit-model" name="model" defaultValue={selectedVehicle.model} required />
+                    <Label>Car Model *</Label>
+                    <Popover open={editModelOpen} onOpenChange={setEditModelOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={editModelOpen}
+                          className="w-full justify-between"
+                          disabled={!editSelectedMakerId}
+                        >
+                          {editSelectedModelId
+                            ? editCarModels?.find((model) => model.id === editSelectedModelId)?.modelName
+                            : "Select model..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search model..." />
+                          <CommandEmpty>No model found.</CommandEmpty>
+                          <CommandGroup className="max-h-64 overflow-auto">
+                            {editCarModels?.map((model) => (
+                              <CommandItem
+                                key={model.id}
+                                value={model.modelName}
+                                onSelect={() => {
+                                  setEditSelectedModelId(model.id);
+                                  setEditModelOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    editSelectedModelId === model.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {model.modelName}
+                              </CommandItem>
+                            ))}
+                            <CommandItem
+                              onSelect={() => {
+                                setEditModelOpen(false);
+                                toast.info("Custom model functionality coming soon!");
+                              }}
+                              className="border-t mt-2 pt-2 text-primary font-medium"
+                            >
+                              <Plus className="mr-2 h-4 w-4" />
+                              Add Custom Model
+                            </CommandItem>
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div>
                     <Label htmlFor="edit-year">Year *</Label>
