@@ -1041,3 +1041,17 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] User stays logged in without any redirects
 - [x] Removed debugging logs from context.ts
 - [x] Ready to save checkpoint
+
+
+## BUG - Error After Login Causing Redirect Back to Login Page - FIXED ✅
+- [x] User reports getting an error after logging in
+- [x] Error appears briefly then redirects to login/signup page
+- [x] User unable to screenshot the error (too fast)
+- [x] Root cause: Database tables didn't exist (migrations not run)
+- [x] Error: "Table 'user' doesn't exist" causing auth.me query to fail
+- [x] Solution: Ran `pnpm db:push` to create all database tables
+- [x] All 9 tables created successfully (users, vehicles, rentalContracts, etc.)
+- [x] Tested complete authentication flow: signup → dashboard → navigation
+- [x] User stays logged in without any errors or redirects
+- [x] Session persists correctly across all pages
+- [x] Ready to save checkpoint
