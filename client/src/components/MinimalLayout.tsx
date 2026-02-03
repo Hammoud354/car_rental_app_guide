@@ -66,37 +66,26 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
 
             {/* User Menu */}
             <div className="flex items-center gap-3">
-              {user ? (
-                <>
-                  <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-gray-100">
-                    <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center">
-                      <span className="text-xs font-medium text-white">
-                        {user.name?.[0]?.toUpperCase() || 'M'}
-                      </span>
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{user.name}</span>
+              {user && (
+                <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-lg bg-gray-100">
+                  <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center">
+                    <span className="text-xs font-medium text-white">
+                      {user.name?.[0]?.toUpperCase() || 'M'}
+                    </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLogout}
-                    disabled={logoutMutation.isPending}
-                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    {logoutMutation.isPending ? "Signing out..." : "Sign out"}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => window.location.href = "/login"}
-                  className="bg-gray-900 hover:bg-gray-800 text-white"
-                >
-                  Sign In / Sign Up
-                </Button>
+                  <span className="text-sm font-medium text-gray-900">{user.name}</span>
+                </div>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                disabled={logoutMutation.isPending}
+                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                {logoutMutation.isPending ? "Signing out..." : "Sign out"}
+              </Button>
             </div>
           </div>
         </div>
