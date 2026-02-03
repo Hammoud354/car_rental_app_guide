@@ -233,22 +233,22 @@ export default function RentalContracts() {
   };
 
   const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/dashboard", label: "HOME", icon: Home },
     { href: "/fleet-management", label: "Fleet", icon: Car },
     { href: "/maintenance", label: "Maintenance", icon: Wrench },
     { href: "/rental-contracts", label: "Contracts", icon: FileText },
+    { href: "/clients", label: "Clients", icon: Users },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex flex-col">
-        <div className="p-6 border-b border-blue-700">
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Car className="h-8 w-8 text-orange-400" />
+            <Car className="h-8 w-8 text-gray-900" />
             <div>
-              <h1 className="text-xl font-bold">RENTAL.OS</h1>
-              <p className="text-xs text-blue-300">v2.0.26 SYSTEM READY</p>
+              <h1 className="text-xl font-bold text-gray-900">Rental.OS</h1>
             </div>
           </div>
         </div>
@@ -259,9 +259,9 @@ export default function RentalContracts() {
               <Link key={item.href} href={item.href}>
                 <div
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    item.href === "/rental-contracts"
-                      ? "bg-orange-500 text-white"
-                      : "text-blue-100 hover:bg-blue-800"
+                    (item.href === "/rental-contracts" || (item.href === "/dashboard" && window.location.pathname === "/dashboard"))
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <item.icon className="h-5 w-5" />
@@ -272,14 +272,14 @@ export default function RentalContracts() {
           </div>
         </nav>
 
-        <div className="p-4 border-t border-blue-700">
-          <div className="text-xs text-blue-300">
-            <div className="font-semibold mb-1">SYSTEM STATUS</div>
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-green-400"></div>
-              <span>ONLINE</span>
-            </div>
-          </div>
+        <div className="p-4 border-t border-gray-200">
+          <Button
+            onClick={() => setLocation("/")}
+            variant="outline"
+            className="w-full"
+          >
+            Sign out
+          </Button>
         </div>
       </div>
 

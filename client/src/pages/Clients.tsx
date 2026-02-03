@@ -138,45 +138,36 @@ export default function Clients() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-900 p-6 flex flex-col">
+      <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
-            <Car className="h-8 w-8 text-orange-500" />
-            <h1 className="text-2xl font-bold">RENTAL.OS</h1>
+            <Car className="h-8 w-8 text-gray-900" />
+            <h1 className="text-2xl font-bold text-gray-900">Rental.OS</h1>
           </div>
-          <p className="text-xs text-gray-300">v2.0.26 SYSTEM READY</p>
         </div>
 
         <nav className="space-y-2 flex-1">
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-white hover:bg-blue-800"
+            className="w-full justify-start text-gray-700 hover:bg-gray-100"
             onClick={() => window.location.href = '/dashboard'}
           >
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            Overview
+            HOME
           </Button>
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-white hover:bg-blue-800"
+            className="w-full justify-start text-gray-700 hover:bg-gray-100"
             onClick={() => window.location.href = '/fleet'}
           >
             <Car className="mr-2 h-4 w-4" />
-            Fleet Management
+            Fleet
           </Button>
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-white hover:bg-blue-800"
-            onClick={() => window.location.href = '/maintenance'}
-          >
-            <Wrench className="mr-2 h-4 w-4" />
-            Maintenance
-          </Button>
-          <Button 
-            variant="ghost" 
-            className="w-full justify-start text-white hover:bg-blue-800"
+            className="w-full justify-start text-gray-700 hover:bg-gray-100"
             onClick={() => window.location.href = '/rental-contracts'}
           >
             <FileText className="mr-2 h-4 w-4" />
@@ -184,28 +175,30 @@ export default function Clients() {
           </Button>
           <Button 
             variant="default" 
-            className="w-full justify-start bg-orange-600 hover:bg-orange-700"
+            className="w-full justify-start bg-gray-900 hover:bg-gray-800 text-white"
           >
             <Users className="mr-2 h-4 w-4" />
             Clients
           </Button>
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-blue-800">
-          <div className="text-xs">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-green-400">● ONLINE</span>
-            </div>
-          </div>
+        <div className="mt-auto pt-4 border-t border-gray-200">
+          <Button
+            onClick={() => window.location.href = "/"}
+            variant="outline"
+            className="w-full"
+          >
+            Sign out
+          </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-8 bg-gray-50">
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
-            <p className="text-gray-400">Manage customer information and rental history</p>
+            <p className="text-gray-600">Manage customer information and rental history</p>
           </div>
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
@@ -305,35 +298,35 @@ export default function Clients() {
               placeholder="Search by name, email, phone, license number, or nationality..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-gray-800 border-gray-700 text-white"
+              className="pl-10 bg-white border-gray-300"
             />
           </div>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-400">Total Clients</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Total Clients</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{clients.length}</div>
+              <div className="text-2xl font-bold text-gray-900">{clients.length}</div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-400">Search Results</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Search Results</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{filteredClients.length}</div>
+              <div className="text-2xl font-bold text-gray-900">{filteredClients.length}</div>
             </CardContent>
           </Card>
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-white border-gray-200">
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-400">Active Filter</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Active Filter</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{searchTerm ? "Yes" : "No"}</div>
+              <div className="text-2xl font-bold text-gray-900">{searchTerm ? "Yes" : "No"}</div>
             </CardContent>
           </Card>
         </div>
@@ -341,9 +334,9 @@ export default function Clients() {
         {/* Clients List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredClients.map((client: any) => (
-            <Card key={client.id} className="bg-gray-800 border-gray-700 hover:border-orange-500 transition-colors">
+            <Card key={client.id} className="bg-white border-gray-200 hover:border-gray-400 transition-colors">
               <CardHeader>
-                <CardTitle className="text-white flex items-center justify-between">
+                <CardTitle className="text-gray-900 flex items-center justify-between">
                   <span>{client.firstName} {client.lastName}</span>
                   <div className="flex gap-1">
                     <Button
@@ -422,9 +415,9 @@ export default function Clients() {
         </div>
 
         {filteredClients.length === 0 && (
-          <Card className="bg-gray-800 border-gray-700 p-12 text-center">
-            <Users className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">
+          <Card className="bg-white border-gray-200 p-12 text-center">
+            <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               {searchTerm ? "No Clients Found" : "No Clients Yet"}
             </h3>
             <p className="text-gray-400 mb-4">

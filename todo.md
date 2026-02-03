@@ -834,3 +834,31 @@
 - [x] Update Fleet.tsx and other pages to use MinimalLayout
 - [x] Fix home button navigation - logo now goes to /dashboard when authenticated
 - [x] Test navigation flow - landing -> sign in -> dashboard -> fleet -> logo -> dashboard (all working)
+
+
+## Theme Consistency & Company Settings
+- [ ] Investigate theme inconsistency on Contracts, Reservations, and Clients pages (different from Dashboard)
+- [ ] Fix theme styling to match Dashboard design across all pages
+- [ ] Ensure consistent colors, fonts, spacing, and component styles
+- [ ] Add HOME button to MinimalLayout navigation that goes to Dashboard
+- [ ] Create companySettings table in database (logo, companyName, address, phone, email, taxId, website)
+- [ ] Build Company Settings page with logo upload functionality
+- [ ] Add Settings link to navigation menu
+- [ ] Implement logo upload to S3 storage
+- [ ] Update contract PDF template to include company logo and info from settings
+- [ ] Test theme consistency across all pages
+- [ ] Test company settings save and logo upload
+- [ ] Test contract PDF generation with company branding
+
+
+## Theme Consistency Fix
+- [x] Update RentalContracts page sidebar to white background with gray borders
+- [x] Change "RENTAL.OS v2.0.26 SYSTEM READY" to clean "Rental.OS"
+- [x] Update button colors from orange/blue to gray/black
+- [x] Add HOME button to RentalContracts sidebar linking to /dashboard
+- [x] Add Sign out button to RentalContracts sidebar
+- [x] Update Clients page sidebar with consistent styling
+- [x] Add HOME button to Clients sidebar
+- [x] Add Sign out button to Clients sidebar
+- [ ] Create Company Settings page with logo upload
+- [ ] Update contract PDF to include company logo and info from settings
