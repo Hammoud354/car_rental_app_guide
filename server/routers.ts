@@ -10,6 +10,31 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    login: publicProcedure
+      .input(z.object({
+        username: z.string(),
+        password: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Simple login: username "Mo" (case-insensitive), password "mo"
+        if (input.username.toLowerCase() === 'mo' && input.password === 'mo') {
+          // Create a simple session cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie(COOKIE_NAME, 'simple-session-mo', {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+          return {
+            success: true,
+            user: {
+              id: 1,
+              name: 'Mo',
+              email: 'mo@rental.os',
+            },
+          };
+        }
+        throw new Error('Invalid username or password');
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

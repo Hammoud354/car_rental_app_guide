@@ -1,10 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, LayoutDashboard, LogOut, FileText, Home, Clock } from "lucide-react";
-import { Link, useLocation } from "wouter";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+import { Car, DollarSign, Wrench, AlertTriangle, Clock } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import MinimalLayout from "@/components/MinimalLayout";
 
 function OverdueWidget() {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery();
@@ -56,8 +55,6 @@ function OverdueWidget() {
 
 export default function Dashboard() {
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
-  const { user, logout } = useAuth();
-  const [location] = useLocation();
 
   // Calculate metrics from real data
   const totalFleet = vehicles?.length || 0;
@@ -92,84 +89,15 @@ export default function Dashboard() {
 
   const maxCategoryCount = Math.max(...Object.values(categories), 1);
 
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/fleet-management", label: "Fleet", icon: Car },
-    { href: "/maintenance", label: "Maintenance", icon: Wrench },
-    { href: "/rental-contracts", label: "Contracts", icon: FileText },
-  ];
+
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
-        <div className="p-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-2">
-            <Car className="h-8 w-8" />
-            <div>
-            <h1 className="text-xl font-bold text-sidebar-foreground">FleetMaster</h1>
-            <p className="text-xs text-muted-foreground">Premium Car Rentals</p>
-            </div>
-          </div>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = location === item.href;
-            return (
-              <Link key={item.href} href={item.href}>
-                <div
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors cursor-pointer ${
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span className="font-medium">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="p-4 border-t border-sidebar-border">
-          {user ? (
-            <button
-              onClick={() => logout()}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors w-full"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Sign Out</span>
-            </button>
-          ) : (
-            <a
-              href={getLoginUrl()}
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
-            >
-              <LogOut className="h-5 w-5" />
-              <span className="font-medium">Sign In</span>
-            </a>
-          )}
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <MinimalLayout>
+      <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground">Dashboard Overview</h2>
-              <p className="text-muted-foreground mt-1">Welcome back to FleetMaster. Here's what's happening today.</p>
-            </div>
-            <Link href="/">
-              <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border bg-background hover:bg-accent transition-colors">
-                <Home className="h-4 w-4" />
-                <span className="font-medium">HOME</span>
-              </button>
-            </Link>
+          <div>
+            <h2 className="text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
+            <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
           </div>
 
           {/* Overdue Contracts Alert Widget */}
@@ -323,8 +251,7 @@ export default function Dashboard() {
               </CardContent>
             </Card>
           </div>
-        </div>
-      </main>
-    </div>
+      </div>
+    </MinimalLayout>
   );
 }
