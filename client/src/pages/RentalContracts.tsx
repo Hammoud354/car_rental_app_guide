@@ -65,6 +65,15 @@ export default function RentalContracts() {
   const contractInvoice = selectedContract 
     ? allInvoices.find(inv => inv.contractId === selectedContract.id)
     : null;
+    
+  // Debug logging
+  useEffect(() => {
+    if (selectedContract) {
+      console.log('Selected contract:', selectedContract);
+      console.log('All invoices:', allInvoices);
+      console.log('Contract invoice:', contractInvoice);
+    }
+  }, [selectedContract, allInvoices, contractInvoice]);
   
   // Mutation to update overdue contracts
   const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();
@@ -942,14 +951,14 @@ export default function RentalContracts() {
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto bg-gray-800 text-white">
+          <DialogContent className="max-w-[98vw] w-[98vw] h-[98vh] max-h-[98vh] overflow-hidden bg-gray-800 text-white flex flex-col">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content space-y-6 pr-2">
+                <div className="contract-details-content space-y-6 pr-2 overflow-y-auto flex-1">
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">

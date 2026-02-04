@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Building2 } from "lucide-react";
 
 export default function CompanySettings() {
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { data: profile, isLoading, refetch } = trpc.company.getProfile.useQuery();
   const updateProfile = trpc.company.updateProfile.useMutation();
@@ -355,7 +356,7 @@ export default function CompanySettings() {
           <Button
             type="button"
             variant="outline"
-            onClick={() => window.location.href = '/'}
+            onClick={() => setLocation('/')}
           >
             Return to Dashboard
           </Button>

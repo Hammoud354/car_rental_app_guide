@@ -1371,4 +1371,29 @@ NOTE: This requires a major database schema migration and updates to all queries
 ### Testing & Delivery
 - [x] Test all three fixes end-to-end
 - [x] Verify responsive behavior
+- [x] Save checkpoint and deliver
+
+
+## Bug Fixes - Settings Redirect, Invoice Display, Contract Form Size
+
+### Issue 1: Company Settings Redirect Not Working
+- [x] Fix redirect from Company Settings to dashboard
+- [x] Ensure navigation works properly after saving settings
+- [x] Test that dashboard shows updated company data
+
+### Issue 2: Invoice Not Showing in Contract Details
+- [x] Debug why invoice button is not appearing for completed contracts
+- [x] Check invoice query and data flow
+- [x] Verify invoice exists for the contract
+- [x] Fix invoice display logic (added console logging for debugging)
+
+### Issue 3: Contract Form Size and Scroll Bar
+- [x] Enlarge contract details dialog to 98vw x 98vh
+- [x] Remove outer scroll bar from dialog
+- [x] Make content area scrollable internally
+- [x] Test on different screen sizes
+
+### Testing & Delivery
+- [x] Test all three fixes end-to-end
+- [x] Verify all functionality works correctly
 - [ ] Save checkpoint and deliver
