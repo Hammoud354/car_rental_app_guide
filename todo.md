@@ -1254,4 +1254,9 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Fix contract not appearing in contracts list after creation (root cause: publicProcedure + hardcoded userId:1, changed to protectedProcedure + ctx.user.id)
 - [x] Test all fixes with new contract creation (CTR-001 created successfully, appears in list)
 - [x] Verify client auto-save works correctly (Jane Smith auto-created, appears in Clients page)
+- [x] Save checkpoint (version 4e2ce19a)
+
+## Redirect to Dashboard After Contract Completion
+- [x] Update RentalContracts component to redirect to /dashboard instead of /fleet (line 252)
+- [x] Verified code change - redirect now goes to /dashboard (cannot test due to vehicle already rented)
 - [ ] Save checkpoint

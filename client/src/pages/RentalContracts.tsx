@@ -248,8 +248,8 @@ export default function RentalContracts() {
         setContractData(null);
         setIsCreateDialogOpen(false);
         toast.success("Contract created successfully!");
-        // Redirect to Fleet Management page
-        setLocation("/fleet");
+        // Redirect to Dashboard
+        setLocation("/dashboard");
       },
     });
   };
