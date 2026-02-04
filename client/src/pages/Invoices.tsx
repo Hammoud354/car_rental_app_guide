@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,17 @@ export default function Invoices() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
+  
+  // Check URL for invoice parameter and open it automatically
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const invoiceId = urlParams.get('invoice');
+    if (invoiceId) {
+      setSelectedInvoice(parseInt(invoiceId));
+      // Clear the URL parameter after opening
+      window.history.replaceState({}, '', '/invoices');
+    }
+  }, []);
 
   const { data: invoices, isLoading } = trpc.invoices.list.useQuery();
   const { data: invoiceDetails } = trpc.invoices.getById.useQuery(

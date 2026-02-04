@@ -58,7 +58,13 @@ export default function RentalContracts() {
   const { data: contracts = [], refetch } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
   const utils = trpc.useUtils();
+  
+  // Find invoice for selected contract
+  const contractInvoice = selectedContract 
+    ? allInvoices.find(inv => inv.contractId === selectedContract.id)
+    : null;
   
   // Mutation to update overdue contracts
   const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();
@@ -936,14 +942,14 @@ export default function RentalContracts() {
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogContent className="max-w-6xl h-[95vh] overflow-hidden bg-gray-800 text-white">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto bg-gray-800 text-white">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content space-y-6 overflow-y-auto max-h-[calc(95vh-12rem)] pr-2">
+                <div className="contract-details-content space-y-6 pr-2">
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
@@ -1209,21 +1215,35 @@ export default function RentalContracts() {
                 >
                   📄 Export PDF
                 </Button>
-                {/* Generate Invoice button - only show for completed contracts */}
+                {/* Invoice button - show for completed contracts */}
                 {selectedContract?.status === 'completed' && (
-                  <Button 
-                    onClick={() => {
-                      if (selectedContract) {
-                        generateInvoice.mutate({ contractId: selectedContract.id });
-                      }
-                    }} 
-                    variant="default"
-                    className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
-                    size="default"
-                    disabled={generateInvoice.isPending}
-                  >
-                    {generateInvoice.isPending ? "Generating..." : "💰 Generate Invoice"}
-                  </Button>
+                  contractInvoice ? (
+                    <Button 
+                      onClick={() => {
+                        // Redirect to invoices page and open the invoice
+                        window.location.href = `/invoices?invoice=${contractInvoice.id}`;
+                      }} 
+                      variant="default"
+                      className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
+                      size="default"
+                    >
+                      📄 View Invoice ({contractInvoice.invoiceNumber})
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => {
+                        if (selectedContract) {
+                          generateInvoice.mutate({ contractId: selectedContract.id });
+                        }
+                      }} 
+                      variant="default"
+                      className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+                      size="default"
+                      disabled={generateInvoice.isPending}
+                    >
+                      {generateInvoice.isPending ? "Generating..." : "💰 Generate Invoice"}
+                    </Button>
+                  )
                 )}
                 {/* Mark as Returned button - only show for active contracts */}
                 {selectedContract?.status === 'active' && (

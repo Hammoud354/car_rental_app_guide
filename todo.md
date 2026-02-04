@@ -1347,3 +1347,28 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Test payment status updates
 - [x] Verify company branding appears correctly
 - [ ] Create checkpoint and deliver
+
+
+## UI/UX Improvements - Company Settings, Contract Dialog, Invoice Access
+
+### Issue 1: Company Settings Return to Dashboard
+- [x] Add "Return to Dashboard" button in Company Settings page
+- [x] Ensure dashboard displays updated company data after settings change
+- [x] Test navigation flow from settings to dashboard
+
+### Issue 2: Contract Details Dialog Button Visibility
+- [x] Fix contract dialog sizing so all buttons are visible
+- [x] Increase dialog height or make it scrollable
+- [x] Ensure no buttons are cut off at the bottom
+- [x] Test on different screen sizes
+
+### Issue 3: Invoice Viewing from Contracts
+- [x] Add "View Invoice" button to completed contracts that have invoices
+- [x] Link to invoice details from contract details dialog
+- [x] Add invoice print/export functionality from contract view
+- [x] Show invoice status (pending/paid/overdue) in contract details
+
+### Testing & Delivery
+- [x] Test all three fixes end-to-end
+- [x] Verify responsive behavior
+- [ ] Save checkpoint and deliver
