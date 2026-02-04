@@ -921,14 +921,14 @@ export default function RentalContracts() {
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gray-800 text-white">
+          <DialogContent className="max-w-6xl h-[95vh] overflow-hidden bg-gray-800 text-white">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content space-y-6">
+                <div className="contract-details-content space-y-6 overflow-y-auto max-h-[calc(95vh-12rem)] pr-2">
                   {/* Contract Number */}
                   <div className="bg-gray-100 border border-gray-300 p-4 rounded-lg">
                     <div className="text-sm text-gray-600">Contract Number</div>

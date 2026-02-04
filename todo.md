@@ -1278,4 +1278,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Add validation to ensure return odometer >= pickup odometer (in ReturnVehicleDialog)
 - [x] Display return information in completed contracts (shows returned date, odometer readings, fuel levels, and notes)
 - [x] Test complete return workflow (successfully returned contract CTR-001, vehicle status updated to Available)
+- [x] Save checkpoint (version e254f3e7)
+
+## Improve Contract Details Dialog UI
+- [x] Remove scrollbars from contract details dialog (changed overflow-y-auto to overflow-hidden on DialogContent)
+- [x] Increase dialog size (width: max-w-4xl → max-w-6xl, height: max-h-[90vh] → h-[95vh])
+- [x] Add internal scrolling to content area only (overflow-y-auto on content div with max-h-[calc(95vh-12rem)])
+- [x] Test the updated dialog appearance (dialog is now wider, taller, and has no visible scrollbar)
 - [ ] Save checkpoint
