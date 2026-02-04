@@ -16,14 +16,20 @@ export const appRouter = router({
         password: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const bcrypt = await import('bcryptjs');
+        
         // Find user by username
         const user = await db.getUserByUsername(input.username);
         if (!user) {
           throw new Error('Invalid username or password');
         }
 
-        // Verify password (in production, use bcrypt.compare)
-        if (user.password !== input.password) {
+        // Verify password with bcrypt
+        if (!user.password) {
+          throw new Error('Invalid username or password');
+        }
+        const isValidPassword = await bcrypt.compare(input.password, user.password);
+        if (!isValidPassword) {
           throw new Error('Invalid username or password');
         }
 
@@ -55,16 +61,21 @@ export const appRouter = router({
         country: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const bcrypt = await import('bcryptjs');
+        
         // Check if username already exists
         const existingUser = await db.getUserByUsername(input.username);
         if (existingUser) {
           throw new Error('Username already exists');
         }
 
+        // Hash password
+        const hashedPassword = await bcrypt.hash(input.password, 10);
+
         // Create new user
         const newUser = await db.createUser({
           username: input.username,
-          password: input.password, // In production, hash this!
+          password: hashedPassword,
           name: input.name,
           email: input.email,
           phone: `${input.countryCode}${input.phone}`,

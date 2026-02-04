@@ -1163,4 +1163,18 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Update all maintenance queries to filter by userId
 - [x] Test data isolation with multiple user accounts
 - [x] Verify new users start with empty database
+- [x] Create checkpoint and deliver
+
+
+## User Registration Feature
+- [x] Create registration backend endpoint (tRPC mutation)
+- [x] Add username uniqueness validation
+- [x] Add password hashing (bcrypt)
+- [ ] Create company settings record on registration
+- [x] Build registration page UI with form
+- [x] Add form validation (client-side)
+- [x] Add success/error handling
+- [ ] Add link to registration from login page
+- [x] Write vitest tests for registration flow
+- [x] Test complete registration process
 - [ ] Create checkpoint and deliver
