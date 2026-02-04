@@ -197,13 +197,13 @@ export async function getAllRentalContracts(userId: number) {
   return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
 }
 
-export async function getRentalContractById(id: number) {
+export async function getRentalContractById(id: number, userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contract: database not available");
     return undefined;
   }
-  const result = await db.select().from(rentalContracts).where(eq(rentalContracts.id, id)).limit(1);
+  const result = await db.select().from(rentalContracts).where(and(eq(rentalContracts.id, id), eq(rentalContracts.userId, userId))).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -257,7 +257,7 @@ export async function renewRentalContract(input: { contractId: number; additiona
   return updated[0];
 }
 
-export async function getRentalContractsByStatus(status?: "active" | "completed" | "overdue") {
+export async function getRentalContractsByStatus(userId: number, status?: "active" | "completed" | "overdue") {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts: database not available");
@@ -265,29 +265,29 @@ export async function getRentalContractsByStatus(status?: "active" | "completed"
   }
   if (!status) {
     // Return all contracts if no status specified
-    return await db.select().from(rentalContracts);
+    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
   }
-  return await db.select().from(rentalContracts).where(eq(rentalContracts.status, status));
+  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, status)));
 }
 
-export async function getActiveContractsByVehicleId(vehicleId: number) {
+export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get active contracts: database not available");
     return [];
   }
   return await db.select().from(rentalContracts)
-    .where(and(eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.status, "active")));
+    .where(and(eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.userId, userId), eq(rentalContracts.status, "active")));
 }
 
-export async function getRentalContractsByClientId(clientId: number) {
+export async function getRentalContractsByClientId(clientId: number, userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts by client: database not available");
     return [];
   }
   return await db.select().from(rentalContracts)
-    .where(eq(rentalContracts.clientId, clientId))
+    .where(and(eq(rentalContracts.clientId, clientId), eq(rentalContracts.userId, userId)))
     .orderBy(desc(rentalContracts.rentalStartDate));
 }
 
@@ -428,7 +428,7 @@ export async function updateOverdueContracts() {
   return { updated: updatedCount };
 }
 
-export async function getOverdueStatistics() {
+export async function getOverdueStatistics(userId: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get overdue statistics: database not available");
@@ -438,7 +438,7 @@ export async function getOverdueStatistics() {
   const overdueContracts = await db
     .select()
     .from(rentalContracts)
-    .where(eq(rentalContracts.status, "overdue"));
+    .where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, "overdue")));
   
   const count = overdueContracts.length;
   const totalLateFees = overdueContracts.reduce((sum, contract) => sum + parseFloat(contract.lateFee || "0"), 0).toFixed(2);
@@ -570,14 +570,14 @@ export async function deleteClient(id: number, userId: number): Promise<void> {
 }
 
 // Vehicle Profitability Analytics
-export async function getVehicleProfitabilityAnalytics() {
+export async function getVehicleProfitabilityAnalytics(userId: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
 
-  // Get all vehicles with their financial data
-  const allVehicles = await db.select().from(vehicles);
+  // Get all vehicles with their financial data for this user
+  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
   
   const analytics = await Promise.all(
     allVehicles.map(async (vehicle) => {
@@ -638,14 +638,14 @@ export async function getVehicleProfitabilityAnalytics() {
   return analytics;
 }
 
-export async function getVehicleFinancialDetails(vehicleId: number) {
+export async function getVehicleFinancialDetails(vehicleId: number, userId: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
   
-  // Get vehicle info
-  const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, vehicleId)).limit(1);
+  // Get vehicle info for this user
+  const vehicle = await db.select().from(vehicles).where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId))).limit(1);
   
   if (!vehicle || vehicle.length === 0) {
     throw new Error("Vehicle not found");

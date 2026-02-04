@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 
@@ -215,20 +215,20 @@ export const appRouter = router({
       return await db.updateOverdueContracts();
     }),
     
-    getOverdueStatistics: publicProcedure.query(async () => {
-      return await db.getOverdueStatistics();
+    getOverdueStatistics: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getOverdueStatistics(ctx.user.id);
     }),
     
-    listByStatus: publicProcedure
+    listByStatus: protectedProcedure
       .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
-      .query(async ({ input }) => {
-        return await db.getRentalContractsByStatus(input.status);
+      .query(async ({ ctx, input }) => {
+        return await db.getRentalContractsByStatus(ctx.user.id, input.status);
       }),
     
-    getById: publicProcedure
+    getById: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getRentalContractById(input.id);
+      .query(async ({ ctx, input }) => {
+        return await db.getRentalContractById(input.id, ctx.user.id);
       }),
     
     create: publicProcedure
@@ -255,7 +255,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         // Check if vehicle already has an active contract
-        const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId);
+        const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId, ctx.user?.id || 1);
         if (activeContracts && activeContracts.length > 0) {
           throw new Error(`Vehicle is already rented. Active contract exists until ${new Date(activeContracts[0].rentalEndDate).toLocaleDateString()}.`);
         }
@@ -448,31 +448,31 @@ export const appRouter = router({
         return await db.getClientByLicenseNumber(input.licenseNumber, 1);
       }),
     
-    getContracts: publicProcedure
+    getContracts: protectedProcedure
       .input(z.object({ clientId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getRentalContractsByClientId(input.clientId);
+      .query(async ({ ctx, input }) => {
+        return await db.getRentalContractsByClientId(input.clientId, ctx.user.id);
       }),
   }),
 
   // Profitability Analytics Router
   analytics: router({
-    vehicleProfitability: publicProcedure.query(async () => {
-      return await db.getVehicleProfitabilityAnalytics();
+    vehicleProfitability: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getVehicleProfitabilityAnalytics(ctx.user.id);
     }),
     
-    vehicleFinancialDetails: publicProcedure
+    vehicleFinancialDetails: protectedProcedure
       .input(z.object({ vehicleId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getVehicleFinancialDetails(input.vehicleId);
+      .query(async ({ ctx, input }) => {
+        return await db.getVehicleFinancialDetails(input.vehicleId, ctx.user.id);
       }),
   }),
 
   // Export Router
   export: router({
-    profitabilityExcel: publicProcedure.query(async ({ ctx }) => {
+    profitabilityExcel: protectedProcedure.query(async ({ ctx }) => {
       const XLSX = await import('xlsx');
-      const vehicles = await db.getVehicleProfitabilityAnalytics();
+      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id);
       
       // Prepare data for Excel
       const data = vehicles.map((v: any) => ({
@@ -519,9 +519,9 @@ export const appRouter = router({
       return { success: true };
     }),
     
-    profitabilityPDF: publicProcedure.query(async ({ ctx }) => {
+    profitabilityPDF: protectedProcedure.query(async ({ ctx }) => {
       const PDFDocument = (await import('pdfkit')).default;
-      const vehicles = await db.getVehicleProfitabilityAnalytics();
+      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id);
       
       // Create PDF document
       const doc = new PDFDocument({ margin: 50 });

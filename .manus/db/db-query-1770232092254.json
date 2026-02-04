@@ -1,0 +1,115 @@
+{
+  "query": "SELECT id, username, name FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, name FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "username": "user_1",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "990016",
+      "username": "user_990016",
+      "name": "Walid El Tayeh"
+    },
+    {
+      "id": "1020044",
+      "username": "test",
+      "name": "test"
+    },
+    {
+      "id": "1050001",
+      "username": "test2",
+      "name": "test2"
+    },
+    {
+      "id": "1050002",
+      "username": "test3",
+      "name": "test2"
+    },
+    {
+      "id": "1080004",
+      "username": "Test4",
+      "name": "Test4"
+    },
+    {
+      "id": "1110001",
+      "username": "mfh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110006",
+      "username": "mohammadfh",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "1110007",
+      "username": "testuser123",
+      "name": "Test User"
+    },
+    {
+      "id": "1110008",
+      "username": "testuser",
+      "name": "Test User"
+    },
+    {
+      "id": "1110009",
+      "username": "moh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110010",
+      "username": "demo",
+      "name": "Demo User"
+    },
+    {
+      "id": "1110011",
+      "username": "mnj",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "1110012",
+      "username": "newuser2026",
+      "name": "New User 2026"
+    },
+    {
+      "id": "1110014",
+      "username": "mohammadf",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110016",
+      "username": "mohh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110017",
+      "username": "mohhh",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1170001",
+      "username": "test12",
+      "name": "test"
+    },
+    {
+      "id": "1200001",
+      "username": "walid",
+      "name": "walid"
+    },
+    {
+      "id": "1230001",
+      "username": "testtest",
+      "name": "tsttt"
+    },
+    {
+      "id": "1230035",
+      "username": "testuser2",
+      "name": "Test User 2"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\n1\tuser_1\tMohammad Hammoud\n990016\tuser_990016\tWalid El Tayeh\n1020044\ttest\ttest\n1050001\ttest2\ttest2\n1050002\ttest3\ttest2\n1080004\tTest4\tTest4\n1110001\tmfh\tmohammad hammoud\n1110006\tmohammadfh\tMohammad Hammoud\n1110007\ttestuser123\tTest User\n1110008\ttestuser\tTest User\n1110009\tmoh\tmohammad hammoud\n1110010\tdemo\tDemo User\n1110011\tmnj\tMohammad Hammoud\n1110012\tnewuser2026\tNew User 2026\n1110014\tmohammadf\tmohammad hammoud\n1110016\tmohh\tmohammad hammoud\n1110017\tmohhh\tmohammad hammoud\n1170001\ttest12\ttest\n1200001\twalid\twalid\n1230001\ttesttest\ttsttt\n1230035\ttestuser2\tTest User 2\n",
+  "stderr": "",
+  "execution_time_ms": 1613
+}
