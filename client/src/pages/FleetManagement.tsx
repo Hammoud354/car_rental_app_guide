@@ -19,6 +19,7 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function FleetManagement() {
+  const utils = trpc.useUtils();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -43,7 +44,7 @@ export default function FleetManagement() {
   const [customModelName, setCustomModelName] = useState("");
   const [customModelMakerId, setCustomModelMakerId] = useState<number | null>(null);
 
-  const { data: vehicles, isLoading, refetch } = trpc.fleet.list.useQuery();
+  const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
   
   // Fetch car makers (using Lebanon as default country - should be from user context)
   const { data: carMakers } = trpc.carMakers.getByCountry.useQuery({ country: "Lebanon" });
@@ -93,7 +94,7 @@ export default function FleetManagement() {
   const createMutation = trpc.fleet.create.useMutation({
     onSuccess: () => {
       toast.success("Vehicle added successfully");
-      refetch();
+      utils.fleet.list.invalidate();
       setIsAddDialogOpen(false);
     },
     onError: (error) => {
@@ -104,7 +105,7 @@ export default function FleetManagement() {
   const updateMutation = trpc.fleet.update.useMutation({
     onSuccess: () => {
       toast.success("Vehicle updated successfully");
-      refetch();
+      utils.fleet.list.invalidate();
       setIsEditDialogOpen(false);
     },
     onError: (error) => {
@@ -115,7 +116,7 @@ export default function FleetManagement() {
   const deleteMutation = trpc.fleet.delete.useMutation({
     onSuccess: () => {
       toast.success("Vehicle deleted successfully");
-      refetch();
+      utils.fleet.list.invalidate();
     },
     onError: (error) => {
       toast.error(`Failed to delete vehicle: ${error.message}`);
@@ -128,8 +129,7 @@ export default function FleetManagement() {
       setIsCustomMakerDialogOpen(false);
       setCustomMakerName("");
       setSelectedMakerId(newMaker.id);
-      // Refetch makers to include the new one
-      window.location.reload(); // Simple reload to refresh data
+      utils.carMakers.getByCountry.invalidate();
     },
     onError: (error) => {
       toast.error(`Failed to add custom maker: ${error.message}`);
@@ -142,8 +142,7 @@ export default function FleetManagement() {
       setIsCustomModelDialogOpen(false);
       setCustomModelName("");
       setSelectedModelId(newModel.id);
-      // Refetch models to include the new one
-      window.location.reload(); // Simple reload to refresh data
+      utils.carMakers.getModelsByMaker.invalidate();
     },
     onError: (error) => {
       toast.error(`Failed to add custom model: ${error.message}`);

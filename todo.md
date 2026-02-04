@@ -1198,4 +1198,41 @@ NOTE: This requires a major database schema migration and updates to all queries
 ## Add Forgot Password Link to Sign-In Page
 - [x] Add "Forgot Password?" link to SignIn.tsx
 - [x] Test link navigation to forgot password page
+- [x] Create checkpoint and deliver
+
+
+## Remember Me Checkbox Feature
+- [x] Add "Remember Me" checkbox to SignIn.tsx
+- [x] Implement extended session token (30 days) in backend
+- [x] Update auth context to handle remember me sessions
+- [x] Test remember me functionality
+
+## Real-Time Data Updates
+- [x] Implement tRPC query invalidation after mutations
+- [x] Add optimistic updates for list operations (using invalidation)
+- [x] Test data updates reflect across all pages
+- [x] Ensure dashboard updates when data changes
+
+## Driver License Expiry Validation
+- [x] Add validation to prevent past dates for license expiry
+- [x] Update client form with date validation
+- [x] Add error messages for invalid dates
+- [x] Test license expiry validation
+
+## Automatic Pricing Calculation
+- [x] Add daily rate field to vehicles table (already exists)
+- [x] Implement automatic price calculation based on duration (already implemented)
+- [x] Update contract form to calculate total cost (already implemented)
+- [x] Display calculated price in real-time (already implemented)
+- [x] Test pricing calculation
+
+## Odometer Validation on Return
+- [x] Add validation to ensure return odometer > start odometer
+- [x] Update contract completion form with validation
+- [x] Add error messages for invalid odometer readings
+- [x] Test odometer validation
+
+## Testing and Delivery
+- [x] Write vitest tests for all new features (9 passing tests)
+- [x] Test complete user flows
 - [ ] Create checkpoint and deliver

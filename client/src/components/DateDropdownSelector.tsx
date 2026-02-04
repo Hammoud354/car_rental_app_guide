@@ -13,6 +13,8 @@ interface DateDropdownSelectorProps {
   value?: Date;
   onChange: (date: Date | undefined) => void;
   required?: boolean;
+  minDate?: Date; // Minimum allowed date
+  maxDate?: Date; // Maximum allowed date
 }
 
 export function DateDropdownSelector({
@@ -21,10 +23,13 @@ export function DateDropdownSelector({
   value,
   onChange,
   required = false,
+  minDate,
+  maxDate,
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
-  // Allow years from 1990 to 10 years in the future for flexibility
-  const years = Array.from({ length: currentYear - 1990 + 11 }, (_, i) => 1990 + i);
+  const minYear = minDate ? minDate.getFullYear() : 1990;
+  const maxYear = maxDate ? maxDate.getFullYear() : currentYear + 10;
+  const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
   const months = [
     { value: 0, label: "January" },
     { value: 1, label: "February" },
@@ -56,7 +61,19 @@ export function DateDropdownSelector({
     const year = parseInt(yearStr);
     const month = selectedMonth ?? 0;
     const day = selectedDay ?? 1;
-    onChange(new Date(year, month, day));
+    const newDate = new Date(year, month, day);
+    
+    // Validate against min/max dates
+    if (minDate && newDate < minDate) {
+      onChange(minDate);
+      return;
+    }
+    if (maxDate && newDate > maxDate) {
+      onChange(maxDate);
+      return;
+    }
+    
+    onChange(newDate);
   };
 
   const handleMonthChange = (monthStr: string) => {
@@ -64,14 +81,38 @@ export function DateDropdownSelector({
     const year = selectedYear ?? currentYear;
     const day = selectedDay ?? 1;
     const maxDay = getDaysInMonth(year, month);
-    onChange(new Date(year, month, Math.min(day, maxDay)));
+    const newDate = new Date(year, month, Math.min(day, maxDay));
+    
+    // Validate against min/max dates
+    if (minDate && newDate < minDate) {
+      onChange(minDate);
+      return;
+    }
+    if (maxDate && newDate > maxDate) {
+      onChange(maxDate);
+      return;
+    }
+    
+    onChange(newDate);
   };
 
   const handleDayChange = (dayStr: string) => {
     const day = parseInt(dayStr);
     const year = selectedYear ?? currentYear;
     const month = selectedMonth ?? 0;
-    onChange(new Date(year, month, day));
+    const newDate = new Date(year, month, day);
+    
+    // Validate against min/max dates
+    if (minDate && newDate < minDate) {
+      onChange(minDate);
+      return;
+    }
+    if (maxDate && newDate > maxDate) {
+      onChange(maxDate);
+      return;
+    }
+    
+    onChange(newDate);
   };
 
   return (

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 
 export default function Clients() {
+  const utils = trpc.useUtils();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -27,8 +28,8 @@ export default function Clients() {
   const [editLicenseIssueDate, setEditLicenseIssueDate] = useState<Date>();
   const [editLicenseExpiryDate, setEditLicenseExpiryDate] = useState<Date>();
 
-  const { data: clients = [], refetch } = trpc.clients.list.useQuery();
-  const { data: clientContracts = [], refetch: refetchContracts } = trpc.clients.getContracts.useQuery(
+  const { data: clients = [] } = trpc.clients.list.useQuery();
+  const { data: clientContracts = [] } = trpc.clients.getContracts.useQuery(
     { clientId: selectedClient?.id || 0 },
     { enabled: !!selectedClient && isContractsDialogOpen }
   );
@@ -36,7 +37,7 @@ export default function Clients() {
   const createClient = trpc.clients.create.useMutation({
     onSuccess: () => {
       toast.success("Client added successfully");
-      refetch();
+      utils.clients.list.invalidate();
       setIsCreateDialogOpen(false);
       setCreateLicenseIssueDate(undefined);
       setCreateLicenseExpiryDate(undefined);
@@ -49,7 +50,7 @@ export default function Clients() {
   const updateClient = trpc.clients.update.useMutation({
     onSuccess: () => {
       toast.success("Client updated successfully");
-      refetch();
+      utils.clients.list.invalidate();
       setIsEditDialogOpen(false);
       setSelectedClient(null);
     },
@@ -61,7 +62,7 @@ export default function Clients() {
   const deleteClient = trpc.clients.delete.useMutation({
     onSuccess: () => {
       toast.success("Client deleted successfully");
-      refetch();
+      utils.clients.list.invalidate();
     },
     onError: (error) => {
       toast.error(`Failed to delete client: ${error.message}`);
@@ -211,6 +212,7 @@ export default function Clients() {
                         value={createLicenseExpiryDate}
                         onChange={setCreateLicenseExpiryDate}
                         required
+                        minDate={new Date()} // Only allow future dates
                       />
                     </div>
                   </div>
@@ -485,6 +487,7 @@ export default function Clients() {
                       value={editLicenseExpiryDate}
                       onChange={setEditLicenseExpiryDate}
                       required
+                      minDate={new Date()} // Only allow future dates
                     />
                   </div>
                 </div>

@@ -84,6 +84,8 @@ export default function RentalContracts() {
       }
       
       utils.contracts.listByStatus.invalidate();
+      utils.contracts.list.invalidate();
+      utils.fleet.list.invalidate();
       // Redirect to rental contracts page
       setLocation("/rental-contracts");
     },
@@ -97,6 +99,7 @@ export default function RentalContracts() {
       toast.success(`${data.updatedCount} contract(s) updated successfully`);
       setSelectedContracts([]);
       utils.contracts.listByStatus.invalidate();
+      utils.contracts.list.invalidate();
     },
     onError: (error) => {
       toast.error("Failed to update contracts: " + error.message);
@@ -144,7 +147,9 @@ export default function RentalContracts() {
   const createContract = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
       toast.success(`Contract created successfully! Contract Number: ${data.contractNumber}`);
-      utils.contracts.list.invalidate(); // Refresh contract list
+      utils.contracts.list.invalidate();
+      utils.contracts.listByStatus.invalidate();
+      utils.fleet.list.invalidate(); // Update vehicle availability
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
@@ -1246,6 +1251,17 @@ export default function RentalContracts() {
                   placeholder="Enter current odometer reading"
                   required
                 />
+                {selectedContractForReturn && (() => {
+                  const contract = contracts.find(c => c.id === selectedContractForReturn);
+                  if (contract && contract.pickupKm && returnKm > 0 && returnKm <= contract.pickupKm) {
+                    return (
+                      <p className="text-sm text-red-600 mt-1">
+                        Return odometer ({returnKm} km) must be greater than pickup odometer ({contract.pickupKm} km)
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               {selectedContractForReturn && (() => {
                 const contract = contracts.find(c => c.id === selectedContractForReturn);
@@ -1289,6 +1305,11 @@ export default function RentalContracts() {
                 className="bg-green-600 hover:bg-green-700"
                 onClick={() => {
                   if (selectedContractForReturn && returnKm > 0) {
+                    const contract = contracts.find(c => c.id === selectedContractForReturn);
+                    if (contract && contract.pickupKm && returnKm <= contract.pickupKm) {
+                      toast.error(`Return odometer (${returnKm} km) must be greater than pickup odometer (${contract.pickupKm} km)`);
+                      return;
+                    }
                     markAsReturnedMutation.mutate({ 
                       contractId: selectedContractForReturn,
                       returnKm 
@@ -1298,7 +1319,10 @@ export default function RentalContracts() {
                     setReturnKm(0);
                   }
                 }}
-                disabled={returnKm <= 0 || markAsReturnedMutation.isPending}
+                disabled={returnKm <= 0 || markAsReturnedMutation.isPending || (() => {
+                  const contract = contracts.find(c => c.id === selectedContractForReturn);
+                  return !!(contract && contract.pickupKm && returnKm > 0 && returnKm <= contract.pickupKm);
+                })()}
               >
                 {markAsReturnedMutation.isPending ? "Completing..." : "Complete Contract"}
               </Button>

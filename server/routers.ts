@@ -14,6 +14,7 @@ export const appRouter = router({
       .input(z.object({
         username: z.string(),
         password: z.string(),
+        rememberMe: z.boolean().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const bcrypt = await import('bcryptjs');
@@ -33,11 +34,15 @@ export const appRouter = router({
           throw new Error('Invalid username or password');
         }
 
-        // Create session cookie
+        // Create session cookie with appropriate expiration
         const cookieOptions = getSessionCookieOptions(ctx.req);
+        const maxAge = input.rememberMe 
+          ? 30 * 24 * 60 * 60 * 1000  // 30 days if remember me is checked
+          : 7 * 24 * 60 * 60 * 1000;   // 7 days otherwise
+        
         ctx.res.cookie(COOKIE_NAME, `user-${user.id}`, {
           ...cookieOptions,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          maxAge,
         });
 
         return {
@@ -446,6 +451,13 @@ export const appRouter = router({
         returnKm: z.number().optional()
       }))
       .mutation(async ({ input }) => {
+        // Validate return odometer is greater than pickup odometer
+        if (input.returnKm) {
+          const contract = await db.getRentalContractById(input.contractId, 1);
+          if (contract && contract.pickupKm && input.returnKm <= contract.pickupKm) {
+            throw new Error(`Return odometer (${input.returnKm} km) must be greater than pickup odometer (${contract.pickupKm} km)`);
+          }
+        }
         return await db.markContractAsReturned(input.contractId, input.returnKm);
       }),
     
@@ -509,6 +521,12 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Validate license expiry date is in the future
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        if (input.licenseExpiryDate < today) {
+          throw new Error('License expiry date must be in the future');
+        }
         return await db.createClient({ ...input, userId: ctx.user?.id || 1 });
       }),
     
@@ -528,6 +546,14 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { id, ...updates } = input;
+        // Validate license expiry date is in the future if provided
+        if (updates.licenseExpiryDate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Reset time to start of day
+          if (updates.licenseExpiryDate < today) {
+            throw new Error('License expiry date must be in the future');
+          }
+        }
         return await db.updateClient(id, 1, updates);
       }),
     

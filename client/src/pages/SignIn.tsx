@@ -13,6 +13,7 @@ export default function SignIn() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    rememberMe: false,
   });
 
   const signInMutation = trpc.auth.login.useMutation({
@@ -72,6 +73,19 @@ export default function SignIn() {
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                 required
               />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={formData.rememberMe}
+                onChange={(e) => setFormData(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
+                Remember me for 30 days
+              </Label>
             </div>
 
             <Button
