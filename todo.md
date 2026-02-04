@@ -1235,4 +1235,14 @@ NOTE: This requires a major database schema migration and updates to all queries
 ## Testing and Delivery
 - [x] Write vitest tests for all new features (9 passing tests)
 - [x] Test complete user flows
-- [ ] Create checkpoint and deliver
+- [x] Create checkpoint and deliver
+
+
+## Tiered Pricing Based on Rental Duration
+- [x] Implement automatic rate adjustment based on rental days
+- [x] Use daily rate for 1-6 days
+- [x] Use weekly rate for 7-29 days  
+- [x] Use monthly rate for 30+ days
+- [x] Update pricing calculation in RentalContracts.tsx
+- [x] Test tiered pricing with different durations (29 vitest tests passing)
+- [x] Create comprehensive vitest test suite for tiered pricing logic

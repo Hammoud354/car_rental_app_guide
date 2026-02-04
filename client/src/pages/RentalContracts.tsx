@@ -134,15 +134,29 @@ export default function RentalContracts() {
     setFinalAmount(final);
   }, [totalAmount, discount]);
   
-  // Load daily rate when vehicle is selected
+  // Load daily rate when vehicle is selected and adjust based on rental duration
   useEffect(() => {
     if (selectedVehicleId) {
       const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
-      if (vehicle && vehicle.dailyRate) {
-        setDailyRate(parseFloat(vehicle.dailyRate));
+      if (vehicle) {
+        let rate = 0;
+        
+        // Tiered pricing based on rental duration
+        if (rentalDays >= 30 && vehicle.monthlyRate) {
+          // Use monthly rate for 30+ days
+          rate = parseFloat(vehicle.monthlyRate);
+        } else if (rentalDays >= 7 && vehicle.weeklyRate) {
+          // Use weekly rate for 7-29 days
+          rate = parseFloat(vehicle.weeklyRate);
+        } else if (vehicle.dailyRate) {
+          // Use daily rate for 1-6 days
+          rate = parseFloat(vehicle.dailyRate);
+        }
+        
+        setDailyRate(rate);
       }
     }
-  }, [selectedVehicleId, vehicles]);
+  }, [selectedVehicleId, vehicles, rentalDays]);
   
   const createContract = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
