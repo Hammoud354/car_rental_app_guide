@@ -958,7 +958,7 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content space-y-6 pr-2 overflow-y-auto flex-1">
+                <div className="contract-details-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
@@ -1170,9 +1170,9 @@ export default function RentalContracts() {
                 </div>
               );
             })()}
-            <div className="mt-6 pt-4 border-t border-gray-700">
+            <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
               {/* Button grid layout - 2x2 on mobile, single row on desktop */}
-              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:justify-between sm:items-center">
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:flex-wrap sm:justify-between sm:items-center w-full">
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => window.print()} 
@@ -1309,7 +1309,7 @@ export default function RentalContracts() {
                   Close
                 </Button>
               </div>
-            </div>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
         

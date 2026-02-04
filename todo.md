@@ -1396,4 +1396,27 @@ NOTE: This requires a major database schema migration and updates to all queries
 ### Testing & Delivery
 - [x] Test all three fixes end-to-end
 - [x] Verify all functionality works correctly
+- [x] Save checkpoint and deliver
+
+
+## Contract Dialog Layout Improvements
+
+### Issue 1: Visible Scroll Bar
+- [x] Hide the scroll bar while keeping content scrollable
+- [x] Use custom scrollbar styling (scrollbarWidth: 'none')
+- [x] Test scrolling still works properly
+
+### Issue 2: Buttons Cut Off
+- [x] Ensure all action buttons are fully visible
+- [x] Move buttons to DialogFooter outside scrollable area
+- [x] Fix button positioning at bottom
+
+### Issue 3: Button Organization
+- [x] Improve button spacing and alignment with flex-wrap
+- [x] Ensure consistent button sizing
+- [x] Better visual hierarchy for primary actions
+
+### Testing & Delivery
+- [x] Test on different screen sizes
+- [x] Verify all buttons are accessible
 - [ ] Save checkpoint and deliver
