@@ -1192,4 +1192,10 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Add token expiration (24 hours)
 - [x] Write vitest tests for password reset flow
 - [x] Test complete forgot password process
+- [x] Create checkpoint and deliver
+
+
+## Add Forgot Password Link to Sign-In Page
+- [x] Add "Forgot Password?" link to SignIn.tsx
+- [x] Test link navigation to forgot password page
 - [ ] Create checkpoint and deliver
