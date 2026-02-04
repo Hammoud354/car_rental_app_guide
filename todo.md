@@ -1285,4 +1285,15 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Increase dialog size (width: max-w-4xl → max-w-6xl, height: max-h-[90vh] → h-[95vh])
 - [x] Add internal scrolling to content area only (overflow-y-auto on content div with max-h-[calc(95vh-12rem)])
 - [x] Test the updated dialog appearance (dialog is now wider, taller, and has no visible scrollbar)
+- [x] Save checkpoint (version 59eec75e)
+
+## Company Branding Setup Feature
+- [x] Create company_profiles table in database schema with fields: name, logo, registration_number, address, phone, email, website, tax_id, colors
+- [x] Add backend procedures: company.getProfile, company.updateProfile (logo upload handled via updateProfile with logoUrl)
+- [x] Create Company Settings page UI with form for all company details
+- [x] Implement logo upload functionality with S3 storage (via tRPC uploadLogo mutation)
+- [x] Add company logo and details to contract dialog header (shows logo, company name, reg number, contact info)
+- [x] Company branding will appear in printed contracts (via browser print from dialog)
+- [x] Add link to Company Settings in navigation (added to user dropdown menu in MinimalLayout)
+- [x] Test complete company branding workflow (Company Settings page loads correctly, all form fields present, navigation link working)
 - [ ] Save checkpoint

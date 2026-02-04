@@ -841,6 +841,49 @@ export const appRouter = router({
         return settings;
       }),
   }),
+
+  company: router({
+    getProfile: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getCompanyProfile(ctx.user.id);
+      return profile;
+    }),
+
+    updateProfile: protectedProcedure
+      .input(z.object({
+        companyName: z.string().min(1),
+        registrationNumber: z.string().optional(),
+        taxId: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        country: z.string().optional(),
+        phone: z.string().optional(),
+        email: z.string().email().optional(),
+        website: z.string().optional(),
+        logoUrl: z.string().optional(),
+        primaryColor: z.string().optional(),
+        secondaryColor: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const profile = await db.upsertCompanyProfile({
+          userId: ctx.user.id,
+          ...input,
+        });
+        return profile;
+      }),
+
+    uploadLogo: protectedProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.array(z.number()), // Uint8Array as number array
+        contentType: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { storagePut } = await import("./storage");
+        const buffer = new Uint8Array(input.fileData);
+        const { url } = await storagePut(input.fileName, buffer, input.contentType);
+        return { url };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

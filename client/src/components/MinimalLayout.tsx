@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Building2, BarChart3, FileText, Wrench, Users, User, LogOut, TrendingUp, CalendarDays } from "lucide-react";
+import { Building2, BarChart3, FileText, Wrench, Users, User, LogOut, TrendingUp, CalendarDays, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import {
@@ -94,6 +94,11 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                     <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
                       Dashboard
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLocation("/company-settings")}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Company Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sign Out

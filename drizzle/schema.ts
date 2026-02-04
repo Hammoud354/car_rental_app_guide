@@ -46,6 +46,31 @@ export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
 
 /**
+ * Company profiles table for branding and company information
+ */
+export const companyProfiles = mysqlTable("companyProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Owner of the company profile
+  companyName: varchar("companyName", { length: 255 }).notNull(),
+  registrationNumber: varchar("registrationNumber", { length: 100 }),
+  taxId: varchar("taxId", { length: 100 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 320 }),
+  website: varchar("website", { length: 255 }),
+  logoUrl: text("logoUrl"), // S3 URL for company logo
+  primaryColor: varchar("primaryColor", { length: 7 }), // Hex color code
+  secondaryColor: varchar("secondaryColor", { length: 7 }), // Hex color code
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CompanyProfile = typeof companyProfiles.$inferSelect;
+export type InsertCompanyProfile = typeof companyProfiles.$inferInsert;
+
+/**
  * Vehicles table for fleet management
  */
 export const vehicles = mysqlTable("vehicles", {

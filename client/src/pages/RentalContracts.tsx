@@ -57,6 +57,7 @@ export default function RentalContracts() {
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
   const { data: contracts = [], refetch } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
+  const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const utils = trpc.useUtils();
   
   // Mutation to update overdue contracts
@@ -929,6 +930,32 @@ export default function RentalContracts() {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
                 <div className="contract-details-content space-y-6 overflow-y-auto max-h-[calc(95vh-12rem)] pr-2">
+                  {/* Company Branding Header */}
+                  {companyProfile && (
+                    <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        {companyProfile.logoUrl && (
+                          <img 
+                            src={companyProfile.logoUrl} 
+                            alt={companyProfile.companyName} 
+                            className="h-16 w-16 object-contain"
+                          />
+                        )}
+                        <div>
+                          <div className="text-2xl font-bold text-gray-900">{companyProfile.companyName}</div>
+                          {companyProfile.registrationNumber && (
+                            <div className="text-sm text-gray-600">Reg. No: {companyProfile.registrationNumber}</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right text-sm text-gray-600">
+                        {companyProfile.phone && <div>{companyProfile.phone}</div>}
+                        {companyProfile.email && <div>{companyProfile.email}</div>}
+                        {companyProfile.address && <div>{companyProfile.address}</div>}
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Contract Number */}
                   <div className="bg-gray-100 border border-gray-300 p-4 rounded-lg">
                     <div className="text-sm text-gray-600">Contract Number</div>

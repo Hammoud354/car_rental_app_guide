@@ -1103,3 +1103,79 @@ export async function getUserByEmail(email: string) {
 
   return user;
 }
+
+/**
+ * Get company profile for a user
+ */
+export async function getCompanyProfile(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { companyProfiles } = await import("../drizzle/schema");
+  
+  const [profile] = await db
+    .select()
+    .from(companyProfiles)
+    .where(eq(companyProfiles.userId, userId))
+    .limit(1);
+
+  return profile;
+}
+
+/**
+ * Create or update company profile
+ */
+export async function upsertCompanyProfile(data: {
+  userId: number;
+  companyName: string;
+  registrationNumber?: string;
+  taxId?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { companyProfiles } = await import("../drizzle/schema");
+  
+  // Check if profile exists
+  const existing = await getCompanyProfile(data.userId);
+  
+  if (existing) {
+    // Update existing profile
+    await db
+      .update(companyProfiles)
+      .set({
+        companyName: data.companyName,
+        registrationNumber: data.registrationNumber,
+        taxId: data.taxId,
+        address: data.address,
+        city: data.city,
+        country: data.country,
+        phone: data.phone,
+        email: data.email,
+        website: data.website,
+        logoUrl: data.logoUrl,
+        primaryColor: data.primaryColor,
+        secondaryColor: data.secondaryColor,
+      })
+      .where(eq(companyProfiles.userId, data.userId));
+    
+    return await getCompanyProfile(data.userId);
+  } else {
+    // Create new profile
+    const [result] = await db
+      .insert(companyProfiles)
+      .values(data)
+      .$returningId();
+    
+    return await getCompanyProfile(data.userId);
+  }
+}
