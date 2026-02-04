@@ -1,0 +1,17 @@
+{
+  "query": "SELECT rc.id, rc.contractNumber, rc.userId, u.name as userName, u.openId \nFROM rentalContracts rc \nJOIN users u ON rc.userId = u.id \nORDER BY rc.id DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT rc.id, rc.contractNumber, rc.userId, u.name as userName, u.openId \nFROM rentalContracts rc \nJOIN users u ON rc.userId = u.id \nORDER BY rc.id DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "450002",
+      "contractNumber": "CTR-001",
+      "userId": "1",
+      "userName": "Mohammad Hammoud",
+      "openId": "eaoa7aHG4W4zHjNjYNHFcY"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcontractNumber\tuserId\tuserName\topenId\n450002\tCTR-001\t1\tMohammad Hammoud\teaoa7aHG4W4zHjNjYNHFcY\n",
+  "stderr": "",
+  "execution_time_ms": 1705
+}

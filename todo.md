@@ -1246,3 +1246,12 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Update pricing calculation in RentalContracts.tsx
 - [x] Test tiered pricing with different durations (29 vitest tests passing)
 - [x] Create comprehensive vitest test suite for tiered pricing logic
+
+## Bug Fixes - Contract Form Issues
+- [x] Fix client not appearing in Clients section after adding from contract form (database tables were missing - ran db:push)
+- [x] Separate Print and PDF buttons into two distinct actions (added Export PDF button with html2canvas + jsPDF)
+- [x] Remove default rental days value (make field empty by default) (changed initial state from 1 to 0)
+- [x] Fix contract not appearing in contracts list after creation (root cause: publicProcedure + hardcoded userId:1, changed to protectedProcedure + ctx.user.id)
+- [x] Test all fixes with new contract creation (CTR-001 created successfully, appears in list)
+- [x] Verify client auto-save works correctly (Jane Smith auto-created, appears in Clients page)
+- [ ] Save checkpoint

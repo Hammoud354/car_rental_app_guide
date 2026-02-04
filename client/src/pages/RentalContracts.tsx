@@ -14,6 +14,8 @@ import { trpc } from "@/lib/trpc";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
@@ -33,7 +35,7 @@ export default function RentalContracts() {
   const [rentalEndDate, setRentalEndDate] = useState<Date>();
   
   // Pricing states
-  const [rentalDays, setRentalDays] = useState<number>(1);
+  const [rentalDays, setRentalDays] = useState<number>(0);
   const [dailyRate, setDailyRate] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
@@ -924,7 +926,7 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="space-y-6">
+                <div className="contract-details-content space-y-6">
                   {/* Contract Number */}
                   <div className="bg-gray-100 border border-gray-300 p-4 rounded-lg">
                     <div className="text-sm text-gray-600">Contract Number</div>
@@ -1074,6 +1076,48 @@ export default function RentalContracts() {
                   size="default"
                 >
                   🖨️ Print
+                </Button>
+                <Button 
+                  onClick={async () => {
+                    const contractElement = document.querySelector('.contract-details-content');
+                    if (!contractElement || !selectedContract) return;
+                    
+                    try {
+                      toast.info("Generating PDF...");
+                      const canvas = await html2canvas(contractElement as HTMLElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                      });
+                      
+                      const imgData = canvas.toDataURL('image/png');
+                      const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4',
+                      });
+                      
+                      const pdfWidth = pdf.internal.pageSize.getWidth();
+                      const pdfHeight = pdf.internal.pageSize.getHeight();
+                      const imgWidth = canvas.width;
+                      const imgHeight = canvas.height;
+                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                      const imgY = 10;
+                      
+                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
+                      toast.success("PDF exported successfully!");
+                    } catch (error) {
+                      console.error('PDF export error:', error);
+                      toast.error("Failed to export PDF");
+                    }
+                  }} 
+                  variant="outline"
+                  className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400"
+                  size="default"
+                >
+                  📄 Export PDF
                 </Button>
                 <Button 
                   onClick={() => {

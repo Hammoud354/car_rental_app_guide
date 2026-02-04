@@ -307,8 +307,8 @@ export const appRouter = router({
 
   // Rental Contracts Router
   contracts: router({
-    list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllRentalContracts(ctx.user?.id || 1);
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getAllRentalContracts(ctx.user.id);
     }),
     
     updateOverdueContracts: publicProcedure.mutation(async () => {
@@ -329,10 +329,10 @@ export const appRouter = router({
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
-        return await db.getRentalContractById(input.id, ctx.user.id);
-      }),
+      return await db.getRentalContractById(input.id, ctx.user.id);
+    }),
     
-    create: publicProcedure
+    create: protectedProcedure
       .input(z.object({
         vehicleId: z.number(),
         clientFirstName: z.string().min(1).max(100),
@@ -356,18 +356,18 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         // Check if vehicle already has an active contract
-        const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId, ctx.user?.id || 1);
+        const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId, ctx.user.id);
         if (activeContracts && activeContracts.length > 0) {
           throw new Error(`Vehicle is already rented. Active contract exists until ${new Date(activeContracts[0].rentalEndDate).toLocaleDateString()}.`);
         }
         
         // Check if client exists by license number
-        let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber, ctx.user?.id || 1);
+        let client = await db.getClientByLicenseNumber(input.drivingLicenseNumber, ctx.user.id);
         
         // If client doesn't exist, create new client record
         if (!client) {
           client = await db.createClient({
-            userId: 1,
+            userId: ctx.user.id,
             firstName: input.clientFirstName,
             lastName: input.clientLastName,
             nationality: input.clientNationality,
@@ -382,7 +382,7 @@ export const appRouter = router({
         // Create contract with client ID
         // Pass null for optional fields so Drizzle inserts NULL
         // Generate sequential contract number
-        const existingContracts = await db.getAllRentalContracts(ctx.user?.id || 1);
+        const existingContracts = await db.getAllRentalContracts(ctx.user.id);
         const maxNumber = existingContracts.reduce((max, contract) => {
           const match = contract.contractNumber.match(/CTR-(\d+)/);
           if (match) {
@@ -395,7 +395,7 @@ export const appRouter = router({
         const contractNumber = `CTR-${String(nextNumber).padStart(3, '0')}`;
         
         return await db.createRentalContract({
-          userId: 1,
+          userId: ctx.user.id,
           vehicleId: input.vehicleId,
           clientId: client.id,
           clientFirstName: input.clientFirstName,

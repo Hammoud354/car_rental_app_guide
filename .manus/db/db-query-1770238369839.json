@@ -1,0 +1,140 @@
+{
+  "query": "SELECT id, openId, name FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, openId, name FROM users;",
+  "rows": [
+    {
+      "id": "1",
+      "openId": "eaoa7aHG4W4zHjNjYNHFcY",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "990016",
+      "openId": "5HANethK6yyJBGGbZaNzUd",
+      "name": "Walid El Tayeh"
+    },
+    {
+      "id": "1020044",
+      "openId": "NULL",
+      "name": "test"
+    },
+    {
+      "id": "1050001",
+      "openId": "NULL",
+      "name": "test2"
+    },
+    {
+      "id": "1050002",
+      "openId": "NULL",
+      "name": "test2"
+    },
+    {
+      "id": "1080004",
+      "openId": "NULL",
+      "name": "Test4"
+    },
+    {
+      "id": "1110001",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110006",
+      "openId": "NULL",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "1110007",
+      "openId": "NULL",
+      "name": "Test User"
+    },
+    {
+      "id": "1110008",
+      "openId": "NULL",
+      "name": "Test User"
+    },
+    {
+      "id": "1110009",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110010",
+      "openId": "NULL",
+      "name": "Demo User"
+    },
+    {
+      "id": "1110011",
+      "openId": "NULL",
+      "name": "Mohammad Hammoud"
+    },
+    {
+      "id": "1110012",
+      "openId": "NULL",
+      "name": "New User 2026"
+    },
+    {
+      "id": "1110014",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110016",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1110017",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "1170001",
+      "openId": "NULL",
+      "name": "test"
+    },
+    {
+      "id": "1200001",
+      "openId": "NULL",
+      "name": "walid"
+    },
+    {
+      "id": "1230001",
+      "openId": "NULL",
+      "name": "tsttt"
+    },
+    {
+      "id": "1230035",
+      "openId": "NULL",
+      "name": "Test User 2"
+    },
+    {
+      "id": "1230041",
+      "openId": "NULL",
+      "name": "Test Rental Company"
+    },
+    {
+      "id": "1230042",
+      "openId": "NULL",
+      "name": "Test Company Registration"
+    },
+    {
+      "id": "1230043",
+      "openId": "NULL",
+      "name": "Test Company Registration"
+    },
+    {
+      "id": "1230045",
+      "openId": "NULL",
+      "name": "Reset Test User"
+    },
+    {
+      "id": "1260003",
+      "openId": "NULL",
+      "name": "mohammad hammoud"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\topenId\tname\n1\teaoa7aHG4W4zHjNjYNHFcY\tMohammad Hammoud\n990016\t5HANethK6yyJBGGbZaNzUd\tWalid El Tayeh\n1020044\tNULL\ttest\n1050001\tNULL\ttest2\n1050002\tNULL\ttest2\n1080004\tNULL\tTest4\n1110001\tNULL\tmohammad hammoud\n1110006\tNULL\tMohammad Hammoud\n1110007\tNULL\tTest User\n1110008\tNULL\tTest User\n1110009\tNULL\tmohammad hammoud\n1110010\tNULL\tDemo User\n1110011\tNULL\tMohammad Hammoud\n1110012\tNULL\tNew User 2026\n1110014\tNULL\tmohammad hammoud\n1110016\tNULL\tmohammad hammoud\n1110017\tNULL\tmohammad hammoud\n1170001\tNULL\ttest\n1200001\tNULL\twalid\n1230001\tNULL\ttsttt\n1230035\tNULL\tTest User 2\n1230041\tNULL\tTest Rental Company\n1230042\tNULL\tTest Company Registration\n1230043\tNULL\tTest Company Registration\n1230045\tNULL\tReset Test User\n1260003\tNULL\tmohammad hammoud\n",
+  "stderr": "",
+  "execution_time_ms": 1691
+}

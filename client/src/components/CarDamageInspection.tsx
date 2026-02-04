@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { X, Trash2, Printer } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "sonner";
 
 interface DamageMark {
   id: string;
@@ -496,16 +499,59 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
             <div className="flex-1">
               <h4 className="font-semibold text-blue-900 mb-1">Ready to Print</h4>
               <p className="text-sm text-blue-700 mb-3">
-                Click the button below to print this contract or save it as PDF. The printed version includes all contract details, vehicle inspection diagram, and signature fields.
+                Print this contract or export it as a PDF file. The output includes all contract details, vehicle inspection diagram, and signature fields.
               </p>
-              <Button 
-                type="button" 
-                onClick={() => window.print()}
-                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
-              >
-                <Printer className="h-4 w-4" />
-                Print Contract / Save as PDF
-              </Button>
+              <div className="flex gap-3">
+                <Button 
+                  type="button" 
+                  onClick={() => window.print()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                >
+                  <Printer className="h-4 w-4" />
+                  Print Contract
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={async () => {
+                    const inspectionElement = document.querySelector('.space-y-6');
+                    if (!inspectionElement) return;
+                    
+                    try {
+                      toast.info("Generating PDF...");
+                      const canvas = await html2canvas(inspectionElement as HTMLElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                      });
+                      
+                      const imgData = canvas.toDataURL('image/png');
+                      const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4',
+                      });
+                      
+                      const pdfWidth = pdf.internal.pageSize.getWidth();
+                      const pdfHeight = pdf.internal.pageSize.getHeight();
+                      const imgWidth = canvas.width;
+                      const imgHeight = canvas.height;
+                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                      const imgY = 10;
+                      
+                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      pdf.save(`Contract-Inspection.pdf`);
+                      toast.success("PDF exported successfully!");
+                    } catch (error) {
+                      console.error('PDF export error:', error);
+                      toast.error("Failed to export PDF");
+                    }
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                >
+                  📄 Export PDF
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>

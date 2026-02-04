@@ -1,0 +1,42 @@
+{
+  "query": "SELECT * FROM rentalContracts ORDER BY id DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM rentalContracts ORDER BY id DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "450002",
+      "vehicleId": "510008",
+      "clientFirstName": "John",
+      "clientLastName": "Doe",
+      "clientNationality": "NULL",
+      "drivingLicenseNumber": "DL123456",
+      "licenseIssueDate": "NULL",
+      "licenseExpiryDate": "2026-01-01 00:00:00",
+      "rentalStartDate": "2026-02-04 20:47:05",
+      "rentalEndDate": "2026-02-14 20:47:05",
+      "signatureData": "NULL",
+      "createdAt": "2026-02-04 20:50:45",
+      "updatedAt": "2026-02-04 20:50:45",
+      "clientPhone": "NULL",
+      "clientAddress": "NULL",
+      "rentalDays": "10",
+      "dailyRate": "35.00",
+      "totalAmount": "350.00",
+      "discount": "0.00",
+      "finalAmount": "350.00",
+      "clientId": "420009",
+      "contractNumber": "CTR-001",
+      "status": "active",
+      "returnedAt": "NULL",
+      "lateFeePercentage": "150.00",
+      "lateFee": "0.00",
+      "fuelLevel": "Full",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "userId": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tvehicleId\tclientFirstName\tclientLastName\tclientNationality\tdrivingLicenseNumber\tlicenseIssueDate\tlicenseExpiryDate\trentalStartDate\trentalEndDate\tsignatureData\tcreatedAt\tupdatedAt\tclientPhone\tclientAddress\trentalDays\tdailyRate\ttotalAmount\tdiscount\tfinalAmount\tclientId\tcontractNumber\tstatus\treturnedAt\tlateFeePercentage\tlateFee\tfuelLevel\tpickupKm\treturnKm\tuserId\n450002\t510008\tJohn\tDoe\tNULL\tDL123456\tNULL\t2026-01-01 00:00:00\t2026-02-04 20:47:05\t2026-02-14 20:47:05\tNULL\t2026-02-04 20:50:45\t2026-02-04 20:50:45\tNULL\tNULL\t10\t35.00\t350.00\t0.00\t350.00\t420009\tCTR-001\tactive\tNULL\t150.00\t0.00\tFull\tNULL\tNULL\t1\n",
+  "stderr": "",
+  "execution_time_ms": 1496
+}
