@@ -1296,4 +1296,54 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Company branding will appear in printed contracts (via browser print from dialog)
 - [x] Add link to Company Settings in navigation (added to user dropdown menu in MinimalLayout)
 - [x] Test complete company branding workflow (Company Settings page loads correctly, all form fields present, navigation link working)
+- [x] Save checkpoint (version cfefe4d9)
+
+## Invoice Generation System
+- [x] Create invoices and invoice_line_items tables in database schema
+- [ ] Add backend procedures: invoices.generate, invoices.list, invoices.getById, invoices.updatePaymentStatus
+- [ ] Build Invoice template component with company branding and itemized charges
+- [ ] Implement PDF export functionality for invoices
+- [ ] Create Invoices management page with list, filters, and payment tracking
+- [ ] Add "Generate Invoice" button to completed contracts
+- [ ] Auto-calculate charges: rental fees, fuel difference, late fees, damage costs
+- [ ] Test complete invoice generation workflow
 - [ ] Save checkpoint
+
+
+## Invoice Generation System
+
+### Phase 1: Database Schema & Backend
+- [x] Create invoices table (invoiceNumber, contractId, dates, amounts, payment status)
+- [x] Create invoiceLineItems table (description, quantity, unitPrice, amount)
+- [x] Push database migrations
+- [x] Implement generateInvoiceForContract function with auto-calculations
+- [x] Add getInvoiceById, listInvoices, updateInvoicePaymentStatus functions
+- [x] Create tRPC procedures for invoice operations
+- [x] Write comprehensive vitest tests (18 tests - all passing ✅)
+
+### Phase 2: Invoice UI Components
+- [x] Create Invoices page with invoice list
+- [x] Add invoice filters (pending/paid/overdue/cancelled)
+- [x] Build InvoiceDetailsDialog component with professional template
+- [x] Display company branding (logo, company info)
+- [x] Show itemized charges breakdown
+- [x] Add PDF export functionality for invoices
+
+### Phase 3: Integration with Contracts
+- [x] Add "Generate Invoice" button to completed contracts
+- [x] Display invoice status in contract details
+- [x] Link invoices to rental contracts
+- [x] Add invoice generation trigger after contract completion
+
+### Phase 4: Payment Management
+- [x] Add payment status update UI
+- [x] Implement payment method selection
+- [x] Add payment date tracking
+- [x] Create payment history view
+
+### Phase 5: Testing & Delivery
+- [x] Test invoice generation workflow end-to-end
+- [x] Test PDF export functionality
+- [x] Test payment status updates
+- [x] Verify company branding appears correctly
+- [ ] Create checkpoint and deliver

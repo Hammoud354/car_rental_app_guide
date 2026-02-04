@@ -24,6 +24,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Analysis from "./pages/Analysis";
 import Reservations from "./pages/Reservations";
 import CompanySettings from "./pages/CompanySettings";
+import Invoices from "./pages/Invoices";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/analysis" component={Analysis} />
       <Route path="/reservations" component={Reservations} />
       <Route path="/company-settings" component={CompanySettings} />
+      <Route path="/invoices" component={Invoices} />
       {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>

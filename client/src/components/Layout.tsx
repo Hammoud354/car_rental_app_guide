@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { Car, BarChart3, FileText, Menu, X, Calendar, Users } from "lucide-react";
+import { Car, BarChart3, FileText, Menu, X, Calendar, Users, Receipt } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +13,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { href: "/fleet-management", label: "Fleet Management", icon: Car },
     { href: "/booking", label: "Reservations", icon: Calendar },
     { href: "/rental-contracts", label: "Rental Contracts", icon: FileText },
+    { href: "/invoices", label: "Invoices", icon: Receipt },
     { href: "/clients", label: "Clients", icon: Users },
   ];
 

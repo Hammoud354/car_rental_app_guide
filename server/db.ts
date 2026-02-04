@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -1178,4 +1178,198 @@ export async function upsertCompanyProfile(data: {
     
     return await getCompanyProfile(data.userId);
   }
+}
+
+
+// ============================================
+// Invoice Functions
+// ============================================
+
+/**
+ * Generate invoice for a completed contract
+ */
+export async function generateInvoiceForContract(contractId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Tables are already imported at the top of the file
+  
+  // Get contract details
+  const [contract] = await db.select().from(rentalContracts).where(and(eq(rentalContracts.id, contractId), eq(rentalContracts.userId, userId))).limit(1);
+  
+  if (!contract) throw new Error("Contract not found");
+  if (contract.status !== "completed") throw new Error("Contract must be completed before generating invoice");
+  
+  // Check if invoice already exists for this contract
+  const [existingInvoice] = await db.select().from(invoices).where(eq(invoices.contractId, contractId)).limit(1);
+  
+  if (existingInvoice) {
+    return existingInvoice;
+  }
+  
+  // Generate invoice number
+  const invoiceCount = await db.select({ count: sql<number>`count(*)` }).from(invoices);
+  const invoiceNumber = `INV-${String(invoiceCount[0].count + 1).padStart(5, "0")}`;
+  
+  // Calculate line items
+  const lineItems: { description: string; quantity: number; unitPrice: number; amount: number }[] = [];
+  
+  // 1. Rental fee (base charge)
+  const rentalDays = contract.rentalDays || 1;
+  const dailyRate = parseFloat(contract.dailyRate?.toString() || "0");
+  const rentalAmount = rentalDays * dailyRate;
+  lineItems.push({
+    description: `Vehicle Rental - ${rentalDays} day(s) @ $${dailyRate}/day`,
+    quantity: rentalDays,
+    unitPrice: dailyRate,
+    amount: rentalAmount,
+  });
+  
+  // 2. Fuel difference charge (if return fuel < pickup fuel)
+  const fuelLevels = { "Empty": 0, "1/4": 0.25, "1/2": 0.5, "3/4": 0.75, "Full": 1 };
+  const pickupFuel = fuelLevels[contract.fuelLevel as keyof typeof fuelLevels] || 1;
+  const returnFuel = fuelLevels[contract.returnFuelLevel as keyof typeof fuelLevels] || 1;
+  const fuelDifference = pickupFuel - returnFuel;
+  
+  if (fuelDifference > 0) {
+    const fuelChargePerUnit = 50; // $50 per fuel level unit
+    const fuelCharge = fuelDifference * fuelChargePerUnit;
+    lineItems.push({
+      description: `Fuel Difference Charge (${Math.round(fuelDifference * 100)}% tank)`,
+      quantity: fuelDifference,
+      unitPrice: fuelChargePerUnit,
+      amount: fuelCharge,
+    });
+  }
+  
+  // 3. Late return fee (if returned after scheduled return date)
+  if (contract.returnedAt && contract.rentalEndDate) {
+    const returnDate = new Date(contract.returnedAt);
+    const scheduledReturnDate = new Date(contract.rentalEndDate);
+    const daysLate = Math.max(0, Math.ceil((returnDate.getTime() - scheduledReturnDate.getTime()) / (1000 * 60 * 60 * 24)));
+    
+    if (daysLate > 0) {
+      const lateFeePerDay = dailyRate * 1.5; // 150% of daily rate as late fee
+      const lateFee = daysLate * lateFeePerDay;
+      lineItems.push({
+        description: `Late Return Fee - ${daysLate} day(s) @ $${lateFeePerDay.toFixed(2)}/day`,
+        quantity: daysLate,
+        unitPrice: lateFeePerDay,
+        amount: lateFee,
+      });
+    }
+  }
+  
+  // Calculate totals
+  const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
+  const taxRate = 0.10; // 10% tax
+  const taxAmount = subtotal * taxRate;
+  const totalAmount = subtotal + taxAmount;
+  
+  // Create invoice
+  const invoiceDate = new Date();
+  const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
+  
+  const invoiceValues: InsertInvoice = {
+      userId,
+      contractId,
+      invoiceNumber,
+      invoiceDate,
+      dueDate,
+      subtotal: subtotal.toFixed(2),
+      taxAmount: taxAmount.toFixed(2),
+      totalAmount: totalAmount.toFixed(2),
+      paymentStatus: "pending",
+    };
+  
+  const invoiceResult = await db
+    .insert(invoices)
+    .values(invoiceValues);
+  
+  const invoiceId = Number((invoiceResult as any)[0]?.insertId || (invoiceResult as any).insertId);
+  
+  // Create line items
+  for (const item of lineItems) {
+    await db.insert(invoiceLineItems).values({
+      invoiceId: invoiceId,
+      description: item.description,
+      quantity: item.quantity.toFixed(2),
+      unitPrice: item.unitPrice.toFixed(2),
+      amount: item.amount.toFixed(2),
+    });
+  }
+  
+  // Return the created invoice with line items
+  return await getInvoiceById(invoiceId, userId);
+}
+
+/**
+ * Get invoice by ID with line items
+ */
+export async function getInvoiceById(invoiceId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Tables are already imported at the top of the file
+  
+  const [invoice] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
+  
+  if (!invoice) return null;
+  
+  const lineItems = await db.select().from(invoiceLineItems).where(eq(invoiceLineItems.invoiceId, invoiceId));
+  
+  return {
+    ...invoice,
+    lineItems,
+  };
+}
+
+/**
+ * List all invoices for a user
+ */
+export async function listInvoices(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Tables are already imported at the top of the file
+  
+  const results = await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
+  return results;
+}
+
+/**
+ * Update invoice payment status
+ */
+export async function updateInvoicePaymentStatus(
+  invoiceId: number,
+  userId: number,
+  paymentStatus: "pending" | "paid" | "overdue" | "cancelled",
+  paymentMethod?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Tables are already imported at the top of the file
+  
+  const updateData: any = {
+    paymentStatus,
+  };
+  
+  if (paymentMethod) {
+    updateData.paymentMethod = paymentMethod;
+  }
+  
+  if (paymentStatus === "paid") {
+    updateData.paidAt = new Date();
+  }
+  
+  await db
+    .update(invoices)
+    .set(updateData)
+    .where(and(
+      eq(invoices.id, invoiceId),
+      eq(invoices.userId, userId)
+    ));
+  
+  return await getInvoiceById(invoiceId, userId);
 }

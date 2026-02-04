@@ -187,16 +187,30 @@ export default function RentalContracts() {
       toast.error(`Failed to renew contract: ${error.message}`);
     },
   });
-  
+
   const deleteContract = trpc.contracts.delete.useMutation({
     onSuccess: () => {
       toast.success("Contract deleted successfully");
       utils.contracts.list.invalidate(); // Refresh contract list
-      utils.contracts.listByStatus.invalidate();
+      utils.contracts.getById.invalidate(); // Refresh contract details
       setIsDetailsDialogOpen(false);
+      setSelectedContract(null);
     },
-    onError: (error: any) => {
-      toast.error(`Failed to renew contract: ${error.message}`);
+  });
+
+  const generateInvoice = trpc.invoices.generate.useMutation({
+    onSuccess: (data) => {
+      if (data) {
+        toast.success(`Invoice ${data.invoiceNumber} generated successfully!`);
+      } else {
+        toast.success("Invoice generated successfully!");
+      }
+      utils.invoices.list.invalidate(); // Refresh invoice list
+      // Optionally redirect to invoices page
+      // window.location.href = '/invoices';
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to generate invoice");
     },
   });
 
@@ -1195,6 +1209,22 @@ export default function RentalContracts() {
                 >
                   📄 Export PDF
                 </Button>
+                {/* Generate Invoice button - only show for completed contracts */}
+                {selectedContract?.status === 'completed' && (
+                  <Button 
+                    onClick={() => {
+                      if (selectedContract) {
+                        generateInvoice.mutate({ contractId: selectedContract.id });
+                      }
+                    }} 
+                    variant="default"
+                    className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+                    size="default"
+                    disabled={generateInvoice.isPending}
+                  >
+                    {generateInvoice.isPending ? "Generating..." : "💰 Generate Invoice"}
+                  </Button>
+                )}
                 {/* Mark as Returned button - only show for active contracts */}
                 {selectedContract?.status === 'active' && (
                   <Button 

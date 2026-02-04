@@ -134,6 +134,13 @@
       "when": 1770244050430,
       "tag": "0019_secret_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1770244848902,
+      "tag": "0020_organic_emma_frost",
+      "breakpoints": true
     }
   ]
 }

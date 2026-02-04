@@ -884,6 +884,51 @@ export const appRouter = router({
         return { url };
       }),
   }),
+
+  invoices: router({
+    // Generate invoice for a completed contract
+    generate: protectedProcedure
+      .input(z.object({
+        contractId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const invoice = await db.generateInvoiceForContract(input.contractId, ctx.user.id);
+        return invoice;
+      }),
+
+    // Get invoice by ID with line items
+    getById: protectedProcedure
+      .input(z.object({
+        invoiceId: z.number(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const invoice = await db.getInvoiceById(input.invoiceId, ctx.user.id);
+        return invoice;
+      }),
+
+    // List all invoices for the user
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const invoices = await db.listInvoices(ctx.user.id);
+      return invoices;
+    }),
+
+    // Update invoice payment status
+    updatePaymentStatus: protectedProcedure
+      .input(z.object({
+        invoiceId: z.number(),
+        paymentStatus: z.enum(["pending", "paid", "overdue", "cancelled"]),
+        paymentMethod: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const invoice = await db.updateInvoicePaymentStatus(
+          input.invoiceId,
+          ctx.user.id,
+          input.paymentStatus,
+          input.paymentMethod
+        );
+        return invoice;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;
