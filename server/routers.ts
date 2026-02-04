@@ -320,6 +320,36 @@ export const appRouter = router({
       return await db.getOverdueStatistics(ctx.user.id);
     }),
     
+    getDashboardStatistics: protectedProcedure.query(async ({ ctx }) => {
+      const contracts = await db.getAllRentalContracts(ctx.user.id);
+      
+      // Calculate actual revenue from all contracts
+      const totalRevenue = contracts.reduce((sum, contract) => {
+        return sum + (parseFloat(contract.finalAmount) || 0);
+      }, 0);
+      
+      // Count active contracts
+      const activeContracts = contracts.filter(c => c.status === 'active').length;
+      
+      // Count completed contracts
+      const completedContracts = contracts.filter(c => c.status === 'completed').length;
+      
+      // Calculate revenue this month
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const revenueThisMonth = contracts
+        .filter(c => new Date(c.rentalStartDate) >= firstDayOfMonth)
+        .reduce((sum, contract) => sum + (parseFloat(contract.finalAmount) || 0), 0);
+      
+      return {
+        totalRevenue,
+        activeContracts,
+        completedContracts,
+        revenueThisMonth,
+        totalContracts: contracts.length,
+      };
+    }),
+    
     listByStatus: protectedProcedure
       .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
       .query(async ({ ctx, input }) => {

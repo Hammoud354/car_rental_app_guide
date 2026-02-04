@@ -55,6 +55,7 @@ function OverdueWidget() {
 
 export default function Dashboard() {
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
+  const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery();
 
   // Calculate metrics from real data
   const totalFleet = vehicles?.length || 0;
@@ -68,13 +69,9 @@ export default function Dashboard() {
     );
   }).length || 0;
 
-  // Calculate estimated revenue (daily rate * 30 days for available vehicles)
-  const estimatedRevenue = vehicles?.reduce((sum, v) => {
-    if (v.status === "Available" || v.status === "Rented") {
-      return sum + (parseFloat(v.dailyRate) * 30);
-    }
-    return sum;
-  }, 0) || 0;
+  // Use actual revenue from contracts
+  const actualRevenue = contractStats?.totalRevenue || 0;
+  const revenueThisMonth = contractStats?.revenueThisMonth || 0;
 
   // Fleet status counts
   const available = vehicles?.filter(v => v.status === "Available").length || 0;
@@ -119,13 +116,14 @@ export default function Dashboard() {
 
             <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Revenue (Est.)</CardTitle>
+                <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
                 <div className="p-2 bg-green-100 rounded-lg">
                   <DollarSign className="h-5 w-5 text-green-600" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-foreground">${(estimatedRevenue / 1000).toFixed(1)}k</div>
+                <div className="text-3xl font-bold text-foreground">${actualRevenue.toFixed(2)}</div>
+                <p className="text-xs text-muted-foreground mt-1">This month: ${revenueThisMonth.toFixed(2)}</p>
               </CardContent>
             </Card>
 

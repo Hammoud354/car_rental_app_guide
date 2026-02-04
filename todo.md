@@ -1259,4 +1259,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 ## Redirect to Dashboard After Contract Completion
 - [x] Update RentalContracts component to redirect to /dashboard instead of /fleet (line 252)
 - [x] Verified code change - redirect now goes to /dashboard (cannot test due to vehicle already rented)
+- [x] Save checkpoint (version 1622f9b5)
+
+## Fix Dashboard Showing Incorrect Revenue Data
+- [x] Investigate dashboard component to find data source (was calculating estimated revenue: dailyRate × 30 days)
+- [x] Replace mock data with real database queries (added getDashboardStatistics procedure)
+- [x] Ensure dashboard calculates revenue from actual contract amounts in database (uses finalAmount from contracts)
+- [x] Test dashboard displays correct data matching actual contracts ($245.00 total revenue, $245.00 this month)
 - [ ] Save checkpoint
