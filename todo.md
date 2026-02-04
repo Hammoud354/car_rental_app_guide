@@ -1177,4 +1177,19 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [ ] Add link to registration from login page
 - [x] Write vitest tests for registration flow
 - [x] Test complete registration process
+- [x] Create checkpoint and deliver
+
+
+## Forgot Password Feature
+- [x] Create passwordResetTokens table in database schema
+- [x] Add token generation function (crypto.randomBytes)
+- [x] Create requestPasswordReset endpoint (generates token, sends email)
+- [x] Create verifyResetToken endpoint (validates token)
+- [x] Create resetPassword endpoint (updates password with token)
+- [x] Build Forgot Password page UI
+- [x] Build Reset Password page UI
+- [x] Add email sending functionality (logs reset link for development)
+- [x] Add token expiration (24 hours)
+- [x] Write vitest tests for password reset flow
+- [x] Test complete forgot password process
 - [ ] Create checkpoint and deliver

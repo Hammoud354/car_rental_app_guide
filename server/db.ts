@@ -1017,3 +1017,73 @@ export async function getFutureReservations(month: number, year: number, userId:
 
   return reservationsWithConflicts;
 }
+
+// ========================================
+// Password Reset Token Functions
+// ========================================
+
+export async function createPasswordResetToken(userId: number, token: string, expiresAt: Date) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { passwordResetTokens } = await import("../drizzle/schema");
+  
+  const [result] = await db.insert(passwordResetTokens).values({
+    userId,
+    token,
+    expiresAt,
+    used: false,
+  });
+
+  return result;
+}
+
+export async function getPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { passwordResetTokens } = await import("../drizzle/schema");
+  
+  const [result] = await db
+    .select()
+    .from(passwordResetTokens)
+    .where(eq(passwordResetTokens.token, token))
+    .limit(1);
+
+  return result;
+}
+
+export async function markTokenAsUsed(tokenId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { passwordResetTokens } = await import("../drizzle/schema");
+  
+  await db
+    .update(passwordResetTokens)
+    .set({ used: true })
+    .where(eq(passwordResetTokens.id, tokenId));
+}
+
+export async function updateUserPassword(userId: number, hashedPassword: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set({ password: hashedPassword })
+    .where(eq(users.id, userId));
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  return user;
+}

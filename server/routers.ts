@@ -109,6 +109,91 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+      }))
+      .mutation(async ({ input }) => {
+        const crypto = await import('crypto');
+        
+        // Find user by email
+        const user = await db.getUserByEmail(input.email);
+        if (!user) {
+          // Don't reveal if email exists or not for security
+          return { success: true, message: 'If the email exists, a reset link will be sent' };
+        }
+
+        // Generate secure random token
+        const token = crypto.randomBytes(32).toString('hex');
+        
+        // Token expires in 24 hours
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        
+        // Save token to database
+        await db.createPasswordResetToken(user.id, token, expiresAt);
+        
+        // TODO: Send email with reset link
+        // For now, we'll just log it (in production, use nodemailer or notification API)
+        const resetLink = `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+        console.log(`[Password Reset] Reset link for ${user.email}: ${resetLink}`);
+        
+        return { success: true, message: 'If the email exists, a reset link will be sent', token };
+      }),
+    verifyResetToken: publicProcedure
+      .input(z.object({
+        token: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const resetToken = await db.getPasswordResetToken(input.token);
+        
+        if (!resetToken) {
+          throw new Error('Invalid or expired reset token');
+        }
+        
+        if (resetToken.used) {
+          throw new Error('This reset token has already been used');
+        }
+        
+        if (new Date() > new Date(resetToken.expiresAt)) {
+          throw new Error('This reset token has expired');
+        }
+        
+        return { valid: true };
+      }),
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ input }) => {
+        const bcrypt = await import('bcryptjs');
+        
+        // Verify token
+        const resetToken = await db.getPasswordResetToken(input.token);
+        
+        if (!resetToken) {
+          throw new Error('Invalid or expired reset token');
+        }
+        
+        if (resetToken.used) {
+          throw new Error('This reset token has already been used');
+        }
+        
+        if (new Date() > new Date(resetToken.expiresAt)) {
+          throw new Error('This reset token has expired');
+        }
+        
+        // Hash new password
+        const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+        
+        // Update user password
+        await db.updateUserPassword(resetToken.userId, hashedPassword);
+        
+        // Mark token as used
+        await db.markTokenAsUsed(resetToken.id);
+        
+        return { success: true, message: 'Password has been reset successfully' };
+      }),
   }),
 
   // Fleet Management Router

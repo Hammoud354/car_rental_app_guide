@@ -19,6 +19,8 @@ import Settings from "./pages/Settings";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Analysis from "./pages/Analysis";
 import Reservations from "./pages/Reservations";
 function Router() {
@@ -30,6 +32,8 @@ function Router() {
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/clients" component={Clients} />
       <Route path="/rental-contracts" component={RentalContracts} />
       <Route path="/404" component={NotFound} />
