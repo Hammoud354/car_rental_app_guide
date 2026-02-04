@@ -291,7 +291,12 @@ export async function getRentalContractsByClientId(clientId: number, userId: num
     .orderBy(desc(rentalContracts.rentalStartDate));
 }
 
-export async function markContractAsReturned(contractId: number, returnKm?: number) {
+export async function markContractAsReturned(
+  contractId: number, 
+  returnKm?: number,
+  returnFuelLevel?: "Empty" | "1/4" | "1/2" | "3/4" | "Full",
+  returnNotes?: string
+) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -332,14 +337,25 @@ export async function markContractAsReturned(contractId: number, returnKm?: numb
     }
   }
   
+  // Update contract status and return information
   await db
     .update(rentalContracts)
     .set({
       status: "completed",
       returnedAt: new Date(),
       ...(returnKm !== undefined && { returnKm }),
+      ...(returnFuelLevel && { returnFuelLevel }),
+      ...(returnNotes && { returnNotes }),
     })
     .where(eq(rentalContracts.id, contractId));
+  
+  // Update vehicle status back to Available
+  if (contract[0].vehicleId) {
+    await db
+      .update(vehicles)
+      .set({ status: "Available" })
+      .where(eq(vehicles.id, contract[0].vehicleId));
+  }
   
   return { success: true, maintenanceAlert };
 }

@@ -1266,4 +1266,16 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Replace mock data with real database queries (added getDashboardStatistics procedure)
 - [x] Ensure dashboard calculates revenue from actual contract amounts in database (uses finalAmount from contracts)
 - [x] Test dashboard displays correct data matching actual contracts ($245.00 total revenue, $245.00 this month)
+- [x] Save checkpoint (version eab4a54c)
+
+## Contract Completion Workflow
+- [x] Add backend procedure `contracts.markAsReturned` to handle return processing
+- [x] Update contract status to 'completed' and set returnedAt timestamp
+- [x] Update vehicle status back to 'Available'
+- [x] Add returnFuelLevel and returnNotes fields to schema
+- [x] Create return form UI component with fields: return odometer, fuel level, notes (ReturnVehicleDialog.tsx)
+- [x] Add "Mark as Returned" button in contract details dialog (only shows for active contracts)
+- [x] Add validation to ensure return odometer >= pickup odometer (in ReturnVehicleDialog)
+- [x] Display return information in completed contracts (shows returned date, odometer readings, fuel levels, and notes)
+- [x] Test complete return workflow (successfully returned contract CTR-001, vehicle status updated to Available)
 - [ ] Save checkpoint

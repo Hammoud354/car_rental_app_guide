@@ -475,20 +475,27 @@ export const appRouter = router({
         return await db.renewRentalContract(input);
       }),
     
-    markAsReturned: publicProcedure
+    markAsReturned: protectedProcedure
       .input(z.object({ 
         contractId: z.number(),
-        returnKm: z.number().optional()
+        returnKm: z.number().optional(),
+        returnFuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
+        returnNotes: z.string().optional(),
       }))
-      .mutation(async ({ input }) => {
+      .mutation(async ({ input, ctx }) => {
         // Validate return odometer is greater than pickup odometer
         if (input.returnKm) {
-          const contract = await db.getRentalContractById(input.contractId, 1);
+          const contract = await db.getRentalContractById(input.contractId, ctx.user.id);
           if (contract && contract.pickupKm && input.returnKm <= contract.pickupKm) {
             throw new Error(`Return odometer (${input.returnKm} km) must be greater than pickup odometer (${contract.pickupKm} km)`);
           }
         }
-        return await db.markContractAsReturned(input.contractId, input.returnKm);
+        return await db.markContractAsReturned(
+          input.contractId, 
+          input.returnKm,
+          input.returnFuelLevel,
+          input.returnNotes
+        );
       }),
     
     delete: publicProcedure

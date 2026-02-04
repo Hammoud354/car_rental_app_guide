@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MinimalLayout from "@/components/MinimalLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
+import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -26,6 +27,7 @@ export default function RentalContracts() {
   const [selectedContract, setSelectedContract] = useState<any>(null);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isRenewDialogOpen, setIsRenewDialogOpen] = useState(false);
+  const [isReturnDialogOpen, setIsReturnDialogOpen] = useState(false);
   const [additionalDays, setAdditionalDays] = useState<number>(1);
   
   // Date states
@@ -53,7 +55,7 @@ export default function RentalContracts() {
   const [returnKm, setReturnKm] = useState<number>(0);
   
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
-  const { data: contracts = [] } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
+  const { data: contracts = [], refetch } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const utils = trpc.useUtils();
   
@@ -1053,6 +1055,53 @@ export default function RentalContracts() {
                     </div>
                   </div>
 
+                  {/* Return Information - only show for completed contracts */}
+                  {selectedContract.status === 'completed' && selectedContract.returnedAt && (
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3 text-gray-900">Return Information</h3>
+                      <div className="grid grid-cols-2 gap-4 bg-green-50 border-2 border-green-200 p-4 rounded-lg">
+                        <div>
+                          <div className="text-sm text-gray-600">Returned On</div>
+                          <div className="font-semibold text-gray-900">{new Date(selectedContract.returnedAt).toLocaleDateString()} {new Date(selectedContract.returnedAt).toLocaleTimeString()}</div>
+                        </div>
+                        {selectedContract.pickupKm && selectedContract.returnKm && (
+                          <>
+                            <div>
+                              <div className="text-sm text-gray-600">Pickup Odometer</div>
+                              <div className="font-semibold text-gray-900">{selectedContract.pickupKm.toLocaleString()} km</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-gray-600">Return Odometer</div>
+                              <div className="font-semibold text-gray-900">{selectedContract.returnKm.toLocaleString()} km</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-gray-600">Total Distance</div>
+                              <div className="text-lg font-bold text-green-600">{(selectedContract.returnKm - selectedContract.pickupKm).toLocaleString()} km</div>
+                            </div>
+                          </>
+                        )}
+                        {selectedContract.fuelLevel && selectedContract.returnFuelLevel && (
+                          <>
+                            <div>
+                              <div className="text-sm text-gray-600">Pickup Fuel Level</div>
+                              <div className="font-semibold text-gray-900">{selectedContract.fuelLevel}</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-gray-600">Return Fuel Level</div>
+                              <div className="font-semibold text-gray-900">{selectedContract.returnFuelLevel}</div>
+                            </div>
+                          </>
+                        )}
+                        {selectedContract.returnNotes && (
+                          <div className="col-span-2 border-t border-green-300 pt-3 mt-2">
+                            <div className="text-sm text-gray-600 mb-1">Return Notes</div>
+                            <div className="text-gray-900 whitespace-pre-wrap">{selectedContract.returnNotes}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Signature */}
                   {selectedContract.signatureData && (
                     <div>
@@ -1119,6 +1168,17 @@ export default function RentalContracts() {
                 >
                   📄 Export PDF
                 </Button>
+                {/* Mark as Returned button - only show for active contracts */}
+                {selectedContract?.status === 'active' && (
+                  <Button 
+                    onClick={() => setIsReturnDialogOpen(true)} 
+                    variant="default"
+                    className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
+                    size="default"
+                  >
+                    ✅ Mark as Returned
+                  </Button>
+                )}
                 <Button 
                   onClick={() => {
                     if (selectedContract && window.confirm(`Are you sure you want to delete contract ${selectedContract.contractNumber}? This action cannot be undone.`)) {
@@ -1387,6 +1447,25 @@ export default function RentalContracts() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+      {/* Return Vehicle Dialog */}
+      {selectedContract && (
+        <ReturnVehicleDialog
+          open={isReturnDialogOpen}
+          onOpenChange={setIsReturnDialogOpen}
+          contractId={selectedContract.id}
+          contractNumber={selectedContract.contractNumber}
+          pickupKm={selectedContract.pickupKm}
+          pickupFuelLevel={selectedContract.fuelLevel}
+          onSuccess={() => {
+            // Refresh contracts list
+            refetch();
+            // Close details dialog
+            setIsDetailsDialogOpen(false);
+            setSelectedContract(null);
+          }}
+        />
+      )}
     </MinimalLayout>
   );
 }
