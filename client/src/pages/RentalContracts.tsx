@@ -1205,13 +1205,13 @@ export default function RentalContracts() {
               );
             })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
-              {/* Button flex layout - prevents text cutoff */}
-              <div className="flex flex-wrap gap-3 w-full justify-start">
+              {/* Button grid layout - 2 columns, equal sizing */}
+              <div className="grid grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => window.print()} 
                   variant="outline"
-                  className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400 min-w-[120px]"
+                  className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400 h-12 w-full"
                   size="default"
                 >
                   🖨️ Print
@@ -1253,7 +1253,7 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="outline"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 min-w-[140px]"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
                   size="default"
                 >
                   📄 Export PDF
@@ -1267,7 +1267,7 @@ export default function RentalContracts() {
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
                       variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white min-w-[180px]"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white h-12 w-full"
                       size="default"
                     >
                       📄 View Invoice ({contractInvoice.invoiceNumber})
@@ -1280,7 +1280,7 @@ export default function RentalContracts() {
                         }
                       }} 
                       variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white min-w-[180px]"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white h-12 w-full"
                       size="default"
                       disabled={generateInvoice.isPending}
                     >
@@ -1293,7 +1293,7 @@ export default function RentalContracts() {
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
                     variant="default"
-                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white min-w-[180px]"
+                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white h-12 w-full"
                     size="default"
                   >
                     ✅ Mark as Returned
@@ -1306,7 +1306,7 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="destructive"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50 min-w-[120px]"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50 h-12 w-full"
                   size="default"
                   disabled={deleteContract.isPending}
                 >
@@ -1329,7 +1329,7 @@ export default function RentalContracts() {
                     setAdditionalDays(1);
                     setIsRenewDialogOpen(true);
                   }} 
-                  className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg min-w-[120px]"
+                  className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
                   size="default"
                 >
                   Renew
@@ -1337,7 +1337,7 @@ export default function RentalContracts() {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsDetailsDialogOpen(false)}
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400 min-w-[120px]"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400 h-12 w-full"
                   size="default"
                 >
                   Close
