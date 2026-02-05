@@ -16,6 +16,8 @@ interface ReturnVehicleDialogProps {
   contractNumber: string;
   pickupKm?: number | null;
   pickupFuelLevel?: string | null;
+  kmLimit?: number | null;
+  overLimitKmRate?: number | null;
   onSuccess?: () => void;
 }
 
@@ -26,13 +28,29 @@ export function ReturnVehicleDialog({
   contractNumber,
   pickupKm,
   pickupFuelLevel,
+  kmLimit,
+  overLimitKmRate = 0.5,
   onSuccess,
 }: ReturnVehicleDialogProps) {
   const { toast } = useToast();
   const [returnKm, setReturnKm] = useState<string>("");
   const [returnFuelLevel, setReturnFuelLevel] = useState<string>("");
   const [returnNotes, setReturnNotes] = useState<string>("");
+  const [damageInspection, setDamageInspection] = useState<string>("");
   const [validationError, setValidationError] = useState<string>("");
+  
+  // Calculate over-limit KM fee
+  const calculateOverLimitFee = () => {
+    if (!returnKm || !pickupKm || !kmLimit) return 0;
+    const returnKmNum = parseInt(returnKm);
+    if (isNaN(returnKmNum)) return 0;
+    const kmDriven = returnKmNum - pickupKm;
+    if (kmDriven <= kmLimit) return 0;
+    const overLimitKm = kmDriven - kmLimit;
+    return overLimitKm * (overLimitKmRate || 0.5);
+  };
+  
+  const overLimitFee = calculateOverLimitFee();
 
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
     onSuccess: (data) => {
@@ -54,6 +72,7 @@ export function ReturnVehicleDialog({
       setReturnKm("");
       setReturnFuelLevel("");
       setReturnNotes("");
+      setDamageInspection("");
       setValidationError("");
       onOpenChange(false);
       
@@ -100,6 +119,8 @@ export function ReturnVehicleDialog({
       returnKm: returnKm ? parseInt(returnKm) : undefined,
       returnFuelLevel: returnFuelLevel as "Empty" | "1/4" | "1/2" | "3/4" | "Full",
       returnNotes: returnNotes || undefined,
+      damageInspection: damageInspection || undefined,
+      overLimitKmFee: overLimitFee > 0 ? overLimitFee : undefined,
     });
   };
 
@@ -151,15 +172,46 @@ export function ReturnVehicleDialog({
             )}
           </div>
 
+          {/* Damage Inspection */}
+          <div className="space-y-2">
+            <Label htmlFor="damageInspection">Damage Inspection *</Label>
+            <Textarea
+              id="damageInspection"
+              placeholder="Inspect vehicle for any damages, scratches, dents, or issues. Enter 'No damage' if vehicle is in good condition."
+              value={damageInspection}
+              onChange={(e) => setDamageInspection(e.target.value)}
+              rows={3}
+              required
+            />
+          </div>
+
+          {/* KM Limit Warning */}
+          {kmLimit && returnKm && pickupKm && (
+            <div className={`p-3 rounded-md text-sm ${
+              parseInt(returnKm) - pickupKm > kmLimit 
+                ? 'bg-red-50 border border-red-200 text-red-800'
+                : 'bg-green-50 border border-green-200 text-green-800'
+            }`}>
+              <p className="font-semibold mb-1">
+                {parseInt(returnKm) - pickupKm > kmLimit ? '⚠️ KM Limit Exceeded' : '✓ Within KM Limit'}
+              </p>
+              <p>KM Driven: {(parseInt(returnKm) - pickupKm).toLocaleString()} km</p>
+              <p>KM Limit: {kmLimit.toLocaleString()} km</p>
+              {overLimitFee > 0 && (
+                <p className="font-bold mt-1">Over-Limit Fee: ${overLimitFee.toFixed(2)}</p>
+              )}
+            </div>
+          )}
+
           {/* Return Notes */}
           <div className="space-y-2">
-            <Label htmlFor="returnNotes">Return Notes (Optional)</Label>
+            <Label htmlFor="returnNotes">Additional Notes (Optional)</Label>
             <Textarea
               id="returnNotes"
-              placeholder="Any notes about vehicle condition, damages, or issues..."
+              placeholder="Any additional notes about the return..."
               value={returnNotes}
               onChange={(e) => setReturnNotes(e.target.value)}
-              rows={4}
+              rows={2}
             />
           </div>
 

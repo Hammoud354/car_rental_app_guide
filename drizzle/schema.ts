@@ -187,6 +187,10 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   pickupKm: int("pickupKm"), // Odometer reading at pickup/contract creation
   returnKm: int("returnKm"), // Odometer reading at return/contract completion
   returnNotes: text("returnNotes"), // Notes about vehicle condition at return
+  damageInspection: text("damageInspection"), // Damage inspection notes at return
+  kmLimit: int("kmLimit"), // Maximum allowed kilometers for the rental period
+  overLimitKmFee: decimal("overLimitKmFee", { precision: 10, scale: 2 }).default("0.00"), // Fee for exceeding KM limit
+  overLimitKmRate: decimal("overLimitKmRate", { precision: 10, scale: 2 }).default("0.50"), // Rate per KM over limit (default $0.50/km)
   lateFeePercentage: decimal("lateFeePercentage", { precision: 5, scale: 2 }).default("150.00"), // Percentage of daily rate for late fees (default 150%)
   lateFee: decimal("lateFee", { precision: 10, scale: 2 }).default("0.00"), // Calculated late fee amount
   status: mysqlEnum("status", ["active", "completed", "overdue"]).default("active").notNull(),

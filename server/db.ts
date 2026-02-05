@@ -295,7 +295,9 @@ export async function markContractAsReturned(
   contractId: number, 
   returnKm?: number,
   returnFuelLevel?: "Empty" | "1/4" | "1/2" | "3/4" | "Full",
-  returnNotes?: string
+  returnNotes?: string,
+  damageInspection?: string,
+  overLimitKmFee?: number
 ) {
   const db = await getDb();
   if (!db) {
@@ -346,6 +348,8 @@ export async function markContractAsReturned(
       ...(returnKm !== undefined && { returnKm }),
       ...(returnFuelLevel && { returnFuelLevel }),
       ...(returnNotes && { returnNotes }),
+      ...(damageInspection && { damageInspection }),
+      ...(overLimitKmFee !== undefined && { overLimitKmFee: overLimitKmFee.toFixed(2) }),
     })
     .where(eq(rentalContracts.id, contractId));
   

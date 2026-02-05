@@ -481,6 +481,8 @@ export const appRouter = router({
         returnKm: z.number().optional(),
         returnFuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
         returnNotes: z.string().optional(),
+        damageInspection: z.string().optional(),
+        overLimitKmFee: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // Validate return odometer is greater than pickup odometer
@@ -494,7 +496,9 @@ export const appRouter = router({
           input.contractId, 
           input.returnKm,
           input.returnFuelLevel,
-          input.returnNotes
+          input.returnNotes,
+          input.damageInspection,
+          input.overLimitKmFee
         );
       }),
     

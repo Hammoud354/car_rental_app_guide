@@ -1148,9 +1148,43 @@ export default function RentalContracts() {
                             </div>
                           </>
                         )}
+                        {/* KM Limit and Over-Limit Fee */}
+                        {selectedContract.kmLimit && selectedContract.pickupKm && selectedContract.returnKm && (
+                          <>
+                            <div>
+                              <div className="text-sm text-gray-600">KM Limit</div>
+                              <div className="font-semibold text-gray-900">{selectedContract.kmLimit.toLocaleString()} km</div>
+                            </div>
+                            <div>
+                              <div className="text-sm text-gray-600">KM Driven</div>
+                              <div className={`font-semibold ${
+                                (selectedContract.returnKm - selectedContract.pickupKm) > selectedContract.kmLimit
+                                  ? 'text-red-600'
+                                  : 'text-green-600'
+                              }`}>
+                                {(selectedContract.returnKm - selectedContract.pickupKm).toLocaleString()} km
+                                {(selectedContract.returnKm - selectedContract.pickupKm) > selectedContract.kmLimit && (
+                                  <span className="text-xs ml-1">(+{((selectedContract.returnKm - selectedContract.pickupKm) - selectedContract.kmLimit).toLocaleString()} km over)</span>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                        {selectedContract.overLimitKmFee && parseFloat(selectedContract.overLimitKmFee) > 0 && (
+                          <div className="col-span-2 bg-red-50 border border-red-200 p-3 rounded-md">
+                            <div className="text-sm text-red-600 font-semibold mb-1">⚠️ Over-Limit KM Fee</div>
+                            <div className="text-xl font-bold text-red-700">${parseFloat(selectedContract.overLimitKmFee).toFixed(2)}</div>
+                          </div>
+                        )}
+                        {selectedContract.damageInspection && (
+                          <div className="col-span-2 border-t border-green-300 pt-3 mt-2">
+                            <div className="text-sm text-gray-600 mb-1 font-semibold">🔍 Damage Inspection</div>
+                            <div className="text-gray-900 whitespace-pre-wrap bg-white p-3 rounded border border-gray-200">{selectedContract.damageInspection}</div>
+                          </div>
+                        )}
                         {selectedContract.returnNotes && (
                           <div className="col-span-2 border-t border-green-300 pt-3 mt-2">
-                            <div className="text-sm text-gray-600 mb-1">Return Notes</div>
+                            <div className="text-sm text-gray-600 mb-1">Additional Notes</div>
                             <div className="text-gray-900 whitespace-pre-wrap">{selectedContract.returnNotes}</div>
                           </div>
                         )}
@@ -1171,13 +1205,13 @@ export default function RentalContracts() {
               );
             })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
-              {/* Button grid layout - 2x2 on mobile, single row on desktop */}
-              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-row sm:flex-wrap sm:justify-between sm:items-center w-full">
+              {/* Button grid layout - equal width buttons */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => window.print()} 
                   variant="outline"
-                  className="print-contract col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400"
+                  className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400"
                   size="default"
                 >
                   🖨️ Print
@@ -1219,7 +1253,7 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="outline"
-                  className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400"
                   size="default"
                 >
                   📄 Export PDF
@@ -1233,7 +1267,7 @@ export default function RentalContracts() {
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
                       variant="default"
-                      className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
                       size="default"
                     >
                       📄 View Invoice ({contractInvoice.invoiceNumber})
@@ -1246,7 +1280,7 @@ export default function RentalContracts() {
                         }
                       }} 
                       variant="default"
-                      className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"
                       size="default"
                       disabled={generateInvoice.isPending}
                     >
@@ -1259,7 +1293,7 @@ export default function RentalContracts() {
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
                     variant="default"
-                    className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
+                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white"
                     size="default"
                   >
                     ✅ Mark as Returned
@@ -1272,7 +1306,7 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="destructive"
-                  className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50"
                   size="default"
                   disabled={deleteContract.isPending}
                 >
@@ -1295,7 +1329,7 @@ export default function RentalContracts() {
                     setAdditionalDays(1);
                     setIsRenewDialogOpen(true);
                   }} 
-                  className="bg-gray-900 hover:bg-gray-800 text-white col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+                  className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg"
                   size="default"
                 >
                   Renew
@@ -1303,7 +1337,7 @@ export default function RentalContracts() {
                 <Button 
                   variant="outline" 
                   onClick={() => setIsDetailsDialogOpen(false)}
-                  className="col-span-1 transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400"
                   size="default"
                 >
                   Close
@@ -1543,6 +1577,8 @@ export default function RentalContracts() {
           contractNumber={selectedContract.contractNumber}
           pickupKm={selectedContract.pickupKm}
           pickupFuelLevel={selectedContract.fuelLevel}
+          kmLimit={selectedContract.kmLimit}
+          overLimitKmRate={selectedContract.overLimitKmRate ? parseFloat(selectedContract.overLimitKmRate) : 0.5}
           onSuccess={() => {
             // Refresh contracts list
             refetch();

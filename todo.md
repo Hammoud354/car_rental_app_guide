@@ -1419,4 +1419,32 @@ NOTE: This requires a major database schema migration and updates to all queries
 ### Testing & Delivery
 - [x] Test on different screen sizes
 - [x] Verify all buttons are accessible
+- [x] Save checkpoint and deliver
+
+
+## Contract Dialog & Inspection Improvements
+
+### Issue 1: Button Alignment
+- [x] Make all buttons in contract dialog equally sized
+- [x] Ensure consistent spacing between buttons
+- [x] Test button layout on different screen sizes
+
+### Issue 2: Enhanced Return Inspection
+- [x] Add damage inspection fields to return dialog
+- [x] Add return odometer (KM) field
+- [x] Calculate over-limit KM fees based on contract KM limit
+- [x] Display inspection notes in completed contract view
+- [x] Show damage assessment details
+- [x] Show KM usage and any over-limit charges
+
+### Backend Changes
+- [x] Update contract schema to include inspection fields
+- [x] Add damage notes field
+- [x] Add over-limit KM fee calculation
+- [x] Update return contract procedure
+
+### Testing & Delivery
+- [x] Test return inspection workflow
+- [x] Verify fee calculations are correct
+- [x] Test button alignment on mobile and desktop
 - [ ] Save checkpoint and deliver
