@@ -91,6 +91,7 @@ export const vehicles = mysqlTable("vehicles", {
   insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 100 }),
   insuranceExpiryDate: timestamp("insuranceExpiryDate"),
   insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Annual or total insurance cost
+  purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
   registrationExpiryDate: timestamp("registrationExpiryDate"),
   photoUrl: text("photoUrl"),
   notes: text("notes"),
@@ -312,3 +313,17 @@ export const invoiceLineItems = mysqlTable("invoiceLineItems", {
 
 export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
 export type InsertInvoiceLineItem = typeof invoiceLineItems.$inferInsert;
+
+/**
+ * Nationalities table for autocomplete dropdown
+ * Stores unique nationalities entered by users for future selection
+ */
+export const nationalities = mysqlTable("nationalities", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
+  nationality: varchar("nationality", { length: 100 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Nationality = typeof nationalities.$inferSelect;
+export type InsertNationality = typeof nationalities.$inferInsert;

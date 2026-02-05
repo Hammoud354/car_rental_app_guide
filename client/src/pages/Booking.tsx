@@ -17,7 +17,7 @@ export default function Booking() {
               The customer-facing interface designed for conversion. This module manages availability, pricing logic, and the secure transaction flow.
             </p>
           </div>
-          <Link href="/">
+          <Link href="/dashboard">
             <Button variant="outline" className="font-mono">
               <Home className="mr-2 h-4 w-4" />
               HOME

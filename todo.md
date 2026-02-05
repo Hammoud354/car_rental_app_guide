@@ -1544,9 +1544,9 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Ensure invoice is generated before opening
 
 ### 6. Fix Home Icon Navigation
-- [ ] Change home icon to redirect to dashboard overview
-- [ ] Remove redirect to landing page
-- [ ] Update all instances of home navigation
+- [x] Change home icon to redirect to dashboard overview
+- [x] Remove redirect to landing page
+- [x] Update all instances of home navigation
 
 ### 7. Remove Redundant Home Button in Maintenance
 - [ ] Remove "Home" button next to "Add Maintenance" button
@@ -1559,15 +1559,15 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [ ] Allow dates far into the future
 
 ### 9. Nationality Autocomplete with Database Storage
-- [ ] Create nationalities table in database
-- [ ] Add nationality to database when entered
-- [ ] Implement autocomplete dropdown for nationality field
-- [ ] Allow both selection and manual entry
+- [x] Create nationalities table in database
+- [x] Add nationality to database when entered
+- [x] Implement autocomplete dropdown for nationality field
+- [x] Allow both selection and manual entry
 
 ### 10. Add Vehicle Cost Field for P&L Analysis
-- [ ] Add purchaseCost field to vehicles table
-- [ ] Update vehicle creation form
-- [ ] Use cost data in analysis/P&L calculations
+- [x] Add purchaseCost field to vehicles table
+- [x] Update vehicle creation form
+- [x] Use cost data in analysis/P&L calculations
 
 ### 11. Standardize Primary Button Color
 - [ ] Define single primary button color (e.g., blue-600)

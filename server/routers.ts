@@ -229,6 +229,7 @@ export const appRouter = router({
         vin: z.string().max(17).optional(),
         insurancePolicyNumber: z.string().max(100).optional(),
         insuranceCost: z.string().optional(),
+        purchaseCost: z.string().optional(),
         insuranceExpiryDate: z.date().optional(),
         registrationExpiryDate: z.date().optional(),
         photoUrl: z.string().optional(),
@@ -256,6 +257,7 @@ export const appRouter = router({
           vin: z.string().max(17).optional(),
           insurancePolicyNumber: z.string().max(100).optional(),
           insuranceCost: z.string().optional(),
+          purchaseCost: z.string().optional(),
           insuranceExpiryDate: z.date().optional(),
           registrationExpiryDate: z.date().optional(),
           photoUrl: z.string().optional(),
@@ -892,6 +894,21 @@ export const appRouter = router({
         const buffer = new Uint8Array(input.fileData);
         const { url } = await storagePut(input.fileName, buffer, input.contentType);
         return { url };
+      }),
+  }),
+
+  // Nationalities router for autocomplete
+  nationalities: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getAllNationalities(ctx.user.id);
+    }),
+    
+    add: protectedProcedure
+      .input(z.object({
+        nationality: z.string().min(1).max(100),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.addNationality(ctx.user.id, input.nationality);
       }),
   }),
 

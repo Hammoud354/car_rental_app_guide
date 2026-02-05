@@ -177,6 +177,7 @@ export default function FleetManagement() {
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
+      purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
       notes: formData.get("notes") as string || undefined,
     });
   };
@@ -211,6 +212,7 @@ export default function FleetManagement() {
         vin: formData.get("vin") as string || undefined,
         insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
+        purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
         notes: formData.get("notes") as string || undefined,
       },
     });
@@ -460,6 +462,11 @@ export default function FleetManagement() {
                 <div>
                   <Label htmlFor="insuranceCost">Annual Insurance Cost ($)</Label>
                   <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" />
+                </div>
+
+                <div>
+                  <Label htmlFor="purchaseCost">Vehicle Purchase Cost ($)</Label>
+                  <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" />
                 </div>
 
                 <div>
@@ -799,6 +806,11 @@ export default function FleetManagement() {
                 <div>
                   <Label htmlFor="edit-insuranceCost">Annual Insurance Cost ($)</Label>
                   <Input id="edit-insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.insuranceCost || ""} />
+                </div>
+
+                <div>
+                  <Label htmlFor="edit-purchaseCost">Vehicle Purchase Cost ($)</Label>
+                  <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""} />
                 </div>
 
                 <div>

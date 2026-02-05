@@ -29,9 +29,9 @@ export default function Breadcrumb() {
 
   // Generate breadcrumb items from current path
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
-    // Always start with home
+    // Always start with home (dashboard)
     const breadcrumbs: BreadcrumbItem[] = [
-      { label: "Home", href: "/" }
+      { label: "Home", href: "/dashboard" }
     ];
 
     // If we're on home page, return just home

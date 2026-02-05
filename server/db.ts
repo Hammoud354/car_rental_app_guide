@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -1401,4 +1401,46 @@ export async function updateInvoicePaymentStatus(
     ));
   
   return await getInvoiceById(invoiceId, userId);
+}
+
+/**
+ * Get all nationalities for a user (for autocomplete dropdown)
+ */
+export async function getAllNationalities(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db.select()
+    .from(nationalities)
+    .where(eq(nationalities.userId, userId))
+    .orderBy(nationalities.nationality);
+}
+
+/**
+ * Add a new nationality to the database if it doesn't exist
+ */
+export async function addNationality(userId: number, nationality: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Check if nationality already exists for this user
+  const existing = await db.select()
+    .from(nationalities)
+    .where(and(
+      eq(nationalities.userId, userId),
+      eq(nationalities.nationality, nationality)
+    ))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    return existing[0]; // Already exists, return it
+  }
+  
+  // Insert new nationality
+  const [result] = await db.insert(nationalities).values({
+    userId,
+    nationality,
+  });
+  
+  return { id: Number(result.insertId), userId, nationality, createdAt: new Date() };
 }

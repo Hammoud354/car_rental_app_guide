@@ -46,6 +46,8 @@ export default function RentalContracts() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
+  const [nationalityComboboxOpen, setNationalityComboboxOpen] = useState(false);
+  const [selectedNationality, setSelectedNationality] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"active" | "completed" | "overdue" | undefined>("active");
   const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -59,6 +61,7 @@ export default function RentalContracts() {
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
+  const { data: nationalities = [] } = trpc.nationalities.list.useQuery();
   const utils = trpc.useUtils();
   
   // Find invoice for selected contract
@@ -77,6 +80,13 @@ export default function RentalContracts() {
   
   // Mutation to update overdue contracts
   const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();
+  
+  // Mutation to add nationality
+  const addNationalityMutation = trpc.nationalities.add.useMutation({
+    onSuccess: () => {
+      utils.nationalities.list.invalidate();
+    },
+  });
   
   // Check for overdue contracts when component mounts or status filter changes
   useEffect(() => {
@@ -561,7 +571,57 @@ export default function RentalContracts() {
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientNationality">Nationality</Label>
-                        <Input id="clientNationality" name="clientNationality" placeholder="e.g., American, Canadian" />
+                        <Popover open={nationalityComboboxOpen} onOpenChange={setNationalityComboboxOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={nationalityComboboxOpen}
+                              className="w-full justify-between"
+                            >
+                              {selectedNationality || "Select or type nationality..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0">
+                            <Command>
+                              <CommandInput 
+                                placeholder="Search or type nationality..." 
+                                value={selectedNationality}
+                                onValueChange={(value) => {
+                                  setSelectedNationality(value);
+                                  // Save to database if it's a new nationality
+                                  if (value && value.trim() && !nationalities.find(n => n.nationality.toLowerCase() === value.toLowerCase())) {
+                                    addNationalityMutation.mutate({ nationality: value.trim() });
+                                  }
+                                }}
+                              />
+                              <CommandList>
+                                <CommandEmpty>Type to add new nationality</CommandEmpty>
+                                <CommandGroup>
+                                  {nationalities.map((nat) => (
+                                    <CommandItem
+                                      key={nat.id}
+                                      value={nat.nationality}
+                                      onSelect={(value) => {
+                                        setSelectedNationality(value);
+                                        setNationalityComboboxOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={`mr-2 h-4 w-4 ${
+                                          selectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      {nat.nationality}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                        <input type="hidden" id="clientNationality" name="clientNationality" value={selectedNationality} />
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientPhone">Phone Number</Label>
