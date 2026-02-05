@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Shield, FileText, UserX, UserCog, ChevronLeft } from "lucide-react";
+import { Shield, FileText, UserX, UserCog, ChevronLeft, Home } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -80,6 +80,12 @@ export default function AuditLogs() {
               <Button variant="outline" size="sm">
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back to Users
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm">
+                <Home className="h-4 w-4 mr-1" />
+                Dashboard
               </Button>
             </Link>
             <h1 className="text-3xl font-bold flex items-center gap-2">
