@@ -255,7 +255,7 @@ export default function FleetManagement() {
             
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-              <Button className="font-mono">
+              <Button className="font-mono bg-gray-900 hover:bg-gray-800">
                 <Plus className="mr-2 h-4 w-4" />
                 ADD VEHICLE
               </Button>

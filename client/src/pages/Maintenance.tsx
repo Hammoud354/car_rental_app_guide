@@ -108,12 +108,6 @@ export default function Maintenance() {
             </div>
             
             <div className="flex gap-3">
-              <Link href="/dashboard">
-                <Button variant="outline" className="font-mono">
-                  <Home className="mr-2 h-4 w-4" />
-                  HOME
-                </Button>
-              </Link>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gray-900 hover:bg-gray-800">

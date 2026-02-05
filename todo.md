@@ -1584,3 +1584,17 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [ ] Verify database schema changes
 - [ ] Run backend tests
 - [ ] Save checkpoint and deliver
+
+### 13. Fix Tax Calculation Error
+- [x] Investigate where tax is still calculated as 10%
+- [x] Update tax calculation to use correct tax rate from settings
+- [x] Verify total amount includes correct tax
+
+### 14. Remove Home Button from Maintenance Page
+- [x] Delete standalone "Home" button next to "Add Maintenance"
+- [x] Keep breadcrumb navigation only
+
+### 15. Change Add Vehicle/Reservation Buttons to Black
+- [x] Update "Add Vehicle" button color to black
+- [x] Update "Add Reservation" button color to black
+- [x] Maintain consistency with new design direction

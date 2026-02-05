@@ -141,12 +141,12 @@ describe('Invoice Generation System', () => {
       expect(parseFloat(invoice!.subtotal)).toBeGreaterThanOrEqual(450);
     });
 
-    it('should apply 10% tax', async () => {
+    it('should apply 11% tax', async () => {
       const invoice = await db.getInvoiceById((await db.generateInvoiceForContract(testContractId, testUserId))!.id, testUserId);
 
-      // Tax should be 10% of subtotal
+      // Tax should be 11% of subtotal
       const subtotal = parseFloat(invoice!.subtotal);
-      const expectedTax = subtotal * 0.10;
+      const expectedTax = subtotal * 0.11;
       expect(parseFloat(invoice!.taxAmount)).toBeCloseTo(expectedTax, 2);
     });
 
