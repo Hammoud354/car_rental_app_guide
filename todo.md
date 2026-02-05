@@ -1648,3 +1648,10 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Replace red dots with numbered markers (1, 2, 3, etc.)
 - [x] Update CarDamageInspection component
 - [x] Improve damage tracking clarity
+
+### 24. Super Admin Data Access Override
+- [x] Add Super Admin bypass to all data filtering queries
+- [x] Allow Super Admin to view all users' vehicles, contracts, clients, etc.
+- [x] Maintain multi-tenancy isolation for regular users
+- [x] Add user filter dropdown for Super Admin to switch between users (skipped - can be added later if needed)
+- [x] Test Super Admin can see all data while regular users see only their own

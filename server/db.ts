@@ -18,6 +18,15 @@ export async function getDb() {
   return _db;
 }
 
+// Helper function to check if a user is Super Admin
+export async function isSuperAdmin(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  
+  const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return user.length > 0 && user[0].role === 'super_admin';
+}
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.openId) {
     throw new Error("User openId is required for upsert");
@@ -98,8 +107,11 @@ export async function getAllVehicles(userId: number) {
     return [];
   }
   
-  // Return only vehicles belonging to the specified user
-  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  // Super Admin can see all vehicles, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  const allVehicles = isAdmin 
+    ? await db.select().from(vehicles)
+    : await db.select().from(vehicles).where(eq(vehicles.userId, userId));
   
   // Calculate total maintenance cost for each vehicle
   const vehiclesWithCosts = await Promise.all(
@@ -194,7 +206,11 @@ export async function getAllRentalContracts(userId: number) {
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
+  // Super Admin can see all contracts, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.select().from(rentalContracts)
+    : await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
 }
 
 export async function getRentalContractById(id: number, userId: number) {
@@ -263,11 +279,18 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
+  // Super Admin can see all contracts, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  
   if (!status) {
     // Return all contracts if no status specified
-    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
+    return isAdmin
+      ? await db.select().from(rentalContracts)
+      : await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
   }
-  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, status)));
+  return isAdmin
+    ? await db.select().from(rentalContracts).where(eq(rentalContracts.status, status))
+    : await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, status)));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
@@ -555,7 +578,11 @@ export async function getAllClients(userId: number): Promise<Client[]> {
   const db = await getDb();
   if (!db) return [];
   
-  return await db.select().from(clients).where(eq(clients.userId, userId));
+  // Super Admin can see all clients, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.select().from(clients)
+    : await db.select().from(clients).where(eq(clients.userId, userId));
 }
 
 export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
@@ -596,8 +623,11 @@ export async function getVehicleProfitabilityAnalytics(userId: number) {
     throw new Error("Database not available");
   }
 
-  // Get all vehicles with their financial data for this user
-  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  // Super Admin can see all vehicles, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  const allVehicles = isAdmin
+    ? await db.select().from(vehicles)
+    : await db.select().from(vehicles).where(eq(vehicles.userId, userId));
   
   const analytics = await Promise.all(
     allVehicles.map(async (vehicle) => {
@@ -1571,9 +1601,11 @@ export async function listInvoices(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Tables are already imported at the top of the file
-  
-  const results = await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
+  // Super Admin can see all invoices, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  const results = isAdmin
+    ? await db.select().from(invoices).orderBy(desc(invoices.createdAt))
+    : await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
   return results;
 }
 
@@ -1621,10 +1653,11 @@ export async function getAllNationalities(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  return await db.select()
-    .from(nationalities)
-    .where(eq(nationalities.userId, userId))
-    .orderBy(nationalities.nationality);
+  // Super Admin can see all nationalities, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.select().from(nationalities).orderBy(nationalities.nationality)
+    : await db.select().from(nationalities).where(eq(nationalities.userId, userId)).orderBy(nationalities.nationality);
 }
 
 /**
