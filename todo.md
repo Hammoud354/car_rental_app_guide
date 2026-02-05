@@ -1655,3 +1655,11 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Maintain multi-tenancy isolation for regular users
 - [x] Add user filter dropdown for Super Admin to switch between users (skipped - can be added later if needed)
 - [x] Test Super Admin can see all data while regular users see only their own
+
+### 25. User Switcher Dropdown for Super Admin
+- [x] Create user context to store selected user filter
+- [x] Add user switcher dropdown in dashboard header
+- [x] Show "All Users" option and list of individual users
+- [x] Update all pages to use selected user filter
+- [x] Persist selected user in session/local storage
+- [x] Test switching between users and viewing their data

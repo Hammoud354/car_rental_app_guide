@@ -204,7 +204,7 @@ export const appRouter = router({
   // Fleet Management Router
   fleet: router({
     list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllVehicles(ctx.user?.id || 1);
+      return await db.getAllVehicles(ctx.user?.id || 1, ctx.filterUserId);
     }),
     
     getById: publicProcedure
@@ -316,7 +316,7 @@ export const appRouter = router({
   // Rental Contracts Router
   contracts: router({
     list: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getAllRentalContracts(ctx.user.id);
+      return await db.getAllRentalContracts(ctx.user.id, ctx.filterUserId);
     }),
     
     updateOverdueContracts: publicProcedure.mutation(async () => {
@@ -329,7 +329,7 @@ export const appRouter = router({
     }),
     
     getDashboardStatistics: protectedProcedure.query(async ({ ctx }) => {
-      const contracts = await db.getAllRentalContracts(ctx.user.id);
+      const contracts = await db.getAllRentalContracts(ctx.user.id, ctx.filterUserId);
       
       // Calculate actual revenue from all contracts
       const totalRevenue = contracts.reduce((sum, contract) => {
@@ -547,7 +547,7 @@ export const appRouter = router({
   // Client Management Router
   clients: router({
     list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllClients(ctx.user?.id || 1);
+      return await db.getAllClients(ctx.user?.id || 1, ctx.filterUserId);
     }),
     
     getById: publicProcedure

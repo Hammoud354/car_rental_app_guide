@@ -7,6 +7,7 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import { UserFilterProvider } from "./contexts/UserFilterContext";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,11 @@ const trpcClient = trpc.createClient({
     httpBatchLink({
       url: "/api/trpc",
       transformer: superjson,
+      headers() {
+        // Get filterUserId from localStorage (set by UserFilterContext)
+        const filterUserId = localStorage.getItem('selectedUserId');
+        return filterUserId ? { 'x-filter-user-id': filterUserId } : {};
+      },
       fetch(input, init) {
         return globalThis.fetch(input, {
           ...(init ?? {}),
@@ -55,7 +61,9 @@ const trpcClient = trpc.createClient({
 createRoot(document.getElementById("root")!).render(
   <trpc.Provider client={trpcClient} queryClient={queryClient}>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <UserFilterProvider>
+        <App />
+      </UserFilterProvider>
     </QueryClientProvider>
   </trpc.Provider>
 );

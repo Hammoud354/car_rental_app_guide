@@ -7,6 +7,7 @@ export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
   res: CreateExpressContextOptions["res"];
   user: User | null;
+  filterUserId?: number | null; // For Super Admin to filter by specific user
 };
 
 export async function createContext(
@@ -55,9 +56,16 @@ export async function createContext(
     user = null;
   }
 
+  // Check for filterUserId header (sent by Super Admin frontend)
+  const filterUserIdHeader = opts.req.headers['x-filter-user-id'];
+  const filterUserId = filterUserIdHeader && filterUserIdHeader !== 'null' 
+    ? parseInt(filterUserIdHeader as string, 10) 
+    : null;
+
   return {
     req: opts.req,
     res: opts.res,
     user,
+    filterUserId: !isNaN(filterUserId as number) ? filterUserId : undefined,
   };
 }

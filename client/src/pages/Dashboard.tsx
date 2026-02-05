@@ -5,6 +5,9 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import MinimalLayout from "@/components/MinimalLayout";
+import { useUserFilter } from "@/contexts/UserFilterContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Users } from "lucide-react";
 
 function OverdueWidget() {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery();
@@ -56,6 +59,8 @@ function OverdueWidget() {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { selectedUserId, setSelectedUserId, isSuperAdmin } = useUserFilter();
+  const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery();
 
@@ -99,14 +104,37 @@ export default function Dashboard() {
               <h2 className="text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
               <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
             </div>
-            {user?.role === "super_admin" && (
-              <Link href="/admin/users">
-                <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                  <Crown className="mr-2 h-4 w-4" />
-                  Super Admin Panel
-                </Button>
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              {isSuperAdmin && allUsers && allUsers.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <Select
+                    value={selectedUserId === null ? "all" : selectedUserId.toString()}
+                    onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
+                  >
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Select user" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Users</SelectItem>
+                      {allUsers.map((u) => (
+                        <SelectItem key={u.id} value={u.id.toString()}>
+                          {u.name || u.username || u.email || `User ${u.id}`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {user?.role === "super_admin" && (
+                <Link href="/admin/users">
+                  <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                    <Crown className="mr-2 h-4 w-4" />
+                    Super Admin Panel
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Overdue Contracts Alert Widget */}

@@ -100,18 +100,26 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // Vehicle Management Queries
-export async function getAllVehicles(userId: number) {
+export async function getAllVehicles(userId: number, filterUserId?: number | null) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicles: database not available");
     return [];
   }
   
-  // Super Admin can see all vehicles, regular users only see their own
+  // Super Admin can see all vehicles or filter by specific user
   const isAdmin = await isSuperAdmin(userId);
-  const allVehicles = isAdmin 
-    ? await db.select().from(vehicles)
-    : await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  let allVehicles;
+  
+  if (isAdmin) {
+    // Super Admin: if filterUserId is provided, show only that user's data; otherwise show all
+    allVehicles = filterUserId 
+      ? await db.select().from(vehicles).where(eq(vehicles.userId, filterUserId))
+      : await db.select().from(vehicles);
+  } else {
+    // Regular user: always show only their own data
+    allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  }
   
   // Calculate total maintenance cost for each vehicle
   const vehiclesWithCosts = await Promise.all(
@@ -200,17 +208,21 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
 }
 
 // Rental Contract Queries
-export async function getAllRentalContracts(userId: number) {
+export async function getAllRentalContracts(userId: number, filterUserId?: number | null) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  // Super Admin can see all contracts, regular users only see their own
+  // Super Admin can see all contracts or filter by specific user
   const isAdmin = await isSuperAdmin(userId);
-  return isAdmin
-    ? await db.select().from(rentalContracts)
-    : await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
+  
+  if (isAdmin) {
+    return filterUserId
+      ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, filterUserId))
+      : await db.select().from(rentalContracts);
+  }
+  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
 }
 
 export async function getRentalContractById(id: number, userId: number) {
@@ -574,15 +586,19 @@ export async function createClient(client: InsertClient): Promise<Client> {
   return created[0];
 }
 
-export async function getAllClients(userId: number): Promise<Client[]> {
+export async function getAllClients(userId: number, filterUserId?: number | null): Promise<Client[]> {
   const db = await getDb();
   if (!db) return [];
   
-  // Super Admin can see all clients, regular users only see their own
+  // Super Admin can see all clients or filter by specific user
   const isAdmin = await isSuperAdmin(userId);
-  return isAdmin
-    ? await db.select().from(clients)
-    : await db.select().from(clients).where(eq(clients.userId, userId));
+  
+  if (isAdmin) {
+    return filterUserId
+      ? await db.select().from(clients).where(eq(clients.userId, filterUserId))
+      : await db.select().from(clients);
+  }
+  return await db.select().from(clients).where(eq(clients.userId, userId));
 }
 
 export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
@@ -617,17 +633,11 @@ export async function deleteClient(id: number, userId: number): Promise<void> {
 }
 
 // Vehicle Profitability Analytics
-export async function getVehicleProfitabilityAnalytics(userId: number) {
+export async function getVehicleProfitabilityAnalytics(userId: number, filterUserId?: number | null) {
   const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  // Super Admin can see all vehicles, regular users only see their own
-  const isAdmin = await isSuperAdmin(userId);
-  const allVehicles = isAdmin
-    ? await db.select().from(vehicles)
-    : await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  if (!db) return [];
+  
+  const allVehicles = await getAllVehicles(userId, filterUserId);
   
   const analytics = await Promise.all(
     allVehicles.map(async (vehicle) => {
