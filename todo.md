@@ -1663,3 +1663,10 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Update all pages to use selected user filter
 - [x] Persist selected user in session/local storage
 - [x] Test switching between users and viewing their data
+
+### 26. Fix Data Isolation Issue
+- [x] Audit all create procedures to ensure userId is set correctly
+- [x] Audit all update procedures to verify userId filtering
+- [x] Audit all delete procedures to verify userId filtering
+- [x] Ensure car makers/models are properly isolated
+- [x] Test that editing data as one user doesn't affect other users

@@ -470,7 +470,7 @@ export const appRouter = router({
         description: z.string().max(500).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        return await db.createDamageMark({ ...input, userId: 1 });
+        return await db.createDamageMark({ ...input, userId: ctx.user?.id || 1 });
       }),
     
     renew: publicProcedure
@@ -603,7 +603,7 @@ export const appRouter = router({
             throw new Error('License expiry date must be in the future');
           }
         }
-        return await db.updateClient(id, 1, updates);
+        return await db.updateClient(id, ctx.user?.id || 1, updates);
       }),
     
     delete: publicProcedure
@@ -847,7 +847,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const settings = await db.upsertCompanySettings({
-          userId: 1,
+          userId: ctx.user?.id || 1,
           ...input,
         });
         return settings;
