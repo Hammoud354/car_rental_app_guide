@@ -1447,4 +1447,32 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Test return inspection workflow
 - [x] Verify fee calculations are correct
 - [x] Test button alignment on mobile and desktop
+- [x] Save checkpoint and deliver
+
+
+## Invoice UI Improvements
+
+### Issue 1: Invoice Form Width
+- [x] Increase invoice details dialog width to prevent number cramping (max-w-4xl → max-w-6xl)
+- [x] Add proper spacing between invoice line items
+- [x] Ensure numbers are clearly separated and readable
+- [x] Test on different screen sizes
+
+### Issue 2: Invoice Page Theme Mismatch
+- [x] Remove sidebar layout from Invoices page
+- [x] Replace "RENTAL.OS" branding with "Car Rental Management System"
+- [x] Add top navigation bar matching other pages (Dashboard, Fleet, Contracts, etc.)
+- [x] Match background colors and styling to main website theme
+- [x] Ensure consistent layout with other pages
+
+### Issue 3: Auto-Open Invoice After Generation
+- [x] Modify Generate Invoice button to automatically open invoice details
+- [x] Remove need for separate "View Invoice" button click
+- [x] Navigate to Invoices page with invoice dialog open
+- [x] Test workflow from contract to invoice view
+
+### Testing & Delivery
+- [x] Test invoice generation and auto-open workflow
+- [x] Verify theme consistency across all pages
+- [x] Check invoice form readability
 - [ ] Save checkpoint and deliver

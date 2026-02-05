@@ -217,12 +217,12 @@ export default function RentalContracts() {
     onSuccess: (data) => {
       if (data) {
         toast.success(`Invoice ${data.invoiceNumber} generated successfully!`);
+        // Navigate to invoices page with the invoice dialog open
+        window.location.href = `/invoices?invoice=${data.id}`;
       } else {
         toast.success("Invoice generated successfully!");
       }
       utils.invoices.list.invalidate(); // Refresh invoice list
-      // Optionally redirect to invoices page
-      // window.location.href = '/invoices';
     },
     onError: (error) => {
       toast.error(error.message || "Failed to generate invoice");

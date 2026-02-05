@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Layout from "@/components/Layout";
+import MinimalLayout from "@/components/MinimalLayout";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -111,7 +111,7 @@ export default function Invoices() {
   };
 
   return (
-    <Layout>
+    <MinimalLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -198,7 +198,7 @@ export default function Invoices() {
 
         {/* Invoice Details Dialog */}
         <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Invoice Details</DialogTitle>
             </DialogHeader>
@@ -386,6 +386,6 @@ export default function Invoices() {
           </DialogContent>
         </Dialog>
       </div>
-    </Layout>
+    </MinimalLayout>
   );
 }
