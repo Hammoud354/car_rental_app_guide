@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText, Home } from "lucide-react";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import MinimalLayout from "@/components/MinimalLayout";
 
@@ -17,12 +17,28 @@ export default function Maintenance() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const [viewingHistory, setViewingHistory] = useState<number | null>(null);
+  const [autoFilledKm, setAutoFilledKm] = useState<number | null>(null);
 
   const { data: vehicles } = trpc.fleet.list.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
     { vehicleId: viewingHistory || 0 },
     { enabled: viewingHistory !== null }
   );
+  
+  // Query for last return KM when vehicle is selected
+  const { data: lastReturnKm } = trpc.fleet.getLastReturnKm.useQuery(
+    { vehicleId: selectedVehicleId || 0 },
+    { enabled: selectedVehicleId !== null }
+  );
+  
+  // Auto-fill KM field when lastReturnKm is loaded
+  useEffect(() => {
+    if (lastReturnKm) {
+      setAutoFilledKm(lastReturnKm);
+    } else {
+      setAutoFilledKm(null);
+    }
+  }, [lastReturnKm]);
 
   const addMaintenanceMutation = trpc.fleet.addMaintenanceRecord.useMutation({
     onSuccess: () => {
@@ -113,7 +129,11 @@ export default function Maintenance() {
                   <div>
                     <Label htmlFor="vehicleSelect">Select Vehicle *</Label>
                     <Select 
-                      onValueChange={(value) => setSelectedVehicleId(parseInt(value))}
+                      onValueChange={(value) => {
+                        const vehicleId = parseInt(value);
+                        setSelectedVehicleId(vehicleId);
+                        // Auto-fill will happen via useEffect when lastReturnKm loads
+                      }}
                       required
                     >
                       <SelectTrigger>
@@ -182,8 +202,19 @@ export default function Maintenance() {
 
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <Label htmlFor="mileageAtService">Kilometer Reading</Label>
-                      <Input id="mileageAtService" name="mileageAtService" type="number" min="0" placeholder="e.g., 45000" />
+                      <Label htmlFor="mileageAtService">
+                        Kilometer Reading
+                        {autoFilledKm && <span className="text-xs text-muted-foreground ml-2">(Auto-filled from last rental)</span>}
+                      </Label>
+                      <Input 
+                        id="mileageAtService" 
+                        name="mileageAtService" 
+                        type="number" 
+                        min="0" 
+                        placeholder="e.g., 45000"
+                        defaultValue={autoFilledKm || undefined}
+                        key={autoFilledKm || 'empty'} // Force re-render when autoFilledKm changes
+                      />
                     </div>
                     <div>
                       <Label htmlFor="cost">Cost ($)</Label>

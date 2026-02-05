@@ -1579,15 +1579,29 @@ export default function RentalContracts() {
           pickupFuelLevel={selectedContract.fuelLevel}
           kmLimit={selectedContract.kmLimit}
           overLimitKmRate={selectedContract.overLimitKmRate ? parseFloat(selectedContract.overLimitKmRate) : 0.5}
-          onSuccess={() => {
+          onSuccess={async () => {
             // Refresh contracts list
             refetch();
             // Close details dialog
             setIsDetailsDialogOpen(false);
+            const contractId = selectedContract.id;
             setSelectedContract(null);
-            // Navigate to dashboard after successful return
-            setTimeout(() => {
-              window.location.href = '/dashboard';
+            
+            // Generate invoice and navigate to it
+            setTimeout(async () => {
+              try {
+                const invoice = await generateInvoice.mutateAsync({ contractId });
+                // Navigate to invoices page with invoice dialog open
+                if (invoice && invoice.id) {
+                  window.location.href = `/invoices?invoice=${invoice.id}`;
+                } else {
+                  window.location.href = '/dashboard';
+                }
+              } catch (error) {
+                console.error('Failed to generate invoice:', error);
+                // Fallback to dashboard if invoice generation fails
+                window.location.href = '/dashboard';
+              }
             }, 1000); // Wait 1 second to show success message
           }}
         />

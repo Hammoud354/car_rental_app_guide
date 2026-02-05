@@ -1514,3 +1514,73 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Verify all buttons are equal size
 - [x] Check spacing and alignment
 - [ ] Save checkpoint and deliver
+
+
+## Comprehensive System Improvements - 12 Features
+
+### 1. Preview Invoice Before Contract Completion
+- [ ] Add "Preview Invoice" button when creating/viewing contracts
+- [ ] Allow viewing estimated invoice before marking as completed
+- [ ] Show calculated charges (rental, fuel, late fees, tax)
+
+### 2. Auto-fill Maintenance KM from Last Rental
+- [x] Query last completed rental contract for the vehicle
+- [x] Auto-populate maintenance KM field with last return KM
+- [x] Allow manual override of auto-filled value
+
+### 3. Increase Invoice Itemized Charges Spacing
+- [x] Add more spacing between columns in invoice table
+- [x] Prevent numbers from appearing concatenated (e.g., "10.00$35.00$350.00")
+- [x] Improve readability of Quantity, Unit Price, and Amount columns
+
+### 4. Change Tax Rate to 11%
+- [x] Update tax calculation from 10% to 11%
+- [x] Update invoice generation logic
+- [x] Update display text to show "Tax (11%)"
+
+### 5. Auto-open Invoice After Vehicle Inspection
+- [x] After marking contract as returned, automatically open invoice
+- [x] Allow immediate print/view of invoice
+- [x] Ensure invoice is generated before opening
+
+### 6. Fix Home Icon Navigation
+- [ ] Change home icon to redirect to dashboard overview
+- [ ] Remove redirect to landing page
+- [ ] Update all instances of home navigation
+
+### 7. Remove Redundant Home Button in Maintenance
+- [ ] Remove "Home" button next to "Add Maintenance" button
+- [ ] Keep breadcrumb navigation only
+- [ ] Clean up button layout
+
+### 8. Extend Driving License Expiry Validation
+- [ ] Ensure license expiry date is always > today
+- [ ] Remove 2036 year limit
+- [ ] Allow dates far into the future
+
+### 9. Nationality Autocomplete with Database Storage
+- [ ] Create nationalities table in database
+- [ ] Add nationality to database when entered
+- [ ] Implement autocomplete dropdown for nationality field
+- [ ] Allow both selection and manual entry
+
+### 10. Add Vehicle Cost Field for P&L Analysis
+- [ ] Add purchaseCost field to vehicles table
+- [ ] Update vehicle creation form
+- [ ] Use cost data in analysis/P&L calculations
+
+### 11. Standardize Primary Button Color
+- [ ] Define single primary button color (e.g., blue-600)
+- [ ] Replace all page-specific button colors
+- [ ] Apply consistent color across entire app
+
+### 12. Fix Company Settings Dashboard Redirect
+- [ ] Update "Back to Dashboard" button
+- [ ] Redirect to /dashboard (overview page)
+- [ ] Test navigation flow
+
+### Testing & Delivery
+- [ ] Test all 12 improvements end-to-end
+- [ ] Verify database schema changes
+- [ ] Run backend tests
+- [ ] Save checkpoint and deliver

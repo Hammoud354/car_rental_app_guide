@@ -303,6 +303,12 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         return await db.getVehicleAnalysis(input.vehicleId, ctx.user?.id || 1);
       }),
+    
+    getLastReturnKm: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getLastReturnKm(input.vehicleId, ctx.user?.id || 1);
+      }),
   }),
 
   // Rental Contracts Router

@@ -264,26 +264,26 @@ export default function Invoices() {
                   {/* Line Items */}
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg">Itemized Charges</h3>
-                    <table className="w-full">
+                    <table className="w-full table-fixed">
                       <thead className="border-b">
                         <tr className="text-left">
-                          <th className="pb-2 font-medium">Description</th>
-                          <th className="pb-2 font-medium text-right">Quantity</th>
-                          <th className="pb-2 font-medium text-right">Unit Price</th>
-                          <th className="pb-2 font-medium text-right">Amount</th>
+                          <th className="pb-2 font-medium w-1/2">Description</th>
+                          <th className="pb-2 font-medium text-right w-1/6 px-4">Quantity</th>
+                          <th className="pb-2 font-medium text-right w-1/6 px-4">Unit Price</th>
+                          <th className="pb-2 font-medium text-right w-1/6 px-4">Amount</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {invoiceDetails.lineItems.map((item, index) => (
                           <tr key={index}>
                             <td className="py-3">{item.description}</td>
-                            <td className="py-3 text-right">
+                            <td className="py-3 text-right px-4">
                               {parseFloat(item.quantity).toFixed(2)}
                             </td>
-                            <td className="py-3 text-right">
+                            <td className="py-3 text-right px-4">
                               ${parseFloat(item.unitPrice).toFixed(2)}
                             </td>
-                            <td className="py-3 text-right font-medium">
+                            <td className="py-3 text-right font-medium px-4">
                               ${parseFloat(item.amount).toFixed(2)}
                             </td>
                           </tr>
@@ -301,7 +301,7 @@ export default function Invoices() {
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax (10%):</span>
+                      <span className="text-muted-foreground">Tax (11%):</span>
                       <span className="font-medium">
                         ${parseFloat(invoiceDetails.taxAmount).toFixed(2)}
                       </span>

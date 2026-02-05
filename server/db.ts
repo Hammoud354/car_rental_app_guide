@@ -959,6 +959,31 @@ export async function getVehicleAnalysis(vehicleId: number, userId: number) {
   };
 }
 
+// Get last return KM for a vehicle (from most recent completed rental)
+export async function getLastReturnKm(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get last return KM: database not available");
+    return null;
+  }
+
+  // Get the most recent completed contract for this vehicle
+  const lastContract = await db.select()
+    .from(rentalContracts)
+    .where(and(
+      eq(rentalContracts.vehicleId, vehicleId),
+      eq(rentalContracts.userId, userId),
+      eq(rentalContracts.status, "completed")
+    ))
+    .orderBy(desc(rentalContracts.returnedAt))
+    .limit(1);
+
+  if (lastContract.length === 0 || !lastContract[0].returnKm) {
+    return null;
+  }
+
+  return lastContract[0].returnKm;
+}
 
 // Get future reservations for calendar view
 export async function getFutureReservations(month: number, year: number, userId: number) {
@@ -1266,7 +1291,7 @@ export async function generateInvoiceForContract(contractId: number, userId: num
   
   // Calculate totals
   const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
-  const taxRate = 0.10; // 10% tax
+  const taxRate = 0.11; // 11% tax
   const taxAmount = subtotal * taxRate;
   const totalAmount = subtotal + taxAmount;
   
