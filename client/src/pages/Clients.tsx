@@ -228,7 +228,7 @@ export default function Clients() {
                   <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
+                  <Button type="submit">
                     Add Client
                   </Button>
                 </div>
@@ -373,7 +373,7 @@ export default function Clients() {
                 : "Add your first client to start managing customer information"}
             </p>
             {!searchTerm && (
-              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-orange-600 hover:bg-orange-700">
+              <Button onClick={() => setIsCreateDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add First Client
               </Button>
@@ -509,7 +509,7 @@ export default function Clients() {
                 <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
+                <Button type="submit">
                   Update Client
                 </Button>
               </div>

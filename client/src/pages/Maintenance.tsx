@@ -230,7 +230,7 @@ export default function Maintenance() {
                     <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                       Cancel
                     </Button>
-                    <Button type="submit" disabled={addMaintenanceMutation.isPending} className="bg-blue-600 hover:bg-blue-700">
+                    <Button type="submit" disabled={addMaintenanceMutation.isPending}>
                       {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
                     </Button>
                   </DialogFooter>

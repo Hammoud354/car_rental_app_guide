@@ -505,7 +505,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                 <Button 
                   type="button" 
                   onClick={() => window.print()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                  className="flex items-center gap-2"
                 >
                   <Printer className="h-4 w-4" />
                   Print Contract
@@ -547,7 +547,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                       toast.error("Failed to export PDF");
                     }
                   }}
-                  className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+                  className="flex items-center gap-2"
                 >
                   📄 Export PDF
                 </Button>

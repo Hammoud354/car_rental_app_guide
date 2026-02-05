@@ -1570,9 +1570,9 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Use cost data in analysis/P&L calculations
 
 ### 11. Standardize Primary Button Color
-- [ ] Define single primary button color (e.g., blue-600)
-- [ ] Replace all page-specific button colors
-- [ ] Apply consistent color across entire app
+- [x] Define single primary button color (e.g., blue-600)
+- [x] Replace all page-specific button colors
+- [x] Apply consistent color across entire app
 
 ### 12. Fix Company Settings Dashboard Redirect
 - [ ] Update "Back to Dashboard" button

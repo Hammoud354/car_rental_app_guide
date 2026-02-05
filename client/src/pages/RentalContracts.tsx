@@ -808,7 +808,6 @@ export default function RentalContracts() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-green-600 hover:bg-green-700"
                   onClick={() => {
                     setPendingBulkAction("completed");
                     setConfirmDialogOpen(true);
@@ -975,7 +974,7 @@ export default function RentalContracts() {
                           <Button
                             variant="default"
                             size="sm"
-                            className="w-full bg-green-600 hover:bg-green-700"
+                            className="w-full"
                             onClick={() => {
                               // Open return inspection dialog
                               setSelectedContractForReturn(contract.id);
@@ -1327,7 +1326,7 @@ export default function RentalContracts() {
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
                       variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white h-12 w-full"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
                       size="default"
                     >
                       📄 View Invoice ({contractInvoice.invoiceNumber})
@@ -1340,7 +1339,7 @@ export default function RentalContracts() {
                         }
                       }} 
                       variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white h-12 w-full"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
                       size="default"
                       disabled={generateInvoice.isPending}
                     >
@@ -1353,7 +1352,7 @@ export default function RentalContracts() {
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
                     variant="default"
-                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg bg-green-600 hover:bg-green-700 text-white h-12 w-full"
+                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
                     size="default"
                   >
                     ✅ Mark as Returned
@@ -1600,7 +1599,6 @@ export default function RentalContracts() {
               </Button>
               <Button
                 variant="default"
-                className="bg-green-600 hover:bg-green-700"
                 onClick={() => {
                   if (selectedContractForReturn && returnKm > 0) {
                     const contract = contracts.find(c => c.id === selectedContractForReturn);
