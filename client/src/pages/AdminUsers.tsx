@@ -16,10 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Trash2, Crown } from "lucide-react";
+import { Shield, Trash2, Crown, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { Redirect } from "wouter";
+import { Redirect, Link } from "wouter";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
@@ -92,6 +92,12 @@ export default function AdminUsers() {
             Manage user accounts and permissions
           </p>
         </div>
+        <Link href="/admin/audit-logs">
+          <Button variant="outline" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            View Audit Logs
+          </Button>
+        </Link>
       </div>
 
       <Card>

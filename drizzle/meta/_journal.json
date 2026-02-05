@@ -169,6 +169,13 @@
       "when": 1770325560801,
       "tag": "0024_massive_master_mold",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "5",
+      "when": 1770326212354,
+      "tag": "0025_closed_blue_shield",
+      "breakpoints": true
     }
   ]
 }

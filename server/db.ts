@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -813,6 +813,19 @@ export async function updateUserRole(userId: number, role: 'user' | 'admin', req
   
   await db.update(users).set({ role }).where(eq(users.id, userId));
   
+  // Log the action
+  await createAuditLog({
+    actorId: requestingUser.id,
+    actorUsername: requestingUser.username,
+    actorRole: requestingUser.role,
+    action: 'role_change',
+    targetUserId: userId,
+    targetUsername: targetUser.username,
+    details: `Changed role from ${targetUser.role} to ${role}`,
+    previousState: { role: targetUser.role },
+    newState: { role },
+  });
+  
   return await getUserById(userId);
 }
 
@@ -844,7 +857,107 @@ export async function deleteUser(userId: number, requestingUserId: number) {
   
   await db.delete(users).where(eq(users.id, userId));
   
+  // Log the action
+  await createAuditLog({
+    actorId: requestingUser.id,
+    actorUsername: requestingUser.username,
+    actorRole: requestingUser.role,
+    action: 'user_delete',
+    targetUserId: userId,
+    targetUsername: targetUser.username,
+    details: `Deleted user account: ${targetUser.username} (${targetUser.name || 'N/A'})`,
+    previousState: { 
+      username: targetUser.username, 
+      role: targetUser.role,
+      email: targetUser.email,
+    },
+  });
+  
   return { success: true };
+}
+
+// Audit Log Functions
+export async function createAuditLog(logData: {
+  actorId: number;
+  actorUsername: string;
+  actorRole: string;
+  action: string;
+  targetUserId?: number;
+  targetUsername?: string;
+  details: string;
+  previousState?: any;
+  newState?: any;
+  ipAddress?: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(auditLogs).values({
+    actorId: logData.actorId,
+    actorUsername: logData.actorUsername,
+    actorRole: logData.actorRole,
+    action: logData.action,
+    targetUserId: logData.targetUserId,
+    targetUsername: logData.targetUsername,
+    details: logData.details,
+    previousState: logData.previousState ? JSON.stringify(logData.previousState) : null,
+    newState: logData.newState ? JSON.stringify(logData.newState) : null,
+    ipAddress: logData.ipAddress,
+  });
+}
+
+export async function getAuditLogs(limit: number = 100, offset: number = 0) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db
+    .select()
+    .from(auditLogs)
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(limit)
+    .offset(offset);
+  
+  return logs.map(log => ({
+    ...log,
+    previousState: log.previousState ? JSON.parse(log.previousState) : null,
+    newState: log.newState ? JSON.parse(log.newState) : null,
+  }));
+}
+
+export async function getAuditLogsByUser(userId: number, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db
+    .select()
+    .from(auditLogs)
+    .where(or(eq(auditLogs.actorId, userId), eq(auditLogs.targetUserId, userId)))
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(limit);
+  
+  return logs.map(log => ({
+    ...log,
+    previousState: log.previousState ? JSON.parse(log.previousState) : null,
+    newState: log.newState ? JSON.parse(log.newState) : null,
+  }));
+}
+
+export async function getAuditLogsByAction(action: string, limit: number = 50) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const logs = await db
+    .select()
+    .from(auditLogs)
+    .where(eq(auditLogs.action, action))
+    .orderBy(desc(auditLogs.createdAt))
+    .limit(limit);
+  
+  return logs.map(log => ({
+    ...log,
+    previousState: log.previousState ? JSON.parse(log.previousState) : null,
+    newState: log.newState ? JSON.parse(log.newState) : null,
+  }));
 }
 
 

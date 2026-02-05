@@ -26,6 +26,7 @@ import Reservations from "./pages/Reservations";
 import CompanySettings from "./pages/CompanySettings";
 import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
+import AuditLogs from "./pages/AuditLogs";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/compliance" component={Compliance} />
       <Route path="/settings" component={Settings} />
       <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/audit-logs" component={AuditLogs} />
       <Route path="/analysis" component={Analysis} />
       <Route path="/reservations" component={Reservations} />
       <Route path="/company-settings" component={CompanySettings} />

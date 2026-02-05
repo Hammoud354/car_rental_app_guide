@@ -327,3 +327,36 @@ export const nationalities = mysqlTable("nationalities", {
 
 export type Nationality = typeof nationalities.$inferSelect;
 export type InsertNationality = typeof nationalities.$inferInsert;
+
+/**
+ * Audit logs table for tracking admin actions
+ * Records all administrative operations with actor and timestamp information
+ */
+export const auditLogs = mysqlTable("auditLogs", {
+  id: int("id").autoincrement().primaryKey(),
+  /** User ID of the admin who performed the action */
+  actorId: int("actorId").notNull(),
+  /** Username of the admin who performed the action */
+  actorUsername: varchar("actorUsername", { length: 100 }).notNull(),
+  /** Role of the admin at the time of action */
+  actorRole: varchar("actorRole", { length: 20 }).notNull(),
+  /** Type of action performed */
+  action: varchar("action", { length: 50 }).notNull(), // e.g., "role_change", "user_delete", "user_create"
+  /** ID of the target user (if applicable) */
+  targetUserId: int("targetUserId"),
+  /** Username of the target user (if applicable) */
+  targetUsername: varchar("targetUsername", { length: 100 }),
+  /** Detailed description of the action */
+  details: text("details").notNull(),
+  /** Previous state before action (JSON) */
+  previousState: text("previousState"),
+  /** New state after action (JSON) */
+  newState: text("newState"),
+  /** IP address of the actor */
+  ipAddress: varchar("ipAddress", { length: 45 }),
+  /** Timestamp of the action */
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;

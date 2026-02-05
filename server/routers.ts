@@ -983,6 +983,36 @@ export const appRouter = router({
         const result = await db.deleteUser(input.userId, ctx.user.id);
         return result;
       }),
+    
+    getAuditLogs: superAdminProcedure
+      .input(z.object({
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const logs = await db.getAuditLogs(input?.limit, input?.offset);
+        return logs;
+      }),
+    
+    getAuditLogsByUser: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const logs = await db.getAuditLogsByUser(input.userId, input.limit);
+        return logs;
+      }),
+    
+    getAuditLogsByAction: superAdminProcedure
+      .input(z.object({
+        action: z.string(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input }) => {
+        const logs = await db.getAuditLogsByAction(input.action, input.limit);
+        return logs;
+      }),
   }),
 });
 
