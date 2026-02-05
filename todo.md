@@ -1475,4 +1475,26 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Test invoice generation and auto-open workflow
 - [x] Verify theme consistency across all pages
 - [x] Check invoice form readability
+- [x] Save checkpoint and deliver
+
+
+## Contract Details Button Layout & Navigation Fixes
+
+### Issue 1: Button Text Cutoff
+- [x] Fix "Export PDF" button text being cut off
+- [x] Fix "View Invoice" button text being cut off
+- [x] Prevent button overlap
+- [x] Ensure all button text is fully visible
+- [x] Adjust button sizing for proper fit (changed from grid to flex layout with min-width)
+
+### Issue 2: Post-Completion Navigation
+- [x] Add automatic navigation to dashboard after marking contract as returned
+- [x] Close contract details dialog after completion
+- [x] Show success message before navigation (1 second delay)
+- [x] Test workflow from contract return to dashboard
+
+### Testing & Delivery
+- [x] Test button layout on different screen sizes
+- [x] Verify all button text is readable
+- [x] Test navigation flow after contract completion
 - [ ] Save checkpoint and deliver
