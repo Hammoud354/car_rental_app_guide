@@ -21,7 +21,7 @@ export const users = mysqlTable("users", {
   countryCode: varchar("countryCode", { length: 10 }), // e.g., +1, +961
   country: varchar("country", { length: 100 }), // Country where system is managed
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, superAdminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 
@@ -954,6 +954,34 @@ export const appRouter = router({
           input.paymentMethod
         );
         return invoice;
+      }),
+  }),
+  
+  // Super Admin User Management
+  admin: router({
+    listUsers: superAdminProcedure
+      .query(async () => {
+        const users = await db.listAllUsers();
+        return users;
+      }),
+    
+    updateUserRole: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        role: z.enum(["user", "admin"]),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const updatedUser = await db.updateUserRole(input.userId, input.role, ctx.user.id);
+        return updatedUser;
+      }),
+    
+    deleteUser: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.deleteUser(input.userId, ctx.user.id);
+        return result;
       }),
   }),
 });

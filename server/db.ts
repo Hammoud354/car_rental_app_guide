@@ -767,6 +767,86 @@ export async function createUser(userData: {
   return newUser;
 }
 
+export async function listAllUsers() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select({
+    id: users.id,
+    username: users.username,
+    name: users.name,
+    email: users.email,
+    phone: users.phone,
+    role: users.role,
+    createdAt: users.createdAt,
+    lastSignedIn: users.lastSignedIn,
+  }).from(users);
+  
+  return result;
+}
+
+export async function updateUserRole(userId: number, role: 'user' | 'admin', requestingUserId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get requesting user to verify they're super admin
+  const requestingUser = await getUserById(requestingUserId);
+  if (!requestingUser || requestingUser.role !== 'super_admin') {
+    throw new Error("Only Super Admin can change user roles");
+  }
+  
+  // Get target user
+  const targetUser = await getUserById(userId);
+  if (!targetUser) {
+    throw new Error("User not found");
+  }
+  
+  // Prevent changing super admin role
+  if (targetUser.role === 'super_admin') {
+    throw new Error("Cannot modify Super Admin role");
+  }
+  
+  // Prevent promoting to super admin
+  if (role === 'super_admin' as any) {
+    throw new Error("Cannot promote users to Super Admin");
+  }
+  
+  await db.update(users).set({ role }).where(eq(users.id, userId));
+  
+  return await getUserById(userId);
+}
+
+export async function deleteUser(userId: number, requestingUserId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get requesting user to verify they're super admin
+  const requestingUser = await getUserById(requestingUserId);
+  if (!requestingUser || requestingUser.role !== 'super_admin') {
+    throw new Error("Only Super Admin can delete users");
+  }
+  
+  // Get target user
+  const targetUser = await getUserById(userId);
+  if (!targetUser) {
+    throw new Error("User not found");
+  }
+  
+  // Prevent deleting super admin
+  if (targetUser.role === 'super_admin') {
+    throw new Error("Cannot delete Super Admin");
+  }
+  
+  // Prevent deleting self
+  if (userId === requestingUserId) {
+    throw new Error("Cannot delete your own account");
+  }
+  
+  await db.delete(users).where(eq(users.id, userId));
+  
+  return { success: true };
+}
+
 
 // Car Makers and Models Management
 export async function getCarMakersByCountry(country: string) {

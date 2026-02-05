@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, Clock } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import MinimalLayout from "@/components/MinimalLayout";
@@ -54,6 +55,7 @@ function OverdueWidget() {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery();
 
@@ -92,9 +94,19 @@ export default function Dashboard() {
     <MinimalLayout>
       <div className="space-y-8">
           {/* Header */}
-          <div>
-            <h2 className="text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
-            <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
+              <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
+            </div>
+            {user?.role === "super_admin" && (
+              <Link href="/admin/users">
+                <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                  <Crown className="mr-2 h-4 w-4" />
+                  Super Admin Panel
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Overdue Contracts Alert Widget */}
