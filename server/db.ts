@@ -361,7 +361,7 @@ export async function markContractAsReturned(
       .where(eq(vehicles.id, contract[0].vehicleId));
   }
   
-  return { success: true, maintenanceAlert };
+  return { success: true, contractId, maintenanceAlert };
 }
 
 export async function deleteRentalContract(contractId: number) {
@@ -962,19 +962,37 @@ export async function getAuditLogsByAction(action: string, limit: number = 50) {
 
 
 // Car Makers and Models Management
-export async function getCarMakersByCountry(country: string) {
+export async function getCarMakersByCountry(country: string, userId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  const result = await db.select().from(carMakers).where(eq(carMakers.country, country));
+  // Return system makers (isCustom = false) OR custom makers belonging to this user
+  const result = await db.select().from(carMakers).where(
+    and(
+      eq(carMakers.country, country),
+      or(
+        eq(carMakers.isCustom, false),
+        userId ? eq(carMakers.userId, userId) : undefined
+      )
+    )
+  );
   return result;
 }
 
-export async function getCarModelsByMaker(makerId: number) {
+export async function getCarModelsByMaker(makerId: number, userId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  const result = await db.select().from(carModels).where(eq(carModels.makerId, makerId));
+  // Return system models (isCustom = false) OR custom models belonging to this user
+  const result = await db.select().from(carModels).where(
+    and(
+      eq(carModels.makerId, makerId),
+      or(
+        eq(carModels.isCustom, false),
+        userId ? eq(carModels.userId, userId) : undefined
+      )
+    )
+  );
   return result;
 }
 

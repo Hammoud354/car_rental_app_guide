@@ -116,8 +116,27 @@ export default function RentalContracts() {
       utils.contracts.listByStatus.invalidate();
       utils.contracts.list.invalidate();
       utils.fleet.list.invalidate();
-      // Redirect to rental contracts page
-      setLocation("/rental-contracts");
+      
+      // Auto-generate invoice and redirect to invoices page
+      if (data.contractId) {
+        generateInvoice.mutate({ contractId: data.contractId }, {
+          onSuccess: (invoiceData) => {
+            // Redirect to invoices page with the new invoice
+            if (invoiceData) {
+              window.location.href = `/invoices?invoice=${invoiceData.id}`;
+            } else {
+              setLocation("/rental-contracts");
+            }
+          },
+          onError: () => {
+            // If invoice generation fails, just redirect to contracts page
+            setLocation("/rental-contracts");
+          }
+        });
+      } else {
+        // Fallback: redirect to rental contracts page
+        setLocation("/rental-contracts");
+      }
     },
     onError: (error) => {
       toast.error("Failed to mark contract as returned: " + error.message);
@@ -656,6 +675,7 @@ export default function RentalContracts() {
                           label="Expiry Date"
                           value={licenseExpiryDate}
                           onChange={setLicenseExpiryDate}
+                          minDate={new Date()} // Only allow future dates
                           required
                         />
                       </div>

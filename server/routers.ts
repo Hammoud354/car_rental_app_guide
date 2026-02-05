@@ -777,16 +777,16 @@ export const appRouter = router({
 
   // Car Makers and Models Router
   carMakers: router({
-    getByCountry: publicProcedure
+    getByCountry: protectedProcedure
       .input(z.object({ country: z.string() }))
-      .query(async ({ input }) => {
-        return await db.getCarMakersByCountry(input.country);
+      .query(async ({ input, ctx }) => {
+        return await db.getCarMakersByCountry(input.country, ctx.user.id);
       }),
     
-    getModelsByMaker: publicProcedure
+    getModelsByMaker: protectedProcedure
       .input(z.object({ makerId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getCarModelsByMaker(input.makerId);
+      .query(async ({ input, ctx }) => {
+        return await db.getCarModelsByMaker(input.makerId, ctx.user.id);
       }),
     
     createCustomMaker: publicProcedure

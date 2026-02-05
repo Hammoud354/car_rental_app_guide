@@ -337,13 +337,13 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
             </svg>
 
             {/* Damage Marks */}
-            {damageMarks.map((mark) => (
+            {damageMarks.map((mark, index) => (
               <div
                 key={mark.id}
-                className={`absolute w-6 h-6 -ml-3 -mt-3 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all ${
+                className={`absolute w-7 h-7 -ml-3.5 -mt-3.5 rounded-full border-2 flex items-center justify-center cursor-pointer transition-all font-bold text-xs ${
                   selectedMark === mark.id
-                    ? "bg-red-500 border-red-700 scale-125"
-                    : "bg-red-400 border-red-600 hover:scale-110"
+                    ? "bg-red-500 border-red-700 scale-125 text-white"
+                    : "bg-red-400 border-red-600 hover:scale-110 text-white"
                 }`}
                 style={{ left: `${mark.x}%`, top: `${mark.y}%` }}
                 onClick={(e) => {
@@ -352,7 +352,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                   setMarkDescription(mark.description);
                 }}
               >
-                <X className="h-4 w-4 text-white" />
+                {index + 1}
               </div>
             ))}
           </div>

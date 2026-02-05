@@ -1617,3 +1617,34 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Create audit log viewer UI for Super Admin
 - [x] Add filtering and search capabilities
 - [x] Test audit log functionality
+
+### 18. Fix Driving License Expiry Date Validation
+- [x] Update validation to only allow future dates for license expiry
+- [x] Prevent selection of past dates in date picker
+- [x] Add clear error message for invalid dates
+
+### 19. Implement User Data Isolation (Multi-Tenancy)
+- [x] Add userId/ownerId to all data tables (vehicles, clients, contracts, etc.)
+- [x] Filter all queries by current user
+- [x] Ensure users only see their own data
+- [x] Test data isolation between different users
+
+### 20. Unify Font Colors to Black
+- [x] Update all text colors to black throughout the website
+- [x] Maintain readability and contrast
+- [x] Keep semantic colors for status indicators only
+
+### 21. Add Lebanon Car Makes
+- [x] Research and compile list of car makes available in Lebanon
+- [x] Add Kia, Hyundai, BMW, and other popular brands
+- [x] Seed database with Lebanon-specific car makes
+
+### 22. Auto-Open Invoice When Contract Completed
+- [x] Change invoice generation to trigger on contract completion
+- [x] Remove manual "Mark as Completed" step
+- [x] Auto-open/display invoice after contract ends
+
+### 23. Number Damage Marks on Car Inspection
+- [x] Replace red dots with numbered markers (1, 2, 3, etc.)
+- [x] Update CarDamageInspection component
+- [x] Improve damage tracking clarity
