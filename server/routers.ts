@@ -935,13 +935,13 @@ export const appRouter = router({
         invoiceId: z.number(),
       }))
       .query(async ({ input, ctx }) => {
-        const invoice = await db.getInvoiceById(input.invoiceId, ctx.user.id);
+        const invoice = await db.getInvoiceById(input.invoiceId, ctx.filterUserId || ctx.user.id);
         return invoice;
       }),
 
     // List all invoices for the user
     list: protectedProcedure.query(async ({ ctx }) => {
-      const invoices = await db.listInvoices(ctx.user.id);
+      const invoices = await db.listInvoices(ctx.filterUserId || ctx.user.id);
       return invoices;
     }),
 

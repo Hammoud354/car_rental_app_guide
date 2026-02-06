@@ -1593,9 +1593,12 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Tables are already imported at the top of the file
+  // Super Admin can see all invoices, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
   
-  const [invoice] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
+  const [invoice] = isAdmin
+    ? await db.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1)
+    : await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
   
   if (!invoice) return null;
   

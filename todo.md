@@ -1775,5 +1775,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ### 42. Fix Invoice View Details Button
 - [x] Investigate why "View Details" button doesn't work for invoices - Missing React imports
 - [x] Fix invoice details dialog opening functionality - Added useState and useEffect imports
-- [x] Ensure invoice data is properly fetched and displayed
+- [x] Dialog opens but content is not displaying - Fixed Super Admin access issue
+- [x] Updated getInvoiceById to check if user is Super Admin
+- [x] Verify invoice details query is returning data - Working correctly
 - [x] Test invoice viewing with different invoice statuses (Pending, Paid, Cancelled)
+- [x] Fixed invoice list query to use filterUserId for Super Admin support

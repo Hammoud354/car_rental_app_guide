@@ -39,7 +39,7 @@ export default function Invoices() {
   }, []);
 
   const { data: invoices, isLoading } = trpc.invoices.list.useQuery();
-  const { data: invoiceDetails } = trpc.invoices.getById.useQuery(
+  const { data: invoiceDetails, isLoading: isLoadingDetails, error: detailsError } = trpc.invoices.getById.useQuery(
     { invoiceId: selectedInvoice! },
     { enabled: !!selectedInvoice }
   );
@@ -203,7 +203,19 @@ export default function Invoices() {
               <DialogTitle>Invoice Details</DialogTitle>
             </DialogHeader>
 
-            {invoiceDetails && (
+            {isLoadingDetails ? (
+              <div className="flex justify-center items-center p-8">
+                <p className="text-muted-foreground">Loading invoice details...</p>
+              </div>
+            ) : detailsError ? (
+              <div className="flex justify-center items-center p-8">
+                <p className="text-red-500">Error loading invoice: {detailsError.message}</p>
+              </div>
+            ) : !invoiceDetails ? (
+              <div className="flex justify-center items-center p-8">
+                <p className="text-muted-foreground">Invoice not found</p>
+              </div>
+            ) : (
               <div className="space-y-6">
                 {/* Invoice Content for PDF Export */}
                 <div id="invoice-content" className="bg-white p-8 space-y-6">

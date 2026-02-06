@@ -1,0 +1,28 @@
+{
+  "query": "SELECT id, invoiceNumber, userId, paymentStatus FROM invoices LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, invoiceNumber, userId, paymentStatus FROM invoices LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "invoiceNumber": "INV-00001",
+      "userId": "270003",
+      "paymentStatus": "pending"
+    },
+    {
+      "id": "2",
+      "invoiceNumber": "INV-00002",
+      "userId": "270003",
+      "paymentStatus": "cancelled"
+    },
+    {
+      "id": "3",
+      "invoiceNumber": "INV-00003",
+      "userId": "270003",
+      "paymentStatus": "pending"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tinvoiceNumber\tuserId\tpaymentStatus\n1\tINV-00001\t270003\tpending\n2\tINV-00002\t270003\tcancelled\n3\tINV-00003\t270003\tpending\n",
+  "stderr": "",
+  "execution_time_ms": 1691
+}
