@@ -1670,3 +1670,43 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Audit all delete procedures to verify userId filtering
 - [x] Ensure car makers/models are properly isolated
 - [x] Test that editing data as one user doesn't affect other users
+
+### 27. Implement Username/Password Authentication
+- [ ] Add username and password fields to user schema
+- [ ] Create login page with username/password form
+- [ ] Create signup/register page
+- [ ] Implement password hashing (bcrypt)
+- [ ] Add JWT token generation for username/password login
+- [ ] Keep OAuth authentication as alternative option
+- [ ] Test login/signup flow
+
+### 28. Add Password Show/Hide Toggle
+- [ ] Add eye icon button to password input fields
+- [ ] Toggle between password and text input types
+- [ ] Apply to both login and signup forms
+- [ ] Ensure accessibility (aria-labels)
+
+### 29. Make Username Case-Insensitive
+- [ ] Convert username to lowercase before saving
+- [ ] Convert username to lowercase before login check
+- [ ] Update database queries to use case-insensitive comparison
+
+### 30. Fix Car Model Dropdown
+- [x] Debug why car models don't display when maker is selected
+- [x] Ensure getCarModelsByMaker is called with correct makerId
+- [x] Verify car models are properly filtered by maker
+- [x] Test dropdown functionality
+- [x] Add state reset when dialog closes to prevent stale selections
+
+### 31. Standardize Contract Tabs Styling
+- [x] Capitalize first letter of each tab (Active, Completed, Overdue, All)
+- [x] Make border/frame consistent across all tabs
+- [x] Ensure active tab styling is consistent
+- [x] Match theme with rest of application
+
+### 32. Fix Nationality Autocomplete Display
+- [x] Remove character-by-character display (P, Pa, Pal, etc.)
+- [x] Show full country names from the start
+- [x] Improve combobox filtering logic
+- [x] Test nationality selection flow
+- [x] Allow Enter key to add custom nationality

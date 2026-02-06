@@ -606,17 +606,23 @@ export default function RentalContracts() {
                             <Command>
                               <CommandInput 
                                 placeholder="Search or type nationality..." 
-                                value={selectedNationality}
-                                onValueChange={(value) => {
-                                  setSelectedNationality(value);
-                                  // Save to database if it's a new nationality
-                                  if (value && value.trim() && !nationalities.find(n => n.nationality.toLowerCase() === value.toLowerCase())) {
-                                    addNationalityMutation.mutate({ nationality: value.trim() });
+                                onKeyDown={(e) => {
+                                  // Allow user to type and add custom nationality on Enter
+                                  if (e.key === 'Enter') {
+                                    const input = e.currentTarget.value;
+                                    if (input && input.trim()) {
+                                      setSelectedNationality(input.trim());
+                                      // Save to database if it's a new nationality
+                                      if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
+                                        addNationalityMutation.mutate({ nationality: input.trim() });
+                                      }
+                                      setNationalityComboboxOpen(false);
+                                    }
                                   }
                                 }}
                               />
                               <CommandList>
-                                <CommandEmpty>Type to add new nationality</CommandEmpty>
+                                <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
                                 <CommandGroup>
                                   {nationalities.map((nat) => (
                                     <CommandItem
@@ -859,26 +865,32 @@ export default function RentalContracts() {
               onClick={() => setStatusFilter("active")}
               className="relative"
             >
-              active
+              Active
               {statusFilter === "active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
               variant={statusFilter === "completed" ? "default" : "ghost"}
               onClick={() => setStatusFilter("completed")}
+              className="relative"
             >
-              completed
+              Completed
+              {statusFilter === "completed" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
               variant={statusFilter === "overdue" ? "default" : "ghost"}
               onClick={() => setStatusFilter("overdue")}
+              className="relative"
             >
-              overdue
+              Overdue
+              {statusFilter === "overdue" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
               variant={!statusFilter ? "default" : "ghost"}
               onClick={() => setStatusFilter(undefined)}
+              className="relative"
             >
               All
+              {!statusFilter && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
           </div>
 

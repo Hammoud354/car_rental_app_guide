@@ -17,10 +17,13 @@ export const appRouter = router({
         rememberMe: z.boolean().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const bcrypt = await import('bcryptjs');
+        const bcrypt = await import('bcrypt');
         
-        // Find user by username
-        const user = await db.getUserByUsername(input.username);
+        // Convert username to lowercase for case-insensitive comparison
+        const usernameLower = input.username.toLowerCase();
+        
+        // Find user by username (case-insensitive)
+        const user = await db.getUserByUsername(usernameLower);
         if (!user) {
           throw new Error('Invalid username or password');
         }
@@ -66,10 +69,13 @@ export const appRouter = router({
         country: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const bcrypt = await import('bcryptjs');
+        const bcrypt = await import('bcrypt');
         
-        // Check if username already exists
-        const existingUser = await db.getUserByUsername(input.username);
+        // Convert username to lowercase for case-insensitive comparison
+        const usernameLower = input.username.toLowerCase();
+        
+        // Check if username already exists (case-insensitive)
+        const existingUser = await db.getUserByUsername(usernameLower);
         if (existingUser) {
           throw new Error('Username already exists');
         }
@@ -79,7 +85,7 @@ export const appRouter = router({
 
         // Create new user
         const newUser = await db.createUser({
-          username: input.username,
+          username: usernameLower,
           password: hashedPassword,
           name: input.name,
           email: input.email,

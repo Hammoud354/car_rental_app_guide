@@ -253,7 +253,14 @@ export default function FleetManagement() {
           <div className="flex gap-3">
 
             
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+              setIsAddDialogOpen(open);
+              if (!open) {
+                // Reset form state when dialog closes
+                setSelectedMakerId(null);
+                setSelectedModelId(null);
+              }
+            }}>
               <DialogTrigger asChild>
               <Button className="font-mono bg-gray-900 hover:bg-gray-800">
                 <Plus className="mr-2 h-4 w-4" />
