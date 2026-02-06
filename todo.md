@@ -1793,3 +1793,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure Lebanese is included for "leb" autocomplete
 - [x] Test autocomplete functionality - Ready to use
 - [x] Verify all major countries are included
+
+### 45. Add Palestinian Nationality to Database
+- [x] Insert Palestinian into nationalities table
+- [x] Verify it appears in dropdown menu
+- [x] Test autocomplete with "pal" search

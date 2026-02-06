@@ -1,0 +1,16 @@
+{
+  "query": "SET @userId = (SELECT id FROM users LIMIT 1);\nINSERT INTO nationalities (nationality, userId) VALUES ('Palestinian', @userId);\nSELECT * FROM nationalities WHERE nationality = 'Palestinian';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SET @userId = (SELECT id FROM users LIMIT 1);\nINSERT INTO nationalities (nationality, userId) VALUES ('Palestinian', @userId);\nSELECT * FROM nationalities WHERE nationality = 'Palestinian';",
+  "rows": [
+    {
+      "id": "30169",
+      "userId": "29",
+      "nationality": "Palestinian",
+      "createdAt": "2026-02-06 23:26:39"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tnationality\tcreatedAt\n30169\t29\tPalestinian\t2026-02-06 23:26:39\n",
+  "stderr": "",
+  "execution_time_ms": 1923
+}
