@@ -1,14 +1,16 @@
 import MinimalLayout from "@/components/MinimalLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle, Clock, X } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "wouter";
 
 export default function Reservations() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
   
   const { data: reservations, isLoading } = trpc.contracts.getFutureReservations.useQuery({
     month: currentDate.getMonth() + 1,
@@ -140,7 +142,11 @@ export default function Reservations() {
                 return (
                   <div
                     key={day}
-                    className={`min-h-[120px] p-2 rounded-lg border ${
+                    onClick={() => {
+                      setSelectedDate(currentDateObj);
+                      setIsDateDialogOpen(true);
+                    }}
+                    className={`min-h-[120px] p-2 rounded-lg border cursor-pointer hover:shadow-md transition-shadow ${
                       isToday
                         ? "bg-blue-50 border-blue-300"
                         : isPast
@@ -168,7 +174,10 @@ export default function Reservations() {
                         return (
                             <div
                               key={reservation.id}
-                              onClick={() => window.location.href = '/rental-contracts'}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = '/rental-contracts';
+                              }}
                               title={tooltipText}
                               className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow relative ${
                                 reservation.hasConflict
@@ -243,6 +252,105 @@ export default function Reservations() {
           <div className="text-center py-8 text-gray-500">Loading reservations...</div>
         )}
       </div>
+
+      {/* Date Details Dialog */}
+      <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              Reservations for {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {selectedDate && (() => {
+              const day = selectedDate.getDate();
+              const dayReservations = getReservationsForDay(day);
+              
+              if (dayReservations.length === 0) {
+                return (
+                  <div className="text-center py-8 text-gray-500">
+                    <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                    <p>No reservations scheduled for this date</p>
+                  </div>
+                );
+              }
+              
+              return dayReservations.map((reservation, idx) => {
+                const startDate = new Date(reservation.rentalStartDate);
+                const endDate = new Date(reservation.rentalEndDate);
+                const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                
+                return (
+                  <Card key={reservation.id} className={reservation.hasConflict ? "border-red-500" : ""}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Car className="h-5 w-5" />
+                          <span>{reservation.vehicleBrand} {reservation.vehicleModel}</span>
+                        </div>
+                        {reservation.hasConflict && (
+                          <div className="flex items-center gap-1 text-red-600 text-sm">
+                            <AlertTriangle className="h-4 w-4" />
+                            <span>Conflict</span>
+                          </div>
+                        )}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1">
+                            <User className="h-4 w-4" />
+                            Client
+                          </div>
+                          <div className="font-medium">{reservation.clientName}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1">
+                            <Phone className="h-4 w-4" />
+                            Phone
+                          </div>
+                          <div className="font-medium">{reservation.clientPhone}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            Start Date
+                          </div>
+                          <div className="font-medium">{startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            End Date
+                          </div>
+                          <div className="font-medium">{endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            Duration
+                          </div>
+                          <div className="font-medium">{durationDays} day{durationDays > 1 ? 's' : ''}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-600">Total Cost</div>
+                          <div className="font-medium text-lg">${reservation.totalCost?.toFixed(2) || 'N/A'}</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-2">
+                        <Link href="/rental-contracts" className="flex-1">
+                          <Button variant="outline" className="w-full">View Contract</Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              });
+            })()}
+          </div>
+        </DialogContent>
+      </Dialog>
     </MinimalLayout>
   );
 }

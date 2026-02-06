@@ -17,6 +17,7 @@ import Breadcrumb from "./Breadcrumb";
 export default function MinimalLayout({ children }: { children: React.ReactNode }) {
   const [location, setLocation] = useLocation();
   const { data: user } = trpc.auth.me.useQuery();
+  const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       toast.success("Signed out successfully");
@@ -51,7 +52,11 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                 <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center group-hover:bg-gray-800 transition-colors">
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-lg font-semibold text-gray-900">Car Rental Management System</span>
+                <span className="text-lg font-semibold text-gray-900">
+                  {companyProfile?.companyName 
+                    ? `${companyProfile.companyName} Car Rental - Management System` 
+                    : "Car Rental Management System"}
+                </span>
               </div>
             </Link>
 
@@ -63,10 +68,10 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                   <Link key={item.href} href={item.href}>
                     <div
                       className={cn(
-                        "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                        "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border",
                         isActive
-                          ? "bg-gray-100 text-gray-900"
-                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          ? "bg-gray-100 text-gray-900 border-gray-300"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-gray-200 hover:border-gray-300"
                       )}
                     >
                       {item.label}

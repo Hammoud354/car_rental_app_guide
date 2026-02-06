@@ -6,10 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export default function Clients() {
   const utils = trpc.useUtils();
@@ -23,16 +25,28 @@ export default function Clients() {
   // Form state for create
   const [createLicenseIssueDate, setCreateLicenseIssueDate] = useState<Date>();
   const [createLicenseExpiryDate, setCreateLicenseExpiryDate] = useState<Date>();
+  const [createNationalityOpen, setCreateNationalityOpen] = useState(false);
+  const [createSelectedNationality, setCreateSelectedNationality] = useState<string>("");
   
   // Form state for edit
   const [editLicenseIssueDate, setEditLicenseIssueDate] = useState<Date>();
   const [editLicenseExpiryDate, setEditLicenseExpiryDate] = useState<Date>();
+  const [editNationalityOpen, setEditNationalityOpen] = useState(false);
+  const [editSelectedNationality, setEditSelectedNationality] = useState<string>("");
 
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: clientContracts = [] } = trpc.clients.getContracts.useQuery(
     { clientId: selectedClient?.id || 0 },
     { enabled: !!selectedClient && isContractsDialogOpen }
   );
+  const { data: nationalities = [] } = trpc.nationalities.list.useQuery();
+  
+  // Mutation to add nationality
+  const addNationalityMutation = trpc.nationalities.add.useMutation({
+    onSuccess: () => {
+      utils.nationalities.list.invalidate();
+    },
+  });
   
   const createClient = trpc.clients.create.useMutation({
     onSuccess: () => {
@@ -41,6 +55,7 @@ export default function Clients() {
       setIsCreateDialogOpen(false);
       setCreateLicenseIssueDate(undefined);
       setCreateLicenseExpiryDate(undefined);
+      setCreateSelectedNationality("");
     },
     onError: (error) => {
       toast.error(`Failed to add client: ${error.message}`);
@@ -76,7 +91,7 @@ export default function Clients() {
     createClient.mutate({
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
-      nationality: formData.get("nationality") as string || undefined,
+      nationality: createSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
@@ -91,6 +106,7 @@ export default function Clients() {
     setSelectedClient(client);
     setEditLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
     setEditLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
+    setEditSelectedNationality(client.nationality || "");
     setIsEditDialogOpen(true);
   };
 
@@ -104,7 +120,7 @@ export default function Clients() {
       id: selectedClient.id,
       firstName: formData.get("firstName") as string || undefined,
       lastName: formData.get("lastName") as string || undefined,
-      nationality: formData.get("nationality") as string || undefined,
+      nationality: editSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string || undefined,
@@ -172,7 +188,60 @@ export default function Clients() {
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="nationality">Nationality</Label>
-                      <Input id="nationality" name="nationality" placeholder="e.g., American, Canadian" className="" />
+                      <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={createNationalityOpen}
+                            className="w-full justify-between"
+                          >
+                            {createSelectedNationality || "Select or type nationality..."}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput 
+                              placeholder="Search or type nationality..." 
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  const input = e.currentTarget.value;
+                                  if (input && input.trim()) {
+                                    setCreateSelectedNationality(input.trim());
+                                    if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
+                                      addNationalityMutation.mutate({ nationality: input.trim() });
+                                    }
+                                    setCreateNationalityOpen(false);
+                                  }
+                                }
+                              }}
+                            />
+                            <CommandList>
+                              <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
+                              <CommandGroup>
+                                {nationalities.map((nat) => (
+                                  <CommandItem
+                                    key={nat.id}
+                                    value={nat.nationality}
+                                    onSelect={(value) => {
+                                      setCreateSelectedNationality(value);
+                                      setCreateNationalityOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={`mr-2 h-4 w-4 ${
+                                        createSelectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                      }`}
+                                    />
+                                    {nat.nationality}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="phone">Phone Number</Label>
@@ -415,13 +484,59 @@ export default function Clients() {
                   </div>
                   <div className="col-span-2">
                     <Label htmlFor="edit-nationality">Nationality</Label>
-                    <Input 
-                      id="edit-nationality" 
-                      name="nationality" 
-                      defaultValue={selectedClient.nationality || ""}
-                      placeholder="e.g., American, Canadian" 
-                      className="" 
-                    />
+                    <Popover open={editNationalityOpen} onOpenChange={setEditNationalityOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={editNationalityOpen}
+                          className="w-full justify-between"
+                        >
+                          {editSelectedNationality || "Select or type nationality..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput 
+                            placeholder="Search or type nationality..." 
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const input = e.currentTarget.value;
+                                if (input && input.trim()) {
+                                  setEditSelectedNationality(input.trim());
+                                  if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
+                                    addNationalityMutation.mutate({ nationality: input.trim() });
+                                  }
+                                  setEditNationalityOpen(false);
+                                } }
+                            }}
+                          />
+                          <CommandList>
+                            <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
+                            <CommandGroup>
+                              {nationalities.map((nat) => (
+                                <CommandItem
+                                  key={nat.id}
+                                  value={nat.nationality}
+                                  onSelect={(value) => {
+                                    setEditSelectedNationality(value);
+                                    setEditNationalityOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                      editSelectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                  {nat.nationality}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                   <div className="col-span-2">
                     <Label htmlFor="edit-phone">Phone Number</Label>

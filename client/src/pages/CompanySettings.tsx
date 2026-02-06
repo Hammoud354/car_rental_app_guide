@@ -26,8 +26,6 @@ export default function CompanySettings() {
     email: "",
     website: "",
     logoUrl: "",
-    primaryColor: "#3b82f6",
-    secondaryColor: "#10b981",
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -47,8 +45,6 @@ export default function CompanySettings() {
         email: profile.email || "",
         website: profile.website || "",
         logoUrl: profile.logoUrl || "",
-        primaryColor: profile.primaryColor || "#3b82f6",
-        secondaryColor: profile.secondaryColor || "#10b981",
       });
       if (profile.logoUrl) {
         setLogoPreview(profile.logoUrl);
@@ -302,63 +298,13 @@ export default function CompanySettings() {
           </CardContent>
         </Card>
 
-        {/* Brand Colors */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Brand Colors</CardTitle>
-            <CardDescription>
-              Choose colors that represent your brand.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="primaryColor">Primary Color</Label>
-                <div className="flex gap-2 items-center">
-                  <Input
-                    id="primaryColor"
-                    type="color"
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    className="w-20 h-10"
-                  />
-                  <Input
-                    type="text"
-                    value={formData.primaryColor}
-                    onChange={(e) => setFormData({ ...formData, primaryColor: e.target.value })}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="secondaryColor">Secondary Color</Label>
-                <div className="flex gap-2 items-center">
-                  <Input
-                    id="secondaryColor"
-                    type="color"
-                    value={formData.secondaryColor}
-                    onChange={(e) => setFormData({ ...formData, secondaryColor: e.target.value })}
-                    className="w-20 h-10"
-                  />
-                  <Input
-                    type="text"
-                    value={formData.secondaryColor}
-                    onChange={(e) => setFormData({ ...formData, secondaryColor: e.target.value })}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <div className="flex justify-between items-center">
           <Button
             type="button"
             variant="outline"
             onClick={() => setLocation('/')}
           >
-            Return to Dashboard
+            Return to Home
           </Button>
           <Button
             type="submit"

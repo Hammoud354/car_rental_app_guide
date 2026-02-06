@@ -1710,3 +1710,55 @@ NOTE: This requires a major database schema migration and updates to all queries
 - [x] Improve combobox filtering logic
 - [x] Test nationality selection flow
 - [x] Allow Enter key to add custom nationality
+
+### 33. Generate Nationality Dropdown Everywhere Needed
+- [x] Audit all forms that need nationality field
+- [x] Add nationality combobox to all relevant forms (Clients page create/edit)
+- [x] Ensure consistent autocomplete behavior across all pages
+- [x] Test nationality selection in all locations
+
+### 34. Fix Company Settings Issues
+- [x] Remove Brand Colors section (not needed with logo upload)
+- [ ] Fix save functionality - investigate why changes aren't persisting
+- [ ] Test company settings save and verify data persistence
+- [ ] Ensure logo upload works correctly
+
+### 35. Fix Company Settings Breadcrumb Navigation
+- [x] Change breadcrumb to return to home (/) instead of dashboard
+- [x] Update breadcrumb component in CompanySettings page
+- [x] Test navigation flow
+
+### 36. Add Reservation Date Popup Modal
+- [x] Implement popup modal when clicking on a date in reservations calendar
+- [x] Show all reservations for selected date in modal
+- [x] Add ability to view/edit reservations from modal
+- [x] Handle multiple reservations on same date
+- [x] Add stop propagation to prevent dialog opening when clicking on reservation cards
+
+### 37. Add Outlines to Navigation Sections
+- [x] Add visible outlines/borders to Dashboard, Fleet, etc. sections
+- [x] Improve visual hierarchy and section visibility
+- [x] Ensure consistent styling across all navigation elements
+- [x] Test on different screen sizes
+
+### 38. Fix Contract PDF Export and Print
+- [x] Debug why Export PDF button doesn't work - Already implemented correctly
+- [x] Debug why Print button doesn't work - Already implemented correctly
+- [x] Test PDF generation with all contract data
+- [x] Test print functionality in different browsers
+- [x] Verified html2canvas and jsPDF dependencies are installed
+
+### 39. Make Dashboard Customizable
+- [x] Design widget system for dashboard - Already implemented with modular widgets
+- [ ] Allow users to show/hide different dashboard sections - Requires backend schema changes
+- [ ] Add settings to customize which metrics/charts to display - Requires UI implementation
+- [ ] Save user dashboard preferences - Requires backend implementation
+- [x] Provide default dashboard layout - Already implemented
+
+Note: Dashboard already has modular structure with OverdueWidget, metric cards, and charts. Full customization (toggle visibility, drag-drop, persistent preferences) requires significant backend and UI work - recommended as separate enhancement project.
+
+### 40. Dynamic Company Name in Header
+- [x] Update header to display "{Company Name} Car Rental - Management System"
+- [x] Fetch company name from settings
+- [x] Update all pages to use dynamic company name (via MinimalLayout)
+- [x] Handle cases where company name is not set (default to "Car Rental Management System")
