@@ -1771,3 +1771,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Updated getOverdueStatistics to accept filterUserId parameter
 - [x] Added query invalidation when selectedUserId changes
 - [x] Verified x-filter-user-id header is sent from frontend
+
+### 42. Fix Invoice View Details Button
+- [x] Investigate why "View Details" button doesn't work for invoices - Missing React imports
+- [x] Fix invoice details dialog opening functionality - Added useState and useEffect imports
+- [x] Ensure invoice data is properly fetched and displayed
+- [x] Test invoice viewing with different invoice statuses (Pending, Paid, Cancelled)
