@@ -1762,3 +1762,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fetch company name from settings
 - [x] Update all pages to use dynamic company name (via MinimalLayout)
 - [x] Handle cases where company name is not set (default to "Car Rental Management System")
+
+### 41. Fix Super Admin User Filter on Dashboard
+- [x] Ensure dashboard queries respect selected user from UserFilterContext
+- [x] Fix fleet statistics to show only selected user's vehicles
+- [x] Fix contract statistics to show only selected user's contracts
+- [x] Fix revenue calculations to show only selected user's revenue
+- [x] Updated getOverdueStatistics to accept filterUserId parameter
+- [x] Added query invalidation when selectedUserId changes
+- [x] Verified x-filter-user-id header is sent from frontend

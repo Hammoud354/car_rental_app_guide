@@ -8,6 +8,7 @@ import MinimalLayout from "@/components/MinimalLayout";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users } from "lucide-react";
+import { useEffect } from "react";
 
 function OverdueWidget() {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery();
@@ -60,9 +61,19 @@ function OverdueWidget() {
 export default function Dashboard() {
   const { user } = useAuth();
   const { selectedUserId, setSelectedUserId, isSuperAdmin } = useUserFilter();
+  const utils = trpc.useUtils();
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery();
+
+  // Invalidate all queries when selectedUserId changes to force refetch with new filter
+  useEffect(() => {
+    if (isSuperAdmin) {
+      utils.fleet.list.invalidate();
+      utils.contracts.getDashboardStatistics.invalidate();
+      utils.contracts.getOverdueStatistics.invalidate();
+    }
+  }, [selectedUserId, isSuperAdmin, utils]);
 
   // Calculate metrics from real data
   const totalFleet = vehicles?.length || 0;

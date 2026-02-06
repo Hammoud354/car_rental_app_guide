@@ -331,7 +331,7 @@ export const appRouter = router({
     }),
     
     getOverdueStatistics: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getOverdueStatistics(ctx.user.id);
+      return await db.getOverdueStatistics(ctx.user.id, ctx.filterUserId);
     }),
     
     getDashboardStatistics: protectedProcedure.query(async ({ ctx }) => {

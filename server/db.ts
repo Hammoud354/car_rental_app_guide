@@ -483,17 +483,20 @@ export async function updateOverdueContracts() {
   return { updated: updatedCount };
 }
 
-export async function getOverdueStatistics(userId: number) {
+export async function getOverdueStatistics(userId: number, filterUserId?: number | null) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get overdue statistics: database not available");
     return { count: 0, totalLateFees: "0.00", avgDaysOverdue: 0 };
   }
   
+  // Use filterUserId if provided (Super Admin filtering), otherwise use userId
+  const effectiveUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  
   const overdueContracts = await db
     .select()
     .from(rentalContracts)
-    .where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, "overdue")));
+    .where(and(eq(rentalContracts.userId, effectiveUserId), eq(rentalContracts.status, "overdue")));
   
   const count = overdueContracts.length;
   const totalLateFees = overdueContracts.reduce((sum, contract) => sum + parseFloat(contract.lateFee || "0"), 0).toFixed(2);
