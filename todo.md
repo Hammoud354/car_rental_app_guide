@@ -1780,3 +1780,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify invoice details query is returning data - Working correctly
 - [x] Test invoice viewing with different invoice statuses (Pending, Paid, Cancelled)
 - [x] Fixed invoice list query to use filterUserId for Super Admin support
+
+### 43. Fix Client Details Dialog Text Color
+- [x] Change input field text color from white/gray to black
+- [x] Changed all text-white to text-foreground for data values
+- [x] Changed label colors from text-gray-400 to text-muted-foreground
+- [x] Ensure all client data is visible in the details dialog

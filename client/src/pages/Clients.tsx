@@ -643,43 +643,43 @@ export default function Clients() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-gray-400">Full Name</Label>
-                  <p className="font-medium text-white">{selectedClient.firstName} {selectedClient.lastName}</p>
+                  <Label className="text-muted-foreground">Full Name</Label>
+                  <p className="font-medium text-foreground">{selectedClient.firstName} {selectedClient.lastName}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Nationality</Label>
-                  <p className="font-medium text-white">{selectedClient.nationality || "N/A"}</p>
+                  <Label className="text-muted-foreground">Nationality</Label>
+                  <p className="font-medium text-foreground">{selectedClient.nationality || "N/A"}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Email</Label>
-                  <p className="font-medium text-white">{selectedClient.email || "N/A"}</p>
+                  <Label className="text-muted-foreground">Email</Label>
+                  <p className="font-medium text-foreground">{selectedClient.email || "N/A"}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400">Phone</Label>
-                  <p className="font-medium text-white">{selectedClient.phone || "N/A"}</p>
+                  <Label className="text-muted-foreground">Phone</Label>
+                  <p className="font-medium text-foreground">{selectedClient.phone || "N/A"}</p>
                 </div>
                 <div className="col-span-2">
-                  <Label className="text-gray-400">Address</Label>
-                  <p className="font-medium text-white">{selectedClient.address || "N/A"}</p>
+                  <Label className="text-muted-foreground">Address</Label>
+                  <p className="font-medium text-foreground">{selectedClient.address || "N/A"}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400">License Number</Label>
-                  <p className="font-mono text-sm text-white">{selectedClient.drivingLicenseNumber}</p>
+                  <Label className="text-muted-foreground">License Number</Label>
+                  <p className="font-mono text-sm text-foreground">{selectedClient.drivingLicenseNumber}</p>
                 </div>
                 <div>
-                  <Label className="text-gray-400">License Expiry</Label>
-                  <p className="font-medium text-white">{new Date(selectedClient.licenseExpiryDate).toLocaleDateString()}</p>
+                  <Label className="text-muted-foreground">License Expiry</Label>
+                  <p className="font-medium text-foreground">{new Date(selectedClient.licenseExpiryDate).toLocaleDateString()}</p>
                 </div>
                 {selectedClient.licenseIssueDate && (
                   <div>
-                    <Label className="text-gray-400">License Issue Date</Label>
-                    <p className="font-medium text-white">{new Date(selectedClient.licenseIssueDate).toLocaleDateString()}</p>
+                    <Label className="text-muted-foreground">License Issue Date</Label>
+                    <p className="font-medium text-foreground">{new Date(selectedClient.licenseIssueDate).toLocaleDateString()}</p>
                   </div>
                 )}
                 {selectedClient.notes && (
                   <div className="col-span-2">
-                    <Label className="text-gray-400">Notes</Label>
-                    <p className="font-medium text-white whitespace-pre-wrap">{selectedClient.notes}</p>
+                    <Label className="text-muted-foreground">Notes</Label>
+                    <p className="font-medium text-foreground whitespace-pre-wrap">{selectedClient.notes}</p>
                   </div>
                 )}
               </div>
