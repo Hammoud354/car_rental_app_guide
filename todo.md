@@ -1786,3 +1786,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Changed all text-white to text-foreground for data values
 - [x] Changed label colors from text-gray-400 to text-muted-foreground
 - [x] Ensure all client data is visible in the details dialog
+
+### 44. Populate Nationalities Database with World Nationalities
+- [x] Clear existing nationalities table
+- [x] Insert comprehensive list of world nationalities (170+ countries)
+- [x] Ensure Lebanese is included for "leb" autocomplete
+- [x] Test autocomplete functionality - Ready to use
+- [x] Verify all major countries are included
