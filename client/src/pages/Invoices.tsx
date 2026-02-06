@@ -117,7 +117,7 @@ export default function Invoices() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Invoices</h1>
-            <p className="text-muted-foreground">Manage billing and payments</p>
+            <p className="text-gray-600">Manage billing and payments</p>
           </div>
         </div>
 
@@ -146,7 +146,7 @@ export default function Invoices() {
         {isLoading ? (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Loading invoices...</p>
+              <p className="text-center text-gray-600">Loading invoices...</p>
             </CardContent>
           </Card>
         ) : filteredInvoices && filteredInvoices.length > 0 ? (
@@ -161,7 +161,7 @@ export default function Invoices() {
                         <h3 className="font-semibold text-lg">{invoice.invoiceNumber}</h3>
                         {getStatusBadge(invoice.paymentStatus)}
                       </div>
-                      <div className="text-sm text-muted-foreground space-y-1">
+                      <div className="text-sm text-gray-600 space-y-1">
                         <p>
                           Invoice Date: {new Date(invoice.invoiceDate).toLocaleDateString()}
                         </p>
@@ -191,7 +191,7 @@ export default function Invoices() {
         ) : (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">No invoices found</p>
+              <p className="text-center text-gray-600">No invoices found</p>
             </CardContent>
           </Card>
         )}
@@ -205,7 +205,7 @@ export default function Invoices() {
 
             {isLoadingDetails ? (
               <div className="flex justify-center items-center p-8">
-                <p className="text-muted-foreground">Loading invoice details...</p>
+                <p className="text-gray-600">Loading invoice details...</p>
               </div>
             ) : detailsError ? (
               <div className="flex justify-center items-center p-8">
@@ -213,12 +213,12 @@ export default function Invoices() {
               </div>
             ) : !invoiceDetails ? (
               <div className="flex justify-center items-center p-8">
-                <p className="text-muted-foreground">Invoice not found</p>
+                <p className="text-gray-600">Invoice not found</p>
               </div>
             ) : (
               <div className="space-y-6">
                 {/* Invoice Content for PDF Export */}
-                <div id="invoice-content" className="bg-white p-8 space-y-6">
+                <div id="invoice-content" className="bg-white text-black p-8 space-y-6 print:block">
                   {/* Company Header */}
                   {companyProfile && (
                     <div className="flex justify-between items-start border-b pb-6">
@@ -231,7 +231,7 @@ export default function Invoices() {
                           />
                         )}
                         <h2 className="text-2xl font-bold">{companyProfile.companyName}</h2>
-                        <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="text-sm text-gray-600 space-y-1">
                           {companyProfile.address && <p>{companyProfile.address}</p>}
                           {companyProfile.city && companyProfile.country && (
                             <p>
@@ -246,7 +246,7 @@ export default function Invoices() {
                       <div className="text-right space-y-2">
                         <h1 className="text-3xl font-bold">INVOICE</h1>
                         <p className="text-lg font-semibold">{invoiceDetails.invoiceNumber}</p>
-                        <div className="text-sm text-muted-foreground space-y-1">
+                        <div className="text-sm text-gray-600 space-y-1">
                           <p>
                             Invoice Date:{" "}
                             {new Date(invoiceDetails.invoiceDate).toLocaleDateString()}
@@ -262,12 +262,12 @@ export default function Invoices() {
                   {/* Invoice Status */}
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm text-muted-foreground">Payment Status</p>
+                      <p className="text-sm text-gray-600">Payment Status</p>
                       {getStatusBadge(invoiceDetails.paymentStatus)}
                     </div>
                     {invoiceDetails.paymentMethod && (
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Payment Method</p>
+                        <p className="text-sm text-gray-600">Payment Method</p>
                         <p className="font-medium">{invoiceDetails.paymentMethod}</p>
                       </div>
                     )}
@@ -307,13 +307,13 @@ export default function Invoices() {
                   {/* Totals */}
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Subtotal:</span>
+                      <span className="text-gray-600">Subtotal:</span>
                       <span className="font-medium">
                         ${parseFloat(invoiceDetails.subtotal).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Tax (11%):</span>
+                      <span className="text-gray-600">Tax (11%):</span>
                       <span className="font-medium">
                         ${parseFloat(invoiceDetails.taxAmount).toFixed(2)}
                       </span>
@@ -327,7 +327,7 @@ export default function Invoices() {
                   {/* Notes */}
                   {invoiceDetails.notes && (
                     <div className="border-t pt-4">
-                      <p className="text-sm text-muted-foreground mb-2">Notes:</p>
+                      <p className="text-sm text-gray-600 mb-2">Notes:</p>
                       <p className="text-sm">{invoiceDetails.notes}</p>
                     </div>
                   )}
@@ -335,11 +335,33 @@ export default function Invoices() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 border-t pt-4">
-                  <Button onClick={handleExportPDF} className="flex-1">
+                  <Button onClick={handleExportPDF} className="flex-1 print:hidden">
                     <Download className="w-4 h-4 mr-2" />
                     Export PDF
                   </Button>
-                  <Button onClick={() => window.print()} variant="outline" className="flex-1">
+                  <Button 
+                    onClick={() => {
+                      // Print only the invoice content
+                      const printContent = document.getElementById('invoice-content');
+                      if (!printContent) return;
+                      
+                      const printWindow = window.open('', '', 'height=600,width=800');
+                      if (!printWindow) return;
+                      
+                      printWindow.document.write('<html><head><title>Invoice</title>');
+                      printWindow.document.write('<style>');
+                      printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; color: black; }');
+                      printWindow.document.write('table { width: 100%; border-collapse: collapse; }');
+                      printWindow.document.write('th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }');
+                      printWindow.document.write('</style></head><body>');
+                      printWindow.document.write(printContent.innerHTML);
+                      printWindow.document.write('</body></html>');
+                      printWindow.document.close();
+                      printWindow.print();
+                    }} 
+                    variant="outline" 
+                    className="flex-1 print:hidden"
+                  >
                     Print Invoice
                   </Button>
                 </div>

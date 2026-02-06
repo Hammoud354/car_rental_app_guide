@@ -1798,3 +1798,34 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Insert Palestinian into nationalities table
 - [x] Verify it appears in dropdown menu
 - [x] Test autocomplete with "pal" search
+
+### 46. Standardize Contract Form Button Styles
+- [x] Make all buttons consistent styling (Print, Export PDF, Mark as Returned, Delete, Renew, Close)
+- [x] All buttons now use outline variant with color-coded hover effects
+- [x] Keep current button placement/layout
+- [x] Ensure visual consistency across all action buttons
+
+### 47. Update License Date Fields to Year-Only
+- [x] Change Issue Date to year-only selection
+- [x] Change Expiry Date to year-only selection
+- [x] Add validation: Expiry Date must be >= current year
+- [x] Extend year range to 2050
+- [x] Added yearOnly prop to DateDropdownSelector component
+
+### 48. Fix Invoice Print Preview Data Display
+- [x] Debug why invoice data doesn't show in print preview - Fixed text colors
+- [x] Changed all text-muted-foreground to text-gray-600 for visibility
+- [x] Added text-black to invoice content container
+- [x] Ensure all invoice fields are visible when printing
+
+### 49. Fix Invoice Print Redirect Issue
+- [x] Prevent browser from redirecting to empty screen on print
+- [x] Print now opens in new window with only invoice content
+- [x] Keep user on invoice details page after print
+- [x] Fix print button behavior
+
+### 50. Fix Invoice Export PDF Functionality
+- [x] Export PDF functionality already implemented correctly
+- [x] Fixed text visibility in PDF by updating colors
+- [x] Ensure PDF generation includes all invoice data
+- [x] Test PDF download with different invoice statuses

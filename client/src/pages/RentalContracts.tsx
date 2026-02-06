@@ -673,6 +673,7 @@ export default function RentalContracts() {
                           label="Issue Date"
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
+                          yearOnly
                         />
                       </div>
                       <div>
@@ -681,7 +682,8 @@ export default function RentalContracts() {
                           label="Expiry Date"
                           value={licenseExpiryDate}
                           onChange={setLicenseExpiryDate}
-                          minDate={new Date()} // Only allow future dates
+                          minDate={new Date(new Date().getFullYear(), 0, 1)} // Minimum: current year
+                          yearOnly
                           required
                         />
                       </div>
@@ -1357,8 +1359,8 @@ export default function RentalContracts() {
                         // Redirect to invoices page and open the invoice
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
-                      variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
+                      variant="outline"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-yellow-400 hover:text-yellow-400 h-12 w-full"
                       size="default"
                     >
                       📄 View Invoice ({contractInvoice.invoiceNumber})
@@ -1370,8 +1372,8 @@ export default function RentalContracts() {
                           generateInvoice.mutate({ contractId: selectedContract.id });
                         }
                       }} 
-                      variant="default"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
+                      variant="outline"
+                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-yellow-400 hover:text-yellow-400 h-12 w-full"
                       size="default"
                       disabled={generateInvoice.isPending}
                     >
@@ -1383,8 +1385,8 @@ export default function RentalContracts() {
                 {selectedContract?.status === 'active' && (
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
-                    variant="default"
-                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
+                    variant="outline"
+                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
                     size="default"
                   >
                     ✅ Mark as Returned
@@ -1396,8 +1398,8 @@ export default function RentalContracts() {
                       deleteContract.mutate({ contractId: selectedContract.id });
                     }
                   }} 
-                  variant="destructive"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50 h-12 w-full"
+                  variant="outline"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-red-400 hover:text-red-400 h-12 w-full"
                   size="default"
                   disabled={deleteContract.isPending}
                 >
@@ -1420,7 +1422,8 @@ export default function RentalContracts() {
                     setAdditionalDays(1);
                     setIsRenewDialogOpen(true);
                   }} 
-                  className="bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200 hover:scale-105 hover:shadow-lg h-12 w-full"
+                  variant="outline"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-purple-400 hover:text-purple-400 h-12 w-full"
                   size="default"
                 >
                   Renew

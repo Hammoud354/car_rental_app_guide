@@ -15,6 +15,7 @@ interface DateDropdownSelectorProps {
   required?: boolean;
   minDate?: Date; // Minimum allowed date
   maxDate?: Date; // Maximum allowed date
+  yearOnly?: boolean; // Only show year selector
 }
 
 export function DateDropdownSelector({
@@ -25,10 +26,11 @@ export function DateDropdownSelector({
   required = false,
   minDate,
   maxDate,
+  yearOnly = false,
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
-  const minYear = minDate ? minDate.getFullYear() : 1990;
-  const maxYear = maxDate ? maxDate.getFullYear() : currentYear + 10;
+  const minYear = minDate ? minDate.getFullYear() : (yearOnly ? 1950 : 1990);
+  const maxYear = maxDate ? maxDate.getFullYear() : (yearOnly ? 2050 : currentYear + 10);
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
   const months = [
     { value: 0, label: "January" },
@@ -59,8 +61,8 @@ export function DateDropdownSelector({
 
   const handleYearChange = (yearStr: string) => {
     const year = parseInt(yearStr);
-    const month = selectedMonth ?? 0;
-    const day = selectedDay ?? 1;
+    const month = yearOnly ? 0 : (selectedMonth ?? 0);
+    const day = yearOnly ? 1 : (selectedDay ?? 1);
     const newDate = new Date(year, month, day);
     
     // Validate against min/max dates
@@ -120,7 +122,7 @@ export function DateDropdownSelector({
       <Label htmlFor={id}>
         {label} {required && <span className="text-red-500">*</span>}
       </Label>
-      <div className="grid grid-cols-3 gap-2">
+      <div className={yearOnly ? "grid grid-cols-1 gap-2" : "grid grid-cols-3 gap-2"}>
         {/* Year Selector */}
         <Select
           value={selectedYear?.toString()}
@@ -140,40 +142,44 @@ export function DateDropdownSelector({
         </Select>
 
         {/* Month Selector */}
-        <Select
-          value={selectedMonth?.toString()}
-          onValueChange={handleMonthChange}
-          required={required}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Month" />
-          </SelectTrigger>
-          <SelectContent>
-            {months.map((month) => (
-              <SelectItem key={month.value} value={month.value.toString()}>
-                {month.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!yearOnly && (
+          <Select
+            value={selectedMonth?.toString()}
+            onValueChange={handleMonthChange}
+            required={required}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Month" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month) => (
+                <SelectItem key={month.value} value={month.value.toString()}>
+                  {month.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         {/* Day Selector */}
-        <Select
-          value={selectedDay?.toString()}
-          onValueChange={handleDayChange}
-          required={required}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Day" />
-          </SelectTrigger>
-          <SelectContent>
-            {days.map((day) => (
-              <SelectItem key={day} value={day.toString()}>
-                {day}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!yearOnly && (
+          <Select
+            value={selectedDay?.toString()}
+            onValueChange={handleDayChange}
+            required={required}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Day" />
+            </SelectTrigger>
+            <SelectContent>
+              {days.map((day) => (
+                <SelectItem key={day} value={day.toString()}>
+                  {day}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );
