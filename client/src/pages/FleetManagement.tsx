@@ -304,7 +304,7 @@ export default function FleetManagement() {
                         <Command>
                           <CommandInput placeholder="Search maker..." />
                           <CommandEmpty>No maker found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-auto">
+                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
                             {carMakers?.map((maker) => (
                               <CommandItem
                                 key={maker.id}
@@ -360,7 +360,7 @@ export default function FleetManagement() {
                         <Command>
                           <CommandInput placeholder="Search model..." />
                           <CommandEmpty>No model found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-auto">
+                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
                             {carModels?.map((model) => (
                               <CommandItem
                                 key={model.id}
@@ -660,7 +660,7 @@ export default function FleetManagement() {
                         <Command>
                           <CommandInput placeholder="Search maker..." />
                           <CommandEmpty>No maker found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-auto">
+                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
                             {carMakers?.map((maker) => (
                               <CommandItem
                                 key={maker.id}
@@ -716,7 +716,7 @@ export default function FleetManagement() {
                         <Command>
                           <CommandInput placeholder="Search model..." />
                           <CommandEmpty>No model found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-auto">
+                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
                             {editCarModels?.map((model) => (
                               <CommandItem
                                 key={model.id}

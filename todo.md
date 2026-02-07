@@ -1867,3 +1867,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add image gallery view for each vehicle with upload capability
 - [x] Write tests for image upload and storage (9 tests, all passing)
 - [x] Test upload, display, and delete functionality
+
+
+### 54. Fix Dropdown Scrolling Issue in Car Maker/Model Selection
+- [x] Investigate why scrollbar is not functioning with mouse scroll - CommandGroup had overflow-auto instead of overflow-y-auto
+- [x] Check Command component scrolling configuration
+- [x] Fix mouse wheel scrolling in dropdown lists - changed to overflow-y-auto overscroll-contain
+- [x] Test scrolling functionality in both Add and Edit vehicle forms - applied to all 4 dropdowns
+- [x] Verify scrollbar visibility and functionality - dev server running with no errors
