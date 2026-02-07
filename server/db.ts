@@ -396,7 +396,10 @@ export async function markContractAsReturned(
       .where(eq(vehicles.id, contract[0].vehicleId));
   }
   
-  return { success: true, contractId, maintenanceAlert };
+  // Auto-generate invoice for the completed contract
+  const invoice = await autoGenerateInvoice(contractId, contract[0].userId);
+  
+  return { success: true, contractId, maintenanceAlert, invoice };
 }
 
 export async function deleteRentalContract(contractId: number) {
@@ -1583,6 +1586,147 @@ export async function generateInvoiceForContract(contractId: number, userId: num
   }
   
   // Return the created invoice with line items
+  return await getInvoiceById(invoiceId, userId);
+}
+
+/**
+ * Generate invoice number in format INV-YYYYMMDD-HHMMSS-XXX
+ */
+async function generateInvoiceNumber(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
+  
+  // Include timestamp in invoice number for uniqueness
+  return `INV-${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
+}
+
+/**
+ * Auto-generate invoice when contract is completed
+ */
+export async function autoGenerateInvoice(contractId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get contract details
+  const [contract] = await db.select().from(rentalContracts)
+    .where(eq(rentalContracts.id, contractId))
+    .limit(1);
+  
+  if (!contract) throw new Error("Contract not found");
+  
+  // Check if invoice already exists for this contract
+  const existingInvoice = await db.select().from(invoices)
+    .where(eq(invoices.contractId, contractId))
+    .limit(1);
+  
+  if (existingInvoice.length > 0) {
+    return existingInvoice[0]; // Invoice already exists, return it
+  }
+  
+  // Generate invoice number
+  const invoiceNumber = await generateInvoiceNumber(userId);
+  
+  // Calculate line items
+  const lineItems: Array<{
+    description: string;
+    quantity: string;
+    unitPrice: string;
+    amount: string;
+  }> = [];
+  
+  // 1. Rental charges
+  const rentalDays = contract.rentalDays || 1;
+  const dailyRate = parseFloat(contract.dailyRate || '0');
+  const rentalCharges = rentalDays * dailyRate;
+  lineItems.push({
+    description: `Vehicle Rental (${rentalDays} days @ $${dailyRate}/day)`,
+    quantity: String(rentalDays),
+    unitPrice: contract.dailyRate,
+    amount: rentalCharges.toFixed(2),
+  });
+  
+  // 2. Discount (if any)
+  const discount = parseFloat(contract.discount || '0');
+  if (discount > 0) {
+    lineItems.push({
+      description: 'Discount',
+      quantity: '1',
+      unitPrice: `-${discount.toFixed(2)}`,
+      amount: `-${discount.toFixed(2)}`,
+    });
+  }
+  
+  // 3. Over-limit KM fee (if any)
+  const overLimitKmFee = parseFloat(contract.overLimitKmFee || '0');
+  if (overLimitKmFee > 0) {
+    lineItems.push({
+      description: 'Over-Limit Kilometer Fee',
+      quantity: '1',
+      unitPrice: overLimitKmFee.toFixed(2),
+      amount: overLimitKmFee.toFixed(2),
+    });
+  }
+  
+  // 4. Late fee (if any)
+  const lateFee = parseFloat(contract.lateFee || '0');
+  if (lateFee > 0) {
+    lineItems.push({
+      description: 'Late Return Fee',
+      quantity: '1',
+      unitPrice: lateFee.toFixed(2),
+      amount: lateFee.toFixed(2),
+    });
+  }
+  
+  // Calculate subtotal
+  const subtotal = lineItems.reduce((sum, item) => sum + parseFloat(item.amount), 0);
+  
+  // Calculate tax (11%)
+  const taxRate = 0.11;
+  const taxAmount = subtotal * taxRate;
+  
+  // Calculate total
+  const totalAmount = subtotal + taxAmount;
+  
+  // Create invoice
+  const invoiceDate = new Date();
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 30); // Due in 30 days
+  
+  const [invoiceResult] = await db.insert(invoices).values({
+    userId,
+    contractId,
+    invoiceNumber,
+    invoiceDate: sql`CURDATE()`,
+    dueDate: sql`DATE_ADD(CURDATE(), INTERVAL 30 DAY)`,
+    subtotal: subtotal.toFixed(2),
+    taxAmount: taxAmount.toFixed(2),
+    totalAmount: totalAmount.toFixed(2),
+    paymentStatus: 'pending',
+  });
+  
+  const invoiceId = Number(invoiceResult.insertId);
+  
+  // Insert line items
+  for (const item of lineItems) {
+    await db.insert(invoiceLineItems).values({
+      invoiceId,
+      description: item.description,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      amount: item.amount,
+    });
+  }
+  
   return await getInvoiceById(invoiceId, userId);
 }
 

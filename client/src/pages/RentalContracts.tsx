@@ -113,28 +113,25 @@ export default function RentalContracts() {
         );
       }
       
+      // Show invoice auto-generation success
+      if (data.invoice) {
+        toast.success("Invoice automatically generated!", {
+          description: `Invoice ${data.invoice.invoiceNumber} has been created for this contract.`,
+          duration: 5000,
+        });
+      }
+      
       utils.contracts.listByStatus.invalidate();
       utils.contracts.list.invalidate();
       utils.fleet.list.invalidate();
+      utils.invoices.list.invalidate();
       
-      // Auto-generate invoice and redirect to invoices page
-      if (data.contractId) {
-        generateInvoice.mutate({ contractId: data.contractId }, {
-          onSuccess: (invoiceData) => {
-            // Redirect to invoices page with the new invoice
-            if (invoiceData) {
-              window.location.href = `/invoices?invoice=${invoiceData.id}`;
-            } else {
-              setLocation("/rental-contracts");
-            }
-          },
-          onError: () => {
-            // If invoice generation fails, just redirect to contracts page
-            setLocation("/rental-contracts");
-          }
-        });
+      // Redirect to invoices page to view the auto-generated invoice
+      if (data.invoice) {
+        setTimeout(() => {
+          setLocation(`/invoices`);
+        }, 1500);
       } else {
-        // Fallback: redirect to rental contracts page
         setLocation("/rental-contracts");
       }
     },

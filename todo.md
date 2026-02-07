@@ -1829,3 +1829,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fixed text visibility in PDF by updating colors
 - [x] Ensure PDF generation includes all invoice data
 - [x] Test PDF download with different invoice statuses
+
+
+### 51. Implement Automatic Invoice Generation on Contract Completion
+- [x] Analyze current invoice creation and contract completion flow
+- [x] Design invoice auto-generation logic (calculate charges, dates, tax)
+- [x] Create backend procedure to auto-generate invoice when contract status changes to "completed"
+- [x] Calculate rental charges based on contract dates and daily rate
+- [x] Include additional charges (discount, over-limit KM fee, late fee) in invoice
+- [x] Auto-populate client information from contract
+- [x] Set invoice status to "pending" by default
+- [x] Update frontend to handle auto-generated invoices
+- [x] Add notification/toast when invoice is auto-generated
+- [x] Write comprehensive tests for auto-generation logic (6 tests, all passing)
+- [x] Test edge cases (discounts, over-limit fees, duplicate prevention)
