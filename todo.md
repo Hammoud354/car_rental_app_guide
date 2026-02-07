@@ -1843,3 +1843,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add notification/toast when invoice is auto-generated
 - [x] Write comprehensive tests for auto-generation logic (6 tests, all passing)
 - [x] Test edge cases (discounts, over-limit fees, duplicate prevention)
+
+### 52. Fix Car Model Dropdown and Populate Comprehensive Models
+- [x] Investigate why Kia models don't appear in dropdown - only had 1 model (cerato)
+- [x] Check carModels table for existing Kia models - found 1 model
+- [x] Populate comprehensive list of Kia models - added 15 models (Rio, Cerato, Forte, Optima, K5, Stinger, Sportage, Sorento, Telluride, Soul, Seltos, Niro, EV6, Carnival, Picanto)
+- [x] Add models for all other manufacturers - added 117 new models across 30 brands (Toyota, Honda, BMW, Mercedes, Audi, Ford, Chevrolet, Nissan, Mazda, VW, Lexus, Subaru, Jeep, Volvo, Porsche, Land Rover, Mitsubishi, Infiniti, Alfa Romeo, Jaguar, Mini, Fiat, Peugeot, Renault, Citroen, Skoda, Seat, Suzuki, BYD)
+- [x] Test car maker/model selection workflow - working perfectly, dropdown shows all 15 Kia models
+- [x] Verify models filter correctly by selected maker - verified Kia shows only Kia models
+- [x] Database now contains 286 total car models
