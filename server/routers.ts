@@ -317,6 +317,50 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         return await db.getLastReturnKm(input.vehicleId, ctx.user?.id || 1);
       }),
+
+    // Vehicle Images
+    addImage: publicProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        imageUrl: z.string(),
+        imageType: z.enum(["exterior", "interior"]),
+        displayOrder: z.number().int().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.addVehicleImage({ ...input, userId: ctx.user?.id || 1 });
+      }),
+
+    getImages: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehicleImages(input.vehicleId, ctx.user?.id || 1);
+      }),
+
+    getImagesByType: publicProcedure
+      .input(z.object({ 
+        vehicleId: z.number(),
+        imageType: z.enum(["exterior", "interior"]),
+      }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehicleImagesByType(input.vehicleId, ctx.user?.id || 1, input.imageType);
+      }),
+
+    deleteImage: publicProcedure
+      .input(z.object({ imageId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteVehicleImage(input.imageId, ctx.user?.id || 1);
+        return { success: true };
+      }),
+
+    updateImageOrder: publicProcedure
+      .input(z.object({ 
+        imageId: z.number(),
+        displayOrder: z.number().int(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.updateImageDisplayOrder(input.imageId, ctx.user?.id || 1, input.displayOrder);
+        return { success: true };
+      }),
   }),
 
   // Rental Contracts Router

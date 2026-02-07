@@ -12,6 +12,7 @@ import Booking from "./pages/Booking";
 import Operations from "./pages/Operations";
 import Compliance from "./pages/Compliance";
 import FleetManagement from "./pages/FleetManagement";
+import VehicleDetails from "./pages/VehicleDetails";
 import Dashboard from "./pages/Dashboard";
 import Maintenance from "./pages/Maintenance";
 import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/maintenance" component={Maintenance} />
       <Route path="/fleet" component={Fleet} />
       <Route path="/fleet-management" component={FleetManagement} />
+      <Route path="/vehicle/:id" component={VehicleDetails} />
       <Route path="/booking" component={Booking} />
       <Route path="/operations" component={Operations} />
       <Route path="/compliance" component={Compliance} />

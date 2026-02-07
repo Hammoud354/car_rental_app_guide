@@ -556,6 +556,18 @@ export default function FleetManagement() {
                   </div>
 
                   <div className="flex gap-2 pt-2 border-t border-border/50">
+                    <Link href={`/vehicle/${vehicle.id}`}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Car className="mr-2 h-3 w-3" />
+                        View Details
+                      </Button>
+                    </Link>
+                  </div>
+                  <div className="flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"

@@ -38,6 +38,40 @@ async function startServer() {
   app.use(cookieParser());
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
+  
+  // Vehicle image upload endpoint
+  app.post("/api/upload-vehicle-image", async (req, res) => {
+    try {
+      const { image, fileName, vehicleId, imageType } = req.body;
+      
+      if (!image || !fileName || !vehicleId || !imageType) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Import storage functions
+      const { storagePut } = await import("../storage");
+      
+      // Extract base64 data
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, "base64");
+      
+      // Generate unique file key
+      const timestamp = Date.now();
+      const randomSuffix = Math.random().toString(36).substring(7);
+      const fileExtension = fileName.split(".").pop() || "jpg";
+      const fileKey = `vehicles/${vehicleId}/${imageType}/${timestamp}-${randomSuffix}.${fileExtension}`;
+      
+      // Upload to S3
+      const mimeType = image.match(/data:(.*?);/)?.[1] || "image/jpeg";
+      const result = await storagePut(fileKey, buffer, mimeType);
+      
+      res.json({ url: result.url });
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ error: "Failed to upload image" });
+    }
+  });
+  
   // tRPC API
   app.use(
     "/api/trpc",

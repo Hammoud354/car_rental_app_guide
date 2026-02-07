@@ -360,3 +360,20 @@ export const auditLogs = mysqlTable("auditLogs", {
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * Vehicle images table for storing multiple photos per vehicle
+ * Supports exterior and interior photos with S3 URLs
+ */
+export const vehicleImages = mysqlTable("vehicleImages", {
+  id: int("id").autoincrement().primaryKey(),
+  vehicleId: int("vehicleId").notNull(), // Foreign key to vehicles table
+  userId: int("userId").notNull(), // Foreign key to users table
+  imageUrl: text("imageUrl").notNull(), // S3 URL for the image
+  imageType: mysqlEnum("imageType", ["exterior", "interior"]).notNull(),
+  displayOrder: int("displayOrder").default(0), // Order for displaying images
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VehicleImage = typeof vehicleImages.$inferSelect;
+export type InsertVehicleImage = typeof vehicleImages.$inferInsert;

@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -1847,4 +1847,78 @@ export async function addNationality(userId: number, nationality: string) {
   });
   
   return { id: Number(result.insertId), userId, nationality, createdAt: new Date() };
+}
+
+
+/**
+ * Vehicle Images Functions
+ */
+
+/**
+ * Add a vehicle image
+ */
+export async function addVehicleImage(image: InsertVehicleImage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(vehicleImages).values(image);
+  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  
+  return await db.select().from(vehicleImages).where(eq(vehicleImages.id, insertId)).limit(1).then(rows => rows[0]);
+}
+
+/**
+ * Get all images for a vehicle
+ */
+export async function getVehicleImages(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Super Admin can see all images, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.select().from(vehicleImages).where(eq(vehicleImages.vehicleId, vehicleId)).orderBy(vehicleImages.displayOrder, vehicleImages.createdAt)
+    : await db.select().from(vehicleImages).where(and(eq(vehicleImages.vehicleId, vehicleId), eq(vehicleImages.userId, userId))).orderBy(vehicleImages.displayOrder, vehicleImages.createdAt);
+}
+
+/**
+ * Get images by type (exterior/interior)
+ */
+export async function getVehicleImagesByType(vehicleId: number, userId: number, imageType: "exterior" | "interior") {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Super Admin can see all images, regular users only see their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.select().from(vehicleImages).where(and(eq(vehicleImages.vehicleId, vehicleId), eq(vehicleImages.imageType, imageType))).orderBy(vehicleImages.displayOrder, vehicleImages.createdAt)
+    : await db.select().from(vehicleImages).where(and(eq(vehicleImages.vehicleId, vehicleId), eq(vehicleImages.userId, userId), eq(vehicleImages.imageType, imageType))).orderBy(vehicleImages.displayOrder, vehicleImages.createdAt);
+}
+
+/**
+ * Delete a vehicle image
+ */
+export async function deleteVehicleImage(imageId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Super Admin can delete any image, regular users only their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.delete(vehicleImages).where(eq(vehicleImages.id, imageId))
+    : await db.delete(vehicleImages).where(and(eq(vehicleImages.id, imageId), eq(vehicleImages.userId, userId)));
+}
+
+/**
+ * Update image display order
+ */
+export async function updateImageDisplayOrder(imageId: number, userId: number, displayOrder: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Super Admin can update any image, regular users only their own
+  const isAdmin = await isSuperAdmin(userId);
+  return isAdmin
+    ? await db.update(vehicleImages).set({ displayOrder }).where(eq(vehicleImages.id, imageId))
+    : await db.update(vehicleImages).set({ displayOrder }).where(and(eq(vehicleImages.id, imageId), eq(vehicleImages.userId, userId)));
 }
