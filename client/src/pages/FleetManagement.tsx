@@ -161,6 +161,16 @@ export default function FleetManagement() {
       toast.error(`Failed to add custom model: ${error.message}`);
     },
   });
+  
+  const populateMakersMutation = trpc.carMakers.populateForCountry.useMutation({
+    onSuccess: (result) => {
+      toast.success(result.message);
+      utils.carMakers.getByCountry.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`Failed to populate: ${error.message}`);
+    },
+  });
 
   const handleAddVehicle = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -294,6 +304,29 @@ export default function FleetManagement() {
             </CardContent>
           </Card>
         )}
+        
+        {/* Populate Car Makers Alert */}
+        {!carMakers || carMakers.length === 0 ? (
+          <Card className="bg-orange-500/5 border-orange-500/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-semibold text-orange-600 mb-1">No Car Makers Found</h3>
+                  <p className="text-sm text-muted-foreground">
+                    You need to populate car makers and models before adding vehicles.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => populateMakersMutation.mutate({ country: "Lebanon" })}
+                  className="whitespace-nowrap"
+                  disabled={populateMakersMutation.isPending}
+                >
+                  {populateMakersMutation.isPending ? "Populating..." : "Populate Car Makers"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
         
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>

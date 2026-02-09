@@ -879,11 +879,21 @@ export const appRouter = router({
         });
       }),
     
-    populateForCountry: publicProcedure
+    populateForCountry: protectedProcedure
       .input(z.object({ country: z.string() }))
       .mutation(async ({ input, ctx }) => {
-        const userId = ctx.user?.id || 1;
-        return await db.populateCarMakersForCountry(input.country, userId);
+        const userId = ctx.user.id;
+        
+        // Check if user already has car makers
+        const existingMakers = await db.getCarMakersByCountry(input.country, userId);
+        if (existingMakers.length > 0) {
+          return { success: true, message: `User already has ${existingMakers.length} car makers`, count: existingMakers.length };
+        }
+        
+        // Populate car makers and models
+        await db.populateCarMakersForCountry(input.country, userId);
+        const newMakers = await db.getCarMakersByCountry(input.country, userId);
+        return { success: true, message: `Successfully populated ${newMakers.length} car makers`, count: newMakers.length };
       }),
   }),
   settings: router({
