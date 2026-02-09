@@ -145,7 +145,15 @@ export async function getVehicleById(id: number, userId: number) {
     console.warn("[Database] Cannot get vehicle: database not available");
     return undefined;
   }
-  const result = await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
+  
+  // Check if user is Super Admin
+  const isAdmin = await isSuperAdmin(userId);
+  
+  // Super Admin can view any vehicle, regular users only their own
+  const result = isAdmin
+    ? await db.select().from(vehicles).where(eq(vehicles.id, id)).limit(1)
+    : await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
+  
   return result.length > 0 ? result[0] : undefined;
 }
 

@@ -1965,3 +1965,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Auto-populate odometer reading from last completed contract with manual override option
 - [x] Fix PDF export button failing to export invoices
 - [x] Fix contract completion failure when marking contract as completed
+
+### 62. Fix Super Admin Vehicle Details Page Access
+- [x] Investigate why vehicle details page shows "Vehicle Not Found" for Super Admin
+- [x] Update getVehicleById query to support Super Admin viewing all vehicles
+- [x] Test Super Admin can view vehicle details from any user
