@@ -607,6 +607,14 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         return await db.getFutureReservations(input.month, input.year, ctx.user?.id || 1);
       }),
+    
+    // Get last odometer reading from completed contract for a vehicle
+    getLastOdometerReading: protectedProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        const lastContract = await db.getLastCompletedContractForVehicle(input.vehicleId, ctx.user.id);
+        return lastContract?.returnKm || null;
+      }),
   }),
 
   // Client Management Router

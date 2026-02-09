@@ -1408,7 +1408,7 @@ export async function getCompanyProfile(userId: number) {
     .where(eq(companyProfiles.userId, userId))
     .limit(1);
 
-  return profile;
+  return profile || null;
 }
 
 /**
@@ -1924,4 +1924,35 @@ export async function updateImageDisplayOrder(imageId: number, userId: number, d
   return isAdmin
     ? await db.update(vehicleImages).set({ displayOrder }).where(eq(vehicleImages.id, imageId))
     : await db.update(vehicleImages).set({ displayOrder }).where(and(eq(vehicleImages.id, imageId), eq(vehicleImages.userId, userId)));
+}
+
+/**
+ * Get the last completed contract for a specific vehicle
+ * Returns the returnKm (odometer reading) from the most recent completed contract
+ */
+export async function getLastCompletedContractForVehicle(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get last completed contract: database not available");
+    return null;
+  }
+  
+  const contracts = await db
+    .select({
+      id: rentalContracts.id,
+      returnKm: rentalContracts.returnKm,
+      returnedAt: rentalContracts.returnedAt,
+    })
+    .from(rentalContracts)
+    .where(
+      and(
+        eq(rentalContracts.vehicleId, vehicleId),
+        eq(rentalContracts.userId, userId),
+        eq(rentalContracts.status, "completed")
+      )
+    )
+    .orderBy(desc(rentalContracts.returnedAt))
+    .limit(1);
+  
+  return contracts.length > 0 ? contracts[0] : null;
 }

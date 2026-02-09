@@ -322,6 +322,7 @@ export default function Clients() {
                         label="Issue Date"
                         value={createLicenseIssueDate}
                         onChange={setCreateLicenseIssueDate}
+                        maxDate={new Date()} // Only allow current or past dates
                       />
                     </div>
                     <div>
@@ -643,6 +644,7 @@ export default function Clients() {
                       label="Issue Date"
                       value={editLicenseIssueDate}
                       onChange={setEditLicenseIssueDate}
+                      maxDate={new Date()} // Only allow current or past dates
                     />
                   </div>
                   <div>

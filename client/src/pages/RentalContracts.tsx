@@ -58,6 +58,19 @@ export default function RentalContracts() {
   const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
   const [returnInspectionOpen, setReturnInspectionOpen] = useState(false);
   const [selectedContractForReturn, setSelectedContractForReturn] = useState<number | null>(null);
+  
+  // Fetch last odometer reading when vehicle is selected
+  const { data: lastOdometerReading } = trpc.contracts.getLastOdometerReading.useQuery(
+    { vehicleId: parseInt(selectedVehicleId) },
+    { enabled: !!selectedVehicleId && selectedVehicleId !== "" }
+  );
+  
+  // Auto-populate pickup odometer when last reading is available
+  useEffect(() => {
+    if (lastOdometerReading && lastOdometerReading > 0) {
+      setPickupKm(lastOdometerReading);
+    }
+  }, [lastOdometerReading]);
   const [returnKm, setReturnKm] = useState<number>(0);
   
   // Fetch all users for Super Admin
@@ -725,6 +738,7 @@ export default function RentalContracts() {
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
                           yearOnly
+                          maxDate={new Date()} // Only allow current or past dates
                         />
                       </div>
                       <div>
@@ -801,6 +815,11 @@ export default function RentalContracts() {
                           placeholder="Enter current odometer reading"
                           required
                         />
+                        {lastOdometerReading && lastOdometerReading > 0 && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Auto-filled from last completed contract ({lastOdometerReading.toLocaleString()} km). You can edit if needed.
+                          </p>
+                        )}
                       </div>
                     </div>
 

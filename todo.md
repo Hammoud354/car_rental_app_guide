@@ -1958,3 +1958,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure consistent user selector behavior across all pages
 - [x] Test Super Admin can view/manage data for any user in all modules
 - [x] Verify regular users cannot see user selector (admin-only feature)
+
+### 61. Fix Critical Issues Reported by User
+- [x] Add comprehensive nationality list with Palestinian included (not just user-entered ones)
+- [x] Restrict driving license issue date to current year and earlier (no future dates)
+- [x] Auto-populate odometer reading from last completed contract with manual override option
+- [x] Fix PDF export button failing to export invoices
+- [x] Fix contract completion failure when marking contract as completed
