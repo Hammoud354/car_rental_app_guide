@@ -1874,4 +1874,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check Command component scrolling configuration
 - [x] Fix mouse wheel scrolling in dropdown lists - changed to overflow-y-auto overscroll-contain
 - [x] Test scrolling functionality in both Add and Edit vehicle forms - applied to all 4 dropdowns
-- [x] Verify scrollbar visibility and functionality - dev server running with no errors
+- [x] ISSUE: Scrollbar visible but not responding to mouse wheel - Command component missing CommandList wrapper
+- [x] Wrap CommandGroup with CommandList component for proper scrolling (has built-in overflow-y-auto)
+- [x] Maintain search functionality while enabling mouse wheel scroll - CommandList preserves all Command features
+- [x] Applied fix to all 4 dropdowns: Add Vehicle (maker/model), Edit Vehicle (maker/model)
+- [x] Dev server running with no errors - ready for testing

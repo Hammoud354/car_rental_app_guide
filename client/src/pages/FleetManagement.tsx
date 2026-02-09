@@ -13,7 +13,7 @@ import MinimalLayout from "@/components/MinimalLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -303,38 +303,40 @@ export default function FleetManagement() {
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
                           <CommandInput placeholder="Search maker..." />
-                          <CommandEmpty>No maker found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
-                            {carMakers?.map((maker) => (
+                          <CommandList>
+                            <CommandEmpty>No maker found.</CommandEmpty>
+                            <CommandGroup>
+                              {carMakers?.map((maker) => (
+                                <CommandItem
+                                  key={maker.id}
+                                  value={maker.name}
+                                  onSelect={() => {
+                                    setSelectedMakerId(maker.id);
+                                    setSelectedModelId(null); // Reset model when maker changes
+                                    setMakerOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedMakerId === maker.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {maker.name}
+                                </CommandItem>
+                              ))}
                               <CommandItem
-                                key={maker.id}
-                                value={maker.name}
                                 onSelect={() => {
-                                  setSelectedMakerId(maker.id);
-                                  setSelectedModelId(null); // Reset model when maker changes
                                   setMakerOpen(false);
+                                  setIsCustomMakerDialogOpen(true);
                                 }}
+                                className="border-t mt-2 pt-2 text-primary font-medium"
                               >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedMakerId === maker.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {maker.name}
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Custom Maker
                               </CommandItem>
-                            ))}
-                            <CommandItem
-                              onSelect={() => {
-                                setMakerOpen(false);
-                                setIsCustomMakerDialogOpen(true);
-                              }}
-                              className="border-t mt-2 pt-2 text-primary font-medium"
-                            >
-                              <Plus className="mr-2 h-4 w-4" />
-                              Add Custom Maker
-                            </CommandItem>
-                          </CommandGroup>
+                            </CommandGroup>
+                          </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
@@ -359,38 +361,40 @@ export default function FleetManagement() {
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
                           <CommandInput placeholder="Search model..." />
-                          <CommandEmpty>No model found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
-                            {carModels?.map((model) => (
+                          <CommandList>
+                            <CommandEmpty>No model found.</CommandEmpty>
+                            <CommandGroup>
+                              {carModels?.map((model) => (
+                                <CommandItem
+                                  key={model.id}
+                                  value={model.modelName}
+                                  onSelect={() => {
+                                    setSelectedModelId(model.id);
+                                    setModelOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedModelId === model.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {model.modelName}
+                                </CommandItem>
+                              ))}
                               <CommandItem
-                                key={model.id}
-                                value={model.modelName}
                                 onSelect={() => {
-                                  setSelectedModelId(model.id);
                                   setModelOpen(false);
+                                  setCustomModelMakerId(selectedMakerId);
+                                  setIsCustomModelDialogOpen(true);
                                 }}
+                                className="border-t mt-2 pt-2 text-primary font-medium"
                               >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    selectedModelId === model.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {model.modelName}
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Custom Model
                               </CommandItem>
-                            ))}
-                            <CommandItem
-                              onSelect={() => {
-                                setModelOpen(false);
-                                setCustomModelMakerId(selectedMakerId);
-                                setIsCustomModelDialogOpen(true);
-                              }}
-                              className="border-t mt-2 pt-2 text-primary font-medium"
-                            >
-                              <Plus className="mr-2 h-4 w-4" />
-                              Add Custom Model
-                            </CommandItem>
-                          </CommandGroup>
+                            </CommandGroup>
+                          </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
@@ -659,38 +663,40 @@ export default function FleetManagement() {
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
                           <CommandInput placeholder="Search maker..." />
-                          <CommandEmpty>No maker found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
-                            {carMakers?.map((maker) => (
+                          <CommandList>
+                            <CommandEmpty>No maker found.</CommandEmpty>
+                            <CommandGroup>
+                              {carMakers?.map((maker) => (
+                                <CommandItem
+                                  key={maker.id}
+                                  value={maker.name}
+                                  onSelect={() => {
+                                    setEditSelectedMakerId(maker.id);
+                                    setEditSelectedModelId(null); // Reset model when maker changes
+                                    setEditMakerOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {maker.name}
+                                </CommandItem>
+                              ))}
                               <CommandItem
-                                key={maker.id}
-                                value={maker.name}
                                 onSelect={() => {
-                                  setEditSelectedMakerId(maker.id);
-                                  setEditSelectedModelId(null); // Reset model when maker changes
                                   setEditMakerOpen(false);
+                                  setIsCustomMakerDialogOpen(true);
                                 }}
+                                className="border-t mt-2 pt-2 text-primary font-medium"
                               >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {maker.name}
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Custom Maker
                               </CommandItem>
-                            ))}
-                            <CommandItem
-                              onSelect={() => {
-                                setEditMakerOpen(false);
-                                setIsCustomMakerDialogOpen(true);
-                              }}
-                              className="border-t mt-2 pt-2 text-primary font-medium"
-                            >
-                              <Plus className="mr-2 h-4 w-4" />
-                              Add Custom Maker
-                            </CommandItem>
-                          </CommandGroup>
+                            </CommandGroup>
+                          </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
@@ -715,38 +721,40 @@ export default function FleetManagement() {
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
                           <CommandInput placeholder="Search model..." />
-                          <CommandEmpty>No model found.</CommandEmpty>
-                          <CommandGroup className="max-h-64 overflow-y-auto overscroll-contain">
-                            {editCarModels?.map((model) => (
+                          <CommandList>
+                            <CommandEmpty>No model found.</CommandEmpty>
+                            <CommandGroup>
+                              {editCarModels?.map((model) => (
+                                <CommandItem
+                                  key={model.id}
+                                  value={model.modelName}
+                                  onSelect={() => {
+                                    setEditSelectedModelId(model.id);
+                                    setEditModelOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      editSelectedModelId === model.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {model.modelName}
+                                </CommandItem>
+                              ))}
                               <CommandItem
-                                key={model.id}
-                                value={model.modelName}
                                 onSelect={() => {
-                                  setEditSelectedModelId(model.id);
                                   setEditModelOpen(false);
+                                  setCustomModelMakerId(editSelectedMakerId);
+                                  setIsCustomModelDialogOpen(true);
                                 }}
+                                className="border-t mt-2 pt-2 text-primary font-medium"
                               >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    editSelectedModelId === model.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {model.modelName}
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Custom Model
                               </CommandItem>
-                            ))}
-                            <CommandItem
-                              onSelect={() => {
-                                setEditModelOpen(false);
-                                setCustomModelMakerId(editSelectedMakerId);
-                                setIsCustomModelDialogOpen(true);
-                              }}
-                              className="border-t mt-2 pt-2 text-primary font-medium"
-                            >
-                              <Plus className="mr-2 h-4 w-4" />
-                              Add Custom Model
-                            </CommandItem>
-                          </CommandGroup>
+                            </CommandGroup>
+                          </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
