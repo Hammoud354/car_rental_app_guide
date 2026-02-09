@@ -285,7 +285,7 @@ export async function renewRentalContract(input: { contractId: number; additiona
   return updated[0];
 }
 
-export async function getRentalContractsByStatus(userId: number, status?: "active" | "completed" | "overdue") {
+export async function getRentalContractsByStatus(userId: number, status?: "active" | "completed" | "overdue", filterUserId?: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get contracts: database not available");
@@ -294,14 +294,17 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
   // Super Admin can see all contracts, regular users only see their own
   const isAdmin = await isSuperAdmin(userId);
   
+  // Determine which userId to filter by
+  const targetUserId = filterUserId || userId;
+  
   if (!status) {
     // Return all contracts if no status specified
-    return isAdmin
-      ? await db.select().from(rentalContracts)
+    return isAdmin && filterUserId
+      ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId))
       : await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
   }
-  return isAdmin
-    ? await db.select().from(rentalContracts).where(eq(rentalContracts.status, status))
+  return isAdmin && filterUserId
+    ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status)))
     : await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, status)));
 }
 

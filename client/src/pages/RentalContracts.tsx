@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
@@ -20,6 +21,9 @@ import jsPDF from "jspdf";
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "admin";
+  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [showInspection, setShowInspection] = useState(false);
@@ -56,9 +60,21 @@ export default function RentalContracts() {
   const [selectedContractForReturn, setSelectedContractForReturn] = useState<number | null>(null);
   const [returnKm, setReturnKm] = useState<number>(0);
   
-  const { data: vehicles = [] } = trpc.fleet.list.useQuery();
-  const { data: contracts = [], refetch } = trpc.contracts.listByStatus.useQuery({ status: statusFilter });
-  const { data: clients = [] } = trpc.clients.list.useQuery();
+  // Fetch all users for Super Admin
+  const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
+    enabled: isSuperAdmin,
+  });
+  
+  const { data: vehicles = [] } = trpc.fleet.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
+  const { data: contracts = [], refetch } = trpc.contracts.listByStatus.useQuery({ 
+    status: statusFilter,
+    filterUserId: selectedTargetUserId || undefined 
+  });
+  const { data: clients = [] } = trpc.clients.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
   const { data: nationalities = [] } = trpc.nationalities.list.useQuery();
@@ -358,6 +374,44 @@ export default function RentalContracts() {
             </div>
           ) : (
           <>
+          {/* Super Admin User Selector */}
+          {isSuperAdmin && (
+            <Card className="bg-primary/5 border-primary/20 mb-6">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <Label htmlFor="userSelector" className="text-sm font-medium whitespace-nowrap">
+                    Managing Contracts For:
+                  </Label>
+                  <Select
+                    value={selectedTargetUserId?.toString() || ""}
+                    onValueChange={(value) => setSelectedTargetUserId(value ? parseInt(value) : null)}
+                  >
+                    <SelectTrigger id="userSelector" className="w-[300px]">
+                      <SelectValue placeholder="Select user to manage..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">All Users (View Only)</SelectItem>
+                      {allUsers?.map((u) => (
+                        <SelectItem key={u.id} value={u.id.toString()}>
+                          {u.name} ({u.username})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedTargetUserId && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedTargetUserId(null)}
+                    >
+                      Clear
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>

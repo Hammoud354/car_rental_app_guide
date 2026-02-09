@@ -421,9 +421,12 @@ export const appRouter = router({
     }),
     
     listByStatus: protectedProcedure
-      .input(z.object({ status: z.enum(["active", "completed", "overdue"]).optional() }))
+      .input(z.object({ 
+        status: z.enum(["active", "completed", "overdue"]).optional(),
+        filterUserId: z.number().optional() 
+      }))
       .query(async ({ ctx, input }) => {
-        return await db.getRentalContractsByStatus(ctx.user.id, input.status);
+        return await db.getRentalContractsByStatus(ctx.user.id, input.status, input.filterUserId);
       }),
     
     getById: protectedProcedure
@@ -608,9 +611,11 @@ export const appRouter = router({
 
   // Client Management Router
   clients: router({
-    list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllClients(ctx.user?.id || 1, ctx.filterUserId);
-    }),
+    list: publicProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getAllClients(ctx.user?.id || 1, input?.filterUserId || ctx.filterUserId);
+      }),
     
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
@@ -1007,10 +1012,12 @@ export const appRouter = router({
       }),
 
     // List all invoices for the user
-    list: protectedProcedure.query(async ({ ctx }) => {
-      const invoices = await db.listInvoices(ctx.filterUserId || ctx.user.id);
-      return invoices;
-    }),
+    list: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        const invoices = await db.listInvoices(input?.filterUserId || ctx.filterUserId || ctx.user.id);
+        return invoices;
+      }),
 
     // Update invoice payment status
     updatePaymentStatus: protectedProcedure

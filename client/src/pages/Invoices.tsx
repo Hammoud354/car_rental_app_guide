@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import MinimalLayout from "@/components/MinimalLayout";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,9 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export default function Invoices() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "admin";
+  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
@@ -38,7 +42,14 @@ export default function Invoices() {
     }
   }, []);
 
-  const { data: invoices, isLoading } = trpc.invoices.list.useQuery();
+  // Fetch all users for Super Admin
+  const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
+    enabled: isSuperAdmin,
+  });
+  
+  const { data: invoices, isLoading } = trpc.invoices.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
   const { data: invoiceDetails, isLoading: isLoadingDetails, error: detailsError } = trpc.invoices.getById.useQuery(
     { invoiceId: selectedInvoice! },
     { enabled: !!selectedInvoice }
@@ -113,6 +124,44 @@ export default function Invoices() {
   return (
     <MinimalLayout>
       <div className="space-y-6">
+        {/* Super Admin User Selector */}
+        {isSuperAdmin && (
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <label htmlFor="userSelector" className="text-sm font-medium whitespace-nowrap">
+                  Managing Invoices For:
+                </label>
+                <Select
+                  value={selectedTargetUserId?.toString() || ""}
+                  onValueChange={(value) => setSelectedTargetUserId(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger id="userSelector" className="w-[300px]">
+                    <SelectValue placeholder="Select user to manage..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">All Users (View Only)</SelectItem>
+                    {allUsers?.map((u) => (
+                      <SelectItem key={u.id} value={u.id.toString()}>
+                        {u.name} ({u.username})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedTargetUserId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedTargetUserId(null)}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>

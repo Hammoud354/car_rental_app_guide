@@ -1947,3 +1947,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Delete all test car makers/models created for testing (carMakers + carModels cleared)
 - [x] Keep only real user accounts (users table untouched)
 - [x] Database is now clean and empty for all users - fresh start
+
+### 60. Extend Super Admin User Selector to All Modules
+- [x] Add user selector dropdown to Rental Contracts page
+- [x] Update Rental Contracts backend queries to accept filterUserId
+- [x] Add user selector dropdown to Clients page
+- [x] Update Clients backend queries to accept filterUserId
+- [x] Add user selector dropdown to Invoices page
+- [x] Update Invoices backend queries to accept filterUserId
+- [x] Ensure consistent user selector behavior across all pages
+- [x] Test Super Admin can view/manage data for any user in all modules
+- [x] Verify regular users cannot see user selector (admin-only feature)

@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -15,6 +17,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 export default function Clients() {
   const utils = trpc.useUtils();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "admin";
+  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -34,7 +39,14 @@ export default function Clients() {
   const [editNationalityOpen, setEditNationalityOpen] = useState(false);
   const [editSelectedNationality, setEditSelectedNationality] = useState<string>("");
 
-  const { data: clients = [] } = trpc.clients.list.useQuery();
+  // Fetch all users for Super Admin
+  const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
+    enabled: isSuperAdmin,
+  });
+  
+  const { data: clients = [] } = trpc.clients.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
   const { data: clientContracts = [] } = trpc.clients.getContracts.useQuery(
     { clientId: selectedClient?.id || 0 },
     { enabled: !!selectedClient && isContractsDialogOpen }
@@ -157,6 +169,44 @@ export default function Clients() {
 
   return (
     <MinimalLayout>
+        {/* Super Admin User Selector */}
+        {isSuperAdmin && (
+          <Card className="bg-primary/5 border-primary/20 mb-6">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="userSelector" className="text-sm font-medium whitespace-nowrap">
+                  Managing Clients For:
+                </Label>
+                <Select
+                  value={selectedTargetUserId?.toString() || ""}
+                  onValueChange={(value) => setSelectedTargetUserId(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger id="userSelector" className="w-[300px]">
+                    <SelectValue placeholder="Select user to manage..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">All Users (View Only)</SelectItem>
+                    {allUsers?.map((u) => (
+                      <SelectItem key={u.id} value={u.id.toString()}>
+                        {u.name} ({u.username})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedTargetUserId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedTargetUserId(null)}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h2 className="text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
