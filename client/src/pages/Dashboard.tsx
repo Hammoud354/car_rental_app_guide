@@ -10,8 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Users } from "lucide-react";
 import { useEffect } from "react";
 
-function OverdueWidget() {
-  const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery();
+function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
+  const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery({ filterUserId: filterUserId || undefined });
   
   if (isLoading || !stats || stats.count === 0) return null;
   
@@ -63,8 +63,8 @@ export default function Dashboard() {
   const { selectedUserId, setSelectedUserId, isSuperAdmin } = useUserFilter();
   const utils = trpc.useUtils();
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
-  const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
-  const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery();
+  const { data: vehicles, isLoading } = trpc.fleet.list.useQuery({ filterUserId: selectedUserId || undefined });
+  const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery({ filterUserId: selectedUserId || undefined });
 
   // Invalidate all queries when selectedUserId changes to force refetch with new filter
   useEffect(() => {
@@ -149,7 +149,7 @@ export default function Dashboard() {
           </div>
 
           {/* Overdue Contracts Alert Widget */}
-          <OverdueWidget />
+          <OverdueWidget filterUserId={selectedUserId} />
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

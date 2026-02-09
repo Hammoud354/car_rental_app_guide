@@ -1925,3 +1925,25 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Frontend passes userId correctly to all queries
 - [x] Users can now click "Populate Car Makers" button to get their own data
 - [x] Complete data isolation implemented - each user gets their own makers/models
+
+
+### 58. CRITICAL: Dashboard Showing Same Data for Different Users
+- [x] Investigate why dashboard shows same fleet count (20) for all users - fleet.list not passing filterUserId
+- [x] Check dashboard queries and ensure they filter by userId
+- [x] Fix Total Fleet count query - added filterUserId parameter
+- [x] Fix Total Revenue query - updated getDashboardStatistics to accept filterUserId
+- [x] Fix In Maintenance query - calculated from filtered vehicles
+- [x] Fix Fleet Status chart query - uses filtered vehicles
+- [x] Fix Fleet Composition query - uses filtered vehicles
+- [x] Updated getOverdueStatistics to accept filterUserId parameter
+- [x] Verify each user sees only their own dashboard data
+
+### 59. Clean Up All Test Data from Database
+- [x] Delete all test vehicles from database (vehicles table cleared)
+- [x] Delete all vehicle images from database (vehicleImages table cleared)
+- [x] Delete all test contracts from database (rentalContracts table cleared)
+- [x] Delete all test clients from database (clients table cleared)
+- [x] Delete all test invoices from database (invoices + invoiceLineItems cleared)
+- [x] Delete all test car makers/models created for testing (carMakers + carModels cleared)
+- [x] Keep only real user accounts (users table untouched)
+- [x] Database is now clean and empty for all users - fresh start

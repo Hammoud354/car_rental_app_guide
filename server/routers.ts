@@ -382,12 +382,16 @@ export const appRouter = router({
       return await db.updateOverdueContracts();
     }),
     
-    getOverdueStatistics: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getOverdueStatistics(ctx.user.id, ctx.filterUserId);
+    getOverdueStatistics: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+      return await db.getOverdueStatistics(ctx.user.id, input?.filterUserId);
     }),
     
-    getDashboardStatistics: protectedProcedure.query(async ({ ctx }) => {
-      const contracts = await db.getAllRentalContracts(ctx.user.id, ctx.filterUserId);
+    getDashboardStatistics: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+      const contracts = await db.getAllRentalContracts(ctx.user.id, input?.filterUserId);
       
       // Calculate actual revenue from all contracts
       const totalRevenue = contracts.reduce((sum, contract) => {
