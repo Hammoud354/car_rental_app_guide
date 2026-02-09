@@ -17,13 +17,19 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { SearchableSelect } from "@/components/SearchableSelect";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "admin";
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
   
   // Car maker and model state for Add form
   const [selectedMakerId, setSelectedMakerId] = useState<number | null>(null);
@@ -44,7 +50,14 @@ export default function FleetManagement() {
   const [customModelName, setCustomModelName] = useState("");
   const [customModelMakerId, setCustomModelMakerId] = useState<number | null>(null);
 
-  const { data: vehicles, isLoading } = trpc.fleet.list.useQuery();
+  const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
+  
+  // Fetch all users for Super Admin
+  const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
+    enabled: isSuperAdmin,
+  });
   
   // Fetch car makers (using Lebanon as default country - should be from user context)
   const { data: carMakers } = trpc.carMakers.getByCountry.useQuery({ country: "Lebanon" });
@@ -179,6 +192,7 @@ export default function FleetManagement() {
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
       notes: formData.get("notes") as string || undefined,
+      targetUserId: selectedTargetUserId || undefined, // For Super Admin to assign to specific user
     });
   };
 
@@ -243,6 +257,44 @@ export default function FleetManagement() {
     <MinimalLayout>
       <div className="container py-8">
       <div className="space-y-8">
+        {/* Super Admin User Selector */}
+        {isSuperAdmin && (
+          <Card className="bg-primary/5 border-primary/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <Label htmlFor="userSelector" className="text-sm font-medium whitespace-nowrap">
+                  Managing Fleet For:
+                </Label>
+                <Select
+                  value={selectedTargetUserId?.toString() || ""}
+                  onValueChange={(value) => setSelectedTargetUserId(value ? parseInt(value) : null)}
+                >
+                  <SelectTrigger id="userSelector" className="w-[300px]">
+                    <SelectValue placeholder="Select user to manage..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">All Users (View Only)</SelectItem>
+                    {allUsers?.map((u) => (
+                      <SelectItem key={u.id} value={u.id.toString()}>
+                        {u.name} ({u.username})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedTargetUserId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedTargetUserId(null)}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">Fleet Operations</div>

@@ -209,9 +209,13 @@ export const appRouter = router({
 
   // Fleet Management Router
   fleet: router({
-    list: publicProcedure.query(async ({ ctx }) => {
-      return await db.getAllVehicles(ctx.user?.id || 1, ctx.filterUserId);
-    }),
+    list: publicProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        // Super Admin can filter by specific user, otherwise show own vehicles
+        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
+        return await db.getAllVehicles(targetUserId, input?.filterUserId);
+      }),
     
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
@@ -240,9 +244,13 @@ export const appRouter = router({
         registrationExpiryDate: z.date().optional(),
         photoUrl: z.string().optional(),
         notes: z.string().optional(),
+        targetUserId: z.number().optional(), // For Super Admin to assign vehicle to specific user
       }))
       .mutation(async ({ input, ctx }) => {
-        return await db.createVehicle({ ...input, userId: ctx.user?.id || 1 });
+        // If Super Admin provides targetUserId, use it; otherwise use current user's ID
+        const userId = input.targetUserId || ctx.user?.id || 1;
+        const { targetUserId: _, ...vehicleData } = input;
+        return await db.createVehicle({ ...vehicleData, userId });
       }),
     
     update: publicProcedure
