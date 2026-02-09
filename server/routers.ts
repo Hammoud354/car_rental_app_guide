@@ -95,7 +95,7 @@ export const appRouter = router({
 
         // Populate car makers and models for the user's country
         try {
-          await db.populateCarMakersForCountry(input.country);
+          await db.populateCarMakersForCountry(input.country, newUser.id);
         } catch (error) {
           console.error('Failed to populate car makers:', error);
           // Continue even if population fails
@@ -881,8 +881,9 @@ export const appRouter = router({
     
     populateForCountry: publicProcedure
       .input(z.object({ country: z.string() }))
-      .mutation(async ({ input }) => {
-        return await db.populateCarMakersForCountry(input.country);
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user?.id || 1;
+        return await db.populateCarMakersForCountry(input.country, userId);
       }),
   }),
   settings: router({

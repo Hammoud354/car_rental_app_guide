@@ -927,6 +927,7 @@ export default function FleetManagement() {
             createCustomMakerMutation.mutate({
               name: customMakerName,
               country: "Lebanon", // Should be from user context
+              userId: user?.id, // Pass current user's ID for data isolation
             });
           }}>
             <div className="space-y-4">
@@ -972,6 +973,7 @@ export default function FleetManagement() {
             createCustomModelMutation.mutate({
               makerId: customModelMakerId,
               modelName: customModelName,
+              userId: user?.id, // Pass current user's ID for data isolation
             });
           }}>
             <div className="space-y-4">

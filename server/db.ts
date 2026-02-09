@@ -1012,14 +1012,13 @@ export async function getCarMakersByCountry(country: string, userId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  // Return system makers (isCustom = false) OR custom makers belonging to this user
+  // STRICT ISOLATION: Only return makers belonging to this specific user
+  if (!userId) return [];
+  
   const result = await db.select().from(carMakers).where(
     and(
       eq(carMakers.country, country),
-      or(
-        eq(carMakers.isCustom, false),
-        userId ? eq(carMakers.userId, userId) : undefined
-      )
+      eq(carMakers.userId, userId)
     )
   );
   return result;
@@ -1029,14 +1028,13 @@ export async function getCarModelsByMaker(makerId: number, userId?: number) {
   const db = await getDb();
   if (!db) return [];
   
-  // Return system models (isCustom = false) OR custom models belonging to this user
+  // STRICT ISOLATION: Only return models belonging to this specific user
+  if (!userId) return [];
+  
   const result = await db.select().from(carModels).where(
     and(
       eq(carModels.makerId, makerId),
-      or(
-        eq(carModels.isCustom, false),
-        userId ? eq(carModels.userId, userId) : undefined
-      )
+      eq(carModels.userId, userId)
     )
   );
   return result;
@@ -1062,41 +1060,43 @@ export async function createCarModel(data: { makerId: number; modelName: string;
   return newModel;
 }
 
-export async function populateCarMakersForCountry(country: string) {
+export async function populateCarMakersForCountry(country: string, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Check if makers already exist for this country
-  const existing = await getCarMakersByCountry(country);
+  // Check if makers already exist for this user and country
+  const existing = await getCarMakersByCountry(country, userId);
   if (existing.length > 0) {
-    return existing; // Already populated
+    return existing; // Already populated for this user
   }
   
   // Import car data
   const { getCarMakersByCountry: getCarData } = await import('./carData');
   const carData = getCarData(country);
   
-  // Insert makers and their models
+  // Insert makers and their models FOR THIS USER
   for (const maker of carData) {
     const makerResult = await db.insert(carMakers).values({
       name: maker.name,
       country: maker.country,
       isCustom: false,
+      userId: userId, // CRITICAL: Assign to specific user
     });
     
     const makerId = Number(makerResult[0].insertId);
     
-    // Insert models for this maker
+    // Insert models for this maker FOR THIS USER
     for (const modelName of maker.popularModels) {
       await db.insert(carModels).values({
         makerId,
         modelName,
         isCustom: false,
+        userId: userId, // CRITICAL: Assign to specific user
       });
     }
   }
   
-  return await getCarMakersByCountry(country);
+  return await getCarMakersByCountry(country, userId);
 }
 
 
