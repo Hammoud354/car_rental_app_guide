@@ -2044,3 +2044,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix PDF export functionality - changed to use browser's print dialog with "Save as PDF" option
 - [x] Fix print CSS to show all contract data - added comprehensive color overrides and visibility rules
 - [x] Test both PDF export and print preview show complete contract information
+
+### 74. Implement Direct PDF Download for Export PDF Button
+- [x] Install puppeteer library for server-side PDF generation
+- [x] Create backend tRPC endpoint to generate PDF from contract HTML
+- [x] Update frontend Export PDF button to call backend endpoint
+- [x] Implement automatic PDF file download without print dialog
+- [x] Test PDF export generates and downloads correctly

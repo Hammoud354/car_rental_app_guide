@@ -265,6 +265,8 @@ export default function RentalContracts() {
     },
   });
 
+  const generatePDF = trpc.contracts.generatePDF.useMutation();
+
   const generateInvoice = trpc.invoices.generate.useMutation({
     onSuccess: (data) => {
       if (data) {
@@ -1352,19 +1354,83 @@ export default function RentalContracts() {
                   🖨️ Print
                 </Button>
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    // Use browser's print dialog - user can save as PDF
-                    toast.info("Opening print dialog... Select 'Save as PDF' or 'Microsoft Print to PDF' as your destination", {
-                      duration: 5000
-                    });
-                    setTimeout(() => {
-                      window.print();
-                    }, 100);
+                    try {
+                      toast.info("Generating PDF... Please wait");
+                      
+                      // Get the contract content HTML
+                      const contractElement = document.getElementById('contract-content');
+                      if (!contractElement) {
+                        toast.error("Contract content not found");
+                        return;
+                      }
+                      
+                      // Get computed styles and create a complete HTML document
+                      const htmlContent = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                          <meta charset="UTF-8">
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; }
+                            .contract-header { text-align: center; margin-bottom: 30px; }
+                            .contract-header h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+                            .contract-number { font-size: 32px; font-weight: bold; margin: 20px 0; }
+                            .section-title { font-size: 18px; font-weight: 600; color: #2563eb; margin: 20px 0 10px 0; }
+                            .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+                            .info-item { margin-bottom: 10px; }
+                            .info-label { font-size: 12px; color: #666; margin-bottom: 4px; }
+                            .info-value { font-size: 14px; font-weight: 600; color: #000; }
+                            .signature-section { margin-top: 40px; page-break-inside: avoid; }
+                            .signature-box { border: 1px solid #ddd; padding: 10px; margin-top: 10px; min-height: 100px; }
+                            .signature-img { max-width: 200px; max-height: 80px; }
+                            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+                          </style>
+                        </head>
+                        <body>
+                          ${contractElement.innerHTML}
+                        </body>
+                        </html>
+                      `;
+                      
+                      // Call backend to generate PDF
+                      const result = await generatePDF.mutateAsync({
+                        contractId: selectedContract.id,
+                        htmlContent
+                      });
+                      
+                      if (result.success && result.pdfData) {
+                        // Convert base64 to blob
+                        const byteCharacters = atob(result.pdfData);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                          byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'application/pdf' });
+                        
+                        // Create download link
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = result.filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                        
+                        toast.success("PDF downloaded successfully!");
+                      }
+                    } catch (error) {
+                      console.error("PDF export error:", error);
+                      toast.error("Failed to export PDF. Please try again.");
+                    }
                   }} 
                   variant="outline"
                   className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
