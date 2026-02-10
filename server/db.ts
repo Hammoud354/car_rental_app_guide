@@ -139,6 +139,46 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
   return vehiclesWithCosts;
 }
 
+export async function getAvailableVehiclesForMaintenance(userId: number, filterUserId?: number | null) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get vehicles: database not available");
+    return [];
+  }
+  
+  // Get all vehicles first
+  const isAdmin = await isSuperAdmin(userId);
+  let allVehicles;
+  
+  if (isAdmin) {
+    allVehicles = filterUserId 
+      ? await db.select().from(vehicles).where(eq(vehicles.userId, filterUserId))
+      : await db.select().from(vehicles);
+  } else {
+    allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
+  }
+  
+  // Filter out vehicles with active contracts (status = 'Active')
+  const availableVehicles = await Promise.all(
+    allVehicles.map(async (vehicle) => {
+      const activeContracts = await db.select()
+        .from(rentalContracts)
+        .where(
+          and(
+            eq(rentalContracts.vehicleId, vehicle.id),
+            eq(rentalContracts.status, 'active')
+          )
+        );
+      
+      // Return vehicle only if it has no active contracts
+      return activeContracts.length === 0 ? vehicle : null;
+    })
+  );
+  
+  // Filter out null values and return
+  return availableVehicles.filter(v => v !== null);
+}
+
 export async function getVehicleById(id: number, userId: number) {
   const db = await getDb();
   if (!db) {

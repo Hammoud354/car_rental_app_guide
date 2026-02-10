@@ -337,6 +337,13 @@ export const appRouter = router({
         return await db.getLastReturnKm(input.vehicleId, ctx.user?.id || 1);
       }),
 
+    listAvailableForMaintenance: publicProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
+        return await db.getAvailableVehiclesForMaintenance(targetUserId, input?.filterUserId);
+      }),
+
     // Vehicle Images
     addImage: publicProcedure
       .input(z.object({

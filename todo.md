@@ -2013,3 +2013,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Remove duplicate nationalities from the database
 - [x] Ensure nationality dropdown shows each country only once
 - [x] Test that client selection properly fills nationality field
+
+### 69. Fix Contract Completion and Maintenance Issues
+- [x] Prevent rented vehicles from being added to maintenance (filter or show warning)
+- [x] Auto-close contract completion form and redirect to dashboard after successful completion
+- [x] Fix PDF export button failing in contract completion form
+- [x] Fix empty print preview - ensure contract details appear
+- [x] Redirect to dashboard after print dialog closes instead of showing empty screen

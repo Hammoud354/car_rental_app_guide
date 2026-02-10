@@ -19,7 +19,7 @@ export default function Maintenance() {
   const [viewingHistory, setViewingHistory] = useState<number | null>(null);
   const [autoFilledKm, setAutoFilledKm] = useState<number | null>(null);
 
-  const { data: vehicles } = trpc.fleet.list.useQuery();
+  const { data: vehicles } = trpc.fleet.listAvailableForMaintenance.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
     { vehicleId: viewingHistory || 0 },
     { enabled: viewingHistory !== null }

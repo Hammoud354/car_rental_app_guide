@@ -155,14 +155,10 @@ export default function RentalContracts() {
       utils.fleet.list.invalidate();
       utils.invoices.list.invalidate();
       
-      // Redirect to invoices page to view the auto-generated invoice
-      if (data.invoice) {
-        setTimeout(() => {
-          setLocation(`/invoices`);
-        }, 1500);
-      } else {
-        setLocation("/rental-contracts");
-      }
+      // Redirect to dashboard after contract completion
+      setTimeout(() => {
+        setLocation("/dashboard");
+      }, 1500);
     },
     onError: (error) => {
       toast.error("Failed to mark contract as returned: " + error.message);
@@ -1342,7 +1338,15 @@ export default function RentalContracts() {
               <div className="grid grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
-                  onClick={() => window.print()} 
+                  onClick={() => {
+                    // Add after-print event listener to redirect to dashboard
+                    const afterPrint = () => {
+                      window.removeEventListener('afterprint', afterPrint);
+                      setLocation('/dashboard');
+                    };
+                    window.addEventListener('afterprint', afterPrint);
+                    window.print();
+                  }} 
                   variant="outline"
                   className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400 h-12 w-full"
                   size="default"
