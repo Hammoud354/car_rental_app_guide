@@ -185,6 +185,12 @@ export default function FleetManagement() {
       return;
     }
     
+    // Super Admin must select a specific user to create vehicle for
+    if (isSuperAdmin && (!selectedTargetUserId || selectedTargetUserId === 0)) {
+      toast.error("Please select a specific user to create this vehicle for");
+      return;
+    }
+    
     createMutation.mutate({
       plateNumber: formData.get("plateNumber") as string,
       brand: selectedMaker.name,

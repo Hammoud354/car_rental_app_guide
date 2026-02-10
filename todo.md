@@ -1976,3 +1976,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify server restarted properly to pick up getVehicleById changes
 - [x] Fix vehicle deletion not working - vehicles remain after delete attempt
 - [x] Test both fixes work correctly
+
+### 64. Fix Vehicle Creation User Isolation for Super Admin
+- [x] Investigate why vehicles created by Super Admin appear in all users' fleets
+- [x] Update vehicle creation to respect user selector (create for selected user, not Super Admin)
+- [x] Apply same fix to client creation
+- [x] Apply same fix to contract creation and other operations (maintenance, invoices)
+- [x] Test that Super Admin can create data for specific users without cross-contamination

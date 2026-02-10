@@ -100,6 +100,12 @@ export default function Clients() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Super Admin must select a specific user to create client for
+    if (isSuperAdmin && (!selectedTargetUserId || selectedTargetUserId === 0)) {
+      toast.error("Please select a specific user to create this client for");
+      return;
+    }
+    
     createClient.mutate({
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
@@ -111,6 +117,7 @@ export default function Clients() {
       licenseExpiryDate: createLicenseExpiryDate!,
       email: formData.get("email") as string || undefined,
       notes: formData.get("notes") as string || undefined,
+      targetUserId: selectedTargetUserId || undefined,
     });
   };
 

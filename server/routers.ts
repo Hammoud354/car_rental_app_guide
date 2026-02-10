@@ -247,8 +247,19 @@ export const appRouter = router({
         targetUserId: z.number().optional(), // For Super Admin to assign vehicle to specific user
       }))
       .mutation(async ({ input, ctx }) => {
-        // If Super Admin provides targetUserId, use it; otherwise use current user's ID
-        const userId = input.targetUserId || ctx.user?.id || 1;
+        const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
+        
+        // Super Admin must provide targetUserId, regular users use their own ID
+        let userId: number;
+        if (isAdmin) {
+          if (!input.targetUserId || input.targetUserId === 0) {
+            throw new Error("Super Admin must select a specific user to create vehicle for");
+          }
+          userId = input.targetUserId;
+        } else {
+          userId = ctx.user?.id || 1;
+        }
+        
         const { targetUserId: _, ...vehicleData } = input;
         return await db.createVehicle({ ...vehicleData, userId });
       }),
@@ -643,6 +654,7 @@ export const appRouter = router({
         licenseExpiryDate: z.date(),
         email: z.string().email().max(320).optional(),
         notes: z.string().optional(),
+        targetUserId: z.number().optional(), // For Super Admin to assign client to specific user
       }))
       .mutation(async ({ input, ctx }) => {
         // Validate license expiry date is in the future
@@ -651,7 +663,22 @@ export const appRouter = router({
         if (input.licenseExpiryDate < today) {
           throw new Error('License expiry date must be in the future');
         }
-        return await db.createClient({ ...input, userId: ctx.user?.id || 1 });
+        
+        const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
+        
+        // Super Admin must provide targetUserId, regular users use their own ID
+        let userId: number;
+        if (isAdmin) {
+          if (!input.targetUserId || input.targetUserId === 0) {
+            throw new Error("Super Admin must select a specific user to create client for");
+          }
+          userId = input.targetUserId;
+        } else {
+          userId = ctx.user?.id || 1;
+        }
+        
+        const { targetUserId: _, ...clientData } = input;
+        return await db.createClient({ ...clientData, userId });
       }),
     
     update: publicProcedure
