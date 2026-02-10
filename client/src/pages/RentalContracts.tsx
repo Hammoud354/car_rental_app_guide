@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
+import html2pdf from 'html2pdf.js';
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
@@ -1087,7 +1088,7 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                <div id="contract-content" className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
@@ -1339,7 +1340,10 @@ export default function RentalContracts() {
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => {
-                    window.print();
+                    // Small delay to ensure dialog is fully rendered
+                    setTimeout(() => {
+                      window.print();
+                    }, 100);
                   }} 
                   variant="outline"
                   className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400 h-12 w-full"
@@ -1348,15 +1352,38 @@ export default function RentalContracts() {
                   🖨️ Print
                 </Button>
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    // Use browser's native print-to-PDF functionality
-                    toast.info("Opening print dialog... Select 'Save as PDF' as your printer");
-                    window.print();
+                    try {
+                      toast.info("Generating PDF... Please wait");
+                      
+                      // Get the contract content element
+                      const element = document.getElementById('contract-content');
+                      if (!element) {
+                        toast.error("Contract content not found");
+                        return;
+                      }
+                      
+                      // Configure html2pdf options
+                      const opt = {
+                        margin: 10,
+                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
+                        image: { type: 'jpeg' as const, quality: 0.98 },
+                        html2canvas: { scale: 2, useCORS: true, logging: false },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+                      };
+                      
+                      // Generate PDF
+                      await html2pdf().set(opt).from(element).save();
+                      toast.success("PDF exported successfully!");
+                    } catch (error) {
+                      console.error("PDF export error:", error);
+                      toast.error("Failed to export PDF. Please try again.");
+                    }
                   }} 
                   variant="outline"
                   className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"

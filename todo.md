@@ -2032,3 +2032,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix PDF export OKLCH color parsing error (html2canvas doesn't support oklch()) - replaced with window.print()
 - [x] Fix print functionality redirecting to blank favorites page instead of showing print preview - removed auto-redirect
 - [x] Test both PDF export and print work correctly with actual contract data
+
+### 72. Fix Non-Functional Print and PDF Export Buttons
+- [x] Investigate why window.print() is not opening print dialog when buttons are clicked
+- [x] Implement proper PDF export functionality using html2pdf.js library
+- [x] Fix print button to properly open browser print dialog with setTimeout
+- [x] Test both buttons work correctly with actual contract data
