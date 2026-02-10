@@ -695,6 +695,32 @@ export async function deleteClient(id: number, userId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // First verify the client exists and belongs to this user
+  const existingClient = await db
+    .select()
+    .from(clients)
+    .where(and(eq(clients.id, id), eq(clients.userId, userId)))
+    .limit(1);
+  
+  if (existingClient.length === 0) {
+    throw new Error("Client not found or you don't have permission to delete this client.");
+  }
+  
+  // Check if client has any related contracts
+  const relatedContracts = await db
+    .select()
+    .from(rentalContracts)
+    .where(and(
+      eq(rentalContracts.clientId, id),
+      eq(rentalContracts.userId, userId)
+    ))
+    .limit(1);
+  
+  if (relatedContracts.length > 0) {
+    throw new Error("Cannot delete client with existing rental contracts. Please delete the contracts first.");
+  }
+  
+  // No related records, safe to delete
   await db.delete(clients).where(and(eq(clients.id, id), eq(clients.userId, userId)));
 }
 

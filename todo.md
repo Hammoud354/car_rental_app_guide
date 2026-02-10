@@ -2065,3 +2065,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Debug Export PDF button not working - added overflow handling and multi-page support
 - [x] Test print output shows complete contract
 - [x] Test PDF export button generates complete contract PDF
+
+### 77. Fix Client Deletion Not Working
+- [x] Check browser console logs for client deletion errors - no errors shown
+- [x] Investigate client deletion backend endpoint (tRPC procedure) - endpoint exists
+- [x] Check frontend delete client button implementation - implementation correct
+- [x] Fix the bug preventing client deletion - added foreign key constraint check for related contracts
+- [x] Test client deletion works correctly
