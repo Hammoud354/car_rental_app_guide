@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
@@ -18,8 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 export default function Clients() {
   const utils = trpc.useUtils();
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "admin";
-  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
+  const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);

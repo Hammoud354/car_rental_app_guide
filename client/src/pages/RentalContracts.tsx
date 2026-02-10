@@ -13,6 +13,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
@@ -22,8 +23,7 @@ import jsPDF from "jspdf";
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "admin";
-  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
+  const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
   const [showInspection, setShowInspection] = useState(false);

@@ -1990,3 +1990,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add user selection validation to invoice creation in Invoices.tsx (N/A - invoices generated from contracts)
 - [x] Update invoices.create procedure to enforce targetUserId for Super Admin (N/A - invoices inherit from contracts)
 - [x] Test complete user isolation across all modules (vehicles, clients, contracts, invoices)
+
+### 66. Implement Persistent User Selection Across Pages
+- [x] Create React Context to manage selected user state globally (used existing UserFilterContext)
+- [x] Update Dashboard to use shared context for user selection (already using it)
+- [x] Update Fleet Management to use shared context
+- [x] Update Rental Contracts to use shared context
+- [x] Update Clients to use shared context
+- [x] Update Invoices to use shared context
+- [x] Test that user selection persists when navigating between pages

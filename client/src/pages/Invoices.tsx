@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MinimalLayout from "@/components/MinimalLayout";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +26,7 @@ import jsPDF from "jspdf";
 
 export default function Invoices() {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "admin";
-  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
+  const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const [selectedInvoice, setSelectedInvoice] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatus, setPaymentStatus] = useState<string>("");

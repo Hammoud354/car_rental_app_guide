@@ -18,18 +18,18 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 import { SearchableSelect } from "@/components/SearchableSelect";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "admin";
+  const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTargetUserId, setSelectedTargetUserId] = useState<number | null>(null);
   
   // Car maker and model state for Add form
   const [selectedMakerId, setSelectedMakerId] = useState<number | null>(null);
