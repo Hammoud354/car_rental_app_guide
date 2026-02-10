@@ -1339,12 +1339,6 @@ export default function RentalContracts() {
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => {
-                    // Add after-print event listener to redirect to dashboard
-                    const afterPrint = () => {
-                      window.removeEventListener('afterprint', afterPrint);
-                      setLocation('/dashboard');
-                    };
-                    window.addEventListener('afterprint', afterPrint);
                     window.print();
                   }} 
                   variant="outline"
@@ -1354,78 +1348,15 @@ export default function RentalContracts() {
                   🖨️ Print
                 </Button>
                 <Button 
-                  onClick={async () => {
+                  onClick={() => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    const contractElement = document.querySelector('.contract-details-content');
-                    if (!contractElement) {
-                      toast.error("Contract content not found");
-                      console.error('Contract element not found');
-                      return;
-                    }
-                    
-                    try {
-                      toast.info("Generating PDF...");
-                      console.log('Starting PDF generation for contract:', selectedContract.contractNumber);
-                      console.log('Contract element:', contractElement);
-                      console.log('Element dimensions:', contractElement.clientWidth, 'x', contractElement.clientHeight);
-                      
-                      const canvas = await html2canvas(contractElement as HTMLElement, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: true,
-                        backgroundColor: '#ffffff',
-                        windowWidth: contractElement.scrollWidth,
-                        windowHeight: contractElement.scrollHeight,
-                      });
-                      
-                      console.log('Canvas created:', canvas.width, 'x', canvas.height);
-                      
-                      if (canvas.width === 0 || canvas.height === 0) {
-                        throw new Error('Canvas has zero dimensions');
-                      }
-                      
-                      const imgData = canvas.toDataURL('image/png');
-                      const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4',
-                      });
-                      
-                      const pdfWidth = pdf.internal.pageSize.getWidth();
-                      const pdfHeight = pdf.internal.pageSize.getHeight();
-                      const imgWidth = canvas.width;
-                      const imgHeight = canvas.height;
-                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight) * 0.95;
-                      const scaledWidth = imgWidth * ratio;
-                      const scaledHeight = imgHeight * ratio;
-                      const imgX = (pdfWidth - scaledWidth) / 2;
-                      const imgY = 10;
-                      
-                      // Add multiple pages if content is too long
-                      let heightLeft = scaledHeight;
-                      let position = 0;
-                      
-                      pdf.addImage(imgData, 'PNG', imgX, imgY, scaledWidth, scaledHeight);
-                      heightLeft -= pdfHeight;
-                      
-                      while (heightLeft > 0) {
-                        position = heightLeft - scaledHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', imgX, position + imgY, scaledWidth, scaledHeight);
-                        heightLeft -= pdfHeight;
-                      }
-                      
-                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
-                      console.log('PDF saved successfully');
-                      toast.success("PDF exported successfully!");
-                    } catch (error) {
-                      console.error('PDF export error:', error);
-                      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
-                    }
+                    // Use browser's native print-to-PDF functionality
+                    toast.info("Opening print dialog... Select 'Save as PDF' as your printer");
+                    window.print();
                   }} 
                   variant="outline"
                   className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
