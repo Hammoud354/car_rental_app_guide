@@ -288,6 +288,12 @@ export default function RentalContracts() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
+    // Super Admin must select a specific user to create contract for
+    if (isSuperAdmin && (!selectedTargetUserId || selectedTargetUserId === 0)) {
+      toast.error("Please select a specific user to create this contract for");
+      return;
+    }
+    
     const data = {
       vehicleId: parseInt(formData.get("vehicleId") as string),
       clientFirstName: formData.get("clientFirstName") as string,
@@ -306,6 +312,7 @@ export default function RentalContracts() {
       discount: discount.toFixed(2),
       finalAmount: finalAmount.toFixed(2),
       pickupKm,
+      targetUserId: selectedTargetUserId || undefined,
     };
     
     setContractData(data);

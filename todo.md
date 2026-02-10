@@ -1983,3 +1983,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Apply same fix to client creation
 - [x] Apply same fix to contract creation and other operations (maintenance, invoices)
 - [x] Test that Super Admin can create data for specific users without cross-contamination
+
+### 65. Apply User Isolation Fix to Contracts and Invoices
+- [x] Add user selection validation to contract creation in RentalContracts.tsx
+- [x] Update contracts.create procedure to enforce targetUserId for Super Admin
+- [x] Add user selection validation to invoice creation in Invoices.tsx (N/A - invoices generated from contracts)
+- [x] Update invoices.create procedure to enforce targetUserId for Super Admin (N/A - invoices inherit from contracts)
+- [x] Test complete user isolation across all modules (vehicles, clients, contracts, invoices)
