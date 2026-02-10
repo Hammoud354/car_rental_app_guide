@@ -1365,16 +1365,36 @@ export default function RentalContracts() {
                       const contractElement = document.getElementById('contract-content');
                       if (!contractElement) {
                         toast.error("Contract content not found");
+                        console.error("Contract element with id 'contract-content' not found");
                         return;
                       }
+                      
+                      // Store original styles
+                      const originalOverflow = contractElement.style.overflow;
+                      const originalHeight = contractElement.style.height;
+                      const originalMaxHeight = contractElement.style.maxHeight;
+                      
+                      // Temporarily make element fully visible for capture
+                      contractElement.style.overflow = 'visible';
+                      contractElement.style.height = 'auto';
+                      contractElement.style.maxHeight = 'none';
                       
                       // Use html2canvas to capture the element as image
                       const canvas = await html2canvas(contractElement, {
                         scale: 2,
                         useCORS: true,
-                        logging: false,
-                        backgroundColor: '#ffffff'
+                        logging: true,
+                        backgroundColor: '#ffffff',
+                        windowWidth: contractElement.scrollWidth,
+                        windowHeight: contractElement.scrollHeight,
+                        scrollY: -window.scrollY,
+                        scrollX: -window.scrollX
                       });
+                      
+                      // Restore original styles
+                      contractElement.style.overflow = originalOverflow;
+                      contractElement.style.height = originalHeight;
+                      contractElement.style.maxHeight = originalMaxHeight;
                       
                       // Create PDF with jsPDF
                       const imgData = canvas.toDataURL('image/png');
@@ -1384,24 +1404,58 @@ export default function RentalContracts() {
                         format: 'a4'
                       });
                       
-                      // Calculate dimensions to fit A4 page
-                      const pdfWidth = pdf.internal.pageSize.getWidth();
-                      const pdfHeight = pdf.internal.pageSize.getHeight();
+                      // Calculate dimensions to fit A4 page (with margins)
+                      const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10mm margin on each side
+                      const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
                       const imgWidth = canvas.width;
                       const imgHeight = canvas.height;
                       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-                      const imgY = 10;
                       
-                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      // Check if content fits on one page
+                      const scaledHeight = imgHeight * ratio;
+                      
+                      if (scaledHeight <= pdfHeight) {
+                        // Fits on one page
+                        const imgX = 10;
+                        const imgY = 10;
+                        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      } else {
+                        // Need multiple pages
+                        let yPosition = 0;
+                        let pageCount = 0;
+                        
+                        while (yPosition < imgHeight) {
+                          if (pageCount > 0) {
+                            pdf.addPage();
+                          }
+                          
+                          const sourceY = yPosition;
+                          const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
+                          
+                          // Create a temporary canvas for this page
+                          const pageCanvas = document.createElement('canvas');
+                          pageCanvas.width = imgWidth;
+                          pageCanvas.height = sourceHeight;
+                          const pageCtx = pageCanvas.getContext('2d');
+                          
+                          if (pageCtx) {
+                            pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+                            const pageImgData = pageCanvas.toDataURL('image/png');
+                            pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
+                          }
+                          
+                          yPosition += sourceHeight;
+                          pageCount++;
+                        }
+                      }
                       
                       // Download the PDF
                       pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
                       
                       toast.success("PDF downloaded successfully!");
-                    } catch (error) {
+                    } catch (error: any) {
                       console.error("PDF export error:", error);
-                      toast.error("Failed to export PDF. Please try again.");
+                      toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
                     }
                   }} 
                   variant="outline"

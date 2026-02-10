@@ -2058,3 +2058,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix PDF generation error - switched to client-side jsPDF + html2canvas
 - [x] Fix print button - already working correctly with proper CSS
 - [x] Test both buttons work correctly with actual contract data
+
+### 76. Fix Incomplete PDF and Print Output - Show All Contract Data
+- [x] Investigate why print CSS is hiding most contract sections - too aggressive hiding rules
+- [x] Fix print CSS to display ALL contract information - completely rewrote print styles
+- [x] Debug Export PDF button not working - added overflow handling and multi-page support
+- [x] Test print output shows complete contract
+- [x] Test PDF export button generates complete contract PDF
