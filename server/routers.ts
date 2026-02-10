@@ -647,62 +647,7 @@ export const appRouter = router({
         return lastContract?.returnKm || null;
       }),
     
-    // Generate PDF for contract
-    generatePDF: protectedProcedure
-      .input(z.object({ 
-        contractId: z.number(),
-        htmlContent: z.string()
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const puppeteer = await import('puppeteer');
-        
-        try {
-          // Get contract details for filename
-          const contract = await db.getRentalContractById(input.contractId, ctx.user.id);
-          if (!contract) {
-            throw new Error('Contract not found');
-          }
-          
-          // Launch headless browser
-          const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-          });
-          
-          const page = await browser.newPage();
-          
-          // Set content with proper styling
-          await page.setContent(input.htmlContent, {
-            waitUntil: 'networkidle0'
-          });
-          
-          // Generate PDF
-          const pdfBuffer = await page.pdf({
-            format: 'A4',
-            printBackground: true,
-            margin: {
-              top: '20px',
-              right: '20px',
-              bottom: '20px',
-              left: '20px'
-            }
-          });
-          
-          await browser.close();
-          
-          // Convert buffer to base64 for transmission
-          const pdfBase64 = Buffer.from(pdfBuffer).toString('base64');
-          
-          return {
-            success: true,
-            pdfData: pdfBase64,
-            filename: `Contract-${contract.contractNumber}.pdf`
-          };
-        } catch (error) {
-          console.error('PDF generation error:', error);
-          throw new Error('Failed to generate PDF');
-        }
-      }),
+
   }),
 
   // Client Management Router

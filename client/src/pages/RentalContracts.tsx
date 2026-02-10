@@ -265,8 +265,6 @@ export default function RentalContracts() {
     },
   });
 
-  const generatePDF = trpc.contracts.generatePDF.useMutation();
-
   const generateInvoice = trpc.invoices.generate.useMutation({
     onSuccess: (data) => {
       if (data) {
@@ -1363,70 +1361,44 @@ export default function RentalContracts() {
                     try {
                       toast.info("Generating PDF... Please wait");
                       
-                      // Get the contract content HTML
+                      // Get the contract content element
                       const contractElement = document.getElementById('contract-content');
                       if (!contractElement) {
                         toast.error("Contract content not found");
                         return;
                       }
                       
-                      // Get computed styles and create a complete HTML document
-                      const htmlContent = `
-                        <!DOCTYPE html>
-                        <html>
-                        <head>
-                          <meta charset="UTF-8">
-                          <style>
-                            * { margin: 0; padding: 0; box-sizing: border-box; }
-                            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; }
-                            .contract-header { text-align: center; margin-bottom: 30px; }
-                            .contract-header h1 { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
-                            .contract-number { font-size: 32px; font-weight: bold; margin: 20px 0; }
-                            .section-title { font-size: 18px; font-weight: 600; color: #2563eb; margin: 20px 0 10px 0; }
-                            .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-                            .info-item { margin-bottom: 10px; }
-                            .info-label { font-size: 12px; color: #666; margin-bottom: 4px; }
-                            .info-value { font-size: 14px; font-weight: 600; color: #000; }
-                            .signature-section { margin-top: 40px; page-break-inside: avoid; }
-                            .signature-box { border: 1px solid #ddd; padding: 10px; margin-top: 10px; min-height: 100px; }
-                            .signature-img { max-width: 200px; max-height: 80px; }
-                            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
-                          </style>
-                        </head>
-                        <body>
-                          ${contractElement.innerHTML}
-                        </body>
-                        </html>
-                      `;
-                      
-                      // Call backend to generate PDF
-                      const result = await generatePDF.mutateAsync({
-                        contractId: selectedContract.id,
-                        htmlContent
+                      // Use html2canvas to capture the element as image
+                      const canvas = await html2canvas(contractElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff'
                       });
                       
-                      if (result.success && result.pdfData) {
-                        // Convert base64 to blob
-                        const byteCharacters = atob(result.pdfData);
-                        const byteNumbers = new Array(byteCharacters.length);
-                        for (let i = 0; i < byteCharacters.length; i++) {
-                          byteNumbers[i] = byteCharacters.charCodeAt(i);
-                        }
-                        const byteArray = new Uint8Array(byteNumbers);
-                        const blob = new Blob([byteArray], { type: 'application/pdf' });
-                        
-                        // Create download link
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = result.filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                        
-                        toast.success("PDF downloaded successfully!");
-                      }
+                      // Create PDF with jsPDF
+                      const imgData = canvas.toDataURL('image/png');
+                      const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                      });
+                      
+                      // Calculate dimensions to fit A4 page
+                      const pdfWidth = pdf.internal.pageSize.getWidth();
+                      const pdfHeight = pdf.internal.pageSize.getHeight();
+                      const imgWidth = canvas.width;
+                      const imgHeight = canvas.height;
+                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                      const imgY = 10;
+                      
+                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      
+                      // Download the PDF
+                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
+                      
+                      toast.success("PDF downloaded successfully!");
                     } catch (error) {
                       console.error("PDF export error:", error);
                       toast.error("Failed to export PDF. Please try again.");

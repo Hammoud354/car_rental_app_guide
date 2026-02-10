@@ -2051,3 +2051,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update frontend Export PDF button to call backend endpoint
 - [x] Implement automatic PDF file download without print dialog
 - [x] Test PDF export generates and downloads correctly
+
+### 75. Debug and Fix PDF Export and Print Button Failures
+- [x] Check browser console logs for PDF generation error details
+- [x] Check server logs for Puppeteer errors - Chromium not installed
+- [x] Fix PDF generation error - switched to client-side jsPDF + html2canvas
+- [x] Fix print button - already working correctly with proper CSS
+- [x] Test both buttons work correctly with actual contract data
