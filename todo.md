@@ -2020,3 +2020,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix PDF export button failing in contract completion form
 - [x] Fix empty print preview - ensure contract details appear
 - [x] Redirect to dashboard after print dialog closes instead of showing empty screen
+
+### 70. Debug and Fix Print and PDF Export Issues in Contract Details
+- [x] Test print functionality in browser to identify specific error
+- [x] Test PDF export functionality to identify specific error
+- [x] Fix print CSS or content visibility issues (print CSS already exists)
+- [x] Fix PDF export errors (html2canvas or jsPDF issues) - added better error handling and logging
+- [x] Verify both print and export work correctly

@@ -1087,7 +1087,7 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div className="contract-details-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                <div className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
@@ -1355,16 +1355,38 @@ export default function RentalContracts() {
                 </Button>
                 <Button 
                   onClick={async () => {
+                    if (!selectedContract) {
+                      toast.error("No contract selected");
+                      return;
+                    }
+                    
                     const contractElement = document.querySelector('.contract-details-content');
-                    if (!contractElement || !selectedContract) return;
+                    if (!contractElement) {
+                      toast.error("Contract content not found");
+                      console.error('Contract element not found');
+                      return;
+                    }
                     
                     try {
                       toast.info("Generating PDF...");
+                      console.log('Starting PDF generation for contract:', selectedContract.contractNumber);
+                      console.log('Contract element:', contractElement);
+                      console.log('Element dimensions:', contractElement.clientWidth, 'x', contractElement.clientHeight);
+                      
                       const canvas = await html2canvas(contractElement as HTMLElement, {
                         scale: 2,
                         useCORS: true,
-                        logging: false,
+                        logging: true,
+                        backgroundColor: '#ffffff',
+                        windowWidth: contractElement.scrollWidth,
+                        windowHeight: contractElement.scrollHeight,
                       });
+                      
+                      console.log('Canvas created:', canvas.width, 'x', canvas.height);
+                      
+                      if (canvas.width === 0 || canvas.height === 0) {
+                        throw new Error('Canvas has zero dimensions');
+                      }
                       
                       const imgData = canvas.toDataURL('image/png');
                       const pdf = new jsPDF({
@@ -1377,16 +1399,32 @@ export default function RentalContracts() {
                       const pdfHeight = pdf.internal.pageSize.getHeight();
                       const imgWidth = canvas.width;
                       const imgHeight = canvas.height;
-                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight) * 0.95;
+                      const scaledWidth = imgWidth * ratio;
+                      const scaledHeight = imgHeight * ratio;
+                      const imgX = (pdfWidth - scaledWidth) / 2;
                       const imgY = 10;
                       
-                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                      // Add multiple pages if content is too long
+                      let heightLeft = scaledHeight;
+                      let position = 0;
+                      
+                      pdf.addImage(imgData, 'PNG', imgX, imgY, scaledWidth, scaledHeight);
+                      heightLeft -= pdfHeight;
+                      
+                      while (heightLeft > 0) {
+                        position = heightLeft - scaledHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'PNG', imgX, position + imgY, scaledWidth, scaledHeight);
+                        heightLeft -= pdfHeight;
+                      }
+                      
                       pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
+                      console.log('PDF saved successfully');
                       toast.success("PDF exported successfully!");
                     } catch (error) {
                       console.error('PDF export error:', error);
-                      toast.error("Failed to export PDF");
+                      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
                     }
                   }} 
                   variant="outline"
