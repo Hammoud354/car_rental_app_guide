@@ -273,21 +273,57 @@
   
   /* Override dark mode colors for print */
   [role="dialog"] .bg-gray-800,
-  [role="dialog"] .bg-gray-700 {
+  [role="dialog"] .bg-gray-700,
+  [role="dialog"] .bg-gray-900 {
     background: white !important;
     border: 1px solid #ddd !important;
   }
   
-  [role="dialog"] .text-white {
+  [role="dialog"] .text-white,
+  [role="dialog"] .text-gray-100,
+  [role="dialog"] .text-gray-200 {
     color: black !important;
   }
   
-  [role="dialog"] .text-gray-400 {
-    color: #666 !important;
+  [role="dialog"] .text-gray-400,
+  [role="dialog"] .text-gray-500,
+  [role="dialog"] .text-gray-600 {
+    color: #333 !important;
   }
   
   [role="dialog"] .text-orange-500 {
     color: #ff4500 !important;
+  }
+  
+  /* Ensure all contract sections are visible */
+  [role="dialog"] .contract-details-content,
+  [role="dialog"] .contract-details-content * {
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  /* Grid layouts should remain as grid */
+  [role="dialog"] .grid {
+    display: grid !important;
+  }
+  
+  /* Flex layouts should remain as flex */
+  [role="dialog"] .flex {
+    display: flex !important;
+  }
+  
+  /* Ensure text is readable */
+  [role="dialog"] .font-semibold,
+  [role="dialog"] .font-bold {
+    font-weight: bold !important;
+    color: black !important;
+  }
+  
+  /* Make sure borders are visible */
+  [role="dialog"] .border,
+  [role="dialog"] .border-gray-300,
+  [role="dialog"] .border-gray-700 {
+    border-color: #ddd !important;
   }
   
   /* Page break settings */

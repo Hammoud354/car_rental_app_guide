@@ -1352,38 +1352,19 @@ export default function RentalContracts() {
                   🖨️ Print
                 </Button>
                 <Button 
-                  onClick={async () => {
+                  onClick={() => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    try {
-                      toast.info("Generating PDF... Please wait");
-                      
-                      // Get the contract content element
-                      const element = document.getElementById('contract-content');
-                      if (!element) {
-                        toast.error("Contract content not found");
-                        return;
-                      }
-                      
-                      // Configure html2pdf options
-                      const opt = {
-                        margin: 10,
-                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
-                        image: { type: 'jpeg' as const, quality: 0.98 },
-                        html2canvas: { scale: 2, useCORS: true, logging: false },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
-                      };
-                      
-                      // Generate PDF
-                      await html2pdf().set(opt).from(element).save();
-                      toast.success("PDF exported successfully!");
-                    } catch (error) {
-                      console.error("PDF export error:", error);
-                      toast.error("Failed to export PDF. Please try again.");
-                    }
+                    // Use browser's print dialog - user can save as PDF
+                    toast.info("Opening print dialog... Select 'Save as PDF' or 'Microsoft Print to PDF' as your destination", {
+                      duration: 5000
+                    });
+                    setTimeout(() => {
+                      window.print();
+                    }, 100);
                   }} 
                   variant="outline"
                   className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"

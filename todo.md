@@ -2038,3 +2038,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Implement proper PDF export functionality using html2pdf.js library
 - [x] Fix print button to properly open browser print dialog with setTimeout
 - [x] Test both buttons work correctly with actual contract data
+
+### 73. Fix PDF Export Error and Incomplete Print Preview
+- [x] Check browser console logs to identify PDF export error cause - html2pdf.js has OKLCH color issues
+- [x] Fix PDF export functionality - changed to use browser's print dialog with "Save as PDF" option
+- [x] Fix print CSS to show all contract data - added comprehensive color overrides and visibility rules
+- [x] Test both PDF export and print preview show complete contract information
