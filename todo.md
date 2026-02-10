@@ -2007,3 +2007,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Remove user selector dropdown UI from Invoices page
 - [x] Keep user selector only in Dashboard (single source of truth)
 - [x] Test that selection from Dashboard persists to all other pages
+
+### 68. Fix Nationality Issues in Contract Creation
+- [x] Auto-populate nationality field when client is selected in contract form
+- [x] Remove duplicate nationalities from the database
+- [x] Ensure nationality dropdown shows each country only once
+- [x] Test that client selection properly fills nationality field

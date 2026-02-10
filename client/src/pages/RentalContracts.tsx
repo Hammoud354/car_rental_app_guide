@@ -569,7 +569,7 @@ export default function RentalContracts() {
                                     // Clear form fields
                                     (document.getElementById("clientFirstName") as HTMLInputElement).value = "";
                                     (document.getElementById("clientLastName") as HTMLInputElement).value = "";
-                                    (document.getElementById("clientNationality") as HTMLInputElement).value = "";
+                                    setSelectedNationality(""); // Fix: Clear nationality state
                                     (document.getElementById("clientPhone") as HTMLInputElement).value = "";
                                     (document.getElementById("clientAddress") as HTMLInputElement).value = "";
                                     (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = "";
@@ -591,7 +591,7 @@ export default function RentalContracts() {
                                       // Auto-fill form fields
                                       (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
                                       (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
-                                      (document.getElementById("clientNationality") as HTMLInputElement).value = client.nationality || "";
+                                      setSelectedNationality(client.nationality || ""); // Fix: Update nationality state
                                       (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
                                       (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
                                       (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
