@@ -1999,3 +1999,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update Clients to use shared context
 - [x] Update Invoices to use shared context
 - [x] Test that user selection persists when navigating between pages
+
+### 67. Remove Redundant User Selector Dropdowns from Non-Dashboard Pages
+- [x] Remove user selector dropdown UI from Fleet Management page
+- [x] Remove user selector dropdown UI from Rental Contracts page
+- [x] Remove user selector dropdown UI from Clients page
+- [x] Remove user selector dropdown UI from Invoices page
+- [x] Keep user selector only in Dashboard (single source of truth)
+- [x] Test that selection from Dashboard persists to all other pages

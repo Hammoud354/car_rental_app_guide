@@ -394,43 +394,6 @@ export default function RentalContracts() {
             </div>
           ) : (
           <>
-          {/* Super Admin User Selector */}
-          {isSuperAdmin && (
-            <Card className="bg-primary/5 border-primary/20 mb-6">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <Label htmlFor="userSelector" className="text-sm font-medium whitespace-nowrap">
-                    Managing Contracts For:
-                  </Label>
-                  <Select
-                    value={selectedTargetUserId?.toString() || ""}
-                    onValueChange={(value) => setSelectedTargetUserId(value ? parseInt(value) : null)}
-                  >
-                    <SelectTrigger id="userSelector" className="w-[300px]">
-                      <SelectValue placeholder="Select user to manage..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">All Users (View Only)</SelectItem>
-                      {allUsers?.map((u) => (
-                        <SelectItem key={u.id} value={u.id.toString()}>
-                          {u.name} ({u.username})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedTargetUserId && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedTargetUserId(null)}
-                    >
-                      Clear
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
           
           <div className="flex justify-between items-center mb-6">
             <div>
