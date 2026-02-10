@@ -1970,3 +1970,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Investigate why vehicle details page shows "Vehicle Not Found" for Super Admin
 - [x] Update getVehicleById query to support Super Admin viewing all vehicles
 - [x] Test Super Admin can view vehicle details from any user
+
+### 63. Fix User Isolation and Vehicle Deletion Issues
+- [x] Debug why vehicle details page still shows "Vehicle Not Found" for Super Admin
+- [x] Verify server restarted properly to pick up getVehicleById changes
+- [x] Fix vehicle deletion not working - vehicles remain after delete attempt
+- [x] Test both fixes work correctly

@@ -188,7 +188,16 @@ export async function deleteVehicle(id: number, userId: number) {
   if (!db) {
     throw new Error("Database not available");
   }
-  await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
+  
+  // Check if user is Super Admin
+  const isAdmin = await isSuperAdmin(userId);
+  
+  // Super Admin can delete any vehicle, regular users only their own
+  if (isAdmin) {
+    await db.delete(vehicles).where(eq(vehicles.id, id));
+  } else {
+    await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
+  }
 }
 
 // Maintenance Records Queries
