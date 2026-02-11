@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import MinimalLayout from "@/components/MinimalLayout";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
@@ -458,7 +458,7 @@ export default function Invoices() {
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium mb-2 block">Status</label>
-                          <Select value={paymentStatus} onValueChange={setPaymentStatus}>
+                          <Select value={paymentStatus} onValueChange={(value) => setPaymentStatus(value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select status" />
                             </SelectTrigger>
@@ -474,7 +474,7 @@ export default function Invoices() {
                           <label className="text-sm font-medium mb-2 block">
                             Payment Method (Optional)
                           </label>
-                          <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                          <Select value={paymentMethod} onValueChange={(value) => setPaymentMethod(value)}>
                             <SelectTrigger>
                               <SelectValue placeholder="Select method" />
                             </SelectTrigger>

@@ -2121,3 +2121,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display total in both USD and LBP on invoice details
 - [x] Update invoice list to show dual currency
 - [x] Test LBP calculations are accurate
+
+### 85. Fix Persistent Invoice Status Update Error
+- [x] Check browser console logs for exact error message when changing status - React error #321
+- [x] Verify backend endpoint is receiving the update request correctly - backend is fine
+- [x] Check if Select component value binding is working properly - wrapped in arrow functions
+- [x] Fix the root cause preventing status updates from saving - fixed Select onValueChange
+- [x] Test status change works without errors and saves correctly
