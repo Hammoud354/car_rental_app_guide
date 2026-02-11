@@ -2100,3 +2100,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Add placeholder content for both sections (to be filled later)
 - [ ] Ensure sections are responsive and match site design
 - [ ] Test landing page displays both new sections correctly
+
+### 82. Fix Invoice Payment Status Update Not Working
+- [x] Investigate why payment status update keeps showing "pending" instead of saving changes
+- [x] Check backend updateInvoicePaymentStatus function for bugs - backend is correct
+- [x] Check frontend mutation and state management - added initialization useEffect
+- [x] Add dialog close functionality after successful status update
+- [x] Test status update saves correctly and dialog closes

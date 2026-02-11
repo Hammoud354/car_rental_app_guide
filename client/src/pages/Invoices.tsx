@@ -55,14 +55,27 @@ export default function Invoices() {
     { invoiceId: selectedInvoice! },
     { enabled: !!selectedInvoice }
   );
+
+  // Initialize payment status when invoice details are loaded
+  useEffect(() => {
+    if (invoiceDetails) {
+      setPaymentStatus(invoiceDetails.paymentStatus);
+      setPaymentMethod(invoiceDetails.paymentMethod || "");
+    }
+  }, [invoiceDetails]);
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
 
   const updatePaymentMutation = trpc.invoices.updatePaymentStatus.useMutation({
     onSuccess: () => {
+      toast.success("Payment status updated successfully");
       trpc.useUtils().invoices.list.invalidate();
       trpc.useUtils().invoices.getById.invalidate();
       setPaymentStatus("");
       setPaymentMethod("");
+      setSelectedInvoice(null); // Close the dialog
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update payment status");
     },
   });
 
