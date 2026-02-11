@@ -1,0 +1,1 @@
+ALTER TABLE `companySettings` ADD `exchangeRateLbpToUsd` decimal(10,2) DEFAULT '89700.00' NOT NULL;

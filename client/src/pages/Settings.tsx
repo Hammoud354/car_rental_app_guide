@@ -24,6 +24,7 @@ export default function Settings() {
     taxId: "",
     website: "",
     termsAndConditions: "",
+    exchangeRateLbpToUsd: 89700,
   });
 
   const [isUploading, setIsUploading] = useState(false);
@@ -41,6 +42,7 @@ export default function Settings() {
         taxId: settings.taxId || "",
         website: settings.website || "",
         termsAndConditions: settings.termsAndConditions || "",
+        exchangeRateLbpToUsd: Number(settings.exchangeRateLbpToUsd) || 89700,
       });
 
     }
@@ -53,7 +55,10 @@ export default function Settings() {
     setIsUploading(true);
 
     try {
-      await updateSettings.mutateAsync(formData);
+      await updateSettings.mutateAsync({
+        ...formData,
+        exchangeRateLbpToUsd: formData.exchangeRateLbpToUsd,
+      });
 
       toast({
         title: "Settings saved",
@@ -229,6 +234,39 @@ export default function Settings() {
                   }
                 />
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Currency Settings</CardTitle>
+            <CardDescription>
+              Configure the LBP to USD exchange rate for invoices
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label htmlFor="exchangeRate">LBP to USD Exchange Rate</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">1 USD =</span>
+                <Input
+                  id="exchangeRate"
+                  type="number"
+                  step="0.01"
+                  min="1"
+                  value={formData.exchangeRateLbpToUsd}
+                  onChange={(e) =>
+                    setFormData({ ...formData, exchangeRateLbpToUsd: Number(e.target.value) })
+                  }
+                  className="w-40"
+                  required
+                />
+                <span className="text-sm text-gray-600">LBP</span>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                This rate will be used to convert USD amounts to LBP on all invoices. Current rate: 1 USD = {formData.exchangeRateLbpToUsd.toLocaleString()} LBP
+              </p>
             </div>
           </CardContent>
         </Card>

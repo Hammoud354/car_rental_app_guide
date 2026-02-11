@@ -267,6 +267,7 @@ export const companySettings = mysqlTable("companySettings", {
   taxId: varchar("taxId", { length: 100 }),
   website: varchar("website", { length: 255 }),
   termsAndConditions: text("termsAndConditions"),
+  exchangeRateLbpToUsd: decimal("exchangeRateLbpToUsd", { precision: 10, scale: 2 }).default("89700.00").notNull(), // LBP per 1 USD
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

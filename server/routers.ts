@@ -979,11 +979,13 @@ export const appRouter = router({
         taxId: z.string().optional(),
         website: z.string().optional(),
         termsAndConditions: z.string().optional(),
+        exchangeRateLbpToUsd: z.number().positive().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const settings = await db.upsertCompanySettings({
           userId: ctx.user?.id || 1,
           ...input,
+          exchangeRateLbpToUsd: input.exchangeRateLbpToUsd ? String(input.exchangeRateLbpToUsd) : undefined,
         });
         return settings;
       }),

@@ -44,6 +44,10 @@ export default function Invoices() {
     }
   }, []);
 
+  // Fetch company settings for exchange rate
+  const { data: settings } = trpc.settings.get.useQuery();
+  const exchangeRate = settings?.exchangeRateLbpToUsd ? Number(settings.exchangeRateLbpToUsd) : 89700;
+
   // Fetch all users for Super Admin
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
     enabled: isSuperAdmin,
@@ -231,7 +235,7 @@ export default function Invoices() {
                     <div className="text-right space-y-2">
                       <div>
                         <p className="text-2xl font-bold">{formatUSD(parseFloat(invoice.totalAmount))}</p>
-                        <p className="text-sm text-gray-600">{formatLBP(convertUSDToLBP(parseFloat(invoice.totalAmount)))}</p>
+                        <p className="text-sm text-gray-600">{formatLBP(convertUSDToLBP(parseFloat(invoice.totalAmount), exchangeRate))}</p>
                       </div>
                       <Button
                         onClick={() => setSelectedInvoice(invoice.id)}
@@ -386,22 +390,22 @@ export default function Invoices() {
 
                     {/* LBP Amounts */}
                     <div className="bg-gray-50 p-4 rounded-lg space-y-2 border-2 border-primary">
-                      <p className="text-xs text-gray-500 mb-2">Lebanese Pounds (LBP) at rate 89,700 LBP/USD</p>
+                      <p className="text-xs text-gray-500 mb-2">Lebanese Pounds (LBP) at rate {exchangeRate.toLocaleString()} LBP/USD</p>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Subtotal (LBP):</span>
                         <span className="font-medium">
-                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.subtotal)))}
+                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.subtotal), exchangeRate))}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-600">Tax/VAT 11% (LBP):</span>
                         <span className="font-medium">
-                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount)))}
+                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount), exchangeRate))}
                         </span>
                       </div>
                       <div className="flex justify-between text-lg font-bold border-t border-primary pt-2">
                         <span>Total (LBP):</span>
-                        <span>{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount)))}</span>
+                        <span>{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate))}</span>
                       </div>
                     </div>
                   </div>

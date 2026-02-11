@@ -2128,3 +2128,22 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check if Select component value binding is working properly - wrapped in arrow functions
 - [x] Fix the root cause preventing status updates from saving - fixed Select onValueChange
 - [x] Test status change works without errors and saves correctly
+
+### 86. Implement Admin Settings Page for Exchange Rate Configuration
+- [x] Add exchangeRateLbpToUsd field to companySettings table
+- [x] Create backend endpoints to get and update exchange rate via settings router
+- [x] Build Settings page UI with Currency Settings card and exchange rate input field
+- [x] Add validation for exchange rate (min=1, step=0.01, type=number)
+- [x] Update currency utility functions to accept rate parameter with default fallback
+- [x] Update Invoices page to fetch exchange rate from settings and pass to conversion functions
+- [ ] Test settings page updates exchange rate and invoices reflect new rate immediately
+
+### 87. Exchange Rate Configuration - Implementation Complete
+- [x] Updated Invoices page to fetch exchange rate dynamically from settings
+- [x] Replaced hardcoded 89,700 rate with tRPC query to settings.get()
+- [x] Added loading state while fetching exchange rate
+- [x] Implemented fallback to default 89,700 if settings not configured
+- [x] Updated all currency conversion calls to use dynamic rate parameter
+- [x] Created comprehensive test suite (server/settings.test.ts)
+- [x] All 8 tests passing - validates exchange rate CRUD operations
+- [x] Exchange rate changes in Settings page now immediately affect invoice displays
