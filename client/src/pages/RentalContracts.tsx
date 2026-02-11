@@ -276,6 +276,8 @@ export default function RentalContracts() {
     },
   });
 
+  const uploadPdfMutation = trpc.files.uploadPdf.useMutation();
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -1444,23 +1446,133 @@ export default function RentalContracts() {
                   📄 Export PDF
                 </Button>
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
-                    const phoneNumber = selectedContract.clientPhone.replace(/[\s\-\(\)]/g, '');
+                    // Get vehicle details from vehicles array
+                    const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+                    if (!vehicle) {
+                      toast.error("Vehicle information not found");
+                      return;
+                    }
                     
-                    // Create WhatsApp message
-                    const message = `Hello ${selectedContract.clientFirstName},\n\nYour rental contract is ready!\n\n📋 Contract: ${selectedContract.contractNumber}\n🚗 Vehicle: ${selectedContract.vehicleBrand} ${selectedContract.vehicleModel} (${selectedContract.vehiclePlateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\nThank you for choosing our service!`;
-                    
-                    // Encode message for URL
-                    const encodedMessage = encodeURIComponent(message);
-                    
-                    // Open WhatsApp with pre-filled message
-                    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                    try {
+                      toast.info("Generating PDF for WhatsApp... Please wait");
+                      
+                      // Get the contract content element
+                      const contractElement = document.getElementById('contract-content');
+                      if (!contractElement) {
+                        toast.error("Contract content not found");
+                        return;
+                      }
+                      
+                      // Store original styles
+                      const originalOverflow = contractElement.style.overflow;
+                      const originalHeight = contractElement.style.height;
+                      const originalMaxHeight = contractElement.style.maxHeight;
+                      
+                      // Temporarily make element fully visible for capture
+                      contractElement.style.overflow = 'visible';
+                      contractElement.style.height = 'auto';
+                      contractElement.style.maxHeight = 'none';
+                      
+                      // Use html2canvas to capture the element as image
+                      const canvas = await html2canvas(contractElement, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#ffffff',
+                        windowWidth: contractElement.scrollWidth,
+                        windowHeight: contractElement.scrollHeight,
+                        scrollY: -window.scrollY,
+                        scrollX: -window.scrollX
+                      });
+                      
+                      // Restore original styles
+                      contractElement.style.overflow = originalOverflow;
+                      contractElement.style.height = originalHeight;
+                      contractElement.style.maxHeight = originalMaxHeight;
+                      
+                      // Create PDF with jsPDF
+                      const imgData = canvas.toDataURL('image/png');
+                      const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                      });
+                      
+                      // Calculate dimensions to fit A4 page (with margins)
+                      const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                      const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
+                      const imgWidth = canvas.width;
+                      const imgHeight = canvas.height;
+                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                      
+                      // Check if content fits on one page
+                      const scaledHeight = imgHeight * ratio;
+                      
+                      if (scaledHeight <= pdfHeight) {
+                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth * ratio, imgHeight * ratio);
+                      } else {
+                        // Need multiple pages
+                        let yPosition = 0;
+                        let pageCount = 0;
+                        
+                        while (yPosition < imgHeight) {
+                          if (pageCount > 0) {
+                            pdf.addPage();
+                          }
+                          
+                          const sourceY = yPosition;
+                          const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
+                          
+                          const pageCanvas = document.createElement('canvas');
+                          pageCanvas.width = imgWidth;
+                          pageCanvas.height = sourceHeight;
+                          const pageCtx = pageCanvas.getContext('2d');
+                          
+                          if (pageCtx) {
+                            pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+                            const pageImgData = pageCanvas.toDataURL('image/png');
+                            pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
+                          }
+                          
+                          yPosition += sourceHeight;
+                          pageCount++;
+                        }
+                      }
+                      
+                      // Convert PDF to base64
+                      const pdfBase64 = pdf.output('datauristring');
+                      
+                      toast.info("Uploading PDF to cloud storage...");
+                      
+                      // Upload PDF to S3
+                      const uploadResult = await uploadPdfMutation.mutateAsync({
+                        base64Data: pdfBase64,
+                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
+                      });
+                      
+                      // Format phone number for WhatsApp
+                      const phoneNumber = selectedContract.clientPhone.replace(/[\s\-\(\)]/g, '');
+                      
+                      // Create WhatsApp message with PDF download link
+                      const message = `Hello ${selectedContract.clientFirstName},\n\nYour rental contract is ready!\n\n📋 Contract: ${selectedContract.contractNumber}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}\n\nThank you for choosing our service!`;
+                      
+                      // Encode message for URL
+                      const encodedMessage = encodeURIComponent(message);
+                      
+                      toast.success("PDF uploaded! Opening WhatsApp...");
+                      
+                      // Open WhatsApp with pre-filled message
+                      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                    } catch (error: any) {
+                      console.error("WhatsApp PDF share error:", error);
+                      toast.error(`Failed to share PDF: ${error.message || 'Unknown error'}`);
+                    }
                   }} 
                   variant="outline"
                   className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-500 hover:text-green-500 h-12 w-full"

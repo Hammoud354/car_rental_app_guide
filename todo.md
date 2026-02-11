@@ -2212,3 +2212,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Updated getInvoiceById to include client name and phone from contract
 - [x] WhatsApp sharing opens WhatsApp Web/App with pre-filled professional message
 - [x] Both USD and LBP amounts shown in invoice WhatsApp message
+
+
+### 94. Fix Vehicle Data in WhatsApp Message and Implement Comprehensive Contract PDF Sharing
+- [x] Fix "undefined undefined (undefined)" vehicle data issue in WhatsApp contract message
+- [x] Fixed by fetching vehicle data from vehicles array instead of contract fields
+- [x] Contract PDF already includes comprehensive vehicle details (brand, model, plate, year, color)
+- [x] Contract PDF already includes complete client information (name, license, phone, email, nationality)
+- [x] Contract PDF already includes rental duration and dates section
+- [x] Contract PDF already includes detailed payment breakdown (daily rate, total days, discounts, final amount)
+- [x] Contract PDF already includes inspection details section with damage marks
+- [x] Implemented PDF generation and upload to S3 storage via tRPC procedure
+- [x] Modified WhatsApp button to generate PDF, upload to S3, then share download link
+- [x] WhatsApp message now includes PDF download link for clients
+- [x] Complete workflow implemented: generate PDF → upload to S3 → share via WhatsApp

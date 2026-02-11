@@ -1187,8 +1187,28 @@ export const appRouter = router({
           maintenanceRecords,
           invoices,
         };
+       }),
+  }),
+
+  // File Upload Router
+  files: router({
+    uploadPdf: protectedProcedure
+      .input(z.object({
+        base64Data: z.string(),
+        filename: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { uploadPdfToS3 } = await import("./uploadPdf");
+        
+        // Convert base64 to buffer
+        const base64WithoutPrefix = input.base64Data.replace(/^data:application\/pdf;base64,/, '');
+        const pdfBuffer = Buffer.from(base64WithoutPrefix, 'base64');
+        
+        // Upload to S3
+        const result = await uploadPdfToS3(pdfBuffer, input.filename, ctx.user.id);
+        
+        return result;
       }),
   }),
 });
-
 export type AppRouter = typeof appRouter;
