@@ -2158,3 +2158,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Enhanced PDF export with element visibility fixes and better error handling
 - [x] Company name now displays from companyProfile or settings fallback
 - [x] Increased spacing with tracking-wider class and larger padding values
+
+
+### 89. Replace Nationality Text Input with Searchable Dropdown
+- [x] Locate current nationality field implementation in client creation form
+- [x] Create comprehensive list of all world nationalities/countries (193 nationalities)
+- [x] Replace Popover/Command component with predefined WORLD_NATIONALITIES list
+- [x] Add search/filter functionality to nationality dropdown (built-in with Command)
+- [x] Updated both Clients and RentalContracts pages
+- [x] Removed database-based nationality mutations (now using static list)
+- [x] Nationality dropdown now shows all world nationalities for every new user
+- [x] Existing clients with custom nationalities still display correctly

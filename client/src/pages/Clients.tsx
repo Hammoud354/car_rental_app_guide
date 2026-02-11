@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { WORLD_NATIONALITIES } from "@shared/nationalities";
 
 export default function Clients() {
   const utils = trpc.useUtils();
@@ -51,14 +52,8 @@ export default function Clients() {
     { clientId: selectedClient?.id || 0 },
     { enabled: !!selectedClient && isContractsDialogOpen }
   );
-  const { data: nationalities = [] } = trpc.nationalities.list.useQuery();
-  
-  // Mutation to add nationality
-  const addNationalityMutation = trpc.nationalities.add.useMutation({
-    onSuccess: () => {
-      utils.nationalities.list.invalidate();
-    },
-  });
+  // Use predefined world nationalities list
+  const nationalities = WORLD_NATIONALITIES;
   
   const createClient = trpc.clients.create.useMutation({
     onSuccess: () => {
@@ -216,34 +211,20 @@ export default function Clients() {
                             aria-expanded={createNationalityOpen}
                             className="w-full justify-between"
                           >
-                            {createSelectedNationality || "Select or type nationality..."}
+                            {createSelectedNationality || "Select nationality..."}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-full p-0">
                           <Command>
-                            <CommandInput 
-                              placeholder="Search or type nationality..." 
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  const input = e.currentTarget.value;
-                                  if (input && input.trim()) {
-                                    setCreateSelectedNationality(input.trim());
-                                    if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
-                                      addNationalityMutation.mutate({ nationality: input.trim() });
-                                    }
-                                    setCreateNationalityOpen(false);
-                                  }
-                                }
-                              }}
-                            />
+                            <CommandInput placeholder="Search nationality..." />
                             <CommandList>
-                              <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
+                              <CommandEmpty>No nationality found.</CommandEmpty>
                               <CommandGroup>
                                 {nationalities.map((nat) => (
                                   <CommandItem
-                                    key={nat.id}
-                                    value={nat.nationality}
+                                    key={nat}
+                                    value={nat}
                                     onSelect={(value) => {
                                       setCreateSelectedNationality(value);
                                       setCreateNationalityOpen(false);
@@ -251,10 +232,10 @@ export default function Clients() {
                                   >
                                     <Check
                                       className={`mr-2 h-4 w-4 ${
-                                        createSelectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                        createSelectedNationality === nat ? "opacity-100" : "opacity-0"
                                       }`}
                                     />
-                                    {nat.nationality}
+                                    {nat}
                                   </CommandItem>
                                 ))}
                               </CommandGroup>
@@ -513,33 +494,20 @@ export default function Clients() {
                           aria-expanded={editNationalityOpen}
                           className="w-full justify-between"
                         >
-                          {editSelectedNationality || "Select or type nationality..."}
+                          {editSelectedNationality || "Select nationality..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-full p-0">
                         <Command>
-                          <CommandInput 
-                            placeholder="Search or type nationality..." 
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                const input = e.currentTarget.value;
-                                if (input && input.trim()) {
-                                  setEditSelectedNationality(input.trim());
-                                  if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
-                                    addNationalityMutation.mutate({ nationality: input.trim() });
-                                  }
-                                  setEditNationalityOpen(false);
-                                } }
-                            }}
-                          />
+                          <CommandInput placeholder="Search nationality..." />
                           <CommandList>
-                            <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
+                            <CommandEmpty>No nationality found.</CommandEmpty>
                             <CommandGroup>
                               {nationalities.map((nat) => (
                                 <CommandItem
-                                  key={nat.id}
-                                  value={nat.nationality}
+                                  key={nat}
+                                  value={nat}
                                   onSelect={(value) => {
                                     setEditSelectedNationality(value);
                                     setEditNationalityOpen(false);
@@ -547,10 +515,10 @@ export default function Clients() {
                                 >
                                   <Check
                                     className={`mr-2 h-4 w-4 ${
-                                      editSelectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                      editSelectedNationality === nat ? "opacity-100" : "opacity-0"
                                     }`}
                                   />
-                                  {nat.nationality}
+                                  {nat}
                                 </CommandItem>
                               ))}
                             </CommandGroup>

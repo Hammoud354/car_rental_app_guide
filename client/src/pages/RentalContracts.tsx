@@ -20,6 +20,7 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { WORLD_NATIONALITIES } from "@shared/nationalities";
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
@@ -91,8 +92,10 @@ export default function RentalContracts() {
   );
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
-  const { data: nationalities = [] } = trpc.nationalities.list.useQuery();
   const utils = trpc.useUtils();
+  
+  // Use predefined world nationalities list
+  const nationalities = WORLD_NATIONALITIES;
   
   // Find invoice for selected contract
   const contractInvoice = selectedContract 
@@ -109,15 +112,7 @@ export default function RentalContracts() {
   }, [selectedContract, allInvoices, contractInvoice]);
   
   // Mutation to update overdue contracts
-  const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();
-  
-  // Mutation to add nationality
-  const addNationalityMutation = trpc.nationalities.add.useMutation({
-    onSuccess: () => {
-      utils.nationalities.list.invalidate();
-    },
-  });
-  
+  const updateOverdueMutation = trpc.contracts.updateOverdueContracts.useMutation();  
   // Check for overdue contracts when component mounts or status filter changes
   useEffect(() => {
     updateOverdueMutation.mutate(undefined, {
@@ -629,36 +624,20 @@ export default function RentalContracts() {
                               aria-expanded={nationalityComboboxOpen}
                               className="w-full justify-between"
                             >
-                              {selectedNationality || "Select or type nationality..."}
+                              {selectedNationality || "Select nationality..."}
                               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-full p-0">
                             <Command>
-                              <CommandInput 
-                                placeholder="Search or type nationality..." 
-                                onKeyDown={(e) => {
-                                  // Allow user to type and add custom nationality on Enter
-                                  if (e.key === 'Enter') {
-                                    const input = e.currentTarget.value;
-                                    if (input && input.trim()) {
-                                      setSelectedNationality(input.trim());
-                                      // Save to database if it's a new nationality
-                                      if (!nationalities.find(n => n.nationality.toLowerCase() === input.toLowerCase())) {
-                                        addNationalityMutation.mutate({ nationality: input.trim() });
-                                      }
-                                      setNationalityComboboxOpen(false);
-                                    }
-                                  }
-                                }}
-                              />
+                              <CommandInput placeholder="Search nationality..." />
                               <CommandList>
-                                <CommandEmpty>Press Enter to add new nationality</CommandEmpty>
+                                <CommandEmpty>No nationality found.</CommandEmpty>
                                 <CommandGroup>
                                   {nationalities.map((nat) => (
                                     <CommandItem
-                                      key={nat.id}
-                                      value={nat.nationality}
+                                      key={nat}
+                                      value={nat}
                                       onSelect={(value) => {
                                         setSelectedNationality(value);
                                         setNationalityComboboxOpen(false);
@@ -666,10 +645,10 @@ export default function RentalContracts() {
                                     >
                                       <Check
                                         className={`mr-2 h-4 w-4 ${
-                                          selectedNationality === nat.nationality ? "opacity-100" : "opacity-0"
+                                          selectedNationality === nat ? "opacity-100" : "opacity-0"
                                         }`}
                                       />
-                                      {nat.nationality}
+                                      {nat}
                                     </CommandItem>
                                   ))}
                                 </CommandGroup>
