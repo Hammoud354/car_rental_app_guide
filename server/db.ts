@@ -1842,9 +1842,14 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
   
   const lineItems = await db.select().from(invoiceLineItems).where(eq(invoiceLineItems.invoiceId, invoiceId));
   
+  // Get contract to fetch client information
+  const [contract] = await db.select().from(rentalContracts).where(eq(rentalContracts.id, invoice.contractId)).limit(1);
+  
   return {
     ...invoice,
     lineItems,
+    clientName: contract ? `${contract.clientFirstName} ${contract.clientLastName}` : 'Client',
+    clientPhone: contract?.clientPhone || '',
   };
 }
 

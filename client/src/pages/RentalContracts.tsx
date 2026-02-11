@@ -1443,6 +1443,31 @@ export default function RentalContracts() {
                 >
                   📄 Export PDF
                 </Button>
+                <Button 
+                  onClick={() => {
+                    if (!selectedContract) {
+                      toast.error("No contract selected");
+                      return;
+                    }
+                    
+                    // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
+                    const phoneNumber = selectedContract.clientPhone.replace(/[\s\-\(\)]/g, '');
+                    
+                    // Create WhatsApp message
+                    const message = `Hello ${selectedContract.clientFirstName},\n\nYour rental contract is ready!\n\n📋 Contract: ${selectedContract.contractNumber}\n🚗 Vehicle: ${selectedContract.vehicleBrand} ${selectedContract.vehicleModel} (${selectedContract.vehiclePlateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\nThank you for choosing our service!`;
+                    
+                    // Encode message for URL
+                    const encodedMessage = encodeURIComponent(message);
+                    
+                    // Open WhatsApp with pre-filled message
+                    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                  }} 
+                  variant="outline"
+                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-500 hover:text-green-500 h-12 w-full"
+                  size="default"
+                >
+                  💬 Send via WhatsApp
+                </Button>
                 {/* Invoice button - show for completed contracts */}
                 {selectedContract?.status === 'completed' && (
                   contractInvoice ? (

@@ -473,6 +473,36 @@ export default function Invoices() {
                   >
                     Print Invoice
                   </Button>
+                  <Button 
+                    onClick={() => {
+                      if (!invoiceDetails) {
+                        toast.error("No invoice selected");
+                        return;
+                      }
+                      
+                      // Check if client phone is available from invoice details
+                      if (!invoiceDetails.clientPhone) {
+                        toast.error("Client phone number not found");
+                        return;
+                      }
+                      
+                      // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
+                      const phoneNumber = invoiceDetails.clientPhone.replace(/[\s\-\(\)]/g, '');
+                      
+                      // Create WhatsApp message
+                      const message = `Hello ${invoiceDetails.clientName},\n\nYour invoice is ready!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate).toLocaleString()} LBP\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}\n\nThank you for your business!`;
+                      
+                      // Encode message for URL
+                      const encodedMessage = encodeURIComponent(message);
+                      
+                      // Open WhatsApp with pre-filled message
+                      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                    }} 
+                    variant="outline" 
+                    className="flex-1 print:hidden"
+                  >
+                    💬 Send via WhatsApp
+                  </Button>
                 </div>
 
                 {/* Payment Status Update */}

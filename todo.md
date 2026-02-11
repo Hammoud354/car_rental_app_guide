@@ -2199,3 +2199,16 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] All 3 tests passing (increased timeout for slow test)
 - [x] Vehicle details now appear in invoice line items for better identification
 - [x] Changes automatically reflected in PDF export
+
+
+### 93. Implement WhatsApp Sharing for Contracts and Invoices
+- [x] Design WhatsApp message format for contracts (include contract number, dates, vehicle info)
+- [x] Design WhatsApp message format for invoices (include invoice number, amount, payment status)
+- [x] Add "Send via WhatsApp" button to contract detail view
+- [x] Add "Send via WhatsApp" button to invoice detail view
+- [x] Implement WhatsApp link generation using wa.me API
+- [x] Format client phone number for international WhatsApp format (removes spaces, dashes, parentheses)
+- [x] Pre-fill WhatsApp message with contract/invoice details
+- [x] Updated getInvoiceById to include client name and phone from contract
+- [x] WhatsApp sharing opens WhatsApp Web/App with pre-filled professional message
+- [x] Both USD and LBP amounts shown in invoice WhatsApp message
