@@ -528,7 +528,7 @@ export const appRouter = router({
         const nextNumber = maxNumber + 1;
         const contractNumber = `CTR-${String(nextNumber).padStart(3, '0')}`;
         
-        return await db.createRentalContract({
+        const contract = await db.createRentalContract({
           userId,
           vehicleId: input.vehicleId,
           clientId: client.id,
@@ -550,6 +550,11 @@ export const appRouter = router({
           signatureData: input.signatureData || null,
           fuelLevel: input.fuelLevel || "Full",
         });
+        
+        // Auto-generate invoice immediately when contract is created
+        const invoice = await db.autoGenerateInvoice(contract.id, userId);
+        
+        return { ...contract, invoice };
       }),
     
     getDamageMarks: publicProcedure

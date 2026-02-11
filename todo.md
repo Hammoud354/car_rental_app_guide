@@ -2169,3 +2169,15 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Removed database-based nationality mutations (now using static list)
 - [x] Nationality dropdown now shows all world nationalities for every new user
 - [x] Existing clients with custom nationalities still display correctly
+
+
+### 90. Move Invoice Creation from Contract Completion to Contract Creation
+- [x] Locate current invoice creation logic in contract workflow
+- [x] Identify where invoices are currently generated (in markAsReturned mutation)
+- [x] Move invoice creation logic to contract create mutation in server/routers.ts
+- [x] Ensure invoice includes all contract details (dates, amounts, client info)
+- [x] Invoice status set to 'pending' when created
+- [x] Created comprehensive test suite with 3 passing tests
+- [x] Verified invoice is created immediately when contract is created
+- [x] Verified invoice amounts calculated correctly (subtotal, tax, total)
+- [x] Verified no duplicate invoices created for same contract
