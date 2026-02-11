@@ -23,6 +23,7 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 
 export default function Invoices() {
   const { user } = useAuth();
@@ -228,7 +229,10 @@ export default function Invoices() {
                       </div>
                     </div>
                     <div className="text-right space-y-2">
-                      <p className="text-2xl font-bold">${parseFloat(invoice.totalAmount).toFixed(2)}</p>
+                      <div>
+                        <p className="text-2xl font-bold">{formatUSD(parseFloat(invoice.totalAmount))}</p>
+                        <p className="text-sm text-gray-600">{formatLBP(convertUSDToLBP(parseFloat(invoice.totalAmount)))}</p>
+                      </div>
                       <Button
                         onClick={() => setSelectedInvoice(invoice.id)}
                         variant="outline"
@@ -359,22 +363,46 @@ export default function Invoices() {
                   </div>
 
                   {/* Totals */}
-                  <div className="border-t pt-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-medium">
-                        ${parseFloat(invoiceDetails.subtotal).toFixed(2)}
-                      </span>
+                  <div className="border-t pt-4 space-y-3">
+                    {/* USD Amounts */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Subtotal (USD):</span>
+                        <span className="font-medium">
+                          {formatUSD(parseFloat(invoiceDetails.subtotal))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Tax/VAT 11% (USD):</span>
+                        <span className="font-medium">
+                          {formatUSD(parseFloat(invoiceDetails.taxAmount))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-base font-semibold border-t pt-2">
+                        <span>Total (USD):</span>
+                        <span>{formatUSD(parseFloat(invoiceDetails.totalAmount))}</span>
+                      </div>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Tax (11%):</span>
-                      <span className="font-medium">
-                        ${parseFloat(invoiceDetails.taxAmount).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-lg font-bold border-t pt-2">
-                      <span>Total:</span>
-                      <span>${parseFloat(invoiceDetails.totalAmount).toFixed(2)}</span>
+
+                    {/* LBP Amounts */}
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-2 border-2 border-primary">
+                      <p className="text-xs text-gray-500 mb-2">Lebanese Pounds (LBP) at rate 89,700 LBP/USD</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Subtotal (LBP):</span>
+                        <span className="font-medium">
+                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.subtotal)))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Tax/VAT 11% (LBP):</span>
+                        <span className="font-medium">
+                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount)))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold border-t border-primary pt-2">
+                        <span>Total (LBP):</span>
+                        <span>{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount)))}</span>
+                      </div>
                     </div>
                   </div>
 

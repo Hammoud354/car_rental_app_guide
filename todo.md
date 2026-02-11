@@ -2107,3 +2107,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check frontend mutation and state management - added initialization useEffect
 - [x] Add dialog close functionality after successful status update
 - [x] Test status update saves correctly and dialog closes
+
+### 83. Fix React Error #321 When Changing Invoice Type
+- [ ] Check browser console logs for full React error details
+- [ ] Identify which component is causing the error
+- [ ] Fix the React error in invoice type change functionality
+- [ ] Test invoice type change works without errors
+
+### 84. Implement LBP Currency Display on Invoices
+- [x] Add LBP conversion rate constant (89,700 LBP per USD)
+- [x] Calculate and display amounts in both USD and LBP
+- [x] Add 11% VAT calculation in LBP
+- [x] Display total in both USD and LBP on invoice details
+- [x] Update invoice list to show dual currency
+- [x] Test LBP calculations are accurate
