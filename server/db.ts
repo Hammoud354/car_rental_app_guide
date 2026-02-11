@@ -1709,6 +1709,13 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
   
   if (!contract) throw new Error("Contract not found");
   
+  // Get vehicle details
+  const [vehicle] = await db.select().from(vehicles)
+    .where(eq(vehicles.id, contract.vehicleId))
+    .limit(1);
+  
+  if (!vehicle) throw new Error("Vehicle not found");
+  
   // Check if invoice already exists for this contract
   const existingInvoice = await db.select().from(invoices)
     .where(eq(invoices.contractId, contractId))
@@ -1729,12 +1736,13 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
     amount: string;
   }> = [];
   
-  // 1. Rental charges
+  // 1. Rental charges with vehicle details
   const rentalDays = contract.rentalDays || 1;
   const dailyRate = parseFloat(contract.dailyRate || '0');
   const rentalCharges = rentalDays * dailyRate;
+  const vehicleInfo = `${vehicle.brand} ${vehicle.model} (Plate: ${vehicle.plateNumber})`;
   lineItems.push({
-    description: `Vehicle Rental (${rentalDays} days @ $${dailyRate}/day)`,
+    description: `Vehicle Rental - ${vehicleInfo} (${rentalDays} days @ $${dailyRate}/day)`,
     quantity: String(rentalDays),
     unitPrice: contract.dailyRate,
     amount: rentalCharges.toFixed(2),

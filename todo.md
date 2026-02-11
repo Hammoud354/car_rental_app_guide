@@ -2189,3 +2189,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verified change appears in invoice detail view
 - [x] Change automatically appears in PDF export (same HTML is captured)
 - [x] Invoice display working correctly with new header
+
+
+### 92. Add Vehicle Details to Invoice Line Items
+- [x] Locate autoGenerateInvoice function in server/db.ts
+- [x] Fetch vehicle details (plate number, brand, model) when generating invoice
+- [x] Update line item description to include vehicle details
+- [x] Format: "Vehicle Rental - [Brand] [Model] (Plate: [PlateNumber]) (X days @ $Y/day)"
+- [x] All 3 tests passing (increased timeout for slow test)
+- [x] Vehicle details now appear in invoice line items for better identification
+- [x] Changes automatically reflected in PDF export

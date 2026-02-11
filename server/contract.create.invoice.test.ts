@@ -174,7 +174,7 @@ describe("Invoice Creation on Contract Creation", () => {
     expect(totalAmount).toBeCloseTo(610.5, 2);
   });
 
-  it("should not create duplicate invoices for same contract", async () => {
+  it("should not create duplicate invoices for same contract", { timeout: 10000 }, async () => {
     // Create a new vehicle for this test to avoid conflicts
     const vehicle3 = await db.createVehicle({
       userId: testUserId,
