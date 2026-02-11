@@ -2181,3 +2181,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verified invoice is created immediately when contract is created
 - [x] Verified invoice amounts calculated correctly (subtotal, tax, total)
 - [x] Verified no duplicate invoices created for same contract
+
+
+### 91. Change Invoice Column Header from "Quantity" to "Number of Days"
+- [x] Locate invoice display component in Invoices page
+- [x] Change "Quantity" column header to "Number of Days"
+- [x] Verified change appears in invoice detail view
+- [x] Change automatically appears in PDF export (same HTML is captured)
+- [x] Invoice display working correctly with new header

@@ -365,7 +365,7 @@ export default function Invoices() {
                       <thead className="border-b-2">
                         <tr className="text-left">
                           <th className="pb-3 font-medium w-1/2">Description</th>
-                          <th className="pb-3 font-medium text-right w-1/6 px-6">Quantity</th>
+                          <th className="pb-3 font-medium text-right w-1/6 px-6">Number of Days</th>
                           <th className="pb-3 font-medium text-right w-1/6 px-6">Unit Price</th>
                           <th className="pb-3 font-medium text-right w-1/6 px-6">Amount</th>
                         </tr>
