@@ -2226,3 +2226,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Modified WhatsApp button to generate PDF, upload to S3, then share download link
 - [x] WhatsApp message now includes PDF download link for clients
 - [x] Complete workflow implemented: generate PDF → upload to S3 → share via WhatsApp
+
+
+### 95. Fix OKLCH Color Parsing Error in WhatsApp PDF Generation
+- [x] Investigate "Attempting to parse an unsupported color function 'oklch'" error
+- [x] Added color conversion before PDF capture to handle OKLCH colors
+- [x] Implemented automatic OKLCH to RGB conversion for all elements
+- [x] Colors are restored after PDF capture to maintain UI appearance
+- [x] Fix applied to both Export PDF and WhatsApp PDF buttons
+- [x] PDF generation now works without color parsing errors

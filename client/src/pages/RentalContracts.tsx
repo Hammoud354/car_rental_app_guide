@@ -1360,6 +1360,38 @@ export default function RentalContracts() {
                       contractElement.style.height = 'auto';
                       contractElement.style.maxHeight = 'none';
                       
+                      // Convert OKLCH colors to RGB for PDF compatibility
+                      const elementsWithOklch = contractElement.querySelectorAll('*');
+                      const originalColors: Map<Element, { color?: string; backgroundColor?: string; borderColor?: string }> = new Map();
+                      
+                      elementsWithOklch.forEach((el: Element) => {
+                        const htmlEl = el as HTMLElement;
+                        const computedStyle = window.getComputedStyle(htmlEl);
+                        const original: { color?: string; backgroundColor?: string; borderColor?: string } = {};
+                        
+                        // Store and convert color
+                        if (computedStyle.color && computedStyle.color.includes('oklch')) {
+                          original.color = htmlEl.style.color;
+                          htmlEl.style.color = computedStyle.color; // Browser converts oklch to rgb
+                        }
+                        
+                        // Store and convert background color
+                        if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('oklch')) {
+                          original.backgroundColor = htmlEl.style.backgroundColor;
+                          htmlEl.style.backgroundColor = computedStyle.backgroundColor;
+                        }
+                        
+                        // Store and convert border color
+                        if (computedStyle.borderColor && computedStyle.borderColor.includes('oklch')) {
+                          original.borderColor = htmlEl.style.borderColor;
+                          htmlEl.style.borderColor = computedStyle.borderColor;
+                        }
+                        
+                        if (Object.keys(original).length > 0) {
+                          originalColors.set(el, original);
+                        }
+                      });
+                      
                       // Use html2canvas to capture the element as image
                       const canvas = await html2canvas(contractElement, {
                         scale: 2,
@@ -1376,6 +1408,14 @@ export default function RentalContracts() {
                       contractElement.style.overflow = originalOverflow;
                       contractElement.style.height = originalHeight;
                       contractElement.style.maxHeight = originalMaxHeight;
+                      
+                      // Restore original colors
+                      originalColors.forEach((original, el) => {
+                        const htmlEl = el as HTMLElement;
+                        if (original.color !== undefined) htmlEl.style.color = original.color;
+                        if (original.backgroundColor !== undefined) htmlEl.style.backgroundColor = original.backgroundColor;
+                        if (original.borderColor !== undefined) htmlEl.style.borderColor = original.borderColor;
+                      });
                       
                       // Create PDF with jsPDF
                       const imgData = canvas.toDataURL('image/png');
@@ -1479,6 +1519,38 @@ export default function RentalContracts() {
                       contractElement.style.height = 'auto';
                       contractElement.style.maxHeight = 'none';
                       
+                      // Convert OKLCH colors to RGB for PDF compatibility
+                      const elementsWithOklch = contractElement.querySelectorAll('*');
+                      const originalColors: Map<Element, { color?: string; backgroundColor?: string; borderColor?: string }> = new Map();
+                      
+                      elementsWithOklch.forEach((el: Element) => {
+                        const htmlEl = el as HTMLElement;
+                        const computedStyle = window.getComputedStyle(htmlEl);
+                        const original: { color?: string; backgroundColor?: string; borderColor?: string } = {};
+                        
+                        // Store and convert color
+                        if (computedStyle.color && computedStyle.color.includes('oklch')) {
+                          original.color = htmlEl.style.color;
+                          htmlEl.style.color = computedStyle.color; // Browser converts oklch to rgb
+                        }
+                        
+                        // Store and convert background color
+                        if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('oklch')) {
+                          original.backgroundColor = htmlEl.style.backgroundColor;
+                          htmlEl.style.backgroundColor = computedStyle.backgroundColor;
+                        }
+                        
+                        // Store and convert border color
+                        if (computedStyle.borderColor && computedStyle.borderColor.includes('oklch')) {
+                          original.borderColor = htmlEl.style.borderColor;
+                          htmlEl.style.borderColor = computedStyle.borderColor;
+                        }
+                        
+                        if (Object.keys(original).length > 0) {
+                          originalColors.set(el, original);
+                        }
+                      });
+                      
                       // Use html2canvas to capture the element as image
                       const canvas = await html2canvas(contractElement, {
                         scale: 2,
@@ -1495,6 +1567,14 @@ export default function RentalContracts() {
                       contractElement.style.overflow = originalOverflow;
                       contractElement.style.height = originalHeight;
                       contractElement.style.maxHeight = originalMaxHeight;
+                      
+                      // Restore original colors
+                      originalColors.forEach((original, el) => {
+                        const htmlEl = el as HTMLElement;
+                        if (original.color !== undefined) htmlEl.style.color = original.color;
+                        if (original.backgroundColor !== undefined) htmlEl.style.backgroundColor = original.backgroundColor;
+                        if (original.borderColor !== undefined) htmlEl.style.borderColor = original.borderColor;
+                      });
                       
                       // Create PDF with jsPDF
                       const imgData = canvas.toDataURL('image/png');
