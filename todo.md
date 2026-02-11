@@ -2072,3 +2072,31 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check frontend delete client button implementation - implementation correct
 - [x] Fix the bug preventing client deletion - added foreign key constraint check for related contracts
 - [x] Test client deletion works correctly
+
+### 78. Add Excel Export Button on Dashboard
+- [x] Install xlsx library for Excel file generation
+- [x] Create backend endpoint to fetch all system data (fleet, contracts, clients, maintenance, invoices)
+- [x] Implement Excel export functionality with multiple sheets for each data type
+- [x] Add "Export to Excel" button on dashboard page
+- [x] Test Excel export downloads correctly with all data
+
+### 79. Add LBP Currency Conversion to Invoices
+- [ ] Add USD to LBP conversion rate (89,700 LBP = 1 USD) to invoice calculations
+- [ ] Calculate 11% VAT in LBP on the LBP amount
+- [ ] Display both USD and LBP amounts on invoice view
+- [ ] Update invoice schema if needed to store LBP amounts
+- [ ] Test invoice displays correct USD and LBP amounts with VAT
+
+### 80. Add Invoice Status Management
+- [ ] Update invoice schema to include status field (pending, paid, cancelled, overdue)
+- [ ] Add status dropdown/buttons to invoice creation and detail views
+- [ ] Implement backend endpoint to update invoice status
+- [ ] Add status filter to invoices list page
+- [ ] Test all status transitions work correctly
+
+### 81. Add Who We Are and Contact Us Sections to Landing Page
+- [ ] Design "Who We Are" section layout for Home page
+- [ ] Design "Contact Us" section layout for Home page
+- [ ] Add placeholder content for both sections (to be filled later)
+- [ ] Ensure sections are responsive and match site design
+- [ ] Test landing page displays both new sections correctly

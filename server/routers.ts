@@ -1151,6 +1151,37 @@ export const appRouter = router({
         return logs;
       }),
   }),
+
+  // Excel Export Router
+  dataExport: router({
+    allData: publicProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id || 1;
+        
+        // Fetch all data
+        const [vehicles, contracts, clients, invoices] = await Promise.all([
+          db.getAllVehicles(userId),
+          db.getAllRentalContracts(userId),
+          db.getAllClients(userId),
+          db.listInvoices(userId),
+        ]);
+        
+        // Fetch maintenance records for each vehicle
+        const maintenancePromises = vehicles.map(v => 
+          db.getMaintenanceRecordsByVehicleId(v.id, userId)
+        );
+        const maintenanceArrays = await Promise.all(maintenancePromises);
+        const maintenanceRecords = maintenanceArrays.flat();
+        
+        return {
+          vehicles,
+          contracts,
+          clients,
+          maintenanceRecords,
+          invoices,
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
-import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,152 @@ import MinimalLayout from "@/components/MinimalLayout";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import * as XLSX from "xlsx";
+
+function ExportToExcelButton() {
+  const [isExporting, setIsExporting] = useState(false);
+  const exportData = trpc.dataExport.allData.useQuery(undefined, { enabled: false });
+
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      toast.info("Fetching data...");
+      
+      const result = await exportData.refetch();
+      if (!result.data) {
+        throw new Error("No data to export");
+      }
+
+      const { vehicles, contracts, clients, maintenanceRecords, invoices } = result.data;
+
+      // Create workbook
+      const workbook = XLSX.utils.book_new();
+
+      // Add Fleet sheet
+      const fleetData = vehicles.map(v => ({
+        "Brand": v.brand,
+        "Model": v.model,
+        "Year": v.year,
+        "Plate Number": v.plateNumber,
+        "VIN": v.vin || "",
+        "Category": v.category,
+        "Status": v.status,
+        "Daily Rate": v.dailyRate,
+        "Weekly Rate": v.weeklyRate || "",
+        "Monthly Rate": v.monthlyRate || "",
+        "Color": v.color,
+        "Mileage": v.mileage,
+        "Insurance Policy Number": v.insurancePolicyNumber || "",
+        "Insurance Expiry": v.insuranceExpiryDate ? new Date(v.insuranceExpiryDate).toLocaleDateString() : "",
+        "Insurance Cost": v.insuranceCost || "",
+        "Purchase Cost": v.purchaseCost || "",
+        "Registration Expiry": v.registrationExpiryDate ? new Date(v.registrationExpiryDate).toLocaleDateString() : "",
+      }));
+      const fleetSheet = XLSX.utils.json_to_sheet(fleetData);
+      XLSX.utils.book_append_sheet(workbook, fleetSheet, "Fleet");
+
+      // Add Contracts sheet
+      const contractsData = contracts.map(c => ({
+        "Contract Number": c.contractNumber,
+        "Client Name": `${c.clientFirstName || ""} ${c.clientLastName || ""}`.trim(),
+        "Vehicle ID": c.vehicleId,
+        "Start Date": c.rentalStartDate ? new Date(c.rentalStartDate).toLocaleDateString() : "",
+        "End Date": c.rentalEndDate ? new Date(c.rentalEndDate).toLocaleDateString() : "",
+        "Rental Days": c.rentalDays,
+        "Daily Rate": c.dailyRate,
+        "Total Amount": c.totalAmount,
+        "Discount": c.discount,
+        "Final Amount": c.finalAmount,
+        "Status": c.status,
+        "Returned At": c.returnedAt ? new Date(c.returnedAt).toLocaleDateString() : "",
+        "Pickup KM": c.pickupKm || "",
+        "Return KM": c.returnKm || "",
+      }));
+      const contractsSheet = XLSX.utils.json_to_sheet(contractsData);
+      XLSX.utils.book_append_sheet(workbook, contractsSheet, "Contracts");
+
+      // Add Clients sheet
+      const clientsData = clients.map(c => ({
+        "First Name": c.firstName,
+        "Last Name": c.lastName,
+        "Nationality": c.nationality || "",
+        "Phone": c.phone || "",
+        "Email": c.email || "",
+        "License Number": c.drivingLicenseNumber,
+        "License Expiry": c.licenseExpiryDate ? new Date(c.licenseExpiryDate).toLocaleDateString() : "",
+        "Address": c.address || "",
+      }));
+      const clientsSheet = XLSX.utils.json_to_sheet(clientsData);
+      XLSX.utils.book_append_sheet(workbook, clientsSheet, "Clients");
+
+      // Add Maintenance sheet
+      const maintenanceData = maintenanceRecords.map(m => ({
+        "Vehicle ID": m.vehicleId,
+        "Performed At": m.performedAt ? new Date(m.performedAt).toLocaleDateString() : "",
+        "Maintenance Type": m.maintenanceType,
+        "Description": m.description || "",
+        "Cost": m.cost || "",
+        "Mileage At Service": m.mileageAtService || "",
+        "Performed By": m.performedBy || "",
+        "Garage Location": m.garageLocation || "",
+        "Garage Entry Date": m.garageEntryDate ? new Date(m.garageEntryDate).toLocaleDateString() : "",
+        "Garage Exit Date": m.garageExitDate ? new Date(m.garageExitDate).toLocaleDateString() : "",
+      }));
+      const maintenanceSheet = XLSX.utils.json_to_sheet(maintenanceData);
+      XLSX.utils.book_append_sheet(workbook, maintenanceSheet, "Maintenance");
+
+      // Add Invoices sheet
+      const invoicesData = invoices.map(i => ({
+        "Invoice Number": i.invoiceNumber,
+        "Contract ID": i.contractId,
+        "Invoice Date": i.invoiceDate ? new Date(i.invoiceDate).toLocaleDateString() : "",
+        "Due Date": i.dueDate ? new Date(i.dueDate).toLocaleDateString() : "",
+        "Subtotal": i.subtotal,
+        "Tax Amount": i.taxAmount,
+        "Total Amount": i.totalAmount,
+        "Payment Status": i.paymentStatus,
+        "Payment Method": i.paymentMethod || "",
+        "Paid At": i.paidAt ? new Date(i.paidAt).toLocaleDateString() : "",
+      }));
+      const invoicesSheet = XLSX.utils.json_to_sheet(invoicesData);
+      XLSX.utils.book_append_sheet(workbook, invoicesSheet, "Invoices");
+
+      // Generate Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      
+      // Download file
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `CarRentalData_${new Date().toISOString().split("T")[0]}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success("Excel file downloaded successfully!");
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("Failed to export data. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <Button
+      onClick={handleExport}
+      disabled={isExporting}
+      className="bg-green-600 hover:bg-green-700 text-white"
+    >
+      <FileSpreadsheet className="mr-2 h-4 w-4" />
+      {isExporting ? "Exporting..." : "Export to Excel"}
+    </Button>
+  );
+}
 
 function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery({ filterUserId: filterUserId || undefined });
@@ -137,6 +282,7 @@ export default function Dashboard() {
                   </Select>
                 </div>
               )}
+              <ExportToExcelButton />
               {user?.role === "super_admin" && (
                 <Link href="/admin/users">
                   <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
