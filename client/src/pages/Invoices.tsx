@@ -117,13 +117,34 @@ export default function Invoices() {
 
       toast.info("Generating PDF...");
       
+      // Temporarily ensure element is fully visible
+      const originalOverflow = element.style.overflow;
+      const originalHeight = element.style.height;
+      const originalMaxHeight = element.style.maxHeight;
+      
+      element.style.overflow = 'visible';
+      element.style.height = 'auto';
+      element.style.maxHeight = 'none';
+      
+      // Wait a moment for layout to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        logging: false,
+        logging: true,
         allowTaint: true,
         backgroundColor: "#ffffff",
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+        scrollY: -window.scrollY,
+        scrollX: -window.scrollX,
       });
+      
+      // Restore original styles
+      element.style.overflow = originalOverflow;
+      element.style.height = originalHeight;
+      element.style.maxHeight = originalMaxHeight;
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
@@ -154,7 +175,7 @@ export default function Invoices() {
       toast.success("PDF exported successfully");
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      toast.error("Failed to export PDF. Please try again.");
+      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -282,17 +303,19 @@ export default function Invoices() {
                 {/* Invoice Content for PDF Export */}
                 <div id="invoice-content" className="bg-white text-black p-8 space-y-6 print:block">
                   {/* Company Header */}
-                  {companyProfile && (
-                    <div className="flex justify-between items-start border-b pb-6">
-                      <div className="space-y-2">
-                        {companyProfile.logoUrl && (
-                          <img
-                            src={companyProfile.logoUrl}
-                            alt="Company Logo"
-                            className="h-16 object-contain"
-                          />
-                        )}
-                        <h2 className="text-2xl font-bold">{companyProfile.companyName}</h2>
+                  <div className="flex justify-between items-start border-b pb-6">
+                    <div className="space-y-2">
+                      {companyProfile?.logoUrl && (
+                        <img
+                          src={companyProfile.logoUrl}
+                          alt="Company Logo"
+                          className="h-16 object-contain"
+                        />
+                      )}
+                      <h2 className="text-2xl font-bold">
+                        {companyProfile?.companyName || settings?.companyName || "Company Name"}
+                      </h2>
+                      {companyProfile && (
                         <div className="text-sm text-gray-600 space-y-1">
                           {companyProfile.address && <p>{companyProfile.address}</p>}
                           {companyProfile.city && companyProfile.country && (
@@ -304,22 +327,22 @@ export default function Invoices() {
                           {companyProfile.email && <p>Email: {companyProfile.email}</p>}
                           {companyProfile.taxId && <p>Tax ID: {companyProfile.taxId}</p>}
                         </div>
-                      </div>
-                      <div className="text-right space-y-2">
-                        <h1 className="text-3xl font-bold">INVOICE</h1>
-                        <p className="text-lg font-semibold">{invoiceDetails.invoiceNumber}</p>
-                        <div className="text-sm text-gray-600 space-y-1">
-                          <p>
-                            Invoice Date:{" "}
-                            {new Date(invoiceDetails.invoiceDate).toLocaleDateString()}
-                          </p>
-                          <p>
-                            Due Date: {new Date(invoiceDetails.dueDate).toLocaleDateString()}
-                          </p>
-                        </div>
+                      )}
+                    </div>
+                    <div className="text-right space-y-2">
+                      <h1 className="text-3xl font-bold">INVOICE</h1>
+                      <p className="text-lg font-semibold">{invoiceDetails.invoiceNumber}</p>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p>
+                          Invoice Date:{" "}
+                          {new Date(invoiceDetails.invoiceDate).toLocaleDateString()}
+                        </p>
+                        <p>
+                          Due Date: {new Date(invoiceDetails.dueDate).toLocaleDateString()}
+                        </p>
                       </div>
                     </div>
-                  )}
+                  </div>
 
                   {/* Invoice Status */}
                   <div className="flex justify-between items-center">
@@ -337,27 +360,27 @@ export default function Invoices() {
 
                   {/* Line Items */}
                   <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Itemized Charges</h3>
+                    <h3 className="font-semibold text-lg mb-4">Itemized Charges</h3>
                     <table className="w-full table-fixed">
-                      <thead className="border-b">
+                      <thead className="border-b-2">
                         <tr className="text-left">
-                          <th className="pb-2 font-medium w-1/2">Description</th>
-                          <th className="pb-2 font-medium text-right w-1/6 px-4">Quantity</th>
-                          <th className="pb-2 font-medium text-right w-1/6 px-4">Unit Price</th>
-                          <th className="pb-2 font-medium text-right w-1/6 px-4">Amount</th>
+                          <th className="pb-3 font-medium w-1/2">Description</th>
+                          <th className="pb-3 font-medium text-right w-1/6 px-6">Quantity</th>
+                          <th className="pb-3 font-medium text-right w-1/6 px-6">Unit Price</th>
+                          <th className="pb-3 font-medium text-right w-1/6 px-6">Amount</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {invoiceDetails.lineItems.map((item, index) => (
                           <tr key={index}>
-                            <td className="py-3">{item.description}</td>
-                            <td className="py-3 text-right px-4">
+                            <td className="py-4">{item.description}</td>
+                            <td className="py-4 text-right px-6 tracking-wider">
                               {parseFloat(item.quantity).toFixed(2)}
                             </td>
-                            <td className="py-3 text-right px-4">
+                            <td className="py-4 text-right px-6 tracking-wider">
                               ${parseFloat(item.unitPrice).toFixed(2)}
                             </td>
-                            <td className="py-3 text-right font-medium px-4">
+                            <td className="py-4 text-right font-medium px-6 tracking-wider">
                               ${parseFloat(item.amount).toFixed(2)}
                             </td>
                           </tr>
@@ -367,45 +390,45 @@ export default function Invoices() {
                   </div>
 
                   {/* Totals */}
-                  <div className="border-t pt-4 space-y-3">
+                  <div className="border-t-2 pt-6 space-y-4 mt-6">
                     {/* USD Amounts */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
+                    <div className="space-y-3">
+                      <div className="flex justify-between text-base">
                         <span className="text-gray-600">Subtotal (USD):</span>
-                        <span className="font-medium">
+                        <span className="font-medium tracking-wider">
                           {formatUSD(parseFloat(invoiceDetails.subtotal))}
                         </span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-base">
                         <span className="text-gray-600">Tax/VAT 11% (USD):</span>
-                        <span className="font-medium">
+                        <span className="font-medium tracking-wider">
                           {formatUSD(parseFloat(invoiceDetails.taxAmount))}
                         </span>
                       </div>
-                      <div className="flex justify-between text-base font-semibold border-t pt-2">
+                      <div className="flex justify-between text-lg font-semibold border-t-2 pt-3 mt-2">
                         <span>Total (USD):</span>
-                        <span>{formatUSD(parseFloat(invoiceDetails.totalAmount))}</span>
+                        <span className="tracking-wider">{formatUSD(parseFloat(invoiceDetails.totalAmount))}</span>
                       </div>
                     </div>
 
                     {/* LBP Amounts */}
-                    <div className="bg-gray-50 p-4 rounded-lg space-y-2 border-2 border-primary">
-                      <p className="text-xs text-gray-500 mb-2">Lebanese Pounds (LBP) at rate {exchangeRate.toLocaleString()} LBP/USD</p>
-                      <div className="flex justify-between text-sm">
+                    <div className="bg-gray-50 p-5 rounded-lg space-y-3 border-2 border-primary mt-4">
+                      <p className="text-xs text-gray-500 mb-3">Lebanese Pounds (LBP) at rate {exchangeRate.toLocaleString()} LBP/USD</p>
+                      <div className="flex justify-between text-base">
                         <span className="text-gray-600">Subtotal (LBP):</span>
-                        <span className="font-medium">
+                        <span className="font-medium tracking-wider">
                           {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.subtotal), exchangeRate))}
                         </span>
                       </div>
-                      <div className="flex justify-between text-sm">
+                      <div className="flex justify-between text-base">
                         <span className="text-gray-600">Tax/VAT 11% (LBP):</span>
-                        <span className="font-medium">
+                        <span className="font-medium tracking-wider">
                           {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount), exchangeRate))}
                         </span>
                       </div>
-                      <div className="flex justify-between text-lg font-bold border-t border-primary pt-2">
+                      <div className="flex justify-between text-xl font-bold border-t-2 border-primary pt-3 mt-2">
                         <span>Total (LBP):</span>
-                        <span>{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate))}</span>
+                        <span className="tracking-wider">{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate))}</span>
                       </div>
                     </div>
                   </div>

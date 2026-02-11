@@ -2147,3 +2147,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Created comprehensive test suite (server/settings.test.ts)
 - [x] All 8 tests passing - validates exchange rate CRUD operations
 - [x] Exchange rate changes in Settings page now immediately affect invoice displays
+
+
+### 88. Fix Invoice PDF Export Button and Enhance Layout
+- [x] Investigate why PDF export button is not working in Invoices page
+- [x] Implement working PDF export using jsPDF + html2canvas libraries
+- [x] Add company name to invoice header (fetch from settings)
+- [x] Increase spacing between numbers in invoice for better readability
+- [x] Add proper margins and padding to invoice layout
+- [x] Enhanced PDF export with element visibility fixes and better error handling
+- [x] Company name now displays from companyProfile or settings fallback
+- [x] Increased spacing with tracking-wider class and larger padding values
