@@ -1552,5 +1552,40 @@ export const appRouter = router({
         return monthlyData;
       }),
   }),
+
+  dashboard: router({
+    getQuickStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user.id;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Get today's revenue from completed contracts
+        const contracts = await db.getCompletedContracts(userId);
+        const todayRevenue = contracts
+          .filter(c => {
+            const endDate = new Date(c.rentalEndDate);
+            return endDate >= today && endDate < tomorrow;
+          })
+          .reduce((sum, c) => sum + parseFloat(c.finalAmount?.toString() || '0'), 0);
+
+        // Get active contracts count
+        const allContracts = await db.getAllRentalContracts(userId);
+        const activeContractsCount = allContracts.filter((c: any) => c.status === 'active').length;
+
+        // Get available vehicles count
+        const vehicles = await db.getAllVehicles(userId);
+        const availableVehiclesCount = vehicles.filter((v: any) => v.status === 'Available').length;
+
+        return {
+          todayRevenue,
+          activeContractsCount,
+          availableVehiclesCount,
+          totalVehicles: vehicles.length,
+        };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

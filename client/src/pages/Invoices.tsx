@@ -118,70 +118,53 @@ export default function Invoices() {
       toast.info("Generating PDF...");
       
       // Temporarily ensure element is fully visible
-      const originalOverflow = element.style.overflow;
-      const originalHeight = element.style.height;
-      const originalMaxHeight = element.style.maxHeight;
+      // Get all elements and their computed styles BEFORE cloning
+      const originalElements = element.querySelectorAll("*");
+      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
       
-      element.style.overflow = 'visible';
-      element.style.height = 'auto';
-      element.style.maxHeight = 'none';
-      
-      // Convert OKLCH colors to RGB for PDF compatibility
-      const allElements = element.querySelectorAll('*');
-      const originalStyles: Map<Element, string> = new Map();
-      
-      allElements.forEach((el: Element) => {
+      originalElements.forEach((el) => {
         const htmlEl = el as HTMLElement;
-        const computedStyle = window.getComputedStyle(htmlEl);
-        
-        // Store original inline style
-        originalStyles.set(el, htmlEl.getAttribute('style') || '');
-        
-        // Apply computed RGB colors as inline styles to override OKLCH
-        const color = computedStyle.color;
-        const bgColor = computedStyle.backgroundColor;
-        const borderColor = computedStyle.borderColor;
-        
-        if (color && color !== 'rgba(0, 0, 0, 0)') {
-          htmlEl.style.color = color;
-        }
-        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
-          htmlEl.style.backgroundColor = bgColor;
-        }
-        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
-          htmlEl.style.borderColor = borderColor;
+        const computed = window.getComputedStyle(htmlEl);
+        computedStyles.push({
+          color: computed.color,
+          backgroundColor: computed.backgroundColor,
+          borderColor: computed.borderColor,
+        });
+      });
+
+      // Create a clone to avoid OKLCH color issues
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.position = "absolute";
+      clone.style.left = "-9999px";
+      clone.style.overflow = 'visible';
+      clone.style.height = 'auto';
+      clone.style.maxHeight = 'none';
+      document.body.appendChild(clone);
+
+      // Apply computed RGB colors to cloned elements
+      const clonedElements = clone.querySelectorAll("*");
+      clonedElements.forEach((el, index) => {
+        const htmlEl = el as HTMLElement;
+        const styles = computedStyles[index];
+        if (styles) {
+          if (styles.color) htmlEl.style.color = styles.color;
+          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
+          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
         }
       });
       
       // Wait a moment for layout to settle
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const canvas = await html2canvas(element, {
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
-        logging: true,
-        allowTaint: true,
+        logging: false,
         backgroundColor: "#ffffff",
-        windowWidth: element.scrollWidth,
-        windowHeight: element.scrollHeight,
-        scrollY: -window.scrollY,
-        scrollX: -window.scrollX,
       });
       
-      // Restore original styles
-      element.style.overflow = originalOverflow;
-      element.style.height = originalHeight;
-      element.style.maxHeight = originalMaxHeight;
-      
-      // Restore original inline styles
-      originalStyles.forEach((originalStyle, el) => {
-        const htmlEl = el as HTMLElement;
-        if (originalStyle) {
-          htmlEl.setAttribute('style', originalStyle);
-        } else {
-          htmlEl.removeAttribute('style');
-        }
-      });
+      // Remove clone
+      document.body.removeChild(clone);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({

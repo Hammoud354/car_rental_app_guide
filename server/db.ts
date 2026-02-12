@@ -1929,29 +1929,45 @@ export async function updateInvoicePaymentStatus(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Tables are already imported at the top of the file
-  
-  const updateData: any = {
-    paymentStatus,
-  };
-  
-  if (paymentMethod) {
-    updateData.paymentMethod = paymentMethod;
+  try {
+    // Tables are already imported at the top of the file
+    
+    const updateData: any = {
+      paymentStatus,
+    };
+    
+    if (paymentMethod) {
+      updateData.paymentMethod = paymentMethod;
+    }
+    
+    if (paymentStatus === "paid") {
+      updateData.paidAt = new Date();
+    }
+    
+    console.log('[updateInvoicePaymentStatus] Updating invoice:', {
+      invoiceId,
+      userId,
+      updateData
+    });
+    
+    const result = await db
+      .update(invoices)
+      .set(updateData)
+      .where(and(
+        eq(invoices.id, invoiceId),
+        eq(invoices.userId, userId)
+      ));
+    
+    console.log('[updateInvoicePaymentStatus] Update result:', result);
+    
+    const updatedInvoice = await getInvoiceById(invoiceId, userId);
+    console.log('[updateInvoicePaymentStatus] Updated invoice:', updatedInvoice);
+    
+    return updatedInvoice;
+  } catch (error) {
+    console.error('[updateInvoicePaymentStatus] Error:', error);
+    throw new Error(`Failed to update invoice payment status: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-  
-  if (paymentStatus === "paid") {
-    updateData.paidAt = new Date();
-  }
-  
-  await db
-    .update(invoices)
-    .set(updateData)
-    .where(and(
-      eq(invoices.id, invoiceId),
-      eq(invoices.userId, userId)
-    ));
-  
-  return await getInvoiceById(invoiceId, userId);
 }
 
 /**

@@ -282,6 +282,33 @@
 }
 
 @media print {
+  /* Hide sidebar navigation and non-printable elements */
+  nav,
+  aside,
+  .sidebar,
+  [class*="sidebar"],
+  [class*="Sidebar"],
+  button,
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure main content takes full width */
+  main,
+  .container,
+  [role="main"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+  }
+  
+  /* Reset body and html for print */
+  body, html {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
   @page {
     margin: 0.5in;
     size: A4;

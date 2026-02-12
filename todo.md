@@ -2957,3 +2957,40 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix OKLCH to RGB conversion in handleExportToPDF function (get computed styles from original before cloning)
 - [x] Test PDF export to ensure it works without errors
 - [x] Save checkpoint after fix
+
+
+## Print Preview Fix and New Features - User Request (Feb 13, 2026)
+
+### Print Preview Fix
+- [ ] Fix print styles to show P&L content instead of blank page
+- [ ] Hide sidebar and export buttons in print view
+- [ ] Ensure proper page breaks and formatting for print
+
+### Dashboard Quick Stats Widget
+- [ ] Create backend procedure to fetch today's revenue
+- [ ] Create backend procedure to count active contracts
+- [ ] Create backend procedure to count available vehicles
+- [ ] Design and implement dashboard stats widget component
+- [ ] Add widget to main Dashboard page
+
+### Vehicle Utilization Rate Tracking
+- [ ] Calculate total days each vehicle has been in the fleet
+- [ ] Calculate total days each vehicle has been rented
+- [ ] Add utilization percentage column to P&L vehicle profitability table
+- [ ] Add visual indicator (progress bar or color coding) for utilization rates
+- [ ] Highlight underperforming vehicles (low utilization)
+
+### Custom Expense Categories Management
+- [ ] Design expense categories database schema (categories table)
+- [ ] Create backend procedures for CRUD operations on expense categories
+- [ ] Create expenses table to track custom expenses per vehicle
+- [ ] Build expense categories management UI page
+- [ ] Add expense entry form for vehicles
+- [ ] Include custom expenses in P&L profit calculations
+- [ ] Update vehicle profitability to include all expense types
+
+
+## Critical Bug Fixes - User Report (Feb 13, 2026)
+- [x] Fix invoice PDF export OKLCH error in contract details view (applied clone-based OKLCH conversion)
+- [x] Debug and fix invoice payment status update error (added detailed error logging and try-catch)
+- [x] Apply same OKLCH color conversion fix used in P&L to invoice PDF export
