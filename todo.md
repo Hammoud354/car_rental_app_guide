@@ -2252,3 +2252,37 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Changed tabs from ghost variant to outline for better consistency
 - [x] Clean tab formatting with proper spacing and no unwanted lines
 - [x] All pages use consistent Inter font and button styling from global theme
+
+
+### 98. Remove Status Field from Vehicle Creation and Implement Automatic Status
+- [ ] Remove status field from vehicle creation form (should be automatic)
+- [ ] Implement automatic status logic: "Rented" when active contract exists
+- [ ] Implement automatic status logic: "Maintenance" when in maintenance
+- [ ] Implement automatic status logic: "Available" when neither rented nor in maintenance
+- [ ] Update vehicle card display to show automatic status
+- [ ] Test status updates when creating contracts and maintenance records
+
+### 99. Fix Font Visibility Issues Across Entire App
+- [ ] Fix font visibility in client creation form
+- [ ] Check and fix font colors in all input fields
+- [ ] Ensure consistent dark font color across all forms
+- [ ] Verify font visibility in all dialogs and modals
+- [ ] Test font readability across all pages
+
+### 98. Remove Status Field from Vehicle Creation and Implement Automatic Status Logic
+- [x] Remove status field from vehicle creation form in FleetManagement page
+- [x] Remove status from vehicle creation and edit mutations (set to "Available" by default)
+- [x] Create updateVehicleStatus function to automatically calculate status
+- [x] Auto-set status to "Rented" when contract is created
+- [x] Auto-set status to "Available" when contract is returned
+- [x] Auto-set status to "Maintenance" when vehicle has active maintenance record (no garageExitDate)
+- [x] Status now updates automatically based on contracts and maintenance
+- [x] Vehicle status logic: Active Contract → Rented, In Garage → Maintenance, Otherwise → Available
+
+### 99. Fix Font Visibility Issues Across Entire App
+- [x] Check font visibility in client form (reported as not visible)
+- [x] Add explicit text-foreground color to all input fields
+- [x] Add explicit text-foreground color to all label fields
+- [x] Ensure consistent font-medium weight for labels
+- [x] Font visibility fixed across all forms (clients, vehicles, contracts)
+- [x] Font colors work correctly in both light and dark themes

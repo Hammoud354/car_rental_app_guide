@@ -234,7 +234,6 @@ export default function FleetManagement() {
         year: parseInt(formData.get("year") as string),
         color: formData.get("color") as string,
         category: formData.get("category") as any,
-        status: formData.get("status") as any,
         dailyRate: formData.get("dailyRate") as string,
         weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
         monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
@@ -483,25 +482,9 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <Select name="status" defaultValue="Available">
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Available">Available</SelectItem>
-                        <SelectItem value="Rented">Rented</SelectItem>
-                        <SelectItem value="Maintenance">Maintenance</SelectItem>
-                        <SelectItem value="Out of Service">Out of Service</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="mileage">Mileage</Label>
-                    <Input id="mileage" name="mileage" type="number" min="0" />
-                  </div>
+                <div>
+                  <Label htmlFor="mileage">Mileage</Label>
+                  <Input id="mileage" name="mileage" type="number" min="0" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
@@ -843,25 +826,9 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-status">Status</Label>
-                    <Select name="status" defaultValue={selectedVehicle.status}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Available">Available</SelectItem>
-                        <SelectItem value="Rented">Rented</SelectItem>
-                        <SelectItem value="Maintenance">Maintenance</SelectItem>
-                        <SelectItem value="Out of Service">Out of Service</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-mileage">Mileage</Label>
-                    <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" />
-                  </div>
+                <div>
+                  <Label htmlFor="edit-mileage">Mileage</Label>
+                  <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">

@@ -206,6 +206,8 @@ export async function createVehicle(vehicle: InsertVehicle) {
   const cleanedVehicle = Object.fromEntries(
     Object.entries(vehicle).filter(([_, value]) => value !== undefined)
   ) as InsertVehicle;
+  // Always set status to Available for new vehicles
+  cleanedVehicle.status = "Available";
   const result = await db.insert(vehicles).values(cleanedVehicle);
   const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
   const created = await db.select().from(vehicles).where(eq(vehicles.id, insertId)).limit(1);

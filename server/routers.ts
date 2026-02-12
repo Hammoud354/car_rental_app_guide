@@ -554,6 +554,10 @@ export const appRouter = router({
         // Auto-generate invoice immediately when contract is created
         const invoice = await db.autoGenerateInvoice(contract.id, userId);
         
+        // Update vehicle status to "Rented"
+        const { updateVehicleStatus } = await import("./updateVehicleStatus");
+        await updateVehicleStatus(input.vehicleId);
+        
         return { ...contract, invoice };
       }),
     
@@ -601,7 +605,7 @@ export const appRouter = router({
             throw new Error(`Return odometer (${input.returnKm} km) must be greater than pickup odometer (${contract.pickupKm} km)`);
           }
         }
-        return await db.markContractAsReturned(
+        const result = await db.markContractAsReturned(
           input.contractId, 
           input.returnKm,
           input.returnFuelLevel,
@@ -609,6 +613,15 @@ export const appRouter = router({
           input.damageInspection,
           input.overLimitKmFee
         );
+        
+        // Update vehicle status back to "Available" (or "Maintenance" if in maintenance)
+        const contract = await db.getRentalContractById(input.contractId, ctx.user.id);
+        if (contract) {
+          const { updateVehicleStatus } = await import("./updateVehicleStatus");
+          await updateVehicleStatus(contract.vehicleId);
+        }
+        
+        return result;
       }),
     
     delete: publicProcedure
