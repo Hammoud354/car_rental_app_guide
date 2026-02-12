@@ -2994,3 +2994,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix invoice PDF export OKLCH error in contract details view (applied clone-based OKLCH conversion)
 - [x] Debug and fix invoice payment status update error (added detailed error logging and try-catch)
 - [x] Apply same OKLCH color conversion fix used in P&L to invoice PDF export
+
+
+## Contract Print and Dialog Issues - User Report (Feb 13, 2026)
+- [x] Fix contract print showing blank page (added print-specific CSS for contract content)
+- [x] Fix contract details dialog freeze/scroll issue (removed scrollbar hiding styles)
+- [x] Ensure contract content is properly formatted for print (added dialog override styles)
+- [x] Test print functionality across all contract types

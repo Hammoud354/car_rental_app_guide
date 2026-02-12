@@ -431,4 +431,23 @@
     print-color-adjust: exact !important;
     -webkit-print-color-adjust: exact !important;
   }
+  
+  /* Show contract content for print */
+  #contract-content,
+  .contract-details-content,
+  .print-content {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+  
+  /* Hide dialog overlay and container styles */
+  [role="dialog"],
+  [data-radix-dialog-content] {
+    position: static !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
 }

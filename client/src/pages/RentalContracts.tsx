@@ -1100,7 +1100,7 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <div id="contract-content" className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+                <div id="contract-content" className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1">
                   {/* Company Branding Header */}
                   {companyProfile && (
                     <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
