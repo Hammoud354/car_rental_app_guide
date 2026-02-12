@@ -2869,3 +2869,33 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Add Clients Excel export
 - [ ] Add Maintenance Excel export
 
+
+
+### 137. Fix Contract Details Dialog Theme
+- [ ] Change dark navy background to light theme
+- [ ] Match card styling with rest of app (white/light gray background)
+- [ ] Ensure text colors are consistent (dark text on light background)
+- [ ] Fix section headers and labels styling
+- [ ] Test dialog appearance and consistency
+
+
+## UX/UI Theme Consistency Fixes - February 12, 2026
+- [x] Fixed Contract Details dialog dark navy background to light theme
+- [x] Changed dialog background from bg-slate-800 to bg-background
+- [x] Changed section cards from bg-gray-700 to bg-card with borders
+- [x] Changed label text from text-gray-400 to text-muted-foreground
+- [x] Added blood-red input outline utility class (input-client) to global CSS
+- [x] Applied blood-red outlines to all input fields in Create Client dialog
+- [x] Applied blood-red outlines to all input fields in Edit Client dialog
+- [x] Removed hover background effects from icon buttons in Client Cards
+- [x] All theme styling now consistent with Apple-style light theme throughout app
+
+
+## Critical UX/UI Fixes - User Reported Issues (Feb 12, 2026)
+- [x] Fix print preview showing empty document (print styles added to global CSS)
+- [x] Fix PDF export OKLCH color error - convert OKLCH to RGB for PDF compatibility (applied to RentalContracts, Invoices, CarDamageInspection)
+- [x] Redesign Contract Details dialog buttons - remove icons, make consistent with app style
+- [x] Apply blood-red input outlines to Client forms (Clients.tsx)
+- [x] Apply blood-red input outlines to Rental Contracts forms (RentalContracts.tsx)
+- [x] Apply blood-red input outlines to Fleet Management forms (FleetManagement.tsx)
+- [ ] Apply blood-red input outlines to remaining pages (Settings, CompanySettings, Maintenance, Auth pages)

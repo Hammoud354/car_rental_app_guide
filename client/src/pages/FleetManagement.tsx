@@ -333,7 +333,7 @@ export default function FleetManagement() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="plateNumber">Plate Number *</Label>
-                    <Input id="plateNumber" name="plateNumber" required />
+                    <Input id="plateNumber" name="plateNumber" required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="vin">VIN</Label>
@@ -459,14 +459,14 @@ export default function FleetManagement() {
                   </div>
                   <div>
                     <Label htmlFor="year">Year *</Label>
-                    <Input id="year" name="year" type="number" min="1900" max="2100" required />
+                    <Input id="year" name="year" type="number" min="1900" max="2100" required className="input-client" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="color">Color *</Label>
-                    <Input id="color" name="color" required />
+                    <Input id="color" name="color" required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="category">Category *</Label>
@@ -495,7 +495,7 @@ export default function FleetManagement() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
-                    <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required />
+                    <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="weeklyRate">Weekly Rate ($)</Label>
@@ -514,12 +514,12 @@ export default function FleetManagement() {
 
                 <div>
                   <Label htmlFor="insuranceCost">Annual Insurance Cost ($)</Label>
-                  <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" />
+                  <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
                 </div>
 
                 <div>
                   <Label htmlFor="purchaseCost">Vehicle Purchase Cost ($)</Label>
-                  <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" />
+                  <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
                 </div>
 
                 <div>
@@ -677,7 +677,7 @@ export default function FleetManagement() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit-plateNumber">Plate Number *</Label>
-                    <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required />
+                    <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="edit-vin">VIN</Label>
@@ -803,14 +803,14 @@ export default function FleetManagement() {
                   </div>
                   <div>
                     <Label htmlFor="edit-year">Year *</Label>
-                    <Input id="edit-year" name="year" type="number" defaultValue={selectedVehicle.year} min="1900" max="2100" required />
+                    <Input id="edit-year" name="year" type="number" defaultValue={selectedVehicle.year} min="1900" max="2100" required className="input-client" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit-color">Color *</Label>
-                    <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required />
+                    <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="edit-category">Category *</Label>
@@ -839,7 +839,7 @@ export default function FleetManagement() {
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="edit-dailyRate">Daily Rate ($) *</Label>
-                    <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" required />
+                    <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" required className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="edit-weeklyRate">Weekly Rate ($)</Label>

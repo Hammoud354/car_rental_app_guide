@@ -530,7 +530,7 @@ export default function RentalContracts() {
                         name="vehicleModel" 
                         placeholder="Select plate number first"
                         readOnly
-                        className="bg-muted cursor-not-allowed"
+                        className="bg-muted cursor-not-allowed input-client"
                       />
                     </div>
                   </div>
@@ -629,11 +629,11 @@ export default function RentalContracts() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="clientFirstName">First Name *</Label>
-                        <Input id="clientFirstName" name="clientFirstName" required />
+                        <Input id="clientFirstName" name="clientFirstName" required className="input-client" />
                       </div>
                       <div>
                         <Label htmlFor="clientLastName">Last Name *</Label>
-                        <Input id="clientLastName" name="clientLastName" required />
+                        <Input id="clientLastName" name="clientLastName" required className="input-client" />
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientNationality">Nationality</Label>
@@ -681,11 +681,11 @@ export default function RentalContracts() {
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientPhone">Phone Number</Label>
-                        <Input id="clientPhone" name="clientPhone" type="tel" placeholder="e.g., +1 234 567 8900" />
+                        <Input id="clientPhone" name="clientPhone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientAddress">Address</Label>
-                        <Input id="clientAddress" name="clientAddress" placeholder="Street, City, State, ZIP" />
+                        <Input id="clientAddress" name="clientAddress" placeholder="Street, City, State, ZIP" className="input-client" />
                       </div>
                     </div>
                   </div>
@@ -696,7 +696,7 @@ export default function RentalContracts() {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="col-span-2">
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                        <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required />
+                        <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                       </div>
                       <div>
                         <DateDropdownSelector
@@ -747,7 +747,7 @@ export default function RentalContracts() {
                           min="1"
                           value={rentalDays}
                           onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
-                          className="mt-1"
+                          className="mt-1 input-client"
                           required
                         />
                         <p className="text-xs text-muted-foreground mt-1">
@@ -760,7 +760,7 @@ export default function RentalContracts() {
                           type="text"
                           value={rentalEndDate ? rentalEndDate.toLocaleDateString() : ""}
                           readOnly
-                          className="bg-gray-50"
+                          className="bg-gray-50 input-client"
                         />
                       </div>
                     </div>
@@ -811,7 +811,7 @@ export default function RentalContracts() {
                           type="text"
                           value={totalAmount.toFixed(2)}
                           readOnly
-                          className="bg-gray-50"
+                          className="bg-gray-50 input-client"
                         />
                       </div>
                       <div>
@@ -833,7 +833,7 @@ export default function RentalContracts() {
                           type="text"
                           value={finalAmount.toFixed(2)}
                           readOnly
-                          className="bg-gray-50 font-bold text-lg"
+                          className="bg-gray-50 font-bold text-lg input-client"
                         />
                       </div>
                     </div>
@@ -1093,7 +1093,7 @@ export default function RentalContracts() {
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-          <DialogContent className="max-w-[98vw] w-[98vw] h-[98vh] max-h-[98vh] overflow-hidden bg-gray-800 text-white flex flex-col">
+          <DialogContent className="max-w-[98vw] w-[98vw] h-[98vh] max-h-[98vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
             </DialogHeader>
@@ -1135,35 +1135,35 @@ export default function RentalContracts() {
                   {/* Client Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-gray-900">Client Information</h3>
-                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
-                        <div className="text-sm text-gray-400">Full Name</div>
+                        <div className="text-sm text-muted-foreground">Full Name</div>
                         <div className="font-semibold">{selectedContract.clientFirstName} {selectedContract.clientLastName}</div>
                       </div>
                       {selectedContract.clientNationality && (
                         <div>
-                          <div className="text-sm text-gray-400">Nationality</div>
+                          <div className="text-sm text-muted-foreground">Nationality</div>
                           <div>{selectedContract.clientNationality}</div>
                         </div>
                       )}
                       {selectedContract.clientPhone && (
                         <div>
-                          <div className="text-sm text-gray-400">Phone</div>
+                          <div className="text-sm text-muted-foreground">Phone</div>
                           <div>{selectedContract.clientPhone}</div>
                         </div>
                       )}
                       {selectedContract.clientAddress && (
                         <div className="col-span-2">
-                          <div className="text-sm text-gray-400">Address</div>
+                          <div className="text-sm text-muted-foreground">Address</div>
                           <div>{selectedContract.clientAddress}</div>
                         </div>
                       )}
                       <div>
-                        <div className="text-sm text-gray-400">License Number</div>
+                        <div className="text-sm text-muted-foreground">License Number</div>
                         <div className="font-mono">{selectedContract.drivingLicenseNumber}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">License Expiry</div>
+                        <div className="text-sm text-muted-foreground">License Expiry</div>
                         <div>{new Date(selectedContract.licenseExpiryDate).toLocaleDateString()}</div>
                       </div>
                     </div>
@@ -1172,26 +1172,26 @@ export default function RentalContracts() {
                   {/* Vehicle Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-gray-900">Vehicle Information</h3>
-                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
-                        <div className="text-sm text-gray-400">Plate Number</div>
+                        <div className="text-sm text-muted-foreground">Plate Number</div>
                         <div className="font-semibold">{vehicle?.plateNumber || "N/A"}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Vehicle</div>
+                        <div className="text-sm text-muted-foreground">Vehicle</div>
                         <div>{vehicle ? `${vehicle.brand} ${vehicle.model} (${vehicle.year})` : "Unknown"}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Category</div>
+                        <div className="text-sm text-muted-foreground">Category</div>
                         <div>{vehicle?.category || "N/A"}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Color</div>
+                        <div className="text-sm text-muted-foreground">Color</div>
                         <div>{vehicle?.color || "N/A"}</div>
                       </div>
                       {vehicle?.vin && (
                         <div className="col-span-2">
-                          <div className="text-sm text-gray-400">VIN Number</div>
+                          <div className="text-sm text-muted-foreground">VIN Number</div>
                           <div className="font-mono">{vehicle.vin}</div>
                         </div>
                       )}
@@ -1201,33 +1201,33 @@ export default function RentalContracts() {
                   {/* Rental Period & Pricing */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-gray-900">Rental Period & Pricing</h3>
-                    <div className="grid grid-cols-2 gap-4 bg-gray-700 p-4 rounded-lg">
+                    <div className="grid grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
-                        <div className="text-sm text-gray-400">Start Date</div>
+                        <div className="text-sm text-muted-foreground">Start Date</div>
                         <div className="font-semibold">{new Date(selectedContract.rentalStartDate).toLocaleDateString()}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Return Date</div>
+                        <div className="text-sm text-muted-foreground">Return Date</div>
                         <div className="font-semibold">{new Date(selectedContract.rentalEndDate).toLocaleDateString()}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Rental Days</div>
+                        <div className="text-sm text-muted-foreground">Rental Days</div>
                         <div>{selectedContract.rentalDays} days</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Daily Rate</div>
+                        <div className="text-sm text-muted-foreground">Daily Rate</div>
                         <div>${selectedContract.dailyRate}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Total Amount</div>
+                        <div className="text-sm text-muted-foreground">Total Amount</div>
                         <div>${selectedContract.totalAmount}</div>
                       </div>
                       <div>
-                        <div className="text-sm text-gray-400">Discount</div>
+                        <div className="text-sm text-muted-foreground">Discount</div>
                         <div>${selectedContract.discount || "0.00"}</div>
                       </div>
                       <div className="col-span-2">
-                        <div className="text-sm text-gray-400">Final Amount</div>
+                        <div className="text-sm text-muted-foreground">Final Amount</div>
                         <div className="text-2xl font-bold text-gray-900">${selectedContract.finalAmount}</div>
                       </div>
                       {selectedContract.status === "overdue" && (
@@ -1338,7 +1338,7 @@ export default function RentalContracts() {
                   {selectedContract.signatureData && (
                     <div>
                       <h3 className="font-semibold text-lg mb-3 text-gray-900">Client Signature</h3>
-                      <div className="bg-gray-700 p-4 rounded-lg">
+                      <div className="bg-card p-4 rounded-lg border border-border">
                         <img src={selectedContract.signatureData} alt="Client Signature" className="max-w-full h-32 border border-gray-600 rounded" />
                       </div>
                     </div>
@@ -1358,10 +1358,10 @@ export default function RentalContracts() {
                     }, 100);
                   }} 
                   variant="outline"
-                  className="print-contract transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-blue-400 hover:text-blue-400 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                 >
-                  🖨️ Print
+                  Print Contract
                 </Button>
                 <Button 
                   onClick={async () => {
@@ -1392,34 +1392,30 @@ export default function RentalContracts() {
                       contractElement.style.maxHeight = 'none';
                       
                       // Convert OKLCH colors to RGB for PDF compatibility
+                      // Get all elements and apply computed RGB colors as inline styles
                       const elementsWithOklch = contractElement.querySelectorAll('*');
-                      const originalColors: Map<Element, { color?: string; backgroundColor?: string; borderColor?: string }> = new Map();
+                      const originalStyles: Map<Element, string> = new Map();
                       
                       elementsWithOklch.forEach((el: Element) => {
                         const htmlEl = el as HTMLElement;
                         const computedStyle = window.getComputedStyle(htmlEl);
-                        const original: { color?: string; backgroundColor?: string; borderColor?: string } = {};
                         
-                        // Store and convert color
-                        if (computedStyle.color && computedStyle.color.includes('oklch')) {
-                          original.color = htmlEl.style.color;
-                          htmlEl.style.color = computedStyle.color; // Browser converts oklch to rgb
+                        // Store original inline style
+                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
+                        
+                        // Apply computed RGB colors as inline styles to override OKLCH
+                        const color = computedStyle.color;
+                        const bgColor = computedStyle.backgroundColor;
+                        const borderColor = computedStyle.borderColor;
+                        
+                        if (color && color !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.color = color;
                         }
-                        
-                        // Store and convert background color
-                        if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('oklch')) {
-                          original.backgroundColor = htmlEl.style.backgroundColor;
-                          htmlEl.style.backgroundColor = computedStyle.backgroundColor;
+                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.backgroundColor = bgColor;
                         }
-                        
-                        // Store and convert border color
-                        if (computedStyle.borderColor && computedStyle.borderColor.includes('oklch')) {
-                          original.borderColor = htmlEl.style.borderColor;
-                          htmlEl.style.borderColor = computedStyle.borderColor;
-                        }
-                        
-                        if (Object.keys(original).length > 0) {
-                          originalColors.set(el, original);
+                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.borderColor = borderColor;
                         }
                       });
                       
@@ -1440,12 +1436,14 @@ export default function RentalContracts() {
                       contractElement.style.height = originalHeight;
                       contractElement.style.maxHeight = originalMaxHeight;
                       
-                      // Restore original colors
-                      originalColors.forEach((original, el) => {
+                      // Restore original inline styles
+                      originalStyles.forEach((originalStyle, el) => {
                         const htmlEl = el as HTMLElement;
-                        if (original.color !== undefined) htmlEl.style.color = original.color;
-                        if (original.backgroundColor !== undefined) htmlEl.style.backgroundColor = original.backgroundColor;
-                        if (original.borderColor !== undefined) htmlEl.style.borderColor = original.borderColor;
+                        if (originalStyle) {
+                          htmlEl.setAttribute('style', originalStyle);
+                        } else {
+                          htmlEl.removeAttribute('style');
+                        }
                       });
                       
                       // Create PDF with jsPDF
@@ -1511,10 +1509,10 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="outline"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                 >
-                  📄 Export PDF
+                  Export to PDF
                 </Button>
                 <Button 
                   onClick={async () => {
@@ -1551,34 +1549,30 @@ export default function RentalContracts() {
                       contractElement.style.maxHeight = 'none';
                       
                       // Convert OKLCH colors to RGB for PDF compatibility
+                      // Get all elements and apply computed RGB colors as inline styles
                       const elementsWithOklch = contractElement.querySelectorAll('*');
-                      const originalColors: Map<Element, { color?: string; backgroundColor?: string; borderColor?: string }> = new Map();
+                      const originalStyles: Map<Element, string> = new Map();
                       
                       elementsWithOklch.forEach((el: Element) => {
                         const htmlEl = el as HTMLElement;
                         const computedStyle = window.getComputedStyle(htmlEl);
-                        const original: { color?: string; backgroundColor?: string; borderColor?: string } = {};
                         
-                        // Store and convert color
-                        if (computedStyle.color && computedStyle.color.includes('oklch')) {
-                          original.color = htmlEl.style.color;
-                          htmlEl.style.color = computedStyle.color; // Browser converts oklch to rgb
+                        // Store original inline style
+                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
+                        
+                        // Apply computed RGB colors as inline styles to override OKLCH
+                        const color = computedStyle.color;
+                        const bgColor = computedStyle.backgroundColor;
+                        const borderColor = computedStyle.borderColor;
+                        
+                        if (color && color !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.color = color;
                         }
-                        
-                        // Store and convert background color
-                        if (computedStyle.backgroundColor && computedStyle.backgroundColor.includes('oklch')) {
-                          original.backgroundColor = htmlEl.style.backgroundColor;
-                          htmlEl.style.backgroundColor = computedStyle.backgroundColor;
+                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.backgroundColor = bgColor;
                         }
-                        
-                        // Store and convert border color
-                        if (computedStyle.borderColor && computedStyle.borderColor.includes('oklch')) {
-                          original.borderColor = htmlEl.style.borderColor;
-                          htmlEl.style.borderColor = computedStyle.borderColor;
-                        }
-                        
-                        if (Object.keys(original).length > 0) {
-                          originalColors.set(el, original);
+                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.borderColor = borderColor;
                         }
                       });
                       
@@ -1599,12 +1593,14 @@ export default function RentalContracts() {
                       contractElement.style.height = originalHeight;
                       contractElement.style.maxHeight = originalMaxHeight;
                       
-                      // Restore original colors
-                      originalColors.forEach((original, el) => {
+                      // Restore original inline styles
+                      originalStyles.forEach((originalStyle, el) => {
                         const htmlEl = el as HTMLElement;
-                        if (original.color !== undefined) htmlEl.style.color = original.color;
-                        if (original.backgroundColor !== undefined) htmlEl.style.backgroundColor = original.backgroundColor;
-                        if (original.borderColor !== undefined) htmlEl.style.borderColor = original.borderColor;
+                        if (originalStyle) {
+                          htmlEl.setAttribute('style', originalStyle);
+                        } else {
+                          htmlEl.removeAttribute('style');
+                        }
                       });
                       
                       // Create PDF with jsPDF
@@ -1690,10 +1686,10 @@ export default function RentalContracts() {
                     }
                   }} 
                   variant="outline"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-500 hover:text-green-500 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                 >
-                  💬 Send via WhatsApp
+                  Share via WhatsApp
                 </Button>
                 {/* Invoice button - show for completed contracts */}
                 {selectedContract?.status === 'completed' && (
@@ -1704,10 +1700,10 @@ export default function RentalContracts() {
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
                       variant="outline"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-yellow-400 hover:text-yellow-400 h-12 w-full"
+                      className="h-10 w-full"
                       size="default"
                     >
-                      📄 View Invoice ({contractInvoice.invoiceNumber})
+                      View Invoice ({contractInvoice.invoiceNumber})
                     </Button>
                   ) : (
                     <Button 
@@ -1717,11 +1713,11 @@ export default function RentalContracts() {
                         }
                       }} 
                       variant="outline"
-                      className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-yellow-400 hover:text-yellow-400 h-12 w-full"
+                      className="h-10 w-full"
                       size="default"
                       disabled={generateInvoice.isPending}
                     >
-                      {generateInvoice.isPending ? "Generating..." : "💰 Generate Invoice"}
+                      {generateInvoice.isPending ? "Generating..." : "Generate Invoice"}
                     </Button>
                   )
                 )}
@@ -1730,10 +1726,10 @@ export default function RentalContracts() {
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
                     variant="outline"
-                    className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-green-400 hover:text-green-400 h-12 w-full"
+                    className="h-10 w-full"
                     size="default"
                   >
-                    ✅ Mark as Returned
+                    Mark as Returned
                   </Button>
                 )}
                 <Button 
@@ -1741,25 +1737,14 @@ export default function RentalContracts() {
                     if (selectedContract && window.confirm(`Are you sure you want to delete contract ${selectedContract.contractNumber}? This action cannot be undone.`)) {
                       deleteContract.mutate({ contractId: selectedContract.id });
                     }
-                  }} 
+                  }}
                   variant="outline"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-red-400 hover:text-red-400 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                   disabled={deleteContract.isPending}
                 >
-                  {deleteContract.isPending ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Deleting...
-                    </>
-                  ) : (
-                    <>🗑️ Delete</>
-                  )}
-                </Button>
-                
+                  {deleteContract.isPending ? "Deleting..." : "Delete Contract"}
+                </Button>                
                 {/* Right side navigation buttons */}
                 <Button 
                   onClick={() => {
@@ -1767,15 +1752,15 @@ export default function RentalContracts() {
                     setIsRenewDialogOpen(true);
                   }} 
                   variant="outline"
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-purple-400 hover:text-purple-400 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                 >
-                  Renew
+                  Renew Contract
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => setIsDetailsDialogOpen(false)}
-                  className="transition-all duration-200 hover:scale-105 hover:shadow-lg hover:border-gray-400 h-12 w-full"
+                  className="h-10 w-full"
                   size="default"
                 >
                   Close
@@ -1787,7 +1772,7 @@ export default function RentalContracts() {
         
         {/* Renew Contract Dialog */}
         <Dialog open={isRenewDialogOpen} onOpenChange={setIsRenewDialogOpen}>
-          <DialogContent className="bg-gray-800 text-white">
+          <DialogContent>
             <DialogHeader>
               <DialogTitle>Renew Contract</DialogTitle>
             </DialogHeader>
@@ -1813,7 +1798,7 @@ export default function RentalContracts() {
                         min="1"
                         value={additionalDays}
                         onChange={(e) => setAdditionalDays(parseInt(e.target.value) || 1)}
-                        className="bg-gray-600 text-white"
+                        className="bg-gray-600 text-white input-client"
                       />
                     </div>
                     <div>
@@ -1926,6 +1911,7 @@ export default function RentalContracts() {
                   onChange={(e) => setReturnKm(parseInt(e.target.value) || 0)}
                   placeholder="Enter current odometer reading"
                   required
+                  className="input-client"
                 />
                 {selectedContractForReturn && (() => {
                   const contract = contracts.find(c => c.id === selectedContractForReturn);

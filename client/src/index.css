@@ -200,6 +200,11 @@
     @apply border-green-500 focus-visible:ring-green-500;
   }
 
+  /* Blood-red input outline for Client forms */
+  .input-client {
+    @apply border-red-600 focus:border-red-600 focus-visible:ring-red-600 focus-visible:ring-1;
+  }
+
   .error-message {
     @apply text-destructive text-sm mt-1;
   }

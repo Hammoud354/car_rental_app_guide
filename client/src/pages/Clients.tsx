@@ -210,11 +210,11 @@ export default function Clients() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
-                      <Input id="firstName" name="firstName" required className="" />
+                      <Input id="firstName" name="firstName" required className="input-client" />
                     </div>
                     <div>
                       <Label htmlFor="lastName">Last Name *</Label>
-                      <Input id="lastName" name="lastName" required className="" />
+                      <Input id="lastName" name="lastName" required className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="nationality">Nationality</Label>
@@ -261,15 +261,15 @@ export default function Clients() {
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="" />
+                      <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" name="email" type="email" placeholder="client@example.com" className="" />
+                      <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="address">Address</Label>
-                      <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="" />
+                      <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                     </div>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export default function Clients() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                      <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="" />
+                      <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                     </div>
                     <div>
                       <DateDropdownSelector
@@ -307,7 +307,7 @@ export default function Clients() {
                 {/* Notes */}
                 <div className="border-t border-gray-700 pt-4">
                   <Label htmlFor="notes">Notes</Label>
-                  <Input id="notes" name="notes" placeholder="Additional information about the client" className="" />
+                  <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client" />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
@@ -376,7 +376,7 @@ export default function Clients() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleViewDetails(client)}
-                      className="h-8 w-8 p-0 hover:bg-blue-700"
+                      className="h-8 w-8 p-0"
                       title="View Details"
                     >
                       <Eye className="h-4 w-4" />
@@ -388,7 +388,7 @@ export default function Clients() {
                         setSelectedClient(client);
                         setIsContractsDialogOpen(true);
                       }}
-                      className="h-8 w-8 p-0 hover:bg-blue-700"
+                      className="h-8 w-8 p-0"
                       title="View Contracts"
                     >
                       <FileText className="h-4 w-4" />
@@ -397,7 +397,7 @@ export default function Clients() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleEditClick(client)}
-                      className="h-8 w-8 p-0 hover:bg-blue-700"
+                      className="h-8 w-8 p-0"
                       title="Edit Client"
                     >
                       <Edit className="h-4 w-4" />
@@ -406,7 +406,7 @@ export default function Clients() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDeleteClick(client.id, `${client.firstName} ${client.lastName}`)}
-                      className="h-8 w-8 p-0 hover:bg-red-700 text-red-400"
+                      className="h-8 w-8 p-0 text-red-400"
                       title="Delete Client"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -498,7 +498,7 @@ export default function Clients() {
                       name="firstName" 
                       defaultValue={selectedClient.firstName}
                       required 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                   <div>
@@ -508,7 +508,7 @@ export default function Clients() {
                       name="lastName" 
                       defaultValue={selectedClient.lastName}
                       required 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -562,7 +562,7 @@ export default function Clients() {
                       type="tel" 
                       defaultValue={selectedClient.phone || ""}
                       placeholder="e.g., +1 234 567 8900" 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -573,7 +573,7 @@ export default function Clients() {
                       type="email" 
                       defaultValue={selectedClient.email || ""}
                       placeholder="client@example.com" 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                   <div className="col-span-2">
@@ -583,7 +583,7 @@ export default function Clients() {
                       name="address" 
                       defaultValue={selectedClient.address || ""}
                       placeholder="Street, City, State, ZIP" 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                 </div>
@@ -600,7 +600,7 @@ export default function Clients() {
                       name="drivingLicenseNumber" 
                       defaultValue={selectedClient.drivingLicenseNumber}
                       required 
-                      className="" 
+                      className="input-client" 
                     />
                   </div>
                   <div>
@@ -633,7 +633,7 @@ export default function Clients() {
                   name="notes" 
                   defaultValue={selectedClient.notes || ""}
                   placeholder="Additional information about the client" 
-                  className="" 
+                  className="input-client" 
                 />
               </div>
 

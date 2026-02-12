@@ -126,6 +126,33 @@ export default function Invoices() {
       element.style.height = 'auto';
       element.style.maxHeight = 'none';
       
+      // Convert OKLCH colors to RGB for PDF compatibility
+      const allElements = element.querySelectorAll('*');
+      const originalStyles: Map<Element, string> = new Map();
+      
+      allElements.forEach((el: Element) => {
+        const htmlEl = el as HTMLElement;
+        const computedStyle = window.getComputedStyle(htmlEl);
+        
+        // Store original inline style
+        originalStyles.set(el, htmlEl.getAttribute('style') || '');
+        
+        // Apply computed RGB colors as inline styles to override OKLCH
+        const color = computedStyle.color;
+        const bgColor = computedStyle.backgroundColor;
+        const borderColor = computedStyle.borderColor;
+        
+        if (color && color !== 'rgba(0, 0, 0, 0)') {
+          htmlEl.style.color = color;
+        }
+        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+          htmlEl.style.backgroundColor = bgColor;
+        }
+        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+          htmlEl.style.borderColor = borderColor;
+        }
+      });
+      
       // Wait a moment for layout to settle
       await new Promise(resolve => setTimeout(resolve, 100));
       
@@ -145,6 +172,16 @@ export default function Invoices() {
       element.style.overflow = originalOverflow;
       element.style.height = originalHeight;
       element.style.maxHeight = originalMaxHeight;
+      
+      // Restore original inline styles
+      originalStyles.forEach((originalStyle, el) => {
+        const htmlEl = el as HTMLElement;
+        if (originalStyle) {
+          htmlEl.setAttribute('style', originalStyle);
+        } else {
+          htmlEl.removeAttribute('style');
+        }
+      });
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({

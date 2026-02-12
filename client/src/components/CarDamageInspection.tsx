@@ -518,10 +518,48 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                     
                     try {
                       toast.info("Generating PDF...");
+                      
+                      // Convert OKLCH colors to RGB for PDF compatibility
+                      const allElements = inspectionElement.querySelectorAll('*');
+                      const originalStyles: Map<Element, string> = new Map();
+                      
+                      allElements.forEach((el: Element) => {
+                        const htmlEl = el as HTMLElement;
+                        const computedStyle = window.getComputedStyle(htmlEl);
+                        
+                        // Store original inline style
+                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
+                        
+                        // Apply computed RGB colors as inline styles to override OKLCH
+                        const color = computedStyle.color;
+                        const bgColor = computedStyle.backgroundColor;
+                        const borderColor = computedStyle.borderColor;
+                        
+                        if (color && color !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.color = color;
+                        }
+                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.backgroundColor = bgColor;
+                        }
+                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+                          htmlEl.style.borderColor = borderColor;
+                        }
+                      });
+                      
                       const canvas = await html2canvas(inspectionElement as HTMLElement, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
+                      });
+                      
+                      // Restore original inline styles
+                      originalStyles.forEach((originalStyle, el) => {
+                        const htmlEl = el as HTMLElement;
+                        if (originalStyle) {
+                          htmlEl.setAttribute('style', originalStyle);
+                        } else {
+                          htmlEl.removeAttribute('style');
+                        }
                       });
                       
                       const imgData = canvas.toDataURL('image/png');
