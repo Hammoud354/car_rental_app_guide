@@ -2950,3 +2950,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ## UI Cleanup - User Request (Feb 12, 2026)
 - [x] Remove redundant breadcrumb navigation from P&L page
 - [x] Save checkpoint after cleanup
+
+
+## PDF Export Fix - User Report (Feb 12, 2026)
+- [x] Debug P&L PDF export OKLCH color conversion issue
+- [x] Fix OKLCH to RGB conversion in handleExportToPDF function (get computed styles from original before cloning)
+- [x] Test PDF export to ensure it works without errors
+- [x] Save checkpoint after fix

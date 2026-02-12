@@ -139,22 +139,36 @@ export default function ProfitLoss() {
         return;
       }
 
+      // Get all elements and their computed styles BEFORE cloning
+      const originalElements = element.querySelectorAll("*");
+      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
+      
+      originalElements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        const computed = window.getComputedStyle(htmlEl);
+        computedStyles.push({
+          color: computed.color,
+          backgroundColor: computed.backgroundColor,
+          borderColor: computed.borderColor,
+        });
+      });
+
       // Create a clone to avoid OKLCH color issues
       const clone = element.cloneNode(true) as HTMLElement;
       clone.style.position = "absolute";
       clone.style.left = "-9999px";
       document.body.appendChild(clone);
 
-      // Convert OKLCH colors to RGB
-      const allElements = clone.querySelectorAll("*");
-      allElements.forEach((el) => {
+      // Apply computed RGB colors to cloned elements
+      const clonedElements = clone.querySelectorAll("*");
+      clonedElements.forEach((el, index) => {
         const htmlEl = el as HTMLElement;
-        const computedStyle = window.getComputedStyle(htmlEl);
-        
-        // Apply computed colors
-        if (computedStyle.color) htmlEl.style.color = computedStyle.color;
-        if (computedStyle.backgroundColor) htmlEl.style.backgroundColor = computedStyle.backgroundColor;
-        if (computedStyle.borderColor) htmlEl.style.borderColor = computedStyle.borderColor;
+        const styles = computedStyles[index];
+        if (styles) {
+          if (styles.color) htmlEl.style.color = styles.color;
+          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
+          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
+        }
       });
 
       const canvas = await html2canvas(clone, {
