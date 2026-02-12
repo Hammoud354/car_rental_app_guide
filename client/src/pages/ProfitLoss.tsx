@@ -18,6 +18,7 @@ import { Link } from "wouter";
 import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
 
 export default function ProfitLoss() {
   const [dateRange, setDateRange] = useState<{
@@ -139,66 +140,53 @@ export default function ProfitLoss() {
         return;
       }
 
-      // Get all elements and their computed styles BEFORE cloning
-      const originalElements = element.querySelectorAll("*");
-      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
+      // Store original styles
+      const originalOverflow = element.style.overflow;
+      const originalHeight = element.style.height;
+      const originalMaxHeight = element.style.maxHeight;
       
-      originalElements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        const computed = window.getComputedStyle(htmlEl);
-        computedStyles.push({
-          color: computed.color,
-          backgroundColor: computed.backgroundColor,
-          borderColor: computed.borderColor,
+      // Temporarily make element fully visible for capture
+      element.style.overflow = 'visible';
+      element.style.height = 'auto';
+      element.style.maxHeight = 'none';
+      
+      // Inject RGB color overrides to fix OKLCH parsing errors
+      const cleanup = prepareForPDFExport();
+      
+      try {
+        // Wait a moment for styles to apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Use html2canvas to capture the element
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
         });
-      });
+        
+        // Restore original styles
+        element.style.overflow = originalOverflow;
+        element.style.height = originalHeight;
+        element.style.maxHeight = originalMaxHeight;
+        
+        // Clean up RGB overrides
+        cleanup();
 
-      // Create a clone to avoid OKLCH color issues
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.position = "absolute";
-      clone.style.left = "-9999px";
-      clone.style.width = element.offsetWidth + "px";
-      document.body.appendChild(clone);
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      // Apply computed RGB colors to clone root element
-      const rootComputed = window.getComputedStyle(element);
-      clone.style.color = rootComputed.color;
-      clone.style.backgroundColor = rootComputed.backgroundColor || "#ffffff";
-      clone.style.borderColor = rootComputed.borderColor;
-
-      // Apply computed RGB colors to cloned child elements
-      const clonedElements = clone.querySelectorAll("*");
-      clonedElements.forEach((el, index) => {
-        const htmlEl = el as HTMLElement;
-        const styles = computedStyles[index];
-        if (styles) {
-          if (styles.color && styles.color !== 'rgba(0, 0, 0, 0)') htmlEl.style.color = styles.color;
-          if (styles.backgroundColor && styles.backgroundColor !== 'rgba(0, 0, 0, 0)') htmlEl.style.backgroundColor = styles.backgroundColor;
-          if (styles.borderColor && styles.borderColor !== 'rgba(0, 0, 0, 0)') htmlEl.style.borderColor = styles.borderColor;
-        }
-      });
-      
-      // Wait for layout to settle
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      });
-
-      document.body.removeChild(clone);
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      
-      const dateStr = new Date().toISOString().split("T")[0];
-      pdf.save(`ProfitLoss_Report_${dateStr}.pdf`);
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        
+        const dateStr = new Date().toISOString().split("T")[0];
+        pdf.save(`ProfitLoss_Report_${dateStr}.pdf`);
+      } catch (innerError: any) {
+        // Clean up RGB overrides even if there's an error
+        cleanup();
+        throw innerError;
+      }
     } catch (error) {
       console.error("PDF export error:", error);
       alert("Failed to export PDF. Please try again.");

@@ -21,6 +21,7 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
 
 export default function RentalContracts() {
@@ -1381,112 +1382,101 @@ export default function RentalContracts() {
                         return;
                       }
                       
-                      // Get all elements and their computed styles BEFORE cloning
-                      const originalElements = contractElement.querySelectorAll("*");
-                      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
+                      // Store original styles
+                      const originalOverflow = contractElement.style.overflow;
+                      const originalHeight = contractElement.style.height;
+                      const originalMaxHeight = contractElement.style.maxHeight;
                       
-                      originalElements.forEach((el) => {
-                        const htmlEl = el as HTMLElement;
-                        const computed = window.getComputedStyle(htmlEl);
-                        computedStyles.push({
-                          color: computed.color,
-                          backgroundColor: computed.backgroundColor,
-                          borderColor: computed.borderColor,
-                        });
-                      });
-
-                      // Create a clone to avoid OKLCH color issues
-                      const clone = contractElement.cloneNode(true) as HTMLElement;
-                      clone.style.position = "absolute";
-                      clone.style.left = "-9999px";
-                      clone.style.overflow = 'visible';
-                      clone.style.height = 'auto';
-                      clone.style.maxHeight = 'none';
-                      document.body.appendChild(clone);
-
-                      // Apply computed RGB colors to cloned elements
-                      const clonedElements = clone.querySelectorAll("*");
-                      clonedElements.forEach((el, index) => {
-                        const htmlEl = el as HTMLElement;
-                        const styles = computedStyles[index];
-                        if (styles) {
-                          if (styles.color) htmlEl.style.color = styles.color;
-                          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
-                          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
-                        }
-                      });
+                      // Temporarily make element fully visible for capture
+                      contractElement.style.overflow = 'visible';
+                      contractElement.style.height = 'auto';
+                      contractElement.style.maxHeight = 'none';
                       
-                      // Wait a moment for layout to settle
-                      await new Promise(resolve => setTimeout(resolve, 100));
+                      // Inject RGB color overrides to fix OKLCH parsing errors
+                      const cleanup = prepareForPDFExport();
                       
-                      // Use html2canvas to capture the cloned element
-                      const canvas = await html2canvas(clone, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                        backgroundColor: "#ffffff",
-                      });
-                      
-                      // Remove clone
-                      document.body.removeChild(clone);
-                      
-                      // Create PDF with jsPDF
-                      const imgData = canvas.toDataURL('image/png');
-                      const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4'
-                      });
-                      
-                      // Calculate dimensions to fit A4 page (with margins)
-                      const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10mm margin on each side
-                      const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
-                      const imgWidth = canvas.width;
-                      const imgHeight = canvas.height;
-                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                      
-                      // Check if content fits on one page
-                      const scaledHeight = imgHeight * ratio;
-                      
-                      if (scaledHeight <= pdfHeight) {
-                        // Fits on one page
-                        const imgX = 10;
-                        const imgY = 10;
-                        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-                      } else {
-                        // Need multiple pages
-                        let yPosition = 0;
-                        let pageCount = 0;
+                      try {
+                        // Wait a moment for styles to apply
+                        await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        while (yPosition < imgHeight) {
-                          if (pageCount > 0) {
-                            pdf.addPage();
+                        // Use html2canvas to capture the element
+                        const canvas = await html2canvas(contractElement, {
+                          scale: 2,
+                          useCORS: true,
+                          logging: false,
+                          backgroundColor: "#ffffff",
+                        });
+                        
+                        // Restore original styles
+                        contractElement.style.overflow = originalOverflow;
+                        contractElement.style.height = originalHeight;
+                        contractElement.style.maxHeight = originalMaxHeight;
+                        
+                        // Clean up RGB overrides
+                        cleanup();
+                      
+                        // Create PDF with jsPDF
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF({
+                          orientation: 'portrait',
+                          unit: 'mm',
+                          format: 'a4'
+                        });
+                        
+                        // Calculate dimensions to fit A4 page (with margins)
+                        const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // 10mm margin on each side
+                        const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
+                        const imgWidth = canvas.width;
+                        const imgHeight = canvas.height;
+                        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                        
+                        // Check if content fits on one page
+                        const scaledHeight = imgHeight * ratio;
+                        
+                        if (scaledHeight <= pdfHeight) {
+                          // Fits on one page
+                          const imgX = 10;
+                          const imgY = 10;
+                          pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                        } else {
+                          // Need multiple pages
+                          let yPosition = 0;
+                          let pageCount = 0;
+                          
+                          while (yPosition < imgHeight) {
+                            if (pageCount > 0) {
+                              pdf.addPage();
+                            }
+                            
+                            const sourceY = yPosition;
+                            const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
+                            
+                            // Create a temporary canvas for this page
+                            const pageCanvas = document.createElement('canvas');
+                            pageCanvas.width = imgWidth;
+                            pageCanvas.height = sourceHeight;
+                            const pageCtx = pageCanvas.getContext('2d');
+                            
+                            if (pageCtx) {
+                              pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+                              const pageImgData = pageCanvas.toDataURL('image/png');
+                              pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
+                            }
+                            
+                            yPosition += sourceHeight;
+                            pageCount++;
                           }
-                          
-                          const sourceY = yPosition;
-                          const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
-                          
-                          // Create a temporary canvas for this page
-                          const pageCanvas = document.createElement('canvas');
-                          pageCanvas.width = imgWidth;
-                          pageCanvas.height = sourceHeight;
-                          const pageCtx = pageCanvas.getContext('2d');
-                          
-                          if (pageCtx) {
-                            pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
-                            const pageImgData = pageCanvas.toDataURL('image/png');
-                            pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
-                          }
-                          
-                          yPosition += sourceHeight;
-                          pageCount++;
                         }
+                      
+                        // Download the PDF
+                        pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
+                        
+                        toast.success("PDF downloaded successfully!");
+                      } catch (innerError: any) {
+                        // Clean up RGB overrides even if there's an error
+                        cleanup();
+                        throw innerError;
                       }
-                      
-                      // Download the PDF
-                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
-                      
-                      toast.success("PDF downloaded successfully!");
                     } catch (error: any) {
                       console.error("PDF export error:", error);
                       toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
@@ -1532,133 +1522,111 @@ export default function RentalContracts() {
                       contractElement.style.height = 'auto';
                       contractElement.style.maxHeight = 'none';
                       
-                      // Convert OKLCH colors to RGB for PDF compatibility
-                      // Get all elements and their computed styles BEFORE cloning
-                      const originalElements = contractElement.querySelectorAll("*");
-                      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
+                      // Inject RGB color overrides to fix OKLCH parsing errors
+                      const cleanup = prepareForPDFExport();
                       
-                      originalElements.forEach((el) => {
-                        const htmlEl = el as HTMLElement;
-                        const computed = window.getComputedStyle(htmlEl);
-                        computedStyles.push({
-                          color: computed.color,
-                          backgroundColor: computed.backgroundColor,
-                          borderColor: computed.borderColor,
-                        });
-                      });
-
-                      // Create a clone to avoid OKLCH color issues
-                      const clone = contractElement.cloneNode(true) as HTMLElement;
-                      clone.style.position = "absolute";
-                      clone.style.left = "-9999px";
-                      clone.style.overflow = 'visible';
-                      clone.style.height = 'auto';
-                      clone.style.maxHeight = 'none';
-                      document.body.appendChild(clone);
-
-                      // Apply computed RGB colors to cloned elements
-                      const clonedElements = clone.querySelectorAll("*");
-                      clonedElements.forEach((el, index) => {
-                        const htmlEl = el as HTMLElement;
-                        const styles = computedStyles[index];
-                        if (styles) {
-                          if (styles.color) htmlEl.style.color = styles.color;
-                          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
-                          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
-                        }
-                      });
-                      
-                      // Wait a moment for layout to settle
-                      await new Promise(resolve => setTimeout(resolve, 100));
-                      
-                      // Use html2canvas to capture the cloned element
-                      const canvas = await html2canvas(clone, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                        backgroundColor: "#ffffff",
-                      });
-                      
-                      // Remove clone
-                      document.body.removeChild(clone);
-                      
-                      // Create PDF with jsPDF
-                      const imgData = canvas.toDataURL('image/png');
-                      const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4'
-                      });
-                      
-                      // Calculate dimensions to fit A4 page (with margins)
-                      const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
-                      const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
-                      const imgWidth = canvas.width;
-                      const imgHeight = canvas.height;
-                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                      
-                      // Check if content fits on one page
-                      const scaledHeight = imgHeight * ratio;
-                      
-                      if (scaledHeight <= pdfHeight) {
-                        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth * ratio, imgHeight * ratio);
-                      } else {
-                        // Need multiple pages
-                        let yPosition = 0;
-                        let pageCount = 0;
+                      try {
+                        // Wait a moment for styles to apply
+                        await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        while (yPosition < imgHeight) {
-                          if (pageCount > 0) {
-                            pdf.addPage();
+                        // Use html2canvas to capture the element
+                        const canvas = await html2canvas(contractElement, {
+                          scale: 2,
+                          useCORS: true,
+                          logging: false,
+                          backgroundColor: "#ffffff",
+                        });
+                        
+                        // Restore original styles
+                        contractElement.style.overflow = originalOverflow;
+                        contractElement.style.height = originalHeight;
+                        contractElement.style.maxHeight = originalMaxHeight;
+                        
+                        // Clean up RGB overrides
+                        cleanup();
+                      
+                        // Create PDF with jsPDF
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF({
+                          orientation: 'portrait',
+                          unit: 'mm',
+                          format: 'a4'
+                        });
+                        
+                        // Calculate dimensions to fit A4 page (with margins)
+                        const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                        const pdfHeight = pdf.internal.pageSize.getHeight() - 20;
+                        const imgWidth = canvas.width;
+                        const imgHeight = canvas.height;
+                        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                        
+                        // Check if content fits on one page
+                        const scaledHeight = imgHeight * ratio;
+                        
+                        if (scaledHeight <= pdfHeight) {
+                          pdf.addImage(imgData, 'PNG', 10, 10, imgWidth * ratio, imgHeight * ratio);
+                        } else {
+                          // Need multiple pages
+                          let yPosition = 0;
+                          let pageCount = 0;
+                          
+                          while (yPosition < imgHeight) {
+                            if (pageCount > 0) {
+                              pdf.addPage();
+                            }
+                            
+                            const sourceY = yPosition;
+                            const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
+                            
+                            const pageCanvas = document.createElement('canvas');
+                            pageCanvas.width = imgWidth;
+                            pageCanvas.height = sourceHeight;
+                            const pageCtx = pageCanvas.getContext('2d');
+                            
+                            if (pageCtx) {
+                              pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
+                              const pageImgData = pageCanvas.toDataURL('image/png');
+                              pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
+                            }
+                            
+                            yPosition += sourceHeight;
+                            pageCount++;
                           }
-                          
-                          const sourceY = yPosition;
-                          const sourceHeight = Math.min(imgHeight - yPosition, pdfHeight / ratio);
-                          
-                          const pageCanvas = document.createElement('canvas');
-                          pageCanvas.width = imgWidth;
-                          pageCanvas.height = sourceHeight;
-                          const pageCtx = pageCanvas.getContext('2d');
-                          
-                          if (pageCtx) {
-                            pageCtx.drawImage(canvas, 0, sourceY, imgWidth, sourceHeight, 0, 0, imgWidth, sourceHeight);
-                            const pageImgData = pageCanvas.toDataURL('image/png');
-                            pdf.addImage(pageImgData, 'PNG', 10, 10, imgWidth * ratio, sourceHeight * ratio);
-                          }
-                          
-                          yPosition += sourceHeight;
-                          pageCount++;
                         }
+                        
+                        // Convert PDF to base64
+                        const pdfBase64 = pdf.output('datauristring');
+                        
+                        toast.info("Uploading PDF to cloud storage...");
+                        
+                        // Upload PDF to S3
+                        const uploadResult = await uploadPdfMutation.mutateAsync({
+                          base64Data: pdfBase64,
+                          filename: `Contract-${selectedContract.contractNumber}.pdf`,
+                        });
+                        
+                        // Use company phone number from settings
+                        if (!companySettings?.phone) {
+                          toast.error("Company phone number not set in settings");
+                          return;
+                        }
+                        const phoneNumber = companySettings.phone.replace(/[\s\-\(\)]/g, '');
+                        
+                        // Create WhatsApp message with PDF download link
+                        const message = `New Contract Created!\n\n📋 Contract: ${selectedContract.contractNumber}\n👤 Client: ${selectedContract.clientFirstName} ${selectedContract.clientLastName}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}`;
+                        
+                        // Encode message for URL
+                        const encodedMessage = encodeURIComponent(message);
+                        
+                        toast.success("PDF uploaded! Opening WhatsApp...");
+                        
+                        // Open WhatsApp with pre-filled message
+                        window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+                      } catch (innerError: any) {
+                        // Clean up RGB overrides even if there's an error
+                        cleanup();
+                        throw innerError;
                       }
-                      
-                      // Convert PDF to base64
-                      const pdfBase64 = pdf.output('datauristring');
-                      
-                      toast.info("Uploading PDF to cloud storage...");
-                      
-                      // Upload PDF to S3
-                      const uploadResult = await uploadPdfMutation.mutateAsync({
-                        base64Data: pdfBase64,
-                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
-                      });
-                      
-                      // Use company phone number from settings
-                      if (!companySettings?.phone) {
-                        toast.error("Company phone number not set in settings");
-                        return;
-                      }
-                      const phoneNumber = companySettings.phone.replace(/[\s\-\(\)]/g, '');
-                      
-                      // Create WhatsApp message with PDF download link
-                      const message = `New Contract Created!\n\n📋 Contract: ${selectedContract.contractNumber}\n👤 Client: ${selectedContract.clientFirstName} ${selectedContract.clientLastName}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}`;
-                      
-                      // Encode message for URL
-                      const encodedMessage = encodeURIComponent(message);
-                      
-                      toast.success("PDF uploaded! Opening WhatsApp...");
-                      
-                      // Open WhatsApp with pre-filled message
-                      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
                     } catch (error: any) {
                       console.error("WhatsApp PDF share error:", error);
                       toast.error(`Failed to share PDF: ${error.message || 'Unknown error'}`);

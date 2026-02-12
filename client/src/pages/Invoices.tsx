@@ -23,6 +23,7 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 
 export default function Invoices() {
@@ -117,82 +118,71 @@ export default function Invoices() {
 
       toast.info("Generating PDF...");
       
-      // Temporarily ensure element is fully visible
-      // Get all elements and their computed styles BEFORE cloning
-      const originalElements = element.querySelectorAll("*");
-      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
+      // Store original styles
+      const originalOverflow = element.style.overflow;
+      const originalHeight = element.style.height;
+      const originalMaxHeight = element.style.maxHeight;
       
-      originalElements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        const computed = window.getComputedStyle(htmlEl);
-        computedStyles.push({
-          color: computed.color,
-          backgroundColor: computed.backgroundColor,
-          borderColor: computed.borderColor,
+      // Temporarily make element fully visible for capture
+      element.style.overflow = 'visible';
+      element.style.height = 'auto';
+      element.style.maxHeight = 'none';
+      
+      // Inject RGB color overrides to fix OKLCH parsing errors
+      const cleanup = prepareForPDFExport();
+      
+      try {
+        // Wait a moment for styles to apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Use html2canvas to capture the element
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
         });
-      });
+        
+        // Restore original styles
+        element.style.overflow = originalOverflow;
+        element.style.height = originalHeight;
+        element.style.maxHeight = originalMaxHeight;
+        
+        // Clean up RGB overrides
+        cleanup();
 
-      // Create a clone to avoid OKLCH color issues
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.position = "absolute";
-      clone.style.left = "-9999px";
-      clone.style.overflow = 'visible';
-      clone.style.height = 'auto';
-      clone.style.maxHeight = 'none';
-      document.body.appendChild(clone);
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+        });
 
-      // Apply computed RGB colors to cloned elements
-      const clonedElements = clone.querySelectorAll("*");
-      clonedElements.forEach((el, index) => {
-        const htmlEl = el as HTMLElement;
-        const styles = computedStyles[index];
-        if (styles) {
-          if (styles.color) htmlEl.style.color = styles.color;
-          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
-          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
-        }
-      });
-      
-      // Wait a moment for layout to settle
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-      });
-      
-      // Remove clone
-      document.body.removeChild(clone);
+        const imgWidth = 210; // A4 width in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Handle multi-page PDFs if content is too long
+        const pageHeight = 297; // A4 height in mm
+        let heightLeft = imgHeight;
+        let position = 0;
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Handle multi-page PDFs if content is too long
-      const pageHeight = 297; // A4 height in mm
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
-      }
 
-      pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
-      toast.success("PDF exported successfully");
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
+        toast.success("PDF exported successfully");
+      } catch (innerError: any) {
+        // Clean up RGB overrides even if there's an error
+        cleanup();
+        throw innerError;
+      }
     } catch (error) {
       console.error("Error exporting PDF:", error);
       toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);

@@ -3014,3 +3014,73 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix the handleExportToPDF function in ProfitLoss.tsx (added backgroundColor: "#ffffff", root element styling, layout wait)
 - [x] Ensure all OKLCH colors are converted to RGB before html2canvas
 - [x] Test P&L PDF export to verify fix works
+
+
+## Global PDF Export OKLCH Fix - Deep Technical Investigation (Feb 13, 2026)
+
+### Phase 1: Codebase Audit
+- [ ] Search entire codebase for "oklch" usage
+- [ ] Audit Tailwind configuration for OKLCH color definitions
+- [ ] Audit CSS variables in :root and theme definitions
+- [ ] Check if design system uses OKLCH by default
+- [ ] Identify PDF rendering engine (html2canvas + jsPDF)
+- [ ] Verify html2canvas OKLCH support status
+
+### Phase 2: Root Cause Analysis
+- [ ] Document where OKLCH colors originate (Tailwind 4 CSS variables)
+- [ ] Identify all CSS properties affected (color, backgroundColor, borderColor, etc.)
+- [ ] Map theme system color resolution flow
+- [ ] Determine why current clone-based approach is insufficient
+
+### Phase 3: Universal Solution Design
+- [ ] Design PDF-safe color conversion middleware
+- [ ] Create reusable PDF export utility function
+- [ ] Implement color normalization for all CSS properties
+- [ ] Add fallback palette using HEX values only
+- [ ] Ensure dark/light theme compatibility
+
+### Phase 4: Implementation
+- [ ] Create global PDF export utility in client/src/lib/pdfExport.ts
+- [ ] Implement comprehensive OKLCH to RGB/HEX conversion
+- [ ] Add PDF-specific stylesheet injection
+- [ ] Replace all individual PDF export functions with global utility
+- [ ] Test across all export points (Contracts, Invoices, P&L, Inspection)
+
+### Phase 5: Testing & Validation
+- [ ] Test PDF export from Rental Contracts page
+- [ ] Test PDF export from Invoices page
+- [ ] Test PDF export from P&L page
+- [ ] Test PDF export from Car Damage Inspection
+- [ ] Verify no console errors during export
+- [ ] Verify layout integrity preserved
+- [ ] Verify theme consistency maintained
+- [ ] Test in both dark and light themes (if applicable)
+
+### Phase 6: Documentation
+- [ ] Document the root cause and solution
+- [ ] Add inline code comments explaining the fix
+- [ ] Update README with PDF export architecture
+- [ ] Save final checkpoint with comprehensive fix
+
+
+## Critical Bug Fix - PDF Export OKLCH Color Parsing Errors
+
+### Issue
+- [x] PDF export failing across all pages with "Attempting to parse an unsupported color function 'oklch'" error
+- [x] Root cause: Tailwind 4 uses OKLCH color syntax that html2canvas cannot parse
+- [x] Previous clone-based fixes were incomplete and inconsistent across pages
+
+### Solution
+- [x] Created universal PDF export utility (`client/src/lib/pdfExport.ts`)
+- [x] Implemented `prepareForPDFExport()` function that injects RGB color overrides
+- [x] Implemented `cleanupAfterPDFExport()` function to remove overrides after export
+- [x] Applied fix to RentalContracts.tsx (Export to PDF and Share via WhatsApp buttons)
+- [x] Applied fix to Invoices.tsx
+- [x] Applied fix to ProfitLoss.tsx
+- [x] Applied fix to CarDamageInspection.tsx
+
+### Testing
+- [x] All TypeScript errors resolved
+- [x] Dev server running without errors
+- [x] All PDF export functions now use centralized utility with automatic OKLCH-to-RGB conversion
+- [ ] Create checkpoint and deliver

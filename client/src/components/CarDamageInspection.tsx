@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { X, Trash2, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
 import { toast } from "sonner";
 
 interface DamageMark {
@@ -519,67 +520,46 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                     try {
                       toast.info("Generating PDF...");
                       
-                      // Convert OKLCH colors to RGB for PDF compatibility
-                      const allElements = inspectionElement.querySelectorAll('*');
-                      const originalStyles: Map<Element, string> = new Map();
+                      // Inject RGB color overrides to fix OKLCH parsing errors
+                      const cleanup = prepareForPDFExport();
                       
-                      allElements.forEach((el: Element) => {
-                        const htmlEl = el as HTMLElement;
-                        const computedStyle = window.getComputedStyle(htmlEl);
+                      try {
+                        // Wait a moment for styles to apply
+                        await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        // Store original inline style
-                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
+                        // Use html2canvas to capture the element
+                        const canvas = await html2canvas(inspectionElement as HTMLElement, {
+                          scale: 2,
+                          useCORS: true,
+                          logging: false,
+                        });
                         
-                        // Apply computed RGB colors as inline styles to override OKLCH
-                        const color = computedStyle.color;
-                        const bgColor = computedStyle.backgroundColor;
-                        const borderColor = computedStyle.borderColor;
+                        // Clean up RGB overrides
+                        cleanup();
+                      
+                        const imgData = canvas.toDataURL('image/png');
+                        const pdf = new jsPDF({
+                          orientation: 'portrait',
+                          unit: 'mm',
+                          format: 'a4',
+                        });
                         
-                        if (color && color !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.color = color;
-                        }
-                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.backgroundColor = bgColor;
-                        }
-                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.borderColor = borderColor;
-                        }
-                      });
-                      
-                      const canvas = await html2canvas(inspectionElement as HTMLElement, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                      });
-                      
-                      // Restore original inline styles
-                      originalStyles.forEach((originalStyle, el) => {
-                        const htmlEl = el as HTMLElement;
-                        if (originalStyle) {
-                          htmlEl.setAttribute('style', originalStyle);
-                        } else {
-                          htmlEl.removeAttribute('style');
-                        }
-                      });
-                      
-                      const imgData = canvas.toDataURL('image/png');
-                      const pdf = new jsPDF({
-                        orientation: 'portrait',
-                        unit: 'mm',
-                        format: 'a4',
-                      });
-                      
-                      const pdfWidth = pdf.internal.pageSize.getWidth();
-                      const pdfHeight = pdf.internal.pageSize.getHeight();
-                      const imgWidth = canvas.width;
-                      const imgHeight = canvas.height;
-                      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-                      const imgX = (pdfWidth - imgWidth * ratio) / 2;
-                      const imgY = 10;
-                      
-                      pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
-                      pdf.save(`Contract-Inspection.pdf`);
-                      toast.success("PDF exported successfully!");
+                        const pdfWidth = pdf.internal.pageSize.getWidth();
+                        const pdfHeight = pdf.internal.pageSize.getHeight();
+                        const imgWidth = canvas.width;
+                        const imgHeight = canvas.height;
+                        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+                        const imgX = (pdfWidth - imgWidth * ratio) / 2;
+                        const imgY = 10;
+                        
+                        pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+                        pdf.save(`Contract-Inspection.pdf`);
+                        toast.success("PDF exported successfully!");
+                      } catch (innerError: any) {
+                        // Clean up RGB overrides even if there's an error
+                        cleanup();
+                        throw innerError;
+                      }
                     } catch (error) {
                       console.error('PDF export error:', error);
                       toast.error("Failed to export PDF");

@@ -27,7 +27,7 @@ export function ContractAmendmentDialog({ contractId, open, onOpenChange, onSucc
   const utils = trpc.useUtils();
   const { data: vehicles = [] } = trpc.fleet.list.useQuery();
 
-  const amendDate = trpc.contracts.amendDate.useMutation({
+  const amendDate = trpc.contracts.amendDates.useMutation({
     onSuccess: () => {
       toast.success("Contract dates amended successfully");
       utils.contracts.list.invalidate();
@@ -35,7 +35,7 @@ export function ContractAmendmentDialog({ contractId, open, onOpenChange, onSucc
       onOpenChange(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to amend dates: ${error.message}`);
     },
   });
@@ -48,7 +48,7 @@ export function ContractAmendmentDialog({ contractId, open, onOpenChange, onSucc
       onOpenChange(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to change vehicle: ${error.message}`);
     },
   });
@@ -61,7 +61,7 @@ export function ContractAmendmentDialog({ contractId, open, onOpenChange, onSucc
       onOpenChange(false);
       resetForm();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`Failed to adjust rate: ${error.message}`);
     },
   });
@@ -196,7 +196,7 @@ export function ContractAmendmentDialog({ contractId, open, onOpenChange, onSucc
                 <SelectContent>
                   {vehicles.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                      {vehicle.make} {vehicle.model} ({vehicle.plateNumber})
+                      {vehicle.brand} {vehicle.model} ({vehicle.plateNumber})
                     </SelectItem>
                   ))}
                 </SelectContent>
