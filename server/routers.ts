@@ -523,6 +523,15 @@ export const appRouter = router({
         signatureData: z.string().optional(),
         fuelLevel: z.enum(["Empty", "1/4", "1/2", "3/4", "Full"]).optional(),
         pickupKm: z.number().int().optional(),
+        // Insurance fields
+        insurancePackage: z.enum(["None", "Basic", "Premium", "Full Coverage"]).default("None"),
+        insuranceCost: z.string().default("0.00"),
+        insuranceDailyRate: z.string().default("0.00"),
+        // Deposit fields
+        depositAmount: z.string().default("0.00"),
+        depositStatus: z.enum(["None", "Held", "Refunded", "Forfeited"]).default("None"),
+        // Fuel policy
+        fuelPolicy: z.enum(["Full-to-Full", "Same-to-Same", "Pre-purchase"]).default("Full-to-Full"),
         targetUserId: z.number().optional(), // For Super Admin to assign contract to specific user
       }))
       .mutation(async ({ input, ctx }) => {
@@ -598,6 +607,15 @@ export const appRouter = router({
           contractNumber,
           signatureData: input.signatureData || null,
           fuelLevel: input.fuelLevel || "Full",
+          // Insurance fields
+          insurancePackage: input.insurancePackage,
+          insuranceCost: input.insuranceCost,
+          insuranceDailyRate: input.insuranceDailyRate,
+          // Deposit fields
+          depositAmount: input.depositAmount,
+          depositStatus: input.depositStatus,
+          // Fuel policy
+          fuelPolicy: input.fuelPolicy,
         });
         
         // Auto-generate invoice immediately when contract is created

@@ -3,6 +3,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
+import { InsuranceDepositSelector } from "@/components/InsuranceDepositSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -49,6 +50,14 @@ export default function RentalContracts() {
   const [discount, setDiscount] = useState<number>(0);
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [pickupKm, setPickupKm] = useState<number>(0);
+  
+  // Insurance, Deposit, and Fuel Policy states
+  const [insurancePackage, setInsurancePackage] = useState<"None" | "Basic" | "Premium" | "Full Coverage">("None");
+  const [insuranceCost, setInsuranceCost] = useState<number>(0);
+  const [insuranceDailyRate, setInsuranceDailyRate] = useState<number>(0);
+  const [depositAmount, setDepositAmount] = useState<number>(0);
+  const [depositStatus, setDepositStatus] = useState<"None" | "Held" | "Refunded" | "Forfeited">("None");
+  const [fuelPolicy, setFuelPolicy] = useState<"Full-to-Full" | "Same-to-Same" | "Pre-purchase">("Full-to-Full");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
@@ -196,11 +205,11 @@ export default function RentalContracts() {
     setTotalAmount(total);
   }, [dailyRate, rentalDays]);
   
-  // Auto-calculate final amount after discount
+  // Auto-calculate final amount after discount and insurance
   useEffect(() => {
-    const final = Math.max(0, totalAmount - discount);
+    const final = Math.max(0, totalAmount - discount + insuranceCost);
     setFinalAmount(final);
-  }, [totalAmount, discount]);
+  }, [totalAmount, discount, insuranceCost]);
   
   // Load daily rate when vehicle is selected and adjust based on rental duration
   useEffect(() => {
@@ -307,6 +316,15 @@ export default function RentalContracts() {
       discount: discount.toFixed(2),
       finalAmount: finalAmount.toFixed(2),
       pickupKm,
+      // Insurance fields
+      insurancePackage,
+      insuranceCost: insuranceCost.toFixed(2),
+      insuranceDailyRate: insuranceDailyRate.toFixed(2),
+      // Deposit fields
+      depositAmount: depositAmount.toFixed(2),
+      depositStatus,
+      // Fuel policy
+      fuelPolicy,
       targetUserId: selectedTargetUserId || undefined,
     };
     
@@ -819,6 +837,26 @@ export default function RentalContracts() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Insurance, Deposit, and Fuel Policy */}
+                  <div className="border-t pt-4">
+                    <h3 className="font-semibold mb-4">Additional Options</h3>
+                    <InsuranceDepositSelector
+                      rentalDays={rentalDays}
+                      onInsuranceChange={(pkg, cost, dailyRate) => {
+                        setInsurancePackage(pkg);
+                        setInsuranceCost(cost);
+                        setInsuranceDailyRate(dailyRate);
+                      }}
+                      onDepositChange={(amount, status) => {
+                        setDepositAmount(amount);
+                        setDepositStatus(status);
+                      }}
+                      onFuelPolicyChange={(policy) => {
+                        setFuelPolicy(policy);
+                      }}
+                    />
                   </div>
 
                   <DialogFooter>

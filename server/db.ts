@@ -1372,11 +1372,13 @@ export async function getFutureReservations(month: number, year: number, userId:
   .orderBy(rentalContracts.rentalStartDate);
 
   // Detect conflicts: check if any vehicle has overlapping reservations
+  // Only active contracts can cause conflicts - completed contracts should not block new reservations
   const reservationsWithConflicts = contracts.map(contract => {
     // Find other contracts for the same vehicle that overlap with this one
     const conflicts = contracts.filter(other => 
       other.id !== contract.id && 
       other.vehicleId === contract.vehicleId &&
+      other.status === 'active' && // Only check active contracts for conflicts
       // Check if date ranges overlap
       new Date(other.rentalStartDate) <= new Date(contract.rentalEndDate) &&
       new Date(other.rentalEndDate) >= new Date(contract.rentalStartDate)
@@ -1750,7 +1752,20 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
     amount: rentalCharges.toFixed(2),
   });
   
-  // 2. Discount (if any)
+  // 2. Insurance (if any)
+  const insuranceCost = parseFloat(contract.insuranceCost || '0');
+  if (insuranceCost > 0) {
+    const insurancePackage = contract.insurancePackage || 'Insurance';
+    const insuranceDailyRate = parseFloat(contract.insuranceDailyRate || '0');
+    lineItems.push({
+      description: `Insurance - ${insurancePackage} (${rentalDays} days @ $${insuranceDailyRate}/day)`,
+      quantity: String(rentalDays),
+      unitPrice: insuranceDailyRate.toFixed(2),
+      amount: insuranceCost.toFixed(2),
+    });
+  }
+  
+  // 3. Discount (if any)
   const discount = parseFloat(contract.discount || '0');
   if (discount > 0) {
     lineItems.push({
@@ -1761,7 +1776,7 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
     });
   }
   
-  // 3. Over-limit KM fee (if any)
+  // 4. Over-limit KM fee (if any)
   const overLimitKmFee = parseFloat(contract.overLimitKmFee || '0');
   if (overLimitKmFee > 0) {
     lineItems.push({
@@ -1772,7 +1787,7 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
     });
   }
   
-  // 4. Late fee (if any)
+  // 5. Late fee (if any)
   const lateFee = parseFloat(contract.lateFee || '0');
   if (lateFee > 0) {
     lineItems.push({

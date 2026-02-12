@@ -2581,3 +2581,52 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Add deposit management UI (ready for implementation)
 - [ ] Add fuel policy selection (ready for implementation)
 - [ ] Implement automated invoice generation (ready for implementation)
+
+
+### 122. Fix Reservation Conflict Bug
+- [ ] Investigate why completed contracts still show conflicts in Reservations
+- [ ] Update conflict detection logic to exclude completed contracts
+- [ ] Test that completed contracts don't block new reservations
+
+### 123. Implement Insurance Selection UI
+- [ ] Add insurance package dropdown to contract creation form
+- [ ] Add insurance cost calculation based on package and duration
+- [ ] Display insurance details in contract view
+- [ ] Include insurance in final amount calculation
+
+### 124. Implement Deposit Management Workflow
+- [ ] Add deposit amount field to contract creation
+- [ ] Add deposit status tracking (Held, Refunded, Forfeited)
+- [ ] Create refund action button in contract completion
+- [ ] Add deposit notes field for refund/forfeit reasons
+
+### 125. Implement Automated Invoice Generation
+- [ ] Auto-generate invoice on contract completion
+- [ ] Include all charges (rental, insurance, deposit, fuel, penalties)
+- [ ] Calculate taxes automatically
+- [ ] Auto-open invoice after generation
+- [ ] Support LBP/USD dual currency display
+
+### 122. Fix Reservation Conflict Bug
+- [x] Investigate why completed contracts still show conflicts in Reservations
+- [x] Update conflict detection logic to exclude completed contracts
+- [x] Test that completed contracts don't block new reservations
+
+### 123. Implement Insurance Selection UI
+- [x] Add insurance package dropdown to contract creation form
+- [x] Add insurance cost calculation based on package and duration
+- [x] Display insurance details in contract view
+- [x] Include insurance in final amount calculation
+
+### 124. Implement Deposit Management Workflow
+- [x] Add deposit amount field to contract creation
+- [x] Add deposit status tracking (Held, Refunded, Forfeited)
+- [x] Create refund action button in contract completion
+- [x] Add deposit notes field for refund/forfeit reasons
+
+### 125. Implement Automated Invoice Generation
+- [x] Auto-generate invoice on contract completion
+- [x] Include all charges (rental, insurance, deposit, fuel, penalties)
+- [x] Calculate taxes automatically
+- [x] Auto-open invoice after generation
+- [x] Support LBP/USD dual currency display
