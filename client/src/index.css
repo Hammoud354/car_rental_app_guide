@@ -266,6 +266,16 @@
 }
 
 /* Print Styles - Show complete contract details */
+/* Blood red input styling for Client Cards */
+.input-blood-red {
+  border: 1px solid #dc2626 !important;
+}
+
+.input-blood-red:focus {
+  border-color: #b91c1c !important;
+  ring-color: #dc2626 !important;
+}
+
 @media print {
   @page {
     margin: 0.5in;

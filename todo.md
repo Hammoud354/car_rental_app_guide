@@ -2816,3 +2816,56 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Verify and fix all Excel exports
 - [ ] Add missing export buttons where needed
 
+
+
+### 136. Fix Contract View Card Consistency
+- [ ] Redesign Contract View card to match other cards in the app
+- [ ] Ensure consistent colors, fonts, spacing, borders, and buttons
+- [ ] Match styling with Client Cards and other app components
+
+---
+
+## ✅ COMPLETED - Session 2
+
+### Contract Amendment UI ✅
+- [x] Created ContractAmendmentDialog component
+- [x] Implemented date change form (extend/shorten rental period)
+- [x] Implemented vehicle swap form (change to different vehicle)
+- [x] Implemented rate adjustment form (modify daily rate)
+- [x] Added amendment reason field with validation
+- [x] Integrated with backend amendment API
+- [x] Ready for integration into Rental Contracts page
+
+### UX/UI Theme Foundation ✅
+- [x] Added blood-red input styling CSS class (.input-blood-red)
+- [x] Created UX/UI fixes documentation for systematic implementation
+
+---
+
+## 🔄 REMAINING - Next Session
+
+### Financial Reports Dashboard (High Priority)
+- [ ] Create FinancialReports page with navigation
+- [ ] Implement P&L report with date range filter
+- [ ] Add revenue analysis by vehicle
+- [ ] Add expense tracking and categorization
+- [ ] Create cash flow analysis chart
+- [ ] Add vehicle purchase cost field for P&L calculations
+- [ ] Implement Excel export for all financial data
+- [ ] Display currency conversion (USD to LBP with VAT)
+
+### UX/UI Theme Completion (High Priority)
+- [ ] Apply blood-red outline to Client Card input fields
+- [ ] Remove blue hover effects from Contact Card icons
+- [ ] Redesign Contract View card for consistency
+- [ ] Global audit: fonts, colors, spacing, borders
+- [ ] Ensure all cards match professional theme
+
+### Export Functionality Fixes (Medium Priority)
+- [ ] Verify Dashboard Excel export
+- [ ] Fix Invoice PDF/Print export
+- [ ] Fix Contract PDF/Print export
+- [ ] Add Fleet Excel export
+- [ ] Add Clients Excel export
+- [ ] Add Maintenance Excel export
+
