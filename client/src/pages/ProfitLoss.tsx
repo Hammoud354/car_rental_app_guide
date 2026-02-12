@@ -157,24 +157,35 @@ export default function ProfitLoss() {
       const clone = element.cloneNode(true) as HTMLElement;
       clone.style.position = "absolute";
       clone.style.left = "-9999px";
+      clone.style.width = element.offsetWidth + "px";
       document.body.appendChild(clone);
 
-      // Apply computed RGB colors to cloned elements
+      // Apply computed RGB colors to clone root element
+      const rootComputed = window.getComputedStyle(element);
+      clone.style.color = rootComputed.color;
+      clone.style.backgroundColor = rootComputed.backgroundColor || "#ffffff";
+      clone.style.borderColor = rootComputed.borderColor;
+
+      // Apply computed RGB colors to cloned child elements
       const clonedElements = clone.querySelectorAll("*");
       clonedElements.forEach((el, index) => {
         const htmlEl = el as HTMLElement;
         const styles = computedStyles[index];
         if (styles) {
-          if (styles.color) htmlEl.style.color = styles.color;
-          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
-          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
+          if (styles.color && styles.color !== 'rgba(0, 0, 0, 0)') htmlEl.style.color = styles.color;
+          if (styles.backgroundColor && styles.backgroundColor !== 'rgba(0, 0, 0, 0)') htmlEl.style.backgroundColor = styles.backgroundColor;
+          if (styles.borderColor && styles.borderColor !== 'rgba(0, 0, 0, 0)') htmlEl.style.borderColor = styles.borderColor;
         }
       });
+      
+      // Wait for layout to settle
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         logging: false,
+        backgroundColor: "#ffffff",
       });
 
       document.body.removeChild(clone);

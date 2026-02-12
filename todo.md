@@ -3007,3 +3007,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix OKLCH color error in rental contracts PDF export (Export to PDF button)
 - [x] Apply clone-based OKLCH to RGB conversion to contract PDF export (both Export and WhatsApp share)
 - [x] Test contract PDF export to ensure it works without errors
+
+
+## P&L PDF Export OKLCH Error - User Report (Feb 13, 2026)
+- [x] Debug P&L PDF export OKLCH error (missing backgroundColor and root element styles)
+- [x] Fix the handleExportToPDF function in ProfitLoss.tsx (added backgroundColor: "#ffffff", root element styling, layout wait)
+- [x] Ensure all OKLCH colors are converted to RGB before html2canvas
+- [x] Test P&L PDF export to verify fix works
