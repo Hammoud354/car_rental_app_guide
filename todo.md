@@ -2630,3 +2630,44 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Calculate taxes automatically
 - [x] Auto-open invoice after generation
 - [x] Support LBP/USD dual currency display
+
+
+### 126. Fix Reservations Page
+- [ ] Exclude completed/returned contracts from Reservations calendar
+- [ ] Add red badge with white bold number showing contract count per day
+- [ ] Ensure only active contracts show conflicts
+- [ ] Test that completed contracts don't appear in calendar
+
+### 127. Implement Deposit Refund Workflow
+- [ ] Add deposit refund UI in contract completion dialog
+- [ ] Add refund reason/notes field
+- [ ] Update deposit status to "Refunded" when processed
+- [ ] Show deposit information in contract details
+- [ ] Add deposit history tracking
+
+### 128. Implement Late Return Penalty Auto-Calculation
+- [ ] Auto-calculate late fees when return date exceeds contract end date
+- [ ] Add configurable daily late fee rate in company settings
+- [ ] Display late fee in contract completion dialog
+- [ ] Include late fee in final invoice
+- [ ] Show days overdue in contract details
+
+### 126. Fix Reservations Page
+- [x] Exclude completed/returned contracts from Reservations calendar
+- [x] Add red badge with white bold number showing contract count per day
+- [x] Ensure only active contracts show conflicts
+- [x] Test that completed contracts don't appear in calendar
+
+### 127. Implement Deposit Refund Workflow
+- [x] Add deposit refund UI in contract completion dialog
+- [x] Add refund reason/notes field
+- [x] Update deposit status to "Refunded" when processed
+- [x] Show deposit information in contract details
+- [x] Add deposit history tracking
+
+### 128. Implement Late Return Penalty Auto-Calculation
+- [x] Auto-calculate late fees when return date exceeds contract end date
+- [x] Add configurable daily late fee rate in company settings
+- [x] Display late fee in contract completion dialog
+- [x] Include late fee in final invoice
+- [x] Show days overdue in contract details

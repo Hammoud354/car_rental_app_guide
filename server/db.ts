@@ -394,7 +394,9 @@ export async function markContractAsReturned(
   returnFuelLevel?: "Empty" | "1/4" | "1/2" | "3/4" | "Full",
   returnNotes?: string,
   damageInspection?: string,
-  overLimitKmFee?: number
+  overLimitKmFee?: number,
+  depositRefund?: boolean,
+  depositRefundNotes?: string
 ) {
   const db = await getDb();
   if (!db) {
@@ -436,18 +438,46 @@ export async function markContractAsReturned(
     }
   }
   
+  // Calculate late fee if vehicle is returned after rental end date
+  let calculatedLateFee = 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const rentalEndDate = new Date(contract[0].rentalEndDate);
+  rentalEndDate.setHours(0, 0, 0, 0);
+  
+  if (today > rentalEndDate) {
+    // Calculate days late
+    const daysLate = Math.ceil((today.getTime() - rentalEndDate.getTime()) / (1000 * 60 * 60 * 24));
+    const dailyRate = parseFloat(contract[0].dailyRate || '0');
+    const lateFeePercentage = parseFloat(contract[0].lateFeePercentage || '150') / 100; // Default 150%
+    
+    // Late fee = days late * daily rate * late fee percentage
+    calculatedLateFee = daysLate * dailyRate * lateFeePercentage;
+  }
+  
   // Update contract status and return information
+  const updateData: any = {
+    status: "completed",
+    returnedAt: new Date(),
+    ...(returnKm !== undefined && { returnKm }),
+    ...(returnFuelLevel && { returnFuelLevel }),
+    ...(returnNotes && { returnNotes }),
+    ...(damageInspection && { damageInspection }),
+    ...(overLimitKmFee !== undefined && { overLimitKmFee: overLimitKmFee.toFixed(2) }),
+    ...(calculatedLateFee > 0 && { lateFee: calculatedLateFee.toFixed(2) }),
+  };
+  
+  // Handle deposit refund
+  if (depositRefund !== undefined) {
+    updateData.depositStatus = depositRefund ? "Refunded" : "Forfeited";
+    if (depositRefundNotes) {
+      updateData.depositNotes = depositRefundNotes;
+    }
+  }
+  
   await db
     .update(rentalContracts)
-    .set({
-      status: "completed",
-      returnedAt: new Date(),
-      ...(returnKm !== undefined && { returnKm }),
-      ...(returnFuelLevel && { returnFuelLevel }),
-      ...(returnNotes && { returnNotes }),
-      ...(damageInspection && { damageInspection }),
-      ...(overLimitKmFee !== undefined && { overLimitKmFee: overLimitKmFee.toFixed(2) }),
-    })
+    .set(updateData)
     .where(eq(rentalContracts.id, contractId));
   
   // Update vehicle status back to Available
@@ -1363,6 +1393,8 @@ export async function getFutureReservations(month: number, year: number, userId:
   .leftJoin(vehicles, eq(rentalContracts.vehicleId, vehicles.id))
   .where(and(
     eq(rentalContracts.userId, userId),
+    // Only show active contracts in reservations calendar
+    eq(rentalContracts.status, 'active'),
     // Contract overlaps with the month
     sql`${rentalContracts.rentalStartDate} <= ${lastDay}`,
     sql`${rentalContracts.rentalEndDate} >= ${firstDay}`,

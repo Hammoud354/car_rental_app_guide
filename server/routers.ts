@@ -663,6 +663,8 @@ export const appRouter = router({
         returnNotes: z.string().optional(),
         damageInspection: z.string().optional(),
         overLimitKmFee: z.number().optional(),
+        depositRefund: z.boolean().optional(),
+        depositRefundNotes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         // Validate return odometer is greater than pickup odometer
@@ -678,7 +680,9 @@ export const appRouter = router({
           input.returnFuelLevel,
           input.returnNotes,
           input.damageInspection,
-          input.overLimitKmFee
+          input.overLimitKmFee,
+          input.depositRefund,
+          input.depositRefundNotes
         );
         
         // Update vehicle status back to "Available" (or "Maintenance" if in maintenance)

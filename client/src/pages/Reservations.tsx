@@ -154,8 +154,15 @@ export default function Reservations() {
                         : "bg-white border-gray-200"
                     }`}
                   >
-                    <div className={`text-sm font-semibold mb-2 ${isToday ? "text-blue-600" : "text-gray-700"}`}>
-                      {day}
+                    <div className="flex items-center justify-between mb-2">
+                      <div className={`text-sm font-semibold ${isToday ? "text-blue-600" : "text-gray-700"}`}>
+                        {day}
+                      </div>
+                      {dayReservations.length > 0 && (
+                        <div className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                          {dayReservations.length}
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-1">
                       {dayReservations.map((reservation, idx) => {
