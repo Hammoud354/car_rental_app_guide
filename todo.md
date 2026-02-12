@@ -2931,3 +2931,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Implement Excel export with all financial data (3 sheets: Overview, Vehicle Profitability, Monthly Performance)
 - [x] Implement PDF export with formatted P&L statement (with OKLCH color fix)
 - [ ] Add comparison view (current period vs previous period)
+
+
+## Navigation Enhancement - User Request (Feb 12, 2026)
+- [x] Add P&L (Profit & Loss) link to main navigation sidebar
+- [x] Ensure P&L link is visible and accessible from all pages
+- [x] Test navigation to P&L page from sidebar
+- [x] Save checkpoint after navigation update

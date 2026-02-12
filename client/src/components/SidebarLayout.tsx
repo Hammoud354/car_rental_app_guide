@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   Building2, BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, ChevronDown, ChevronRight,
-  PanelLeftClose, PanelLeftOpen
+  PanelLeftClose, PanelLeftOpen, DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -71,6 +71,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       label: "main",
       items: [
         { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
+        { href: "/profit-loss", label: "Profit & Loss", icon: DollarSign },
         { href: "/analysis", label: "Analysis", icon: TrendingUp },
       ],
     },
