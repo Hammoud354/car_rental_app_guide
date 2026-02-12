@@ -413,3 +413,22 @@ export const dashboardPreferences = mysqlTable("dashboardPreferences", {
 
 export type DashboardPreference = typeof dashboardPreferences.$inferSelect;
 export type InsertDashboardPreference = typeof dashboardPreferences.$inferInsert;
+
+
+/**
+ * Contract amendments table for tracking all changes made to rental contracts
+ */
+export const contractAmendments = mysqlTable("contractAmendments", {
+  id: int("id").autoincrement().primaryKey(),
+  contractId: int("contractId").notNull(), // Foreign key to rentalContracts
+  userId: int("userId").notNull(), // User who made the amendment
+  amendmentType: mysqlEnum("amendmentType", ["date_change", "vehicle_change", "rate_adjustment", "other"]).notNull(),
+  amendmentReason: text("amendmentReason").notNull(),
+  previousValues: text("previousValues").notNull(), // JSON string of old values
+  newValues: text("newValues").notNull(), // JSON string of new values
+  amountDifference: decimal("amountDifference", { precision: 10, scale: 2 }).default("0.00"), // Change in total amount
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ContractAmendment = typeof contractAmendments.$inferSelect;
+export type InsertContractAmendment = typeof contractAmendments.$inferInsert;

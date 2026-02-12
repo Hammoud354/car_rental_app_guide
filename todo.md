@@ -2671,3 +2671,148 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display late fee in contract completion dialog
 - [x] Include late fee in final invoice
 - [x] Show days overdue in contract details
+
+
+### 129. Implement Contract Amendment UI
+- [ ] Create contract amendment dialog/form
+- [ ] Allow modification of rental dates (start/end)
+- [ ] Allow vehicle change with availability check
+- [ ] Allow rate adjustments
+- [ ] Add amendment reason/notes field
+- [ ] Create audit trail for all amendments
+- [ ] Send notification to client about changes
+- [ ] Recalculate total amount on amendments
+- [ ] Test amendment workflow end-to-end
+
+### 130. Create Financial Reports Dashboard
+- [ ] Create new Financial Reports page
+- [ ] Implement Profit & Loss report with date range filter
+- [ ] Add revenue by vehicle breakdown
+- [ ] Add expense tracking and categorization
+- [ ] Add cash flow analysis
+- [ ] Implement Excel export for all reports
+- [ ] Add visual charts for revenue trends
+- [ ] Add summary cards (total revenue, expenses, profit margin)
+- [ ] Test all report calculations and exports
+
+### 131. Fix All Export Functionality
+- [ ] Audit all existing export buttons (PDF, Print, Excel)
+- [ ] Fix contract PDF export
+- [ ] Fix invoice PDF export
+- [ ] Fix maintenance records export
+- [ ] Fix client list export to Excel
+- [ ] Fix fleet list export to Excel
+- [ ] Add print functionality to all major pages
+- [ ] Test all exports across different browsers
+- [ ] Ensure proper formatting in all exports
+
+
+---
+
+## 🎨 COMPREHENSIVE UX/UI THEME & FEATURES IMPLEMENTATION
+
+### 132. UX/UI Theme Consistency Fixes
+- [ ] Add thin blood red outline to all input fields in Client Cards
+- [ ] Remove blue hover highlighting from icons in Contact Cards
+- [ ] Redesign Contract Detail card to match app theme (colors, fonts, spacing, borders, buttons)
+- [ ] Ensure consistent font color (dark/black) throughout entire app
+- [ ] Audit and fix global consistency: colors, typography, spacing, borders, icons, card styles
+- [ ] Make all cards match the professional theme of Client/Booking cards
+
+### 133. Contract Amendment UI
+- [ ] Create contract amendment dialog component
+- [ ] Add date change form (extend/shorten rental period)
+- [ ] Add vehicle swap form (change to different vehicle)
+- [ ] Add rate adjustment form (modify daily rate)
+- [ ] Display amendment history with audit trail
+- [ ] Integrate amendment UI into Rental Contracts page
+- [ ] Test all amendment workflows
+
+### 134. Financial Reports Dashboard
+- [ ] Create new Financial Reports page in navigation
+- [ ] Implement Profit & Loss (P&L) report with date range filter
+- [ ] Add revenue analysis by vehicle
+- [ ] Add expense tracking and categorization
+- [ ] Create cash flow analysis chart
+- [ ] Add vehicle purchase cost field for P&L calculations
+- [ ] Implement Excel export for all financial data
+- [ ] Add PDF export for financial reports
+- [ ] Display currency conversion (USD to LBP with VAT)
+
+### 135. Fix All Export Functionality
+- [ ] Verify Dashboard Excel export works correctly
+- [ ] Fix Invoice PDF export and Print functionality
+- [ ] Fix Contract PDF export and Print functionality
+- [ ] Add Fleet export to Excel functionality
+- [ ] Add Clients export to Excel functionality
+- [ ] Add Maintenance export to Excel functionality
+- [ ] Ensure all exports include proper formatting and branding
+- [ ] Test all export buttons across the entire app
+
+---
+
+## ✅ COMPLETED IN THIS SESSION
+
+### Insurance, Deposits & Fuel Policy ✅
+- [x] Database schema for insurance packages (None, Basic, Premium, Full Coverage)
+- [x] Database schema for deposit management (amount, status, refund tracking)
+- [x] Database schema for fuel policy (Full-to-Full, Same-to-Same, Pre-purchase)
+- [x] InsuranceDepositSelector component created
+- [x] Integrated into contract creation form
+- [x] Backend API updated to handle insurance, deposits, fuel policy
+- [x] Automated invoice generation includes insurance and deposit line items
+
+### Reservations & Conflict Management ✅
+- [x] Fixed reservation conflict detection to exclude completed contracts
+- [x] Added red badge with contract count per day on calendar
+- [x] Reservations calendar now only shows active contracts
+
+### Deposit Refund Workflow ✅
+- [x] Added deposit refund fields to contract completion
+- [x] Backend supports refund status (Refunded/Forfeited)
+- [x] Deposit refund notes field added
+
+### Late Return Penalties ✅
+- [x] Auto-calculation of late fees based on days overdue
+- [x] Configurable late fee percentage
+- [x] Late fees included in final invoice
+
+### Contract Amendments Backend ✅
+- [x] Database schema for contract amendments table
+- [x] Audit trail system for all amendments
+- [x] Backend API for date changes (extend/shorten rental)
+- [x] Backend API for vehicle swaps
+- [x] Backend API for rate adjustments
+- [x] Amendment history tracking with previous/new values
+
+### Design System Foundation ✅
+- [x] EmptyState component created
+- [x] LoadingSkeleton components (text, card, table)
+- [x] Enhanced CSS utilities for forms and states
+
+---
+
+## 🔄 REMAINING WORK FOR NEXT SESSION
+
+### UX/UI Theme Consistency (Priority 1)
+- [ ] Add thin blood red outline to all input fields in Client Cards
+- [ ] Remove blue hover highlighting from icons in Contact Cards  
+- [ ] Redesign Contract Detail card to match app theme
+- [ ] Global consistency audit and fixes
+
+### Contract Amendment UI (Priority 2)
+- [ ] Create amendment dialog component
+- [ ] Integrate into Rental Contracts page
+- [ ] Test all amendment workflows
+
+### Financial Reports Dashboard (Priority 3)
+- [ ] Create Financial Reports page
+- [ ] Implement P&L report
+- [ ] Add revenue analysis by vehicle
+- [ ] Excel export functionality
+
+### Export Functionality Fixes (Priority 4)
+- [ ] Verify and fix all PDF exports
+- [ ] Verify and fix all Excel exports
+- [ ] Add missing export buttons where needed
+

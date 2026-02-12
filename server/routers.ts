@@ -741,6 +741,63 @@ export const appRouter = router({
         return lastContract?.returnKm || null;
       }),
     
+    // Contract Amendment Procedures
+    getAmendments: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .query(async ({ input }) => {
+        const amendments = await import("./contractAmendments");
+        return await amendments.getContractAmendments(input.contractId);
+      }),
+    
+    amendDates: protectedProcedure
+      .input(z.object({
+        contractId: z.number(),
+        newStartDate: z.date(),
+        newEndDate: z.date(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const amendments = await import("./contractAmendments");
+        return await amendments.amendContractDates(
+          input.contractId,
+          ctx.user.id,
+          input.newStartDate,
+          input.newEndDate,
+          input.reason
+        );
+      }),
+    
+    amendVehicle: protectedProcedure
+      .input(z.object({
+        contractId: z.number(),
+        newVehicleId: z.number(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const amendments = await import("./contractAmendments");
+        return await amendments.amendContractVehicle(
+          input.contractId,
+          ctx.user.id,
+          input.newVehicleId,
+          input.reason
+        );
+      }),
+    
+    amendRate: protectedProcedure
+      .input(z.object({
+        contractId: z.number(),
+        newDailyRate: z.number(),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const amendments = await import("./contractAmendments");
+        return await amendments.amendContractRate(
+          input.contractId,
+          ctx.user.id,
+          input.newDailyRate,
+          input.reason
+        );
+      }),
 
   }),
 
