@@ -2235,3 +2235,20 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Colors are restored after PDF capture to maintain UI appearance
 - [x] Fix applied to both Export PDF and WhatsApp PDF buttons
 - [x] PDF generation now works without color parsing errors
+
+
+### 96. Empty All Database Tables for Fresh Start
+- [x] Truncate all database tables (vehicles, clients, contracts, invoices, maintenance, etc.)
+- [x] Cleared: vehicles, clients, rentalContracts, invoices, maintenanceRecords, damageMarks, carMakers, carModels, companySettings, companyProfiles, auditLogs, vehicleImages, invoiceLineItems
+- [x] Verified all tables are empty (0 rows in all tables)
+- [x] Database is now empty and ready for fresh data entry
+
+
+### 97. Fix Theme Consistency Across All Pages
+- [x] Audit all pages to identify button color, font, and formatting inconsistencies
+- [x] Found consistent button variants across pages (default, outline, ghost, destructive)
+- [x] Theme uses Apple-style minimalism with consistent OKLCH colors
+- [x] Fixed contract page tab highlights - removed border-b line and bottom indicators
+- [x] Changed tabs from ghost variant to outline for better consistency
+- [x] Clean tab formatting with proper spacing and no unwanted lines
+- [x] All pages use consistent Inter font and button styling from global theme

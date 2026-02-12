@@ -1,0 +1,20 @@
+{
+  "query": "SELECT \n  (SELECT COUNT(*) FROM vehicles) as vehicles_count,\n  (SELECT COUNT(*) FROM clients) as clients_count,\n  (SELECT COUNT(*) FROM rentalContracts) as contracts_count,\n  (SELECT COUNT(*) FROM invoices) as invoices_count,\n  (SELECT COUNT(*) FROM maintenanceRecords) as maintenance_count,\n  (SELECT COUNT(*) FROM damageMarks) as damageMarks_count,\n  (SELECT COUNT(*) FROM carMakers) as carMakers_count,\n  (SELECT COUNT(*) FROM carModels) as carModels_count;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT \n  (SELECT COUNT(*) FROM vehicles) as vehicles_count,\n  (SELECT COUNT(*) FROM clients) as clients_count,\n  (SELECT COUNT(*) FROM rentalContracts) as contracts_count,\n  (SELECT COUNT(*) FROM invoices) as invoices_count,\n  (SELECT COUNT(*) FROM maintenanceRecords) as maintenance_count,\n  (SELECT COUNT(*) FROM damageMarks) as damageMarks_count,\n  (SELECT COUNT(*) FROM carMakers) as carMakers_count,\n  (SELECT COUNT(*) FROM carModels) as carModels_count;",
+  "rows": [
+    {
+      "vehicles_count": "0",
+      "clients_count": "0",
+      "contracts_count": "0",
+      "invoices_count": "0",
+      "maintenance_count": "0",
+      "damageMarks_count": "0",
+      "carMakers_count": "0",
+      "carModels_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "vehicles_count\tclients_count\tcontracts_count\tinvoices_count\tmaintenance_count\tdamageMarks_count\tcarMakers_count\tcarModels_count\n0\t0\t0\t0\t0\t0\t0\t0\n",
+  "stderr": "",
+  "execution_time_ms": 1666
+}

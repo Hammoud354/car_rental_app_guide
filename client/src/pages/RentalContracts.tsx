@@ -879,38 +879,30 @@ export default function RentalContracts() {
           )}
           
           {/* Status Filter Tabs */}
-          <div className="flex gap-2 mb-6 border-b border-border pb-2">
+          <div className="flex gap-2 mb-6">
             <Button
-              variant={statusFilter === "active" ? "default" : "ghost"}
+              variant={statusFilter === "active" ? "default" : "outline"}
               onClick={() => setStatusFilter("active")}
-              className="relative"
             >
               Active
-              {statusFilter === "active" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
-              variant={statusFilter === "completed" ? "default" : "ghost"}
+              variant={statusFilter === "completed" ? "default" : "outline"}
               onClick={() => setStatusFilter("completed")}
-              className="relative"
             >
               Completed
-              {statusFilter === "completed" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
-              variant={statusFilter === "overdue" ? "default" : "ghost"}
+              variant={statusFilter === "overdue" ? "default" : "outline"}
               onClick={() => setStatusFilter("overdue")}
-              className="relative"
             >
               Overdue
-              {statusFilter === "overdue" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
             <Button
-              variant={!statusFilter ? "default" : "ghost"}
+              variant={!statusFilter ? "default" : "outline"}
               onClick={() => setStatusFilter(undefined)}
-              className="relative"
             >
               All
-              {!statusFilter && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
             </Button>
           </div>
 
