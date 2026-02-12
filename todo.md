@@ -2441,3 +2441,20 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Added Dashboard widget toggle functionality
 - [x] Created Customize Widgets dialog with switches for all widgets
 - [x] Tested sidebar navigation and widget toggles
+
+
+### 115. Add Sidebar Collapse/Minimize Functionality
+- [ ] Add toggle button to collapse/expand sidebar
+- [ ] Implement collapsed state with icon-only view
+- [ ] Add smooth transition animations
+- [ ] Persist sidebar state in localStorage
+- [ ] Test collapse/expand functionality
+
+- [x] Sidebar collapse/expand functionality implemented and tested
+- [x] Toggle button working correctly (PanelLeftClose/PanelLeftOpen icons)
+- [x] Collapsed state shows icon-only view (80px width)
+- [x] Expanded state shows full sidebar (264px width)
+- [x] Smooth transition animations (300ms duration)
+- [x] State persists in localStorage
+- [x] Tooltips show on hover in collapsed mode
+- [x] All navigation icons remain accessible when collapsed
