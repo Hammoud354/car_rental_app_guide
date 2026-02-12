@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -207,16 +208,19 @@ export default function ProfitLoss() {
 
   if (isLoadingFinancial || isLoadingVehicles || isLoadingMonthly) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-      </div>
+      <SidebarLayout>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </div>
+      </SidebarLayout>
     );
   }
 
   const isProfit = (financialData?.profitLoss.netProfit || 0) >= 0;
 
   return (
-    <div className="container mx-auto py-8 max-w-7xl">
+    <SidebarLayout>
+      <div className="container mx-auto py-8 max-w-7xl">
       <div id="profit-loss-content">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
@@ -460,5 +464,6 @@ export default function ProfitLoss() {
         </Button>
       </div>
     </div>
+    </SidebarLayout>
   );
 }

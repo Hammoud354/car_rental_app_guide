@@ -2938,3 +2938,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure P&L link is visible and accessible from all pages
 - [x] Test navigation to P&L page from sidebar
 - [x] Save checkpoint after navigation update
+
+
+## Sidebar Navigation Fix - User Report (Feb 12, 2026)
+- [x] Wrap P&L page with SidebarLayout component to maintain navigation
+- [x] Verify sidebar persists when navigating to P&L page
+- [x] Test navigation between all pages with sidebar
+- [x] Save checkpoint after fix
