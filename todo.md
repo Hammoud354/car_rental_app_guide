@@ -2413,3 +2413,31 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Include vehicle details and due date/km in message
 - [ ] Implement automatic checking (daily or on vehicle mileage update)
 - [ ] Test WhatsApp alerts send to company owner, not clients
+
+### 111. Make Dashboard Page Customizable
+- [ ] Add widget selection/configuration UI
+- [ ] Allow users to choose which widgets to display on dashboard
+- [ ] Implement widget toggle or drag-and-drop functionality
+- [ ] Save widget preferences to database per user
+- [ ] Test dashboard customization works correctly
+
+### 112. Fix Company Settings Page UI Issues
+- [ ] Add breadcrumb navigation to Company Settings page (Overview > Settings)
+- [ ] Remove "Return Home" button from bottom of Settings page
+- [ ] Test breadcrumb navigation works correctly
+- [ ] Verify Settings page matches other pages' navigation pattern
+
+### 113. Create Professional Left Navigation Panel
+- [ ] Design left sidebar navigation with sections and subsections
+- [ ] Add active state highlighting with professional color theme
+- [ ] Implement collapsible subsections
+- [ ] Apply consistent styling across all pages
+- [ ] Test navigation and active states
+
+### 114. Mark Completed Items
+- [x] Created SidebarLayout component with professional left navigation
+- [x] Added collapsible sections (MAIN, MANAGEMENT, DATA)
+- [x] Implemented active state highlighting with blue color theme
+- [x] Added Dashboard widget toggle functionality
+- [x] Created Customize Widgets dialog with switches for all widgets
+- [x] Tested sidebar navigation and widget toggles

@@ -4,7 +4,11 @@ import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet }
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
+import { Settings as SettingsIcon, Eye, EyeOff } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Users } from "lucide-react";
@@ -205,6 +209,21 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  
+  // Widget visibility state
+  const [widgetVisibility, setWidgetVisibility] = useState({
+    totalFleet: true,
+    totalRevenue: true,
+    inMaintenance: true,
+    expiringDocs: true,
+    overdueAlert: true,
+    fleetStatus: true,
+    fleetComposition: true,
+  });
+
+  const toggleWidget = (widgetId: keyof typeof widgetVisibility) => {
+    setWidgetVisibility(prev => ({ ...prev, [widgetId]: !prev[widgetId] }));
+  };
   const { selectedUserId, setSelectedUserId, isSuperAdmin } = useUserFilter();
   const utils = trpc.useUtils();
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
@@ -252,7 +271,7 @@ export default function Dashboard() {
 
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -261,6 +280,102 @@ export default function Dashboard() {
               <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
             </div>
             <div className="flex items-center gap-3">
+              {/* Widget Settings Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    Customize Widgets
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Dashboard Widgets</DialogTitle>
+                    <DialogDescription>
+                      Toggle widgets on or off to customize your dashboard view
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="totalFleet" className="flex items-center gap-2">
+                        <Car className="h-4 w-4" />
+                        Total Fleet
+                      </Label>
+                      <Switch
+                        id="totalFleet"
+                        checked={widgetVisibility.totalFleet}
+                        onCheckedChange={() => toggleWidget('totalFleet')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="totalRevenue" className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4" />
+                        Total Revenue
+                      </Label>
+                      <Switch
+                        id="totalRevenue"
+                        checked={widgetVisibility.totalRevenue}
+                        onCheckedChange={() => toggleWidget('totalRevenue')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="inMaintenance" className="flex items-center gap-2">
+                        <Wrench className="h-4 w-4" />
+                        In Maintenance
+                      </Label>
+                      <Switch
+                        id="inMaintenance"
+                        checked={widgetVisibility.inMaintenance}
+                        onCheckedChange={() => toggleWidget('inMaintenance')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="expiringDocs" className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        Expiring Documents
+                      </Label>
+                      <Switch
+                        id="expiringDocs"
+                        checked={widgetVisibility.expiringDocs}
+                        onCheckedChange={() => toggleWidget('expiringDocs')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="overdueAlert" className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Overdue Contracts Alert
+                      </Label>
+                      <Switch
+                        id="overdueAlert"
+                        checked={widgetVisibility.overdueAlert}
+                        onCheckedChange={() => toggleWidget('overdueAlert')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="fleetStatus" className="flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        Fleet Status Chart
+                      </Label>
+                      <Switch
+                        id="fleetStatus"
+                        checked={widgetVisibility.fleetStatus}
+                        onCheckedChange={() => toggleWidget('fleetStatus')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="fleetComposition" className="flex items-center gap-2">
+                        <Eye className="h-4 w-4" />
+                        Fleet Composition
+                      </Label>
+                      <Switch
+                        id="fleetComposition"
+                        checked={widgetVisibility.fleetComposition}
+                        onCheckedChange={() => toggleWidget('fleetComposition')}
+                      />
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
               {isSuperAdmin && allUsers && allUsers.length > 0 && (
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-gray-500" />
@@ -295,10 +410,11 @@ export default function Dashboard() {
           </div>
 
           {/* Overdue Contracts Alert Widget */}
-          <OverdueWidget filterUserId={selectedUserId} />
+          {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {widgetVisibility.totalFleet && (
             <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Fleet</CardTitle>
@@ -310,6 +426,9 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-foreground">{totalFleet}</div>
               </CardContent>
             </Card>
+            )}
+
+            {widgetVisibility.totalRevenue && (
 
             <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -323,6 +442,9 @@ export default function Dashboard() {
                 <p className="text-xs text-muted-foreground mt-1">This month: ${revenueThisMonth.toFixed(2)}</p>
               </CardContent>
             </Card>
+            )}
+
+            {widgetVisibility.inMaintenance && (
 
             <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -335,6 +457,9 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-foreground">{inMaintenance}</div>
               </CardContent>
             </Card>
+            )}
+
+            {widgetVisibility.expiringDocs && (
 
             <Card className="bg-card shadow-sm">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -347,11 +472,13 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-foreground">{expiringDocs}</div>
               </CardContent>
             </Card>
+            )}
           </div>
 
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Fleet Status */}
+            {widgetVisibility.fleetStatus && (
             <Card className="bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-foreground">Fleet Status</CardTitle>
@@ -416,8 +543,10 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Fleet Composition */}
+            {widgetVisibility.fleetComposition && (
             <Card className="bg-card shadow-sm">
               <CardHeader>
                 <CardTitle className="text-lg font-semibold text-foreground">Fleet Composition</CardTitle>
@@ -445,8 +574,9 @@ export default function Dashboard() {
                 </div>
               </CardContent>
             </Card>
+            )}
           </div>
       </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }
