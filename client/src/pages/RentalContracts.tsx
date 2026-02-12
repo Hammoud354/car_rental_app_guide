@@ -1381,70 +1381,54 @@ export default function RentalContracts() {
                         return;
                       }
                       
-                      // Store original styles
-                      const originalOverflow = contractElement.style.overflow;
-                      const originalHeight = contractElement.style.height;
-                      const originalMaxHeight = contractElement.style.maxHeight;
+                      // Get all elements and their computed styles BEFORE cloning
+                      const originalElements = contractElement.querySelectorAll("*");
+                      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
                       
-                      // Temporarily make element fully visible for capture
-                      contractElement.style.overflow = 'visible';
-                      contractElement.style.height = 'auto';
-                      contractElement.style.maxHeight = 'none';
-                      
-                      // Convert OKLCH colors to RGB for PDF compatibility
-                      // Get all elements and apply computed RGB colors as inline styles
-                      const elementsWithOklch = contractElement.querySelectorAll('*');
-                      const originalStyles: Map<Element, string> = new Map();
-                      
-                      elementsWithOklch.forEach((el: Element) => {
+                      originalElements.forEach((el) => {
                         const htmlEl = el as HTMLElement;
-                        const computedStyle = window.getComputedStyle(htmlEl);
-                        
-                        // Store original inline style
-                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
-                        
-                        // Apply computed RGB colors as inline styles to override OKLCH
-                        const color = computedStyle.color;
-                        const bgColor = computedStyle.backgroundColor;
-                        const borderColor = computedStyle.borderColor;
-                        
-                        if (color && color !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.color = color;
-                        }
-                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.backgroundColor = bgColor;
-                        }
-                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.borderColor = borderColor;
+                        const computed = window.getComputedStyle(htmlEl);
+                        computedStyles.push({
+                          color: computed.color,
+                          backgroundColor: computed.backgroundColor,
+                          borderColor: computed.borderColor,
+                        });
+                      });
+
+                      // Create a clone to avoid OKLCH color issues
+                      const clone = contractElement.cloneNode(true) as HTMLElement;
+                      clone.style.position = "absolute";
+                      clone.style.left = "-9999px";
+                      clone.style.overflow = 'visible';
+                      clone.style.height = 'auto';
+                      clone.style.maxHeight = 'none';
+                      document.body.appendChild(clone);
+
+                      // Apply computed RGB colors to cloned elements
+                      const clonedElements = clone.querySelectorAll("*");
+                      clonedElements.forEach((el, index) => {
+                        const htmlEl = el as HTMLElement;
+                        const styles = computedStyles[index];
+                        if (styles) {
+                          if (styles.color) htmlEl.style.color = styles.color;
+                          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
+                          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
                         }
                       });
                       
-                      // Use html2canvas to capture the element as image
-                      const canvas = await html2canvas(contractElement, {
+                      // Wait a moment for layout to settle
+                      await new Promise(resolve => setTimeout(resolve, 100));
+                      
+                      // Use html2canvas to capture the cloned element
+                      const canvas = await html2canvas(clone, {
                         scale: 2,
                         useCORS: true,
-                        logging: true,
-                        backgroundColor: '#ffffff',
-                        windowWidth: contractElement.scrollWidth,
-                        windowHeight: contractElement.scrollHeight,
-                        scrollY: -window.scrollY,
-                        scrollX: -window.scrollX
+                        logging: false,
+                        backgroundColor: "#ffffff",
                       });
                       
-                      // Restore original styles
-                      contractElement.style.overflow = originalOverflow;
-                      contractElement.style.height = originalHeight;
-                      contractElement.style.maxHeight = originalMaxHeight;
-                      
-                      // Restore original inline styles
-                      originalStyles.forEach((originalStyle, el) => {
-                        const htmlEl = el as HTMLElement;
-                        if (originalStyle) {
-                          htmlEl.setAttribute('style', originalStyle);
-                        } else {
-                          htmlEl.removeAttribute('style');
-                        }
-                      });
+                      // Remove clone
+                      document.body.removeChild(clone);
                       
                       // Create PDF with jsPDF
                       const imgData = canvas.toDataURL('image/png');
@@ -1549,59 +1533,54 @@ export default function RentalContracts() {
                       contractElement.style.maxHeight = 'none';
                       
                       // Convert OKLCH colors to RGB for PDF compatibility
-                      // Get all elements and apply computed RGB colors as inline styles
-                      const elementsWithOklch = contractElement.querySelectorAll('*');
-                      const originalStyles: Map<Element, string> = new Map();
+                      // Get all elements and their computed styles BEFORE cloning
+                      const originalElements = contractElement.querySelectorAll("*");
+                      const computedStyles: Array<{ color: string; backgroundColor: string; borderColor: string }> = [];
                       
-                      elementsWithOklch.forEach((el: Element) => {
+                      originalElements.forEach((el) => {
                         const htmlEl = el as HTMLElement;
-                        const computedStyle = window.getComputedStyle(htmlEl);
-                        
-                        // Store original inline style
-                        originalStyles.set(el, htmlEl.getAttribute('style') || '');
-                        
-                        // Apply computed RGB colors as inline styles to override OKLCH
-                        const color = computedStyle.color;
-                        const bgColor = computedStyle.backgroundColor;
-                        const borderColor = computedStyle.borderColor;
-                        
-                        if (color && color !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.color = color;
-                        }
-                        if (bgColor && bgColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.backgroundColor = bgColor;
-                        }
-                        if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
-                          htmlEl.style.borderColor = borderColor;
+                        const computed = window.getComputedStyle(htmlEl);
+                        computedStyles.push({
+                          color: computed.color,
+                          backgroundColor: computed.backgroundColor,
+                          borderColor: computed.borderColor,
+                        });
+                      });
+
+                      // Create a clone to avoid OKLCH color issues
+                      const clone = contractElement.cloneNode(true) as HTMLElement;
+                      clone.style.position = "absolute";
+                      clone.style.left = "-9999px";
+                      clone.style.overflow = 'visible';
+                      clone.style.height = 'auto';
+                      clone.style.maxHeight = 'none';
+                      document.body.appendChild(clone);
+
+                      // Apply computed RGB colors to cloned elements
+                      const clonedElements = clone.querySelectorAll("*");
+                      clonedElements.forEach((el, index) => {
+                        const htmlEl = el as HTMLElement;
+                        const styles = computedStyles[index];
+                        if (styles) {
+                          if (styles.color) htmlEl.style.color = styles.color;
+                          if (styles.backgroundColor) htmlEl.style.backgroundColor = styles.backgroundColor;
+                          if (styles.borderColor) htmlEl.style.borderColor = styles.borderColor;
                         }
                       });
                       
-                      // Use html2canvas to capture the element as image
-                      const canvas = await html2canvas(contractElement, {
+                      // Wait a moment for layout to settle
+                      await new Promise(resolve => setTimeout(resolve, 100));
+                      
+                      // Use html2canvas to capture the cloned element
+                      const canvas = await html2canvas(clone, {
                         scale: 2,
                         useCORS: true,
                         logging: false,
-                        backgroundColor: '#ffffff',
-                        windowWidth: contractElement.scrollWidth,
-                        windowHeight: contractElement.scrollHeight,
-                        scrollY: -window.scrollY,
-                        scrollX: -window.scrollX
+                        backgroundColor: "#ffffff",
                       });
                       
-                      // Restore original styles
-                      contractElement.style.overflow = originalOverflow;
-                      contractElement.style.height = originalHeight;
-                      contractElement.style.maxHeight = originalMaxHeight;
-                      
-                      // Restore original inline styles
-                      originalStyles.forEach((originalStyle, el) => {
-                        const htmlEl = el as HTMLElement;
-                        if (originalStyle) {
-                          htmlEl.setAttribute('style', originalStyle);
-                        } else {
-                          htmlEl.removeAttribute('style');
-                        }
-                      });
+                      // Remove clone
+                      document.body.removeChild(clone);
                       
                       // Create PDF with jsPDF
                       const imgData = canvas.toDataURL('image/png');

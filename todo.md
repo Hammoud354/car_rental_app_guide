@@ -3001,3 +3001,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix contract details dialog freeze/scroll issue (removed scrollbar hiding styles)
 - [x] Ensure contract content is properly formatted for print (added dialog override styles)
 - [x] Test print functionality across all contract types
+
+
+## Rental Contracts PDF Export Fix - User Report (Feb 13, 2026)
+- [x] Fix OKLCH color error in rental contracts PDF export (Export to PDF button)
+- [x] Apply clone-based OKLCH to RGB conversion to contract PDF export (both Export and WhatsApp share)
+- [x] Test contract PDF export to ensure it works without errors
