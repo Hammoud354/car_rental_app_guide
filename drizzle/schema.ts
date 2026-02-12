@@ -432,3 +432,25 @@ export const contractAmendments = mysqlTable("contractAmendments", {
 
 export type ContractAmendment = typeof contractAmendments.$inferSelect;
 export type InsertContractAmendment = typeof contractAmendments.$inferInsert;
+
+
+/**
+ * WhatsApp message templates table for customizable contract sharing
+ */
+export const whatsappTemplates = mysqlTable("whatsappTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
+  templateType: mysqlEnum("templateType", [
+    "contract_created",
+    "contract_renewed", 
+    "contract_completed",
+    "invoice_generated"
+  ]).notNull(),
+  messageTemplate: text("messageTemplate").notNull(), // Template with variables like {{contractNumber}}, {{clientName}}
+  isActive: boolean("isActive").default(true).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WhatsappTemplate = typeof whatsappTemplates.$inferSelect;
+export type InsertWhatsappTemplate = typeof whatsappTemplates.$inferInsert;

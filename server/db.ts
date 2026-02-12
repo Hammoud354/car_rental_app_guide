@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2250,3 +2250,105 @@ export async function getMaintenanceRecords(
 }
 
 // getAllVehicles already exists above, no need to duplicate
+
+/**
+ * WhatsApp Templates
+ */
+export async function getWhatsappTemplates(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(whatsappTemplates)
+    .where(eq(whatsappTemplates.userId, userId));
+}
+
+export async function getWhatsappTemplateByType(
+  userId: number,
+  templateType: 'contract_created' | 'contract_renewed' | 'contract_completed' | 'invoice_generated'
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const results = await db
+    .select()
+    .from(whatsappTemplates)
+    .where(
+      and(
+        eq(whatsappTemplates.userId, userId),
+        eq(whatsappTemplates.templateType, templateType),
+        eq(whatsappTemplates.isActive, true)
+      )
+    )
+    .limit(1);
+
+  return results[0] || null;
+}
+
+export async function upsertWhatsappTemplate(
+  userId: number,
+  templateType: 'contract_created' | 'contract_renewed' | 'contract_completed' | 'invoice_generated',
+  messageTemplate: string,
+  isActive: boolean = true
+) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not initialized');
+
+  // Check if template exists
+  const existing = await db
+    .select()
+    .from(whatsappTemplates)
+    .where(
+      and(
+        eq(whatsappTemplates.userId, userId),
+        eq(whatsappTemplates.templateType, templateType)
+      )
+    )
+    .limit(1);
+
+  if (existing.length > 0) {
+    // Update existing template
+    await db
+      .update(whatsappTemplates)
+      .set({
+        messageTemplate,
+        isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(whatsappTemplates.id, existing[0].id));
+    
+    return { ...existing[0], messageTemplate, isActive };
+  } else {
+    // Insert new template
+    const result = await db
+      .insert(whatsappTemplates)
+      .values({
+        userId,
+        templateType,
+        messageTemplate,
+        isActive,
+      });
+
+    const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+    
+    return {
+      id: insertId,
+      userId,
+      templateType,
+      messageTemplate,
+      isActive,
+    };
+  }
+}
+
+export async function deleteWhatsappTemplate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not initialized');
+
+  await db
+    .delete(whatsappTemplates)
+    .where(eq(whatsappTemplates.id, id));
+
+  return { success: true };
+}

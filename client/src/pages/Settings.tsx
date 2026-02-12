@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Save, Loader2, ChevronRight } from "lucide-react";
+import { Building2, Save, Loader2, ChevronRight, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
@@ -106,6 +106,25 @@ export default function Settings() {
           Manage your company information that will appear on rental contracts
         </p>
       </div>
+
+      {/* Quick Links to Other Settings */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Additional Settings</CardTitle>
+          <CardDescription>
+            Configure additional features and integrations
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link href="/whatsapp-settings">
+            <Button variant="outline" className="w-full justify-start gap-2">
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp Message Templates
+              <ChevronRight className="h-4 w-4 ml-auto" />
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
 
       <form onSubmit={handleSubmit}>
         <Card className="mb-6">

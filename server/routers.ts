@@ -1553,6 +1553,64 @@ export const appRouter = router({
       }),
   }),
 
+  whatsappTemplates: router({
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user.id;
+        return await db.getWhatsappTemplates(userId);
+      }),
+    
+    get: protectedProcedure
+      .input(z.object({
+        templateType: z.enum(['contract_created', 'contract_renewed', 'contract_completed', 'invoice_generated']),
+      }))
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        return await db.getWhatsappTemplateByType(userId, input.templateType);
+      }),
+    
+    upsert: protectedProcedure
+      .input(z.object({
+        templateType: z.enum(['contract_created', 'contract_renewed', 'contract_completed', 'invoice_generated']),
+        messageTemplate: z.string(),
+        isActive: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        return await db.upsertWhatsappTemplate(userId, input.templateType, input.messageTemplate, input.isActive ?? true);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteWhatsappTemplate(input.id);
+      }),
+    
+    uploadThumbnail: protectedProcedure
+      .input(z.object({
+        thumbnailData: z.string(), // Base64 encoded image
+        filename: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { storagePut } = await import('./storage');
+        
+        // Convert base64 to buffer
+        const base64Data = input.thumbnailData.split(',')[1];
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // Generate unique filename
+        const timestamp = Date.now();
+        const key = `thumbnails/${ctx.user.id}/${timestamp}-${input.filename}`;
+        
+        // Upload to S3
+        const result = await storagePut(key, buffer, 'image/jpeg');
+        
+        return { url: result.url };
+      }),
+  }),
+
   dashboard: router({
     getQuickStats: protectedProcedure
       .query(async ({ ctx }) => {

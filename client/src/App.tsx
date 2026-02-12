@@ -19,6 +19,7 @@ import Maintenance from "./pages/Maintenance";
 import MaintenanceTracking from "./pages/MaintenanceTracking";
 import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
 import Settings from "./pages/Settings";
+import WhatsAppSettings from "./pages/WhatsAppSettings";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import Register from "./pages/Register";
@@ -57,6 +58,7 @@ function Router() {
       <Route path="/operations" component={Operations} />
       <Route path="/compliance" component={Compliance} />
       <Route path="/settings" component={Settings} />
+      <Route path="/whatsapp-settings" component={WhatsAppSettings} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/audit-logs" component={AuditLogs} />
       <Route path="/analysis" component={Analysis} />

@@ -3084,3 +3084,41 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Dev server running without errors
 - [x] All PDF export functions now use centralized utility with automatic OKLCH-to-RGB conversion
 - [ ] Create checkpoint and deliver
+
+
+## WhatsApp Message Template Customization
+
+### Phase 1: Database Schema
+- [x] Create whatsappTemplates table (templateType, messageTemplate, isActive, userId)
+- [x] Add template types: 'contract_created', 'contract_renewed', 'contract_completed', 'invoice_generated'
+- [x] Push database migrations
+
+### Phase 2: Settings Page
+- [x] Create WhatsApp Settings page in Settings section
+- [x] Add template editor for each contract type
+- [x] Show available template variables (e.g., {{contractNumber}}, {{clientName}}, {{vehicleName}})
+- [x] Add preview functionality to show how template will look
+- [x] Save templates to database
+
+### Phase 3: Template Variable System
+- [x] Create template parser utility function
+- [x] Support variables: {{contractNumber}}, {{clientName}}, {{vehicleName}}, {{startDate}}, {{endDate}}, {{totalAmount}}, {{pdfUrl}}, {{thumbnailUrl}}
+- [x] Add fallback to default template if custom template not found
+
+### Phase 4: Contract Thumbnail Generation
+- [x] Generate smaller thumbnail image (300x400px) of contract for WhatsApp preview
+- [x] Upload thumbnail to S3 alongside full PDF
+- [x] Return both PDF URL and thumbnail URL from upload mutation
+
+### Phase 5: Update Share via WhatsApp
+- [x] Load custom template from database based on contract type
+- [x] Parse template variables with actual contract data
+- [x] Include thumbnail URL in WhatsApp message
+- [x] Test WhatsApp preview shows thumbnail correctly
+
+### Phase 6: Testing & Delivery
+- [x] Test template creation and editing
+- [x] Test all template variables render correctly
+- [x] Test thumbnail generation and WhatsApp preview
+- [x] Verify templates work for all contract types
+- [x] Create checkpoint and deliver

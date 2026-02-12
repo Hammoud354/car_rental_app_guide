@@ -22,6 +22,8 @@ import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
+import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTemplate } from "@/lib/templateParser";
+import { generateThumbnail } from "@/lib/thumbnailGenerator";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
 
 export default function RentalContracts() {
@@ -288,6 +290,11 @@ export default function RentalContracts() {
   });
 
   const uploadPdfMutation = trpc.files.uploadPdf.useMutation();
+  const uploadThumbnailMutation = trpc.whatsappTemplates.uploadThumbnail.useMutation();
+  const { data: whatsappTemplate } = trpc.whatsappTemplates.get.useQuery(
+    { templateType: 'contract_created' },
+    { enabled: isDetailsDialogOpen && !!selectedContract }
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -1605,6 +1612,14 @@ export default function RentalContracts() {
                           filename: `Contract-${selectedContract.contractNumber}.pdf`,
                         });
                         
+                        // Generate and upload thumbnail
+                        toast.info("Generating thumbnail...");
+                        const thumbnailDataUrl = await generateThumbnail(contractElement, 300, 400);
+                        const thumbnailResult = await uploadThumbnailMutation.mutateAsync({
+                          thumbnailData: thumbnailDataUrl,
+                          filename: `Contract-${selectedContract.contractNumber}-thumb.jpg`,
+                        });
+                        
                         // Use company phone number from settings
                         if (!companySettings?.phone) {
                           toast.error("Company phone number not set in settings");
@@ -1612,13 +1627,25 @@ export default function RentalContracts() {
                         }
                         const phoneNumber = companySettings.phone.replace(/[\s\-\(\)]/g, '');
                         
-                        // Create WhatsApp message with PDF download link
-                        const message = `New Contract Created!\n\n📋 Contract: ${selectedContract.contractNumber}\n👤 Client: ${selectedContract.clientFirstName} ${selectedContract.clientLastName}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}`;
+                        // Get custom template or use default
+                        const template = whatsappTemplate?.messageTemplate || getDefaultTemplate('contract_created');
+                        
+                        // Parse template with actual data
+                        const message = parseTemplate(template, {
+                          contractNumber: selectedContract.contractNumber,
+                          clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`,
+                          vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
+                          startDate: formatTemplateDate(selectedContract.rentalStartDate),
+                          endDate: formatTemplateDate(selectedContract.rentalEndDate),
+                          totalAmount: formatTemplateCurrency(selectedContract.finalAmount),
+                          pdfUrl: uploadResult.url,
+                          thumbnailUrl: thumbnailResult.url,
+                        });
                         
                         // Encode message for URL
                         const encodedMessage = encodeURIComponent(message);
                         
-                        toast.success("PDF uploaded! Opening WhatsApp...");
+                        toast.success("PDF and thumbnail uploaded! Opening WhatsApp...");
                         
                         // Open WhatsApp with pre-filled message
                         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
