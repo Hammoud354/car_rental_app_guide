@@ -406,6 +406,36 @@ export const appRouter = router({
           input.maintenanceIntervalMonths
         );
       }),
+
+    checkMaintenanceAlerts: protectedProcedure.query(async ({ ctx }) => {
+      const { checkMaintenanceDue, generateMaintenanceAlertMessage, getCompanyPhoneNumber } = await import("./maintenanceAlerts");
+      const alerts = await checkMaintenanceDue(ctx.user.id);
+      const companyPhone = await getCompanyPhoneNumber(ctx.user.id);
+      const message = generateMaintenanceAlertMessage(alerts);
+      return { alerts, message, companyPhone };
+    }),
+
+    sendMaintenanceAlertWhatsApp: protectedProcedure.mutation(async ({ ctx }) => {
+      const { checkMaintenanceDue, generateMaintenanceAlertMessage, getCompanyPhoneNumber } = await import("./maintenanceAlerts");
+      const alerts = await checkMaintenanceDue(ctx.user.id);
+      
+      if (alerts.length === 0) {
+        return { success: false, message: "No maintenance alerts to send" };
+      }
+
+      const companyPhone = await getCompanyPhoneNumber(ctx.user.id);
+      if (!companyPhone) {
+        throw new Error("Company phone number not set in settings");
+      }
+
+      const message = generateMaintenanceAlertMessage(alerts);
+      
+      // Format phone number for WhatsApp
+      const phoneNumber = companyPhone.replace(/[\s\-\(\)]/g, "");
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+      
+      return { success: true, whatsappUrl, alertCount: alerts.length };
+    }),
   }),
 
   // Rental Contracts Router

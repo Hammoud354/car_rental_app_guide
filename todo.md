@@ -2399,3 +2399,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Found duplicate dashboard links in MinimalLayout component
 - [x] Removed duplicate Dashboard link from dropdown menu (kept only nav bar link)
 - [x] Error resolved - no more duplicate key warnings
+
+
+### 109. Fix Invisible Font in Client Cards
+- [ ] Locate client card component in Clients page
+- [ ] Change text color from light gray to darker color for better visibility
+- [ ] Ensure labels (Phone, License, Address) are clearly readable
+- [ ] Test client cards have good contrast
+
+### 110. Implement Maintenance Due WhatsApp Alerts to Company Owner
+- [ ] Create function to check for maintenance due (within 7 days or 500km)
+- [ ] Send WhatsApp alert to company phone number from settings
+- [ ] Include vehicle details and due date/km in message
+- [ ] Implement automatic checking (daily or on vehicle mileage update)
+- [ ] Test WhatsApp alerts send to company owner, not clients

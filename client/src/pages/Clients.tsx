@@ -399,32 +399,32 @@ export default function Clients() {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="text-gray-300 space-y-2">
+              <CardContent className="text-gray-900 space-y-2">
                 {client.nationality && (
                   <div className="text-sm">
-                    <span className="text-gray-400">Nationality:</span> {client.nationality}
+                    <span className="text-gray-800 font-medium">Nationality:</span> <span className="text-gray-900">{client.nationality}</span>
                   </div>
                 )}
                 {client.phone && (
                   <div className="text-sm">
-                    <span className="text-gray-400">Phone:</span> {client.phone}
+                    <span className="text-gray-800 font-medium">Phone:</span> <span className="text-gray-900">{client.phone}</span>
                   </div>
                 )}
                 {client.email && (
                   <div className="text-sm">
-                    <span className="text-gray-400">Email:</span> {client.email}
+                    <span className="text-gray-800 font-medium">Email:</span> <span className="text-gray-900">{client.email}</span>
                   </div>
                 )}
                 <div className="text-sm">
-                  <span className="text-gray-400">License:</span> {client.drivingLicenseNumber}
+                  <span className="text-gray-800 font-medium">License:</span> <span className="text-gray-900">{client.drivingLicenseNumber}</span>
                 </div>
                 <div className="text-sm">
-                  <span className="text-gray-400">License Expiry:</span>{" "}
-                  {new Date(client.licenseExpiryDate).toLocaleDateString()}
+                  <span className="text-gray-800 font-medium">License Expiry:</span>{" "}
+                  <span className="text-gray-900">{new Date(client.licenseExpiryDate).toLocaleDateString()}</span>
                 </div>
                 {client.address && (
                   <div className="text-sm">
-                    <span className="text-gray-400">Address:</span> {client.address}
+                    <span className="text-gray-800 font-medium">Address:</span> <span className="text-gray-900">{client.address}</span>
                   </div>
                 )}
               </CardContent>

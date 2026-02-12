@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock } from "lucide-react";
+import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -26,6 +26,8 @@ export default function MaintenanceTracking() {
       toast.error(`Failed to update schedule: ${error.message}`);
     },
   });
+
+  const sendAlertMutation = trpc.fleet.sendMaintenanceAlertWhatsApp.useMutation();
 
   const handleUpdateSchedule = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,14 +84,36 @@ export default function MaintenanceTracking() {
         <span className="text-foreground font-medium">Maintenance Tracking</span>
       </div>
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Wrench className="h-8 w-8" />
-          Maintenance Tracking & Alerts
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Track maintenance schedules and get alerts for upcoming service
-        </p>
+      <div className="mb-8 flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Wrench className="h-8 w-8" />
+            Maintenance Tracking & Alerts
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Track maintenance schedules and get alerts for upcoming service
+          </p>
+        </div>
+        <Button
+          onClick={async () => {
+            try {
+              const result = await sendAlertMutation.mutateAsync();
+              if (result.success && result.whatsappUrl) {
+                window.open(result.whatsappUrl, "_blank");
+                toast.success(`Sending alert for ${result.alertCount} vehicle(s)`);
+              } else {
+                toast.info(result.message || "No maintenance alerts to send");
+              }
+            } catch (error: any) {
+              toast.error(error.message || "Failed to send alert");
+            }
+          }}
+          disabled={sendAlertMutation.isPending || (overdueVehicles.length === 0 && upcomingVehicles.length === 0)}
+          className="gap-2"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Send WhatsApp Alert
+        </Button>
       </div>
 
       {/* Alert Summary Cards */}
