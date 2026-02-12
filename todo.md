@@ -2945,3 +2945,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify sidebar persists when navigating to P&L page
 - [x] Test navigation between all pages with sidebar
 - [x] Save checkpoint after fix
+
+
+## UI Cleanup - User Request (Feb 12, 2026)
+- [x] Remove redundant breadcrumb navigation from P&L page
+- [x] Save checkpoint after cleanup

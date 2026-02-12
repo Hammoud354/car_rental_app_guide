@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, DollarSign, TrendingUp, TrendingDown, Download, Calendar, ChevronRight } from "lucide-react";
+import { Loader2, DollarSign, TrendingUp, TrendingDown, Download, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
@@ -222,15 +222,6 @@ export default function ProfitLoss() {
     <SidebarLayout>
       <div className="container mx-auto py-8 max-w-7xl">
       <div id="profit-loss-content">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-        <Link href="/">
-          <span className="hover:text-foreground cursor-pointer">Overview</span>
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">Profit & Loss</span>
-      </div>
-
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
