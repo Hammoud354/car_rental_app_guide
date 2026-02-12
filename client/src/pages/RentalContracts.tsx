@@ -21,7 +21,7 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
+import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
 import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTemplate } from "@/lib/templateParser";
 import { generateThumbnail } from "@/lib/thumbnailGenerator";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
@@ -1399,15 +1399,33 @@ export default function RentalContracts() {
                       contractElement.style.height = 'auto';
                       contractElement.style.maxHeight = 'none';
                       
-                      // Inject RGB color overrides to fix OKLCH parsing errors
-                      const cleanup = prepareForPDFExport();
+                      // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
+                      const safeClone = createPdfSafeClone(contractElement);
+                      
+                      // Make the clone visible with same dimensions as original
+                      safeClone.style.position = 'static';
+                      safeClone.style.left = '0';
+                      safeClone.style.top = '0';
+                      safeClone.style.overflow = 'visible';
+                      safeClone.style.height = 'auto';
+                      safeClone.style.maxHeight = 'none';
                       
                       try {
                         // Wait a moment for styles to apply
                         await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        // Use html2canvas to capture the element
-                        const canvas = await html2canvas(contractElement, {
+                        // Verify no OKLCH remains (development check)
+                        if (process.env.NODE_ENV === 'development') {
+                          const hasOklch = verifyNoOklch(safeClone);
+                          if (hasOklch) {
+                            console.warn('OKLCH colors still present in clone!');
+                          } else {
+                            console.log('✓ All OKLCH colors successfully converted');
+                          }
+                        }
+                        
+                        // Use html2canvas to capture the SAFE CLONE (not the original)
+                        const canvas = await html2canvas(safeClone, {
                           scale: 2,
                           useCORS: true,
                           logging: false,
@@ -1419,8 +1437,8 @@ export default function RentalContracts() {
                         contractElement.style.height = originalHeight;
                         contractElement.style.maxHeight = originalMaxHeight;
                         
-                        // Clean up RGB overrides
-                        cleanup();
+                        // Clean up the safe clone
+                        cleanupPdfSafeClone(safeClone);
                       
                         // Create PDF with jsPDF
                         const imgData = canvas.toDataURL('image/png');
@@ -1480,8 +1498,12 @@ export default function RentalContracts() {
                         
                         toast.success("PDF downloaded successfully!");
                       } catch (innerError: any) {
-                        // Clean up RGB overrides even if there's an error
-                        cleanup();
+                        // Clean up the safe clone even if there's an error
+                        cleanupPdfSafeClone(safeClone);
+                        // Restore original styles
+                        contractElement.style.overflow = originalOverflow;
+                        contractElement.style.height = originalHeight;
+                        contractElement.style.maxHeight = originalMaxHeight;
                         throw innerError;
                       }
                     } catch (error: any) {
@@ -1529,15 +1551,23 @@ export default function RentalContracts() {
                       contractElement.style.height = 'auto';
                       contractElement.style.maxHeight = 'none';
                       
-                      // Inject RGB color overrides to fix OKLCH parsing errors
-                      const cleanup = prepareForPDFExport();
+                      // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
+                      const safeClone = createPdfSafeClone(contractElement);
+                      
+                      // Make the clone visible with same dimensions as original
+                      safeClone.style.position = 'static';
+                      safeClone.style.left = '0';
+                      safeClone.style.top = '0';
+                      safeClone.style.overflow = 'visible';
+                      safeClone.style.height = 'auto';
+                      safeClone.style.maxHeight = 'none';
                       
                       try {
                         // Wait a moment for styles to apply
                         await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        // Use html2canvas to capture the element
-                        const canvas = await html2canvas(contractElement, {
+                        // Use html2canvas to capture the SAFE CLONE (not the original)
+                        const canvas = await html2canvas(safeClone, {
                           scale: 2,
                           useCORS: true,
                           logging: false,
@@ -1549,8 +1579,8 @@ export default function RentalContracts() {
                         contractElement.style.height = originalHeight;
                         contractElement.style.maxHeight = originalMaxHeight;
                         
-                        // Clean up RGB overrides
-                        cleanup();
+                        // Clean up the safe clone
+                        cleanupPdfSafeClone(safeClone);
                       
                         // Create PDF with jsPDF
                         const imgData = canvas.toDataURL('image/png');
@@ -1650,8 +1680,12 @@ export default function RentalContracts() {
                         // Open WhatsApp with pre-filled message
                         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
                       } catch (innerError: any) {
-                        // Clean up RGB overrides even if there's an error
-                        cleanup();
+                        // Clean up the safe clone even if there's an error
+                        cleanupPdfSafeClone(safeClone);
+                        // Restore original styles
+                        contractElement.style.overflow = originalOverflow;
+                        contractElement.style.height = originalHeight;
+                        contractElement.style.maxHeight = originalMaxHeight;
                         throw innerError;
                       }
                     } catch (error: any) {

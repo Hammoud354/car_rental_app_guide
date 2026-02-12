@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { X, Trash2, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
+import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
 import { toast } from "sonner";
 
 interface DamageMark {
@@ -520,22 +520,27 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                     try {
                       toast.info("Generating PDF...");
                       
-                      // Inject RGB color overrides to fix OKLCH parsing errors
-                      const cleanup = prepareForPDFExport();
+                      // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
+                      const safeClone = createPdfSafeClone(inspectionElement as HTMLElement);
+                      
+                      // Make the clone visible
+                      safeClone.style.position = 'static';
+                      safeClone.style.left = '0';
+                      safeClone.style.top = '0';
                       
                       try {
                         // Wait a moment for styles to apply
                         await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        // Use html2canvas to capture the element
-                        const canvas = await html2canvas(inspectionElement as HTMLElement, {
+                        // Use html2canvas to capture the SAFE CLONE (not the original)
+                        const canvas = await html2canvas(safeClone, {
                           scale: 2,
                           useCORS: true,
                           logging: false,
                         });
                         
-                        // Clean up RGB overrides
-                        cleanup();
+                        // Clean up the safe clone
+                        cleanupPdfSafeClone(safeClone);
                       
                         const imgData = canvas.toDataURL('image/png');
                         const pdf = new jsPDF({
@@ -556,8 +561,8 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                         pdf.save(`Contract-Inspection.pdf`);
                         toast.success("PDF exported successfully!");
                       } catch (innerError: any) {
-                        // Clean up RGB overrides even if there's an error
-                        cleanup();
+                        // Clean up the safe clone even if there's an error
+                        cleanupPdfSafeClone(safeClone);
                         throw innerError;
                       }
                     } catch (error) {

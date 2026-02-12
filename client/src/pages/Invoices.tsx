@@ -23,7 +23,7 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { prepareForPDFExport, cleanupAfterPDFExport } from "@/lib/pdfExport";
+import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 
 export default function Invoices() {
@@ -128,15 +128,23 @@ export default function Invoices() {
       element.style.height = 'auto';
       element.style.maxHeight = 'none';
       
-      // Inject RGB color overrides to fix OKLCH parsing errors
-      const cleanup = prepareForPDFExport();
+      // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
+      const safeClone = createPdfSafeClone(element);
+      
+      // Make the clone visible with same dimensions as original
+      safeClone.style.position = 'static';
+      safeClone.style.left = '0';
+      safeClone.style.top = '0';
+      safeClone.style.overflow = 'visible';
+      safeClone.style.height = 'auto';
+      safeClone.style.maxHeight = 'none';
       
       try {
         // Wait a moment for styles to apply
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        // Use html2canvas to capture the element
-        const canvas = await html2canvas(element, {
+        // Use html2canvas to capture the SAFE CLONE (not the original)
+        const canvas = await html2canvas(safeClone, {
           scale: 2,
           useCORS: true,
           logging: false,
@@ -148,8 +156,8 @@ export default function Invoices() {
         element.style.height = originalHeight;
         element.style.maxHeight = originalMaxHeight;
         
-        // Clean up RGB overrides
-        cleanup();
+        // Clean up the safe clone
+        cleanupPdfSafeClone(safeClone);
 
         const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF({
@@ -179,8 +187,12 @@ export default function Invoices() {
         pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
         toast.success("PDF exported successfully");
       } catch (innerError: any) {
-        // Clean up RGB overrides even if there's an error
-        cleanup();
+        // Clean up the safe clone even if there's an error
+        cleanupPdfSafeClone(safeClone);
+        // Restore original styles
+        element.style.overflow = originalOverflow;
+        element.style.height = originalHeight;
+        element.style.maxHeight = originalMaxHeight;
         throw innerError;
       }
     } catch (error) {

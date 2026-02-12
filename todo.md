@@ -3122,3 +3122,43 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test thumbnail generation and WhatsApp preview
 - [x] Verify templates work for all contract types
 - [x] Create checkpoint and deliver
+
+
+## CRITICAL: Deep OKLCH PDF Export Investigation & Fix
+
+### Phase 1: Identify Real Rendering Source
+- [x] Confirm PDF rendering stack (jsPDF + html2canvas)
+- [x] Log exact failing stack trace from browser console
+- [x] Identify where OKLCH parsing fails (html2canvas style computation)
+- [x] Document the complete rendering pipeline
+
+### Phase 2: Search Entire Project for OKLCH Sources
+- [x] Search for `oklch(` in all CSS files
+- [x] Search for `--color-` CSS variables
+- [x] Search for `:root` theme definitions
+- [x] Check Tailwind config for OKLCH color definitions
+- [x] Verify computed styles contain OKLCH even if raw CSS doesn't
+- [x] Document all OKLCH sources found
+
+### Phase 3: Implement Architectural Fix
+- [x] Create DOM cloning utility that sanitizes computed styles
+- [x] Implement OKLCH-to-RGB/HEX converter for computed styles
+- [x] Build PDF rendering wrapper that uses sanitized clone
+- [x] Ensure live app keeps OKLCH, PDF receives safe colors only
+- [ ] Test the utility in isolatio### Phase 4: Apply Fix Globally
+- [x] Update RentalContracts.tsx (Export to PDF + WhatsApp)
+- [x] Update Invoices.tsx
+- [x] Update ProfitLoss.tsx
+- [x] Update CarDamageInspection.tsx
+- [x] Verify no TypeScript errors
+- [x] Verify dev server runs withou### Phase 5: Hard Testing & Validation
+- [x] Console log computed styles before export on all pages
+- [x] Confirm ZERO oklch() remains in computed styles
+- [x] Test export from RentalContracts page
+- [x] Test export from Invoices page
+- [x] Test export from ProfitLoss page
+- [x] Test export from CarDamageInspection page
+- [x] Verify no runtime console errors
+- [x] Verify layout integrity preserved
+- [x] Verify theme consistency int### Phase 6: Deliver comprehensive fix
+- [x] Document the architectural solution
