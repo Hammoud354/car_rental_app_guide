@@ -97,9 +97,6 @@ export default function MinimalLayout({ children }: { children: React.ReactNode 
                       User ID: {user.id}
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
-                      Dashboard
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setLocation("/company-settings")}>
                       <Settings className="h-4 w-4 mr-2" />
                       Company Settings

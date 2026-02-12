@@ -2386,3 +2386,16 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Updated WhatsApp messages to show "New Contract Created" and "New Invoice Generated"
 - [x] Messages now include client name but send to company number
 - [x] Added validation to check if company phone is set before sending
+
+
+### 108. Fix Duplicate /dashboard Route Error
+- [ ] Check App.tsx for duplicate /dashboard routes
+- [ ] Remove or consolidate duplicate routes
+- [ ] Ensure unique keys for all routes
+- [ ] Test that error is resolved
+
+### 108. Fix Duplicate /dashboard Route Error - COMPLETED
+- [x] Check App.tsx for duplicate /dashboard routes
+- [x] Found duplicate dashboard links in MinimalLayout component
+- [x] Removed duplicate Dashboard link from dropdown menu (kept only nav bar link)
+- [x] Error resolved - no more duplicate key warnings
