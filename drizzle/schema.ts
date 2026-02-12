@@ -383,3 +383,21 @@ export const vehicleImages = mysqlTable("vehicleImages", {
 
 export type VehicleImage = typeof vehicleImages.$inferSelect;
 export type InsertVehicleImage = typeof vehicleImages.$inferInsert;
+
+
+/**
+ * Dashboard preferences table for customizable dashboard widgets
+ */
+export const dashboardPreferences = mysqlTable("dashboardPreferences", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  widgetId: varchar("widgetId", { length: 100 }).notNull(), // e.g., "total_vehicles", "active_contracts", "revenue_chart"
+  position: int("position").notNull(), // Order of widget on dashboard
+  isVisible: boolean("isVisible").default(true).notNull(),
+  settings: text("settings"), // JSON string for widget-specific settings
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type DashboardPreference = typeof dashboardPreferences.$inferSelect;
+export type InsertDashboardPreference = typeof dashboardPreferences.$inferInsert;

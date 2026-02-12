@@ -91,6 +91,7 @@ export default function RentalContracts() {
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const { data: companySettings } = trpc.settings.get.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
   const utils = trpc.useUtils();
   
@@ -1628,11 +1629,15 @@ export default function RentalContracts() {
                         filename: `Contract-${selectedContract.contractNumber}.pdf`,
                       });
                       
-                      // Format phone number for WhatsApp
-                      const phoneNumber = selectedContract.clientPhone.replace(/[\s\-\(\)]/g, '');
+                      // Use company phone number from settings
+                      if (!companySettings?.phone) {
+                        toast.error("Company phone number not set in settings");
+                        return;
+                      }
+                      const phoneNumber = companySettings.phone.replace(/[\s\-\(\)]/g, '');
                       
                       // Create WhatsApp message with PDF download link
-                      const message = `Hello ${selectedContract.clientFirstName},\n\nYour rental contract is ready!\n\n📋 Contract: ${selectedContract.contractNumber}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}\n\nThank you for choosing our service!`;
+                      const message = `New Contract Created!\n\n📋 Contract: ${selectedContract.contractNumber}\n👤 Client: ${selectedContract.clientFirstName} ${selectedContract.clientLastName}\n🚗 Vehicle: ${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})\n📅 Period: ${new Date(selectedContract.rentalStartDate).toLocaleDateString()} - ${new Date(selectedContract.rentalEndDate).toLocaleDateString()}\n💰 Total: $${parseFloat(selectedContract.finalAmount).toFixed(2)}\n\n📄 Download Contract PDF:\n${uploadResult.url}`;
                       
                       // Encode message for URL
                       const encodedMessage = encodeURIComponent(message);

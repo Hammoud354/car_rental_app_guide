@@ -480,17 +480,17 @@ export default function Invoices() {
                         return;
                       }
                       
-                      // Check if client phone is available from invoice details
-                      if (!invoiceDetails.clientPhone) {
-                        toast.error("Client phone number not found");
+                      // Use company phone number from settings
+                      if (!settings?.phone) {
+                        toast.error("Company phone number not set in settings");
                         return;
                       }
                       
                       // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
-                      const phoneNumber = invoiceDetails.clientPhone.replace(/[\s\-\(\)]/g, '');
+                      const phoneNumber = settings.phone.replace(/[\s\-\(\)]/g, '');
                       
                       // Create WhatsApp message
-                      const message = `Hello ${invoiceDetails.clientName},\n\nYour invoice is ready!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate).toLocaleString()} LBP\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}\n\nThank you for your business!`;
+                      const message = `New Invoice Generated!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate).toLocaleString()} LBP\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}`;
                       
                       // Encode message for URL
                       const encodedMessage = encodeURIComponent(message);

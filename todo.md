@@ -2329,3 +2329,60 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Created backend mutations for maintenance schedule management
 - [x] Added navigation link from Fleet Management to Maintenance Tracking
 - [x] Complete maintenance tracking system with alert summary cards
+
+
+### 103. Create Customizable Dashboard with Widget Management
+- [ ] Design default dashboard layout with key metrics widgets
+- [ ] Create widget library (Total Vehicles, Active Contracts, Revenue, Maintenance Alerts, etc.)
+- [ ] Add "Customize Dashboard" button to toggle edit mode
+- [ ] Implement drag-and-drop widget reordering
+- [ ] Add widget selector dialog to add/remove widgets
+- [ ] Save user's dashboard preferences to database
+- [ ] Load custom dashboard layout on page load
+- [ ] Test widget customization functionality
+
+### 104. Add Maintenance Cost Tracking and Expense Reports
+- [ ] Add cost field to maintenance records (already exists, verify)
+- [ ] Create expense report view showing total costs per vehicle
+- [ ] Add date range filter for expense reports
+- [ ] Calculate total maintenance costs per vehicle
+- [ ] Show maintenance cost vs revenue for profitability analysis
+- [ ] Add export to CSV functionality for expense reports
+- [ ] Test cost tracking and reports
+
+### 105. Implement Automated Maintenance Reminders
+- [ ] Create maintenance reminder check function (7 days before due date or 500km before)
+- [ ] Add backend cron job or scheduled task for reminder checks
+- [ ] Implement WhatsApp notification for maintenance due
+- [ ] Implement email notification for maintenance due
+- [ ] Add notification preferences to company settings
+- [ ] Test automated reminders trigger correctly
+- [ ] Verify notifications sent to correct recipients
+
+### 106. Create Vehicle Utilization Analytics Dashboard
+- [ ] Calculate rental frequency per vehicle (contracts per month)
+- [ ] Calculate idle days (days not rented)
+- [ ] Calculate revenue per vehicle (total from all contracts)
+- [ ] Calculate utilization rate (rented days / total days)
+- [ ] Create analytics page with charts and tables
+- [ ] Add date range filter for analytics
+- [ ] Show top performing and underperforming vehicles
+- [ ] Test analytics calculations
+
+### 107. Fix WhatsApp to Use Company Number from Settings
+- [ ] Add company phone number field to company settings schema
+- [ ] Update company settings form to include phone number
+- [ ] Modify WhatsApp share functions to use company number instead of client number
+- [ ] Update contract WhatsApp message to send to company number
+- [ ] Update invoice WhatsApp message to send to company number
+- [ ] Test WhatsApp opens with company number correctly
+
+### 107. Fix WhatsApp to Use Company Number from Settings - COMPLETED
+- [x] Company phone number field already exists in companySettings schema
+- [x] Added company settings query to RentalContracts page
+- [x] Added company settings query to Invoices page (already existed)
+- [x] Modified contract WhatsApp function to use company phone instead of client phone
+- [x] Modified invoice WhatsApp function to use company phone instead of client phone
+- [x] Updated WhatsApp messages to show "New Contract Created" and "New Invoice Generated"
+- [x] Messages now include client name but send to company number
+- [x] Added validation to check if company phone is set before sending
