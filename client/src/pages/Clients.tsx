@@ -9,13 +9,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
+
+// Helper function to check license expiry status
+const getLicenseExpiryStatus = (expiryDate: Date | string) => {
+  const expiry = new Date(expiryDate);
+  const today = new Date();
+  const threeMonthsFromNow = new Date();
+  threeMonthsFromNow.setMonth(today.getMonth() + 3);
+
+  if (expiry < today) {
+    return { status: 'expired', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200', message: 'License Expired' };
+  } else if (expiry <= threeMonthsFromNow) {
+    return { status: 'expiring', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', message: 'Expiring Soon' };
+  }
+  return { status: 'valid', color: '', bgColor: '', borderColor: '', message: '' };
+};
 
 export default function Clients() {
   const utils = trpc.useUtils();
@@ -421,6 +436,18 @@ export default function Clients() {
                 <div className="text-sm">
                   <span className="text-gray-800 font-medium">License Expiry:</span>{" "}
                   <span className="text-gray-900">{new Date(client.licenseExpiryDate).toLocaleDateString()}</span>
+                  {(() => {
+                    const expiryStatus = getLicenseExpiryStatus(client.licenseExpiryDate);
+                    if (expiryStatus.status !== 'valid') {
+                      return (
+                        <span className={`ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${expiryStatus.color} ${expiryStatus.bgColor} ${expiryStatus.borderColor} border`}>
+                          <AlertTriangle className="h-3 w-3" />
+                          {expiryStatus.message}
+                        </span>
+                      );
+                    }
+                    return null;
+                  })()}
                 </div>
                 {client.address && (
                   <div className="text-sm">

@@ -298,14 +298,7 @@ export default function CompanySettings() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-between items-center">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setLocation('/')}
-          >
-            Return to Home
-          </Button>
+        <div className="flex justify-end items-center">
           <Button
             type="submit"
             disabled={updateProfile.isPending || uploading}

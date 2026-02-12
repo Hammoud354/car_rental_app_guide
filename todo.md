@@ -2458,3 +2458,25 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] State persists in localStorage
 - [x] Tooltips show on hover in collapsed mode
 - [x] All navigation icons remain accessible when collapsed
+
+
+### 116. Remove Top Navigation and Fix Company Settings
+- [ ] Remove top navigation bar from SidebarLayout (keep only left sidebar)
+- [ ] Remove bottom-left button from Company Settings page (opposite Save Settings)
+- [ ] Ensure all navigation is through left sidebar only
+- [ ] Test navigation consistency across all pages
+
+### 117. Add License Expiry Alerts to Clients Page
+- [ ] Add red alert badge if license is expired
+- [ ] Add orange alert badge if license expires within 3 months
+- [ ] Display alerts on client cards and client list
+- [ ] Test alert visibility and accuracy
+
+- [x] Removed "Return to Home" button from Company Settings page
+- [x] Changed button layout from justify-between to justify-end
+- [x] Only "Save Changes" button remains at bottom-right
+- [x] Implemented getLicenseExpiryStatus helper function
+- [x] Added red alert badge for expired licenses (License Expired)
+- [x] Added orange alert badge for licenses expiring within 3 months (Expiring Soon)
+- [x] Alerts display on client cards with AlertTriangle icon
+- [x] Alert styling: rounded badge with colored background and border
