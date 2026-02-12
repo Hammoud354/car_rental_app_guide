@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Save, Loader2 } from "lucide-react";
+import { Building2, Save, Loader2, ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Settings() {
@@ -87,6 +88,15 @@ export default function Settings() {
 
   return (
     <div className="container mx-auto py-8 max-w-4xl">
+      {/* Breadcrumb */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <Link href="/">
+          <span className="hover:text-foreground cursor-pointer">Overview</span>
+        </Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">Settings</span>
+      </div>
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Building2 className="h-8 w-8" />

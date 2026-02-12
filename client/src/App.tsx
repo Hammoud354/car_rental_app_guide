@@ -16,6 +16,7 @@ import FleetManagement from "./pages/FleetManagement";
 import VehicleDetails from "./pages/VehicleDetails";
 import Dashboard from "./pages/Dashboard";
 import Maintenance from "./pages/Maintenance";
+import MaintenanceTracking from "./pages/MaintenanceTracking";
 import ProfitabilityDashboard from "./pages/ProfitabilityDashboard";
 import Settings from "./pages/Settings";
 import SignUp from "./pages/SignUp";
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profitability" component={ProfitabilityDashboard} />
       <Route path="/maintenance" component={Maintenance} />
+      <Route path="/maintenance-tracking" component={MaintenanceTracking} />
       <Route path="/fleet" component={Fleet} />
       <Route path="/fleet-management" component={FleetManagement} />
       <Route path="/vehicle/:id" component={VehicleDetails} />

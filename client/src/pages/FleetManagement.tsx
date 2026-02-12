@@ -304,7 +304,12 @@ export default function FleetManagement() {
           </div>
           
           <div className="flex gap-3">
-
+            <Link href="/maintenance-tracking">
+              <Button variant="outline">
+                <Wrench className="h-4 w-4 mr-2" />
+                Maintenance Tracking
+              </Button>
+            </Link>
             
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
               setIsAddDialogOpen(open);

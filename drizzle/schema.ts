@@ -93,6 +93,11 @@ export const vehicles = mysqlTable("vehicles", {
   insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Annual or total insurance cost
   purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
   registrationExpiryDate: timestamp("registrationExpiryDate"),
+  // Maintenance schedule tracking
+  nextMaintenanceDate: timestamp("nextMaintenanceDate"), // Next scheduled maintenance date
+  nextMaintenanceKm: int("nextMaintenanceKm"), // Next maintenance at this mileage
+  maintenanceIntervalKm: int("maintenanceIntervalKm").default(5000), // Maintenance every X km (default 5000km)
+  maintenanceIntervalMonths: int("maintenanceIntervalMonths").default(6), // Maintenance every X months (default 6 months)
   photoUrl: text("photoUrl"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),

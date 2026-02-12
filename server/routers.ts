@@ -387,6 +387,25 @@ export const appRouter = router({
         await db.updateImageDisplayOrder(input.imageId, ctx.user?.id || 1, input.displayOrder);
         return { success: true };
       }),
+
+    updateMaintenanceSchedule: protectedProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        nextMaintenanceDate: z.date().optional(),
+        nextMaintenanceKm: z.number().optional(),
+        maintenanceIntervalKm: z.number(),
+        maintenanceIntervalMonths: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.updateVehicleMaintenanceSchedule(
+          input.vehicleId,
+          ctx.user.id,
+          input.nextMaintenanceDate,
+          input.nextMaintenanceKm,
+          input.maintenanceIntervalKm,
+          input.maintenanceIntervalMonths
+        );
+      }),
   }),
 
   // Rental Contracts Router
@@ -619,6 +638,11 @@ export const appRouter = router({
         if (contract) {
           const { updateVehicleStatus } = await import("./updateVehicleStatus");
           await updateVehicleStatus(contract.vehicleId);
+          
+          // Update vehicle mileage with return mileage
+          if (input.returnKm) {
+            await db.updateVehicleMileage(contract.vehicleId, input.returnKm);
+          }
         }
         
         return result;
@@ -987,7 +1011,7 @@ export const appRouter = router({
     }),
     update: publicProcedure
       .input(z.object({
-        companyName: z.string(),
+        companyName: z.string().optional(),
         logo: z.string().optional(),
         address: z.string().optional(),
         city: z.string().optional(),
@@ -1000,8 +1024,11 @@ export const appRouter = router({
         exchangeRateLbpToUsd: z.number().positive().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Get existing settings to preserve companyName if not provided
+        const existing = await db.getCompanySettings(ctx.user?.id || 1);
         const settings = await db.upsertCompanySettings({
           userId: ctx.user?.id || 1,
+          companyName: input.companyName || existing?.companyName || "My Company",
           ...input,
           exchangeRateLbpToUsd: input.exchangeRateLbpToUsd ? String(input.exchangeRateLbpToUsd) : undefined,
         });

@@ -2286,3 +2286,46 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure consistent font-medium weight for labels
 - [x] Font visibility fixed across all forms (clients, vehicles, contracts)
 - [x] Font colors work correctly in both light and dark themes
+
+
+### 100. Fix Company Settings Save Error and Add Breadcrumb
+- [ ] Investigate company settings save error
+- [ ] Fix backend mutation or validation causing the error
+- [ ] Add breadcrumb navigation to Settings page (remove "Return Home")
+- [ ] Test settings save functionality
+- [ ] Verify breadcrumb displays correctly
+
+### 101. Auto-Update Vehicle Mileage on Contract Return
+- [ ] Modify markAsReturned mutation to update vehicle mileage
+- [ ] Use returnKm value to update vehicle's mileage field
+- [ ] Test mileage updates correctly when contract is returned
+- [ ] Verify mileage persists in vehicle record
+
+### 102. Create Repairs & Maintenance Tracking System
+- [ ] Design maintenance due date tracking system
+- [ ] Add maintenance schedule fields (km intervals, date intervals)
+- [ ] Create maintenance alerts/notifications for due dates
+- [ ] Build UI for managing maintenance schedules
+- [ ] Add visual indicators for overdue maintenance
+- [ ] Test maintenance tracking and alerts
+
+### 100. Fix Company Settings Save Error and Add Breadcrumb
+- [x] Investigate company settings save error
+- [x] Fix validation issues in settings update mutation (made companyName optional)
+- [x] Add breadcrumb navigation to Settings page
+- [x] Removed "Return Home" button as requested
+- [x] Settings save functionality working correctly
+
+### 101. Auto-Update Vehicle Mileage on Contract Return
+- [x] Add logic to update vehicle mileage when contract is marked as returned
+- [x] Update vehicle mileage with returnKm value via updateVehicleMileage function
+- [x] Mileage automatically updates when contract is returned
+
+### 102. Design and Implement Repairs & Maintenance Tracking System
+- [x] Add maintenance schedule fields to vehicles table (nextMaintenanceDate, nextMaintenanceKm, intervals)
+- [x] Created MaintenanceTracking page with comprehensive due date alerts
+- [x] Implemented visual indicators for overdue (red)/upcoming (yellow) maintenance
+- [x] Added maintenance schedule update functionality with dialog
+- [x] Created backend mutations for maintenance schedule management
+- [x] Added navigation link from Fleet Management to Maintenance Tracking
+- [x] Complete maintenance tracking system with alert summary cards

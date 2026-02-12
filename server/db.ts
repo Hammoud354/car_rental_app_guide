@@ -2054,3 +2054,42 @@ export async function getLastCompletedContractForVehicle(vehicleId: number, user
   
   return contracts.length > 0 ? contracts[0] : null;
 }
+
+
+/**
+ * Update vehicle mileage
+ */
+export async function updateVehicleMileage(vehicleId: number, mileage: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(vehicles)
+    .set({ mileage })
+    .where(eq(vehicles.id, vehicleId));
+}
+
+
+/**
+ * Update vehicle maintenance schedule
+ */
+export async function updateVehicleMaintenanceSchedule(
+  vehicleId: number,
+  userId: number,
+  nextMaintenanceDate?: Date,
+  nextMaintenanceKm?: number,
+  maintenanceIntervalKm?: number,
+  maintenanceIntervalMonths?: number
+): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(vehicles)
+    .set({
+      nextMaintenanceDate,
+      nextMaintenanceKm,
+      maintenanceIntervalKm,
+      maintenanceIntervalMonths,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+}
