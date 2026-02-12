@@ -1,4 +1,4 @@
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Link } from "wouter";
 
 export default function Booking() {
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-8">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
@@ -110,6 +110,6 @@ export default function Booking() {
           </Card>
         </div>
       </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

@@ -1,4 +1,4 @@
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -85,7 +85,7 @@ export default function Reservations() {
   };
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -351,6 +351,6 @@ export default function Reservations() {
           </div>
         </DialogContent>
       </Dialog>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

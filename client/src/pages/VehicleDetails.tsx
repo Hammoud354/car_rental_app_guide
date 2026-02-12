@@ -1,6 +1,6 @@
 import { useParams, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,17 +18,17 @@ export default function VehicleDetails() {
 
   if (isLoading) {
     return (
-      <MinimalLayout>
+      <SidebarLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </MinimalLayout>
+      </SidebarLayout>
     );
   }
 
   if (!vehicle) {
     return (
-      <MinimalLayout>
+      <SidebarLayout>
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold mb-4">Vehicle Not Found</h2>
           <Button onClick={() => setLocation("/fleet-management")}>
@@ -36,7 +36,7 @@ export default function VehicleDetails() {
             Back to Fleet
           </Button>
         </div>
-      </MinimalLayout>
+      </SidebarLayout>
     );
   }
 
@@ -48,7 +48,7 @@ export default function VehicleDetails() {
   };
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -240,6 +240,6 @@ export default function VehicleDetails() {
           </div>
         </div>
       </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

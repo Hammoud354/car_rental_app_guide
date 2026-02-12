@@ -11,7 +11,7 @@ import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 
 export default function Maintenance() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -98,7 +98,7 @@ export default function Maintenance() {
   ];
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -371,6 +371,6 @@ export default function Maintenance() {
             </Dialog>
           )}
         </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

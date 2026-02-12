@@ -1,10 +1,10 @@
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Lock, FileCheck, Scale } from "lucide-react";
 
 export default function Compliance() {
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-8">
         <div className="flex flex-col gap-2">
           <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 04</div>
@@ -70,6 +70,6 @@ export default function Compliance() {
           </Card>
         </div>
       </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

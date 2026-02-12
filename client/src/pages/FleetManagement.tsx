@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X } from "lucide-react";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -269,7 +269,7 @@ export default function FleetManagement() {
   };
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="container py-8">
       <div className="space-y-8">
         
@@ -992,6 +992,6 @@ export default function FleetManagement() {
           </form>
         </DialogContent>
       </Dialog>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

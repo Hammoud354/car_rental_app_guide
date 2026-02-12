@@ -2480,3 +2480,29 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Added orange alert badge for licenses expiring within 3 months (Expiring Soon)
 - [x] Alerts display on client cards with AlertTriangle icon
 - [x] Alert styling: rounded badge with colored background and border
+
+
+### 118. Replace MinimalLayout with SidebarLayout Across All Pages
+- [ ] Find all pages using MinimalLayout
+- [ ] Replace MinimalLayout import with SidebarLayout in all pages
+- [ ] Remove top navigation bar from all pages
+- [ ] Ensure consistent left sidebar navigation across entire app
+- [ ] Test navigation on all pages (Fleet, Contracts, Maintenance, Clients, etc.)
+
+- [x] Found 13 pages using MinimalLayout
+- [x] Replaced MinimalLayout with SidebarLayout in all pages:
+  * Analysis.tsx
+  * Booking.tsx
+  * Clients.tsx
+  * Compliance.tsx
+  * Fleet.tsx
+  * FleetManagement.tsx
+  * Invoices.tsx
+  * Maintenance.tsx
+  * Operations.tsx
+  * RentalContracts.tsx
+  * Reservations.tsx
+  * VehicleDetails.tsx
+- [x] Removed top navigation bar from all pages
+- [x] Ensured consistent left sidebar navigation across entire app
+- [x] Tested navigation on Fleet and Contracts pages - working correctly

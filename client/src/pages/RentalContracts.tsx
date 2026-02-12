@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
@@ -353,7 +353,7 @@ export default function RentalContracts() {
   ];
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
           {showInspection ? (
             <div>
               <div className="mb-6">
@@ -2005,6 +2005,6 @@ export default function RentalContracts() {
           }}
         />
       )}
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

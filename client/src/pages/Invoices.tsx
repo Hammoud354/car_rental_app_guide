@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
@@ -190,7 +190,7 @@ export default function Invoices() {
   };
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
       <div className="space-y-6">
         
         {/* Header */}
@@ -559,6 +559,6 @@ export default function Invoices() {
           </DialogContent>
         </Dialog>
       </div>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }

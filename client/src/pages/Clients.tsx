@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import MinimalLayout from "@/components/MinimalLayout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -185,7 +185,7 @@ export default function Clients() {
   });
 
   return (
-    <MinimalLayout>
+    <SidebarLayout>
         
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -812,6 +812,6 @@ export default function Clients() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </MinimalLayout>
+    </SidebarLayout>
   );
 }
