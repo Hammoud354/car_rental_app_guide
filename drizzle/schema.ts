@@ -199,6 +199,18 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   overLimitKmRate: decimal("overLimitKmRate", { precision: 10, scale: 2 }).default("0.50"), // Rate per KM over limit (default $0.50/km)
   lateFeePercentage: decimal("lateFeePercentage", { precision: 5, scale: 2 }).default("150.00"), // Percentage of daily rate for late fees (default 150%)
   lateFee: decimal("lateFee", { precision: 10, scale: 2 }).default("0.00"), // Calculated late fee amount
+  // Insurance package selection
+  insurancePackage: mysqlEnum("insurancePackage", ["None", "Basic", "Premium", "Full Coverage"]).default("None"),
+  insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }).default("0.00"), // Total insurance cost for rental period
+  insuranceDailyRate: decimal("insuranceDailyRate", { precision: 10, scale: 2 }).default("0.00"), // Daily insurance rate
+  // Deposit management
+  depositAmount: decimal("depositAmount", { precision: 10, scale: 2 }).default("0.00"), // Security deposit amount
+  depositStatus: mysqlEnum("depositStatus", ["None", "Held", "Refunded", "Forfeited"]).default("None"),
+  depositRefundDate: timestamp("depositRefundDate"), // Date when deposit was refunded
+  depositNotes: text("depositNotes"), // Notes about deposit (reason for forfeit, etc.)
+  // Fuel policy
+  fuelPolicy: mysqlEnum("fuelPolicy", ["Full-to-Full", "Same-to-Same", "Pre-purchase"]).default("Full-to-Full"),
+  fuelCharge: decimal("fuelCharge", { precision: 10, scale: 2 }).default("0.00"), // Fuel charges (if applicable)
   status: mysqlEnum("status", ["active", "completed", "overdue"]).default("active").notNull(),
   returnedAt: timestamp("returnedAt"), // Timestamp when contract was marked as returned
   createdAt: timestamp("createdAt").defaultNow().notNull(),

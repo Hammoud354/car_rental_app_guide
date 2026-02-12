@@ -171,6 +171,61 @@
     min-width: 0;
   }
 
+  /* Professional Card System - Use directly in JSX with Tailwind classes */
+  /* Example: className="bg-card border border-border rounded-lg shadow-sm p-6" */
+  
+  /* Loading States */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  .skeleton-text {
+    @apply h-4 w-full animate-pulse bg-muted rounded;
+  }
+
+  .skeleton-title {
+    @apply h-6 w-3/4 animate-pulse bg-muted rounded;
+  }
+
+  .skeleton-card {
+    @apply h-32 w-full animate-pulse bg-muted rounded;
+  }
+
+  /* Form Validation */
+  .input-error {
+    @apply border-destructive focus-visible:ring-destructive;
+  }
+
+  .input-success {
+    @apply border-green-500 focus-visible:ring-green-500;
+  }
+
+  .error-message {
+    @apply text-destructive text-sm mt-1;
+  }
+
+  .required-indicator::after {
+    content: ' *';
+    @apply text-destructive;
+  }
+
+  /* Empty States */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-12 px-4 text-center;
+  }
+
+  .empty-state-icon {
+    @apply w-16 h-16 text-muted-foreground mb-4;
+  }
+
+  .empty-state-title {
+    @apply text-xl font-semibold mb-2;
+  }
+
+  .empty-state-description {
+    @apply text-muted-foreground mb-6 max-w-md;
+  }
+
   @media (min-width: 640px) {
     .container {
       padding-left: 1.5rem;
