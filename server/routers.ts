@@ -1081,7 +1081,7 @@ export const appRouter = router({
         city: z.string().optional(),
         country: z.string().optional(),
         phone: z.string().optional(),
-        email: z.string().email().optional(),
+        email: z.union([z.string().email(), z.literal('')]).optional(),
         website: z.string().optional(),
         logoUrl: z.string().optional(),
         primaryColor: z.string().optional(),

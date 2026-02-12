@@ -2506,3 +2506,27 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Removed top navigation bar from all pages
 - [x] Ensured consistent left sidebar navigation across entire app
 - [x] Tested navigation on Fleet and Contracts pages - working correctly
+
+
+### 119. Add Home Icon to Company Settings Page
+- [ ] Add Home icon next to "Company Settings" title
+- [ ] Icon should navigate to Dashboard (/dashboard)
+- [ ] Style icon consistently with page header
+- [ ] Test navigation functionality
+
+
+### 120. Fix Email Validation Error in Company Settings
+- [ ] Make email field optional in company profile validation
+- [ ] Allow empty email submissions
+- [ ] Test form submission with empty email field
+- [ ] Ensure validation only checks format when email is provided
+
+- [x] Added Home icon to Company Settings page header
+- [x] Icon navigates to Dashboard (/dashboard) 
+- [x] Styled consistently with page header (outline button with icon)
+- [x] Tested navigation - working correctly
+
+- [x] Fixed email validation to allow empty strings
+- [x] Changed validation from `.email().optional()` to `.union([z.string().email(), z.literal('')]).optional()`
+- [x] Tested form submission with empty email - no validation error
+- [x] Form successfully saves with empty email field

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Building2 } from "lucide-react";
+import { Loader2, Upload, Building2, Home } from "lucide-react";
 
 export default function CompanySettings() {
   const [, setLocation] = useLocation();
@@ -142,10 +142,20 @@ export default function CompanySettings() {
   return (
     <div className="container max-w-4xl py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Building2 className="h-8 w-8" />
-          Company Settings
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Building2 className="h-8 w-8" />
+            Company Settings
+          </h1>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setLocation('/dashboard')}
+            title="Go to Dashboard"
+          >
+            <Home className="h-5 w-5" />
+          </Button>
+        </div>
         <p className="text-muted-foreground mt-2">
           Configure your company branding and information that will appear on contracts and documents.
         </p>
