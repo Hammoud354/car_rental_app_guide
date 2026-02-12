@@ -30,6 +30,7 @@ import CompanySettings from "./pages/CompanySettings";
 import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
+import ProfitLoss from "./pages/ProfitLoss";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/404" component={NotFound} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profitability" component={ProfitabilityDashboard} />
+      <Route path="/profit-loss" component={ProfitLoss} />
       <Route path="/maintenance" component={Maintenance} />
       <Route path="/maintenance-tracking" component={MaintenanceTracking} />
       <Route path="/fleet" component={Fleet} />

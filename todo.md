@@ -2899,3 +2899,35 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Apply blood-red input outlines to Rental Contracts forms (RentalContracts.tsx)
 - [x] Apply blood-red input outlines to Fleet Management forms (FleetManagement.tsx)
 - [ ] Apply blood-red input outlines to remaining pages (Settings, CompanySettings, Maintenance, Auth pages)
+
+
+## New Features - User Requested (Feb 12, 2026)
+
+### Input Styling Completion
+- [x] Apply blood-red outlines to Settings page input fields
+- [x] Apply blood-red outlines to Company Settings page input fields
+- [x] Apply blood-red outlines to Maintenance page input fields
+- [x] Apply blood-red outlines to Authentication pages (SignIn, SignUp, ForgotPassword, ResetPassword, Register)
+- [x] Apply blood-red outlines to MaintenanceTracking page input fields
+
+### P&L (Profit & Loss) Financial Dashboard
+- [x] Design P&L database schema for tracking financial metrics (using existing tables)
+- [x] Create backend tRPC procedures for P&L calculations (getFinancialOverview, getVehicleProfitability, getRevenueByMonth)
+- [x] Calculate total revenue from all completed contracts
+- [x] Calculate total expenses (maintenance costs, insurance, vehicle purchases)
+- [x] Calculate net profit/loss and profit margins
+- [x] Build P&L frontend page with financial overview cards
+- [x] Add monthly revenue vs expenses table visualization
+- [x] Add vehicle profitability breakdown table with ROI
+- [x] Add expense category breakdown (maintenance, insurance)
+- [x] Add navigation link to P&L page in Landing page dropdown
+
+### Enhanced Reporting Features
+- [x] Add date range filter component (start date, end date)
+- [x] Apply date filters to P&L calculations
+- [x] Add month/quarter/year quick filter buttons
+- [x] Add "Export to Excel" button for P&L report
+- [x] Add "Export to PDF" button for P&L report
+- [x] Implement Excel export with all financial data (3 sheets: Overview, Vehicle Profitability, Monthly Performance)
+- [x] Implement PDF export with formatted P&L statement (with OKLCH color fix)
+- [ ] Add comparison view (current period vs previous period)

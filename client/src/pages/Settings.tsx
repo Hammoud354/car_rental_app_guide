@@ -127,6 +127,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, logo: e.target.value })
                   }
+                 
                 />
               </div>
               {formData.logo && (
@@ -138,7 +139,7 @@ export default function Settings() {
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
-                  />
+                />
                 </div>
               )}
             </div>
@@ -175,6 +176,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                 
                 />
               </div>
               <div>
@@ -185,6 +187,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
+                 
                 />
               </div>
             </div>
@@ -209,6 +212,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
+                 
                 />
               </div>
               <div>
@@ -219,6 +223,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, country: e.target.value })
                   }
+                 
                 />
               </div>
             </div>
@@ -232,6 +237,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, taxId: e.target.value })
                   }
+                 
                 />
               </div>
               <div>
@@ -242,6 +248,7 @@ export default function Settings() {
                   onChange={(e) =>
                     setFormData({ ...formData, website: e.target.value })
                   }
+                 
                 />
               </div>
             </div>

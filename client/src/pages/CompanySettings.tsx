@@ -133,18 +133,18 @@ export default function CompanySettings() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-screen input-client">
+        <Loader2 className="h-8 w-8 animate-spin input-client" />
       </div>
     );
   }
 
   return (
-    <div className="container max-w-4xl py-8">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold flex items-center gap-2">
-            <Building2 className="h-8 w-8" />
+    <div className="container max-w-4xl py-8 input-client">
+      <div className="mb-8 input-client">
+        <div className="flex items-center justify-between input-client">
+          <h1 className="text-3xl font-bold flex items-center gap-2 input-client">
+            <Building2 className="h-8 w-8 input-client" />
             Company Settings
           </h1>
           <Button
@@ -153,15 +153,15 @@ export default function CompanySettings() {
             onClick={() => setLocation('/dashboard')}
             title="Go to Dashboard"
           >
-            <Home className="h-5 w-5" />
+            <Home className="h-5 w-5 input-client" />
           </Button>
         </div>
-        <p className="text-muted-foreground mt-2">
+        <p className="text-muted-foreground mt-2 input-client">
           Configure your company branding and information that will appear on contracts and documents.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 input-client">
         {/* Company Logo */}
         <Card>
           <CardHeader>
@@ -170,32 +170,32 @@ export default function CompanySettings() {
               Upload your company logo. This will appear on all contracts and documents.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-6">
+          <CardContent className="space-y-4 input-client">
+            <div className="flex items-center gap-6 input-client">
               {logoPreview ? (
-                <div className="w-32 h-32 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                  <img src={logoPreview} alt="Company Logo" className="max-w-full max-h-full object-contain" />
+                <div className="w-32 h-32 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center input-client">
+                  <img src={logoPreview} alt="Company Logo" className="max-w-full max-h-full object-contain input-client" />
                 </div>
               ) : (
-                <div className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted">
-                  <Building2 className="h-12 w-12 text-muted-foreground" />
+                <div className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted input-client">
+                  <Building2 className="h-12 w-12 text-muted-foreground input-client" />
                 </div>
               )}
-              <div className="flex-1">
-                <Label htmlFor="logo" className="cursor-pointer">
-                  <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit">
-                    <Upload className="h-4 w-4" />
+              <div className="flex-1 input-client">
+                <Label htmlFor="logo" className="cursor-pointer input-client">
+                  <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit input-client">
+                    <Upload className="h-4 w-4 input-client" />
                     Choose Logo
                   </div>
                   <Input
                     id="logo"
                     type="file"
                     accept="image/*"
-                    className="hidden"
+                    className="hidden input-client"
                     onChange={handleLogoChange}
                   />
                 </Label>
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm text-muted-foreground mt-2 input-client">
                   Recommended: PNG or SVG, max 2MB
                 </p>
               </div>
@@ -211,9 +211,9 @@ export default function CompanySettings() {
               Basic information about your company.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
+          <CardContent className="space-y-4 input-client">
+            <div className="grid grid-cols-2 gap-4 input-client">
+              <div className="col-span-2 input-client">
                 <Label htmlFor="companyName">Company Name *</Label>
                 <Input
                   id="companyName"
@@ -250,9 +250,9 @@ export default function CompanySettings() {
               How clients can reach your company.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
+          <CardContent className="space-y-4 input-client">
+            <div className="grid grid-cols-2 gap-4 input-client">
+              <div className="col-span-2 input-client">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -294,7 +294,7 @@ export default function CompanySettings() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
-              <div className="col-span-2">
+              <div className="col-span-2 input-client">
                 <Label htmlFor="website">Website</Label>
                 <Input
                   id="website"
@@ -308,13 +308,13 @@ export default function CompanySettings() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end items-center">
+        <div className="flex justify-end items-center input-client">
           <Button
             type="submit"
             disabled={updateProfile.isPending || uploading}
           >
             {(updateProfile.isPending || uploading) && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin input-client" />
             )}
             Save Changes
           </Button>

@@ -99,27 +99,27 @@ export default function Maintenance() {
 
   return (
     <SidebarLayout>
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8 input-client">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 input-client">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">Maintenance Tracking</h2>
-              <p className="text-gray-600 mt-1">Track and manage vehicle maintenance records</p>
+              <h2 className="text-3xl font-bold text-gray-900 input-client">Maintenance Tracking</h2>
+              <p className="text-gray-600 mt-1 input-client">Track and manage vehicle maintenance records</p>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex gap-3 input-client">
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-900 hover:bg-gray-800">
-                  <Plus className="mr-2 h-4 w-4" />
+                <Button className="bg-gray-900 hover:bg-gray-800 input-client">
+                  <Plus className="mr-2 h-4 w-4 input-client" />
                   Add Maintenance Record
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto input-client">
                 <DialogHeader>
                   <DialogTitle>Add Maintenance Record</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleAddMaintenance} className="space-y-4">
+                <form onSubmit={handleAddMaintenance} className="space-y-4 input-client">
                   <div>
                     <Label htmlFor="vehicleSelect">Select Vehicle *</Label>
                     <Select 
@@ -143,7 +143,7 @@ export default function Maintenance() {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="maintenanceType">Maintenance Type *</Label>
                       <Select name="maintenanceType" required>
@@ -163,7 +163,7 @@ export default function Maintenance() {
                     </div>
                     <div>
                       <Label htmlFor="performedAt">Date Performed *</Label>
-                      <Input id="performedAt" name="performedAt" type="date" required />
+                      <Input id="performedAt" name="performedAt" type="date" required className="input-client" />
                     </div>
                   </div>
 
@@ -172,33 +172,33 @@ export default function Maintenance() {
                     <Textarea id="description" name="description" rows={3} required placeholder="Describe the maintenance work performed..." />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="garageLocation">Garage Location</Label>
-                      <Input id="garageLocation" name="garageLocation" placeholder="e.g., Downtown Auto Center" />
+                      <Input id="garageLocation" name="garageLocation" placeholder="e.g., Downtown Auto Center" className="input-client" />
                     </div>
                     <div>
                       <Label htmlFor="performedBy">Performed By</Label>
-                      <Input id="performedBy" name="performedBy" placeholder="Technician name" />
+                      <Input id="performedBy" name="performedBy" placeholder="Technician name" className="input-client" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="garageEntryDate">Garage Entry Date</Label>
-                      <Input id="garageEntryDate" name="garageEntryDate" type="date" />
+                      <Input id="garageEntryDate" name="garageEntryDate" type="date" className="input-client" />
                     </div>
                     <div>
                       <Label htmlFor="garageExitDate">Garage Exit Date</Label>
-                      <Input id="garageExitDate" name="garageExitDate" type="date" />
+                      <Input id="garageExitDate" name="garageExitDate" type="date" className="input-client" />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4 input-client">
                     <div>
                       <Label htmlFor="mileageAtService">
                         Kilometer Reading
-                        {autoFilledKm && <span className="text-xs text-muted-foreground ml-2">(Auto-filled from last rental)</span>}
+                        {autoFilledKm && <span className="text-xs text-muted-foreground ml-2 input-client">(Auto-filled from last rental)</span>}
                       </Label>
                       <Input 
                         id="mileageAtService" 
@@ -207,16 +207,16 @@ export default function Maintenance() {
                         min="0" 
                         placeholder="e.g., 45000"
                         defaultValue={autoFilledKm || undefined}
-                        key={autoFilledKm || 'empty'} // Force re-render when autoFilledKm changes
+                        key={autoFilledKm || 'empty'} // Force re-render when autoFilledKm changes className="input-client"
                       />
                     </div>
                     <div>
                       <Label htmlFor="cost">Cost ($)</Label>
-                      <Input id="cost" name="cost" type="number" step="0.01" min="0" placeholder="0.00" />
+                      <Input id="cost" name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
                     </div>
                     <div>
                       <Label htmlFor="kmDueMaintenance">KM Due for Maintenance</Label>
-                      <Input id="kmDueMaintenance" name="kmDueMaintenance" type="number" min="0" placeholder="e.g., 50000" />
+                      <Input id="kmDueMaintenance" name="kmDueMaintenance" type="number" min="0" placeholder="e.g., 50000" className="input-client" />
                     </div>
                   </div>
 
@@ -235,14 +235,14 @@ export default function Maintenance() {
           </div>
 
           {/* Vehicle List with Maintenance Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 input-client">
             {vehicles?.map((vehicle) => (
-              <Card key={vehicle.id} className="bg-white shadow-sm hover:shadow-md transition-shadow">
+              <Card key={vehicle.id} className="bg-white shadow-sm hover:shadow-md transition-shadow input-client">
                 <CardHeader>
-                  <div className="flex justify-between items-start">
+                  <div className="flex justify-between items-start input-client">
                     <div>
-                      <CardTitle className="text-lg font-bold">{vehicle.plateNumber}</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <CardTitle className="text-lg font-bold input-client">{vehicle.plateNumber}</CardTitle>
+                      <p className="text-sm text-gray-600 mt-1 input-client">
                         {vehicle.brand} {vehicle.model} ({vehicle.year})
                       </p>
                     </div>
@@ -251,15 +251,15 @@ export default function Maintenance() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-sm space-y-2">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Gauge className="h-4 w-4" />
+                <CardContent className="space-y-4 input-client">
+                  <div className="text-sm space-y-2 input-client">
+                    <div className="flex items-center gap-2 text-gray-600 input-client">
+                      <Gauge className="h-4 w-4 input-client" />
                       <span>Current: {vehicle.mileage || 0} km</span>
                     </div>
                     {(vehicle as any).totalMaintenanceCost && parseFloat((vehicle as any).totalMaintenanceCost) > 0 && (
-                      <div className="flex items-center gap-2 text-gray-900 font-semibold">
-                        <span className="text-blue-600">💰</span>
+                      <div className="flex items-center gap-2 text-gray-900 font-semibold input-client">
+                        <span className="text-blue-600 input-client">💰</span>
                         <span>Total Maintenance: ${(vehicle as any).totalMaintenanceCost}</span>
                       </div>
                     )}
@@ -267,10 +267,10 @@ export default function Maintenance() {
 
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full input-client"
                     onClick={() => setViewingHistory(vehicle.id)}
                   >
-                    <Wrench className="mr-2 h-4 w-4" />
+                    <Wrench className="mr-2 h-4 w-4 input-client" />
                     View Maintenance History
                   </Button>
                 </CardContent>
@@ -281,7 +281,7 @@ export default function Maintenance() {
           {/* Maintenance History Dialog */}
           {viewingHistory && (
             <Dialog open={viewingHistory !== null} onOpenChange={() => setViewingHistory(null)}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto input-client">
                 <DialogHeader>
                   <DialogTitle>
                     Maintenance History - {vehicles?.find(v => v.id === viewingHistory)?.plateNumber}
@@ -290,69 +290,69 @@ export default function Maintenance() {
                 
                 {/* Total Cost Summary */}
                 {maintenanceRecords && maintenanceRecords.length > 0 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl">💰</span>
-                        <span className="text-sm font-medium text-gray-600">Total Maintenance Cost</span>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 input-client">
+                    <div className="flex items-center justify-between input-client">
+                      <div className="flex items-center gap-2 input-client">
+                        <span className="text-2xl input-client">💰</span>
+                        <span className="text-sm font-medium text-gray-600 input-client">Total Maintenance Cost</span>
                       </div>
-                      <span className="text-2xl font-bold text-blue-600">
+                      <span className="text-2xl font-bold text-blue-600 input-client">
                         ${maintenanceRecords.reduce((sum, record) => {
                           const cost = record.cost ? parseFloat(record.cost.toString()) : 0;
                           return sum + cost;
                         }, 0).toFixed(2)}
                       </span>
                     </div>
-                    <div className="mt-2 text-xs text-gray-500">
+                    <div className="mt-2 text-xs text-gray-500 input-client">
                       Based on {maintenanceRecords.length} maintenance record{maintenanceRecords.length !== 1 ? 's' : ''}
                     </div>
                   </div>
                 )}
                 
-                <div className="space-y-4">
+                <div className="space-y-4 input-client">
                   {maintenanceRecords && maintenanceRecords.length > 0 ? (
                     maintenanceRecords.map((record) => (
-                      <Card key={record.id} className="bg-gray-50">
-                        <CardContent className="pt-6">
-                          <div className="flex justify-between items-start mb-4">
+                      <Card key={record.id} className="bg-gray-50 input-client">
+                        <CardContent className="pt-6 input-client">
+                          <div className="flex justify-between items-start mb-4 input-client">
                             <Badge className={getMaintenanceTypeColor(record.maintenanceType)}>
                               {record.maintenanceType}
                             </Badge>
-                            <span className="text-sm text-gray-600">
+                            <span className="text-sm text-gray-600 input-client">
                               {new Date(record.performedAt).toLocaleDateString()}
                             </span>
                           </div>
 
-                          <p className="text-gray-900 font-medium mb-3">{record.description}</p>
+                          <p className="text-gray-900 font-medium mb-3 input-client">{record.description}</p>
 
-                          <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="grid grid-cols-2 gap-4 text-sm input-client">
                             {record.garageLocation && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <MapPin className="h-4 w-4" />
+                              <div className="flex items-center gap-2 text-gray-600 input-client">
+                                <MapPin className="h-4 w-4 input-client" />
                                 <span>{record.garageLocation}</span>
                               </div>
                             )}
                             {record.mileageAtService && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Gauge className="h-4 w-4" />
+                              <div className="flex items-center gap-2 text-gray-600 input-client">
+                                <Gauge className="h-4 w-4 input-client" />
                                 <span>{record.mileageAtService} km</span>
                               </div>
                             )}
                             {record.cost && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <DollarSign className="h-4 w-4" />
+                              <div className="flex items-center gap-2 text-gray-600 input-client">
+                                <DollarSign className="h-4 w-4 input-client" />
                                 <span>${record.cost}</span>
                               </div>
                             )}
                             {record.performedBy && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Wrench className="h-4 w-4" />
+                              <div className="flex items-center gap-2 text-gray-600 input-client">
+                                <Wrench className="h-4 w-4 input-client" />
                                 <span>{record.performedBy}</span>
                               </div>
                             )}
                             {record.kmDueMaintenance && (
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <Gauge className="h-4 w-4" />
+                              <div className="flex items-center gap-2 text-gray-600 input-client">
+                                <Gauge className="h-4 w-4 input-client" />
                                 <span>Next service at: {record.kmDueMaintenance} km</span>
                               </div>
                             )}
@@ -361,9 +361,9 @@ export default function Maintenance() {
                       </Card>
                     ))
                   ) : (
-                    <div className="text-center py-12">
-                      <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                      <p className="text-gray-600">No maintenance records yet</p>
+                    <div className="text-center py-12 input-client">
+                      <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4 input-client" />
+                      <p className="text-gray-600 input-client">No maintenance records yet</p>
                     </div>
                   )}
                 </div>

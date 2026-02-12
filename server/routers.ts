@@ -1359,5 +1359,198 @@ export const appRouter = router({
         return result;
       }),
   }),
+
+  // P&L (Profit & Loss) Financial Dashboard
+  profitLoss: router({
+    getFinancialOverview: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+
+        // Get all financial data
+        const [
+          completedContracts,
+          paidInvoices,
+          maintenanceRecords,
+          allVehicles
+        ] = await Promise.all([
+          db.getCompletedContracts(userId, startDate, endDate),
+          db.getPaidInvoices(userId, startDate, endDate),
+          db.getMaintenanceRecords(userId, startDate, endDate),
+          db.getAllVehicles(userId)
+        ]);
+
+        // Calculate total revenue from completed contracts
+        const contractRevenue = completedContracts.reduce((sum, contract) => {
+          return sum + parseFloat(contract.finalAmount?.toString() || '0');
+        }, 0);
+
+        // Calculate total revenue from paid invoices
+        const invoiceRevenue = paidInvoices.reduce((sum, invoice) => {
+          return sum + parseFloat(invoice.totalAmount?.toString() || '0');
+        }, 0);
+
+        const totalRevenue = contractRevenue + invoiceRevenue;
+
+        // Calculate total expenses
+        const maintenanceCosts = maintenanceRecords.reduce((sum, record) => {
+          return sum + parseFloat(record.cost?.toString() || '0');
+        }, 0);
+
+        const insuranceCosts = allVehicles.reduce((sum, vehicle) => {
+          return sum + parseFloat(vehicle.insuranceCost?.toString() || '0');
+        }, 0);
+
+        const vehiclePurchaseCosts = allVehicles.reduce((sum, vehicle) => {
+          return sum + parseFloat(vehicle.purchaseCost?.toString() || '0');
+        }, 0);
+
+        const totalExpenses = maintenanceCosts + insuranceCosts;
+
+        // Calculate net profit/loss
+        const netProfit = totalRevenue - totalExpenses;
+        const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
+
+        return {
+          revenue: {
+            total: totalRevenue,
+            contracts: contractRevenue,
+            invoices: invoiceRevenue,
+          },
+          expenses: {
+            total: totalExpenses,
+            maintenance: maintenanceCosts,
+            insurance: insuranceCosts,
+          },
+          assets: {
+            vehiclePurchaseCosts,
+            totalVehicles: allVehicles.length,
+          },
+          profitLoss: {
+            netProfit,
+            profitMargin,
+          },
+        };
+      }),
+
+    getVehicleProfitability: protectedProcedure
+      .input(z.object({
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        const startDate = input.startDate ? new Date(input.startDate) : undefined;
+        const endDate = input.endDate ? new Date(input.endDate) : undefined;
+
+        const vehicles = await db.getAllVehicles(userId);
+        const contracts = await db.getCompletedContracts(userId, startDate, endDate);
+        const maintenanceRecords = await db.getMaintenanceRecords(userId, startDate, endDate);
+
+        // Calculate profitability for each vehicle
+        const vehicleProfitability = vehicles.map(vehicle => {
+          // Revenue from this vehicle's contracts
+          const vehicleContracts = contracts.filter(c => c.vehicleId === vehicle.id);
+          const revenue = vehicleContracts.reduce((sum, contract) => {
+            return sum + parseFloat(contract.finalAmount?.toString() || '0');
+          }, 0);
+
+          // Maintenance costs for this vehicle
+          const vehicleMaintenance = maintenanceRecords.filter(m => m.vehicleId === vehicle.id);
+          const maintenanceCost = vehicleMaintenance.reduce((sum, record) => {
+            return sum + parseFloat(record.cost?.toString() || '0');
+          }, 0);
+
+          // Insurance cost
+          const insuranceCost = parseFloat(vehicle.insuranceCost?.toString() || '0');
+
+          // Total expenses
+          const totalExpenses = maintenanceCost + insuranceCost;
+
+          // Net profit
+          const netProfit = revenue - totalExpenses;
+
+          // ROI (Return on Investment) based on purchase cost
+          const purchaseCost = parseFloat(vehicle.purchaseCost?.toString() || '0');
+          const roi = purchaseCost > 0 ? (netProfit / purchaseCost) * 100 : 0;
+
+          return {
+            vehicleId: vehicle.id,
+            plateNumber: vehicle.plateNumber,
+            brand: vehicle.brand,
+            model: vehicle.model,
+            year: vehicle.year,
+            revenue,
+            expenses: {
+              maintenance: maintenanceCost,
+              insurance: insuranceCost,
+              total: totalExpenses,
+            },
+            netProfit,
+            purchaseCost,
+            roi,
+            contractCount: vehicleContracts.length,
+          };
+        });
+
+        // Sort by net profit (highest first)
+        return vehicleProfitability.sort((a, b) => b.netProfit - a.netProfit);
+      }),
+
+    getRevenueByMonth: protectedProcedure
+      .input(z.object({
+        year: z.number().optional(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        const year = input.year || new Date().getFullYear();
+
+        const contracts = await db.getCompletedContracts(userId);
+        const invoices = await db.getPaidInvoices(userId);
+
+        // Group by month
+        const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+          month: i + 1,
+          monthName: new Date(year, i).toLocaleString('default', { month: 'long' }),
+          revenue: 0,
+          expenses: 0,
+        }));
+
+        // Add contract revenue
+        contracts.forEach(contract => {
+          const contractDate = new Date(contract.rentalEndDate);
+          if (contractDate.getFullYear() === year) {
+            const month = contractDate.getMonth();
+            monthlyData[month].revenue += parseFloat(contract.finalAmount?.toString() || '0');
+          }
+        });
+
+        // Add invoice revenue
+        invoices.forEach(invoice => {
+          const invoiceDate = new Date(invoice.createdAt);
+          if (invoiceDate.getFullYear() === year) {
+            const month = invoiceDate.getMonth();
+            monthlyData[month].revenue += parseFloat(invoice.totalAmount?.toString() || '0');
+          }
+        });
+
+        // Add maintenance expenses
+        const maintenanceRecords = await db.getMaintenanceRecords(userId);
+        maintenanceRecords.forEach(record => {
+          const recordDate = new Date(record.performedAt);
+          if (recordDate.getFullYear() === year) {
+            const month = recordDate.getMonth();
+            monthlyData[month].expenses += parseFloat(record.cost?.toString() || '0');
+          }
+        });
+
+        return monthlyData;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

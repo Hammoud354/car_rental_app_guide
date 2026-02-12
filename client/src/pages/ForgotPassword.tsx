@@ -48,33 +48,33 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Mail className="w-8 h-8 text-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 input-client">
+      <Card className="w-full max-w-md shadow-2xl input-client">
+        <CardHeader className="space-y-3 text-center input-client">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center input-client">
+            <Mail className="w-8 h-8 text-primary input-client" />
           </div>
-          <CardTitle className="text-3xl font-bold">Forgot Password?</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-3xl font-bold input-client">Forgot Password?</CardTitle>
+          <CardDescription className="text-base input-client">
             Enter your email address and we'll send you a link to reset your password
           </CardDescription>
         </CardHeader>
         <CardContent>
           {success ? (
-            <div className="space-y-6">
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
+            <div className="space-y-6 input-client">
+              <Alert className="bg-green-50 border-green-200 input-client">
+                <CheckCircle className="h-4 w-4 text-green-600 input-client" />
+                <AlertDescription className="text-green-800 input-client">
                   If an account exists with this email, you will receive a password reset link shortly. Please check your inbox.
                 </AlertDescription>
               </Alert>
               
-              <div className="text-center text-sm text-muted-foreground">
+              <div className="text-center text-sm text-muted-foreground input-client">
                 Didn't receive the email? Check your spam folder or{" "}
                 <button
                   type="button"
                   onClick={() => setSuccess(false)}
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium input-client"
                 >
                   try again
                 </button>
@@ -82,24 +82,24 @@ export default function ForgotPassword() {
 
               <Button
                 variant="outline"
-                className="w-full"
+                className="w-full input-client"
                 onClick={() => setLocation("/login")}
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
+                <ArrowLeft className="mr-2 h-4 w-4 input-client" />
                 Back to Login
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 input-client">
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="email" className="flex items-center gap-2 input-client">
+                  <Mail className="w-4 h-4 input-client" />
                   Email Address
                 </Label>
                 <Input
@@ -115,12 +115,12 @@ export default function ForgotPassword() {
 
               <Button
                 type="submit"
-                className="w-full h-12 text-lg font-semibold"
+                className="w-full h-12 text-lg font-semibold input-client"
                 disabled={resetMutation.isPending}
               >
                 {resetMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin input-client" />
                     Sending Reset Link...
                   </>
                 ) : (
@@ -128,13 +128,13 @@ export default function ForgotPassword() {
                 )}
               </Button>
 
-              <div className="text-center">
+              <div className="text-center input-client">
                 <button
                   type="button"
                   onClick={() => setLocation("/login")}
-                  className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-2"
+                  className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-2 input-client"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4 input-client" />
                   Back to Login
                 </button>
               </div>

@@ -51,6 +51,9 @@ export default function Landing() {
                   <DropdownMenuItem onClick={() => setLocation("/dashboard")}>
                     Dashboard
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocation("/profit-loss")}>
+                    Profit & Loss
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out

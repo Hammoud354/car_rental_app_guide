@@ -94,30 +94,30 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <Card className="w-full max-w-2xl shadow-2xl">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Building2 className="w-8 h-8 text-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 input-client">
+      <Card className="w-full max-w-2xl shadow-2xl input-client">
+        <CardHeader className="space-y-3 text-center input-client">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center input-client">
+            <Building2 className="w-8 h-8 text-primary input-client" />
           </div>
-          <CardTitle className="text-3xl font-bold">Create Your Account</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-3xl font-bold input-client">Create Your Account</CardTitle>
+          <CardDescription className="text-base input-client">
             Register your company to start managing your car rental operations
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 input-client">
             {errors.submit && (
               <Alert variant="destructive">
                 <AlertDescription>{errors.submit}</AlertDescription>
               </Alert>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 input-client">
               {/* Company Name */}
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="name" className="flex items-center gap-2">
-                  <Building2 className="w-4 h-4" />
+              <div className="space-y-2 md:col-span-2 input-client">
+                <Label htmlFor="name" className="flex items-center gap-2 input-client">
+                  <Building2 className="w-4 h-4 input-client" />
                   Company Name
                 </Label>
                 <Input
@@ -129,14 +129,14 @@ export default function Register() {
                   className={errors.name ? "border-destructive" : ""}
                 />
                 {errors.name && (
-                  <p className="text-sm text-destructive">{errors.name}</p>
+                  <p className="text-sm text-destructive input-client">{errors.name}</p>
                 )}
               </div>
 
               {/* Username */}
-              <div className="space-y-2">
-                <Label htmlFor="username" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="username" className="flex items-center gap-2 input-client">
+                  <User className="w-4 h-4 input-client" />
                   Username
                 </Label>
                 <Input
@@ -148,14 +148,14 @@ export default function Register() {
                   className={errors.username ? "border-destructive" : ""}
                 />
                 {errors.username && (
-                  <p className="text-sm text-destructive">{errors.username}</p>
+                  <p className="text-sm text-destructive input-client">{errors.username}</p>
                 )}
               </div>
 
               {/* Email */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="email" className="flex items-center gap-2 input-client">
+                  <Mail className="w-4 h-4 input-client" />
                   Email
                 </Label>
                 <Input
@@ -167,24 +167,24 @@ export default function Register() {
                   className={errors.email ? "border-destructive" : ""}
                 />
                 {errors.email && (
-                  <p className="text-sm text-destructive">{errors.email}</p>
+                  <p className="text-sm text-destructive input-client">{errors.email}</p>
                 )}
               </div>
 
               {/* Phone */}
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="phone" className="flex items-center gap-2 input-client">
+                  <Phone className="w-4 h-4 input-client" />
                   Phone Number
                 </Label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 input-client">
                   <Input
                     id="countryCode"
                     type="text"
                     placeholder="+1"
                     value={formData.countryCode}
                     onChange={(e) => handleChange("countryCode", e.target.value)}
-                    className="w-20"
+                    className="w-20 input-client"
                   />
                   <Input
                     id="phone"
@@ -196,14 +196,14 @@ export default function Register() {
                   />
                 </div>
                 {errors.phone && (
-                  <p className="text-sm text-destructive">{errors.phone}</p>
+                  <p className="text-sm text-destructive input-client">{errors.phone}</p>
                 )}
               </div>
 
               {/* Country */}
-              <div className="space-y-2">
-                <Label htmlFor="country" className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="country" className="flex items-center gap-2 input-client">
+                  <MapPin className="w-4 h-4 input-client" />
                   Country
                 </Label>
                 <Input
@@ -216,9 +216,9 @@ export default function Register() {
               </div>
 
               {/* Password */}
-              <div className="space-y-2">
-                <Label htmlFor="password" className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="password" className="flex items-center gap-2 input-client">
+                  <Lock className="w-4 h-4 input-client" />
                   Password
                 </Label>
                 <Input
@@ -230,14 +230,14 @@ export default function Register() {
                   className={errors.password ? "border-destructive" : ""}
                 />
                 {errors.password && (
-                  <p className="text-sm text-destructive">{errors.password}</p>
+                  <p className="text-sm text-destructive input-client">{errors.password}</p>
                 )}
               </div>
 
               {/* Confirm Password */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="confirmPassword" className="flex items-center gap-2 input-client">
+                  <Lock className="w-4 h-4 input-client" />
                   Confirm Password
                 </Label>
                 <Input
@@ -249,19 +249,19 @@ export default function Register() {
                   className={errors.confirmPassword ? "border-destructive" : ""}
                 />
                 {errors.confirmPassword && (
-                  <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                  <p className="text-sm text-destructive input-client">{errors.confirmPassword}</p>
                 )}
               </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full h-12 text-lg font-semibold"
+              className="w-full h-12 text-lg font-semibold input-client"
               disabled={signUpMutation.isPending}
             >
               {signUpMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin input-client" />
                   Creating Account...
                 </>
               ) : (
@@ -269,12 +269,12 @@ export default function Register() {
               )}
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-muted-foreground input-client">
               Already have an account?{" "}
               <button
                 type="button"
                 onClick={() => setLocation("/login")}
-                className="text-primary hover:underline font-medium"
+                className="text-primary hover:underline font-medium input-client"
               >
                 Sign in
               </button>

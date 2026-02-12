@@ -87,17 +87,17 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4 input-client">
+      <Card className="w-full max-w-md input-client">
         <CardHeader>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
+          <CardTitle className="text-2xl input-client">Create Account</CardTitle>
           <CardDescription>
             Sign up to get started with Car Rental Management System
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-4 input-client">
+            <div className="space-y-2 input-client">
               <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
@@ -110,7 +110,7 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
                 id="fullName"
@@ -122,7 +122,7 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -134,7 +134,7 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="country">Country</Label>
               <Select value={formData.country} onValueChange={handleCountryChange}>
                 <SelectTrigger>
@@ -150,14 +150,14 @@ export default function SignUp() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="phone">Phone Number</Label>
-              <div className="flex gap-2">
+              <div className="flex gap-2 input-client">
                 <Input
                   type="text"
                   value={formData.countryCode}
                   disabled
-                  className="w-20"
+                  className="w-20 input-client"
                 />
                 <Input
                   id="phone"
@@ -166,14 +166,14 @@ export default function SignUp() {
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                   required
-                  className="flex-1"
+                  className="flex-1 input-client"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="password">Password</Label>
-              <div className="relative">
+              <div className="relative input-client">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -182,22 +182,22 @@ export default function SignUp() {
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   required
                   minLength={6}
-                  className="pr-10"
+                  className="pr-10 input-client"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground input-client"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeOff className="h-4 w-4 input-client" /> : <Eye className="h-4 w-4 input-client" />}
                 </button>
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 input-client">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
+              <div className="relative input-client">
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
@@ -206,27 +206,27 @@ export default function SignUp() {
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   required
                   minLength={6}
-                  className="pr-10"
+                  className="pr-10 input-client"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground input-client"
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4 input-client" /> : <Eye className="h-4 w-4 input-client" />}
                 </button>
               </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full input-client"
               disabled={signUpMutation.isPending}
             >
               {signUpMutation.isPending ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin input-client" />
                   Creating Account...
                 </>
               ) : (
@@ -234,12 +234,12 @@ export default function SignUp() {
               )}
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm text-muted-foreground input-client">
               Already have an account?{" "}
               <Button
                 type="button"
                 variant="link"
-                className="p-0 h-auto"
+                className="p-0 h-auto input-client"
                 onClick={() => setLocation("/signin")}
               >
                 Sign In

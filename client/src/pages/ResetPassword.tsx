@@ -77,11 +77,11 @@ export default function ResetPassword() {
   // Show loading while verifying token
   if (verifyToken.isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-        <Card className="w-full max-w-md shadow-2xl">
-          <CardContent className="pt-6 flex flex-col items-center justify-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-muted-foreground">Verifying reset link...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 input-client">
+        <Card className="w-full max-w-md shadow-2xl input-client">
+          <CardContent className="pt-6 flex flex-col items-center justify-center space-y-4 input-client">
+            <Loader2 className="h-12 w-12 animate-spin text-primary input-client" />
+            <p className="text-muted-foreground input-client">Verifying reset link...</p>
           </CardContent>
         </Card>
       </div>
@@ -91,21 +91,21 @@ export default function ResetPassword() {
   // Show error if token is invalid
   if (tokenValid === false) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-        <Card className="w-full max-w-md shadow-2xl">
-          <CardHeader className="space-y-3 text-center">
-            <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-destructive" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 input-client">
+        <Card className="w-full max-w-md shadow-2xl input-client">
+          <CardHeader className="space-y-3 text-center input-client">
+            <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center input-client">
+              <AlertCircle className="w-8 h-8 text-destructive input-client" />
             </div>
-            <CardTitle className="text-3xl font-bold">Invalid Reset Link</CardTitle>
-            <CardDescription className="text-base">
+            <CardTitle className="text-3xl font-bold input-client">Invalid Reset Link</CardTitle>
+            <CardDescription className="text-base input-client">
               {error || "This password reset link is invalid or has expired"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button
               variant="outline"
-              className="w-full"
+              className="w-full input-client"
               onClick={() => setLocation("/forgot-password")}
             >
               Request New Reset Link
@@ -117,38 +117,38 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <Card className="w-full max-w-md shadow-2xl">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-            <Lock className="w-8 h-8 text-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4 input-client">
+      <Card className="w-full max-w-md shadow-2xl input-client">
+        <CardHeader className="space-y-3 text-center input-client">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center input-client">
+            <Lock className="w-8 h-8 text-primary input-client" />
           </div>
-          <CardTitle className="text-3xl font-bold">Reset Password</CardTitle>
-          <CardDescription className="text-base">
+          <CardTitle className="text-3xl font-bold input-client">Reset Password</CardTitle>
+          <CardDescription className="text-base input-client">
             Enter your new password below
           </CardDescription>
         </CardHeader>
         <CardContent>
           {success ? (
-            <div className="space-y-6">
-              <Alert className="bg-green-50 border-green-200">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <AlertDescription className="text-green-800">
+            <div className="space-y-6 input-client">
+              <Alert className="bg-green-50 border-green-200 input-client">
+                <CheckCircle className="h-4 w-4 text-green-600 input-client" />
+                <AlertDescription className="text-green-800 input-client">
                   Your password has been reset successfully! Redirecting to login...
                 </AlertDescription>
               </Alert>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 input-client">
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="newPassword" className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="newPassword" className="flex items-center gap-2 input-client">
+                  <Lock className="w-4 h-4 input-client" />
                   New Password
                 </Label>
                 <Input
@@ -160,14 +160,14 @@ export default function ResetPassword() {
                   className={error ? "border-destructive" : ""}
                   autoFocus
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground input-client">
                   Password must be at least 6 characters
                 </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
+              <div className="space-y-2 input-client">
+                <Label htmlFor="confirmPassword" className="flex items-center gap-2 input-client">
+                  <Lock className="w-4 h-4 input-client" />
                   Confirm Password
                 </Label>
                 <Input
@@ -182,12 +182,12 @@ export default function ResetPassword() {
 
               <Button
                 type="submit"
-                className="w-full h-12 text-lg font-semibold"
+                className="w-full h-12 text-lg font-semibold input-client"
                 disabled={resetMutation.isPending}
               >
                 {resetMutation.isPending ? (
                   <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin input-client" />
                     Resetting Password...
                   </>
                 ) : (
@@ -195,12 +195,12 @@ export default function ResetPassword() {
                 )}
               </Button>
 
-              <div className="text-center text-sm text-muted-foreground">
+              <div className="text-center text-sm text-muted-foreground input-client">
                 Remember your password?{" "}
                 <button
                   type="button"
                   onClick={() => setLocation("/login")}
-                  className="text-primary hover:underline font-medium"
+                  className="text-primary hover:underline font-medium input-client"
                 >
                   Sign in
                 </button>

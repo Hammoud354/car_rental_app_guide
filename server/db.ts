@@ -2140,3 +2140,97 @@ export async function updateVehicleMaintenanceSchedule(
     })
     .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
 }
+
+
+// ========================================
+// P&L (Profit & Loss) Helper Functions
+// ========================================
+
+/**
+ * Get completed rental contracts for P&L calculations
+ */
+export async function getCompletedContracts(
+  userId: number,
+  startDate?: Date,
+  endDate?: Date
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [
+    eq(rentalContracts.userId, userId),
+    eq(rentalContracts.status, "completed")
+  ];
+
+  // Apply date filters if provided
+  if (startDate) {
+    conditions.push(gte(rentalContracts.rentalEndDate, startDate));
+  }
+  if (endDate) {
+    conditions.push(lte(rentalContracts.rentalEndDate, endDate));
+  }
+
+  return await db
+    .select()
+    .from(rentalContracts)
+    .where(and(...conditions));
+}
+
+/**
+ * Get paid invoices for P&L calculations
+ */
+export async function getPaidInvoices(
+  userId: number,
+  startDate?: Date,
+  endDate?: Date
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [
+    eq(invoices.userId, userId)
+    // Note: invoices table doesn't have status field, all invoices are considered
+  ];
+
+  // Apply date filters if provided
+  if (startDate) {
+    conditions.push(gte(invoices.createdAt, startDate));
+  }
+  if (endDate) {
+    conditions.push(lte(invoices.createdAt, endDate));
+  }
+
+  return await db
+    .select()
+    .from(invoices)
+    .where(and(...conditions));
+}
+
+/**
+ * Get maintenance records for P&L calculations
+ */
+export async function getMaintenanceRecords(
+  userId: number,
+  startDate?: Date,
+  endDate?: Date
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const conditions = [eq(maintenanceRecords.userId, userId)];
+
+  // Apply date filters if provided
+  if (startDate) {
+    conditions.push(gte(maintenanceRecords.performedAt, startDate));
+  }
+  if (endDate) {
+    conditions.push(lte(maintenanceRecords.performedAt, endDate));
+  }
+
+  return await db
+    .select()
+    .from(maintenanceRecords)
+    .where(and(...conditions));
+}
+
+// getAllVehicles already exists above, no need to duplicate
