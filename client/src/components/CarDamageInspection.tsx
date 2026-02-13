@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { X, Trash2, Printer } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
+import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { toast } from "sonner";
 
 interface DamageMark {
@@ -521,7 +521,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                       toast.info("Generating PDF...");
                       
                       // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
-                      const safeClone = createPdfSafeClone(inspectionElement as HTMLElement);
+                      const safeClone = await createSanitizedPdfClone(inspectionElement as HTMLElement);
                       
                       // Make the clone visible
                       safeClone.style.position = 'static';
@@ -540,7 +540,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                         });
                         
                         // Clean up the safe clone
-                        cleanupPdfSafeClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                       
                         const imgData = canvas.toDataURL('image/png');
                         const pdf = new jsPDF({
@@ -562,7 +562,7 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
                         toast.success("PDF exported successfully!");
                       } catch (innerError: any) {
                         // Clean up the safe clone even if there's an error
-                        cleanupPdfSafeClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                         throw innerError;
                       }
                     } catch (error) {

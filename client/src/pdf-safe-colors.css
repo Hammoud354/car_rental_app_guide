@@ -1,0 +1,124 @@
+/**
+ * PDF-SAFE COLOR PALETTE
+ * 
+ * This stylesheet provides HEX-only color definitions for PDF export.
+ * It overrides all OKLCH colors with browser-compatible HEX values.
+ * 
+ * Usage: Add class "pdf-safe-mode" to the root element before PDF export.
+ */
+
+.pdf-safe-mode {
+  /* Light Mode - HEX only */
+  --background: #fcfcfc !important; /* oklch(0.99 0 0) → Pure white */
+  --foreground: #000000 !important; /* oklch(0 0 0) → Pure black */
+  
+  --card: #fafafa !important; /* oklch(0.98 0 0) → Slightly off-white */
+  --card-foreground: #000000 !important;
+  
+  --popover: #fcfcfc !important;
+  --popover-foreground: #000000 !important;
+  
+  --primary: #0066CC !important; /* oklch(0.45 0.15 250) → Apple blue */
+  --primary-foreground: #fcfcfc !important;
+  
+  --secondary: #f5f5f5 !important; /* oklch(0.96 0 0) → Light gray */
+  --secondary-foreground: #000000 !important;
+  
+  --muted: #f5f5f5 !important;
+  --muted-foreground: #808080 !important; /* oklch(0.50 0 0) → Medium gray */
+  
+  --accent: #f5f5f5 !important;
+  --accent-foreground: #000000 !important;
+  
+  --destructive: #CC3333 !important; /* oklch(0.55 0.22 25) → Red */
+  --destructive-foreground: #fcfcfc !important;
+  
+  --border: #e6e6e6 !important; /* oklch(0.90 0 0) → Light border */
+  --input: #e6e6e6 !important;
+  --ring: #0066CC !important;
+  
+  --chart-1: #0066CC !important; /* Blue */
+  --chart-2: #33AA55 !important; /* Green */
+  --chart-3: #FF9933 !important; /* Orange */
+  --chart-4: #9966CC !important; /* Purple */
+  --chart-5: #CC3333 !important; /* Red */
+  
+  --sidebar: #f8f8f8 !important;
+  --sidebar-foreground: #000000 !important;
+  --sidebar-primary: #0066CC !important;
+  --sidebar-primary-foreground: #fcfcfc !important;
+  --sidebar-accent: #f0f0f0 !important;
+  --sidebar-accent-foreground: #000000 !important;
+  --sidebar-border: #ebebeb !important;
+  --sidebar-ring: #0066CC !important;
+  
+  /* Override Tailwind color tokens */
+  --color-background: #fcfcfc !important;
+  --color-foreground: #000000 !important;
+  --color-card: #fafafa !important;
+  --color-card-foreground: #000000 !important;
+  --color-popover: #fcfcfc !important;
+  --color-popover-foreground: #000000 !important;
+  --color-primary: #0066CC !important;
+  --color-primary-foreground: #fcfcfc !important;
+  --color-secondary: #f5f5f5 !important;
+  --color-secondary-foreground: #000000 !important;
+  --color-muted: #f5f5f5 !important;
+  --color-muted-foreground: #808080 !important;
+  --color-accent: #f5f5f5 !important;
+  --color-accent-foreground: #000000 !important;
+  --color-destructive: #CC3333 !important;
+  --color-destructive-foreground: #fcfcfc !important;
+  --color-border: #e6e6e6 !important;
+  --color-input: #e6e6e6 !important;
+  --color-ring: #0066CC !important;
+  --color-chart-1: #0066CC !important;
+  --color-chart-2: #33AA55 !important;
+  --color-chart-3: #FF9933 !important;
+  --color-chart-4: #9966CC !important;
+  --color-chart-5: #CC3333 !important;
+  --color-sidebar: #f8f8f8 !important;
+  --color-sidebar-foreground: #000000 !important;
+  --color-sidebar-primary: #0066CC !important;
+  --color-sidebar-primary-foreground: #fcfcfc !important;
+  --color-sidebar-accent: #f0f0f0 !important;
+  --color-sidebar-accent-foreground: #000000 !important;
+  --color-sidebar-border: #ebebeb !important;
+  --color-sidebar-ring: #0066CC !important;
+}
+
+/* Dark mode PDF-safe colors */
+.pdf-safe-mode.dark {
+  --background: #1a1a2e !important;
+  --foreground: #e8e8ea !important;
+  --card: #252538 !important;
+  --card-foreground: #e8e8ea !important;
+  --popover: #1a1a2e !important;
+  --popover-foreground: #e8e8ea !important;
+  --primary: #3399FF !important;
+  --primary-foreground: #fcfcfc !important;
+  --secondary: #2a2a3e !important;
+  --secondary-foreground: #e8e8ea !important;
+  --muted: #2a2a3e !important;
+  --muted-foreground: #9999a0 !important;
+  --accent: #2a2a3e !important;
+  --accent-foreground: #e8e8ea !important;
+  --destructive: #FF4444 !important;
+  --destructive-foreground: #fcfcfc !important;
+  --border: #3a3a4e !important;
+  --input: #3a3a4e !important;
+  --ring: #3399FF !important;
+  --chart-1: #3399FF !important;
+  --chart-2: #44CC66 !important;
+  --chart-3: #FFAA44 !important;
+  --chart-4: #AA77DD !important;
+  --chart-5: #FF4444 !important;
+  --sidebar: #1f1f33 !important;
+  --sidebar-foreground: #e8e8ea !important;
+  --sidebar-primary: #3399FF !important;
+  --sidebar-primary-foreground: #fcfcfc !important;
+  --sidebar-accent: #2a2a3e !important;
+  --sidebar-accent-foreground: #e8e8ea !important;
+  --sidebar-border: #3a3a4e !important;
+  --sidebar-ring: #3399FF !important;
+}

@@ -21,8 +21,7 @@ import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
-import { createAbsolutelyIsolatedClone, cleanupIsolatedClone, logPdfExportDiagnostics } from "@/lib/pdfExportDiagnostic";
+import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTemplate } from "@/lib/templateParser";
 import { generateThumbnail } from "@/lib/thumbnailGenerator";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
@@ -1402,7 +1401,7 @@ export default function RentalContracts() {
                       
                       // Create an absolutely isolated clone with comprehensive diagnostics
                       console.log('🚀 Starting PDF export with absolute isolation...');
-                      const safeClone = createAbsolutelyIsolatedClone(contractElement);
+                      const safeClone = await createSanitizedPdfClone(contractElement);
                       
                       // Make the clone visible with same dimensions as original
                       safeClone.style.position = 'static';
@@ -1416,14 +1415,11 @@ export default function RentalContracts() {
                         // Wait a moment for styles to apply
                         await new Promise(resolve => setTimeout(resolve, 100));
                         
-                        // Verify no OKLCH remains (development check)
-                        if (process.env.NODE_ENV === 'development') {
-                          const hasOklch = verifyNoOklch(safeClone);
-                          if (hasOklch) {
-                            console.warn('OKLCH colors still present in clone!');
-                          } else {
-                            console.log('✓ All OKLCH colors successfully converted');
-                          }
+                        // Non-negotiable validation
+                        const validation = validateNoModernCss(safeClone);
+                        if (!validation.valid) {
+                          console.error('❌ VALIDATION FAILED - Modern CSS still present');
+                          throw new Error('PDF export validation failed: Modern CSS detected');
                         }
                         
                         // Use html2canvas to capture the SAFE CLONE (not the original)
@@ -1440,7 +1436,7 @@ export default function RentalContracts() {
                         contractElement.style.maxHeight = originalMaxHeight;
                         
                         // Clean up the safe clone
-                        cleanupIsolatedClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                       
                         // Create PDF with jsPDF
                         const imgData = canvas.toDataURL('image/png');
@@ -1501,7 +1497,7 @@ export default function RentalContracts() {
                         toast.success("PDF downloaded successfully!");
                       } catch (innerError: any) {
                         // Clean up the safe clone even if there's an error
-                        cleanupIsolatedClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                         // Restore original styles
                         contractElement.style.overflow = originalOverflow;
                         contractElement.style.height = originalHeight;
@@ -1555,7 +1551,7 @@ export default function RentalContracts() {
                       
                       // Create an absolutely isolated clone with comprehensive diagnostics
                       console.log('🚀 Starting PDF export with absolute isolation...');
-                      const safeClone = createAbsolutelyIsolatedClone(contractElement);
+                      const safeClone = await createSanitizedPdfClone(contractElement);
                       
                       // Make the clone visible with same dimensions as original
                       safeClone.style.position = 'static';
@@ -1583,7 +1579,7 @@ export default function RentalContracts() {
                         contractElement.style.maxHeight = originalMaxHeight;
                         
                         // Clean up the safe clone
-                        cleanupIsolatedClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                       
                         // Create PDF with jsPDF
                         const imgData = canvas.toDataURL('image/png');
@@ -1684,7 +1680,7 @@ export default function RentalContracts() {
                         window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
                       } catch (innerError: any) {
                         // Clean up the safe clone even if there's an error
-                        cleanupIsolatedClone(safeClone);
+                        cleanupSanitizedClone(safeClone);
                         // Restore original styles
                         contractElement.style.overflow = originalOverflow;
                         contractElement.style.height = originalHeight;

@@ -23,7 +23,7 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { createPdfSafeClone, cleanupPdfSafeClone, verifyNoOklch } from "@/lib/pdfExportSafe";
+import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 
 export default function Invoices() {
@@ -129,7 +129,7 @@ export default function Invoices() {
       element.style.maxHeight = 'none';
       
       // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
-      const safeClone = createPdfSafeClone(element);
+      const safeClone = await createSanitizedPdfClone(element);
       
       // Make the clone visible with same dimensions as original
       safeClone.style.position = 'static';
@@ -157,7 +157,7 @@ export default function Invoices() {
         element.style.maxHeight = originalMaxHeight;
         
         // Clean up the safe clone
-        cleanupPdfSafeClone(safeClone);
+        cleanupSanitizedClone(safeClone);
 
         const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF({
@@ -188,7 +188,7 @@ export default function Invoices() {
         toast.success("PDF exported successfully");
       } catch (innerError: any) {
         // Clean up the safe clone even if there's an error
-        cleanupPdfSafeClone(safeClone);
+        cleanupSanitizedClone(safeClone);
         // Restore original styles
         element.style.overflow = originalOverflow;
         element.style.height = originalHeight;
