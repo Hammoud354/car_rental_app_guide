@@ -1397,7 +1397,56 @@ export default function RentalContracts() {
               {/* Button grid layout - 2 columns, equal sizing */}
               <div className="grid grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
-
+                <Button 
+                  onClick={() => {
+                    window.print();
+                  }} 
+                  variant="outline"
+                  className="h-10 w-full"
+                  size="default"
+                >
+                  🖨️ Print Contract
+                </Button>
+                <Button 
+                  onClick={async () => {
+                    if (!selectedContract) {
+                      toast.error("No contract selected");
+                      return;
+                    }
+                    
+                    try {
+                      toast.info("Generating PDF...");
+                      
+                      const element = document.getElementById('contract-content');
+                      if (!element) {
+                        toast.error("Contract content not found");
+                        return;
+                      }
+                      
+                      // Use html2pdf library
+                      const html2pdf = (await import('html2pdf.js')).default;
+                      
+                      const opt = {
+                        margin: 10,
+                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
+                        image: { type: 'jpeg' as const, quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+                      };
+                      
+                      await html2pdf().set(opt).from(element).save();
+                      toast.success("PDF downloaded successfully!");
+                    } catch (error: any) {
+                      console.error("PDF export error:", error);
+                      toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
+                    }
+                  }} 
+                  variant="outline"
+                  className="h-10 w-full"
+                  size="default"
+                >
+                  📄 Export to PDF
+                </Button>
                 <Button 
                   onClick={async () => {
                     if (!selectedContract) {

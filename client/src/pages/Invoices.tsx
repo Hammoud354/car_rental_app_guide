@@ -498,6 +498,48 @@ export default function Invoices() {
                   </Button>
                 </div>
 
+                {/* Action Buttons */}
+                <div className="flex gap-3 justify-end print:hidden">
+                  <Button 
+                    onClick={() => window.print()} 
+                    variant="outline"
+                  >
+                    🖨️ Print Invoice
+                  </Button>
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        toast.info("Generating PDF...");
+                        
+                        const element = document.getElementById('invoice-content');
+                        if (!element) {
+                          toast.error("Invoice content not found");
+                          return;
+                        }
+                        
+                        const html2pdf = (await import('html2pdf.js')).default;
+                        
+                        const opt = {
+                          margin: 10,
+                          filename: `${invoiceDetails?.invoiceNumber || 'invoice'}.pdf`,
+                          image: { type: 'jpeg' as const, quality: 0.98 },
+                          html2canvas: { scale: 2 },
+                          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+                        };
+                        
+                        await html2pdf().set(opt).from(element).save();
+                        toast.success("PDF downloaded successfully!");
+                      } catch (error: any) {
+                        console.error("PDF export error:", error);
+                        toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
+                      }
+                    }} 
+                    variant="outline"
+                  >
+                    📄 Export to PDF
+                  </Button>
+                </div>
+
                 {/* Payment Status Update */}
                 {invoiceDetails.paymentStatus !== "paid" && (
                   <Card>

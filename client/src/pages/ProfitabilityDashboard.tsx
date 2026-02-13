@@ -87,7 +87,42 @@ export default function ProfitabilityDashboard() {
             <FileSpreadsheet className="h-4 w-4" />
             Export to Excel
           </Button>
-
+          <Button
+            variant="outline"
+            onClick={async () => {
+              try {
+                const { toast } = await import('sonner');
+                toast.info("Generating PDF...");
+                
+                const element = document.querySelector('.p-8.space-y-6') as HTMLElement;
+                if (!element) {
+                  toast.error("Dashboard content not found");
+                  return;
+                }
+                
+                const html2pdf = (await import('html2pdf.js')).default;
+                
+                const opt = {
+                  margin: 10,
+                  filename: 'profitability-dashboard.pdf',
+                  image: { type: 'jpeg' as const, quality: 0.98 },
+                  html2canvas: { scale: 2 },
+                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' as const }
+                };
+                
+                await html2pdf().set(opt).from(element).save();
+                toast.success("PDF downloaded successfully!");
+              } catch (error: any) {
+                const { toast } = await import('sonner');
+                console.error("PDF export error:", error);
+                toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
+              }
+            }}
+            className="flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Export to PDF
+          </Button>
         </div>
       </div>
 

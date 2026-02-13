@@ -495,9 +495,18 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
 
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
+      <div className="flex justify-end gap-4 print:hidden">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
+        </Button>
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={() => window.print()}
+          className="flex items-center gap-2"
+        >
+          <Printer className="h-4 w-4" />
+          Print Inspection
         </Button>
         <Button type="button" onClick={handleSubmit} className="bg-black hover:bg-gray-800 text-white">
           Complete Contract

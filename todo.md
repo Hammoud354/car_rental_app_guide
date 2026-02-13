@@ -3632,3 +3632,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ## Remove Non-Working Features
 - [x] Remove all Export PDF buttons and functionality from entire application
 - [x] Remove all Print buttons and functionality from entire application
+
+## Rebuild PDF/Print and Fix Return Odometer
+- [ ] Fix Return Odometer to display pickup odometer value as starting point
+- [ ] Add validation error message when return odometer is less than pickup odometer
+- [x] Rebuild Print functionality from scratch in CarDamageInspection page
+- [x] Rebuild Print functionality from scratch in Invoices page
+- [x] Rebuild Print functionality from scratch in RentalContracts page
+- [x] Rebuild PDF Export functionality from scratch in Invoices page
+- [x] Rebuild PDF Export functionality from scratch in RentalContracts page
+- [x] Rebuild PDF Export functionality from scratch in ProfitabilityDashboard page
