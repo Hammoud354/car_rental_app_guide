@@ -292,13 +292,11 @@ export const appRouter = router({
         
         // Super Admin must provide targetUserId, regular users use their own ID
         let userId: number;
-        if (isAdmin) {
-          if (!input.targetUserId || input.targetUserId === 0) {
-            throw new Error("Super Admin must select a specific user to create vehicle for");
-          }
-          userId = input.targetUserId;
+        // Super Admin can create vehicles for themselves (default) or for selected user
+        if (isAdmin && input.targetUserId && input.targetUserId !== 0) {
+          userId = input.targetUserId; // Creating for another user
         } else {
-          userId = ctx.user?.id || 1;
+          userId = ctx.user?.id || 1; // Creating for themselves
         }
         
         const { targetUserId: _, ...vehicleData } = input;
