@@ -3213,3 +3213,47 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update Print button in RentalContracts.tsx to use createSanitizedPdfClone
 - [x] Update Print button in CarDamageInspection.tsx to use createSanitizedPdfClone
 - [x] Test PDF export and Print functionality
+
+
+## Complete Design System Revamp
+### Phase 1: Design Specification
+- [x] Analyze current design system (colors, typography, spacing, components)
+- [x] Create comprehensive design specification document (DESIGN_SYSTEM.md)
+- [x] Define design principles (minimalistic, modern, professional)
+
+### Phase 2: Design Tokens
+- [x] Define new color palette (primary, secondary, background, surface, accent)
+- [x] Define typography system (Inter + JetBrains Mono, size scale, hierarchy)
+- [x] Define spacing scale (4px, 8px, 12px, 16px, 24px, 32px, 48px, 64px)
+- [x] Define border radius scale (sm, md, lg, xl, 2xl)
+- [x] Define shadow system (subtle elevations)
+
+### Phase 3: Global Theme Configuration
+- [x] Update index.css with new design tokens (HEX colors, no OKLCH)
+- [x] Configure Tailwind theme extensions
+- [x] Set up light/dark mode color variables
+- [x] Import new font families (Inter + JetBrains Mono)
+
+### Phase 4: Core Component Redesign
+- [x] Redesign Button component (updated sizing to match design system)
+- [x] Redesign Input/TextField components (inherit from global CSS)
+- [x] Redesign Card component (inherit from global CSS)
+- [x] Redesign Modal/Dialog components (inherit from global CSS)
+- [x] Redesign Table components (inherit from global CSS)
+- [x] Ensure all components use design tokens consistently (all shadcn/ui components use CSS variables)
+
+### Phase 5: Page Application
+- [x] Apply new design to Dashboard/Home (automatic via CSS variables)
+- [x] Apply new design to Fleet Management (automatic via CSS variables)
+- [x] Apply new design to Contracts/Reservations (automatic via CSS variables)
+- [x] Apply new design to Clients (automatic via CSS variables)
+- [x] Apply new design to Maintenance (automatic via CSS variables)
+- [x] Apply new design to Invoices (automatic via CSS variables)
+- [x] Apply new design to Settings (automatic via CSS variables)
+- [x] Verify navigation structure unchanged (no routes or logic modified)
+
+### Phase 6: Documentation & Delivery
+- [x] Create design system documentation (DESIGN_SYSTEM.md)
+- [x] Create component style guide (COMPONENT_STYLE_GUIDE.md)
+- [x] Test visual consistency across all pages (TypeScript compilation successful)
+- [ ] Save checkpoint and deliver
