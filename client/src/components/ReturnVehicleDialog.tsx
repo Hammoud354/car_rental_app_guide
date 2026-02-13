@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,13 @@ export function ReturnVehicleDialog({
   const [returnNotes, setReturnNotes] = useState<string>("");
   const [damageInspection, setDamageInspection] = useState<string>("");
   const [validationError, setValidationError] = useState<string>("");
+  
+  // Auto-populate returnKm with pickupKm when dialog opens
+  useEffect(() => {
+    if (open && pickupKm) {
+      setReturnKm(pickupKm.toString());
+    }
+  }, [open, pickupKm]);
   
   // Calculate over-limit KM fee
   const calculateOverLimitFee = () => {

@@ -3625,3 +3625,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix PDF export failing with "Modern CSS detected" error (OKLCH colors)
 - [x] Fix WhatsApp share failing with OKLCH color parsing error
 - [x] Fix Mark as Completed to show return details dialog instead of simple confirmation
+
+- [x] Fix Return Odometer validation to prevent values less than Pickup Odometer and set minimum to Pickup Odometer
