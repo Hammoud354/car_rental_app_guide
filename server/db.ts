@@ -483,11 +483,41 @@ export async function deleteRentalContract(contractId: number) {
     throw new Error("Database not available");
   }
   
-  // Delete associated damage marks first
-  await db.delete(damageMarks).where(eq(damageMarks.contractId, contractId));
+  // Get the contract to find the associated vehicle
+  const contract = await db.select().from(rentalContracts).where(eq(rentalContracts.id, contractId)).limit(1);
   
-  // Then delete the contract
-  await db.delete(rentalContracts).where(eq(rentalContracts.id, contractId));
+  if (contract.length > 0) {
+    const vehicleId = contract[0].vehicleId;
+    
+    // Delete associated damage marks first
+    await db.delete(damageMarks).where(eq(damageMarks.contractId, contractId));
+    
+    // Delete the contract
+    await db.delete(rentalContracts).where(eq(rentalContracts.id, contractId));
+    
+    // Check if the vehicle has any other active contracts
+    const now = new Date();
+    const activeContracts = await db.select()
+      .from(rentalContracts)
+      .where(
+        and(
+          eq(rentalContracts.vehicleId, vehicleId),
+          or(
+            eq(rentalContracts.status, 'active'),
+            eq(rentalContracts.status, 'overdue')
+          ),
+          lte(rentalContracts.rentalStartDate, now),
+          gte(rentalContracts.rentalEndDate, now)
+        )
+      );
+    
+    // If no active contracts remain, return vehicle to Available status
+    if (activeContracts.length === 0) {
+      await db.update(vehicles)
+        .set({ status: 'Available' })
+        .where(eq(vehicles.id, vehicleId));
+    }
+  }
   
   return { success: true };
 }

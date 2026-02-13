@@ -3642,3 +3642,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Rebuild PDF Export functionality from scratch in Invoices page
 - [x] Rebuild PDF Export functionality from scratch in RentalContracts page
 - [x] Rebuild PDF Export functionality from scratch in ProfitabilityDashboard page
+
+
+## Bug Fix - Vehicle Status Not Updating When Contract Deleted
+- [x] When a contract is deleted, the associated vehicle should automatically return to "Available" status
+- [x] Implement vehicle status update in contract deletion procedure
+- [x] Test that deleting a contract returns vehicle to Available status
