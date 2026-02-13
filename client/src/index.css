@@ -460,11 +460,65 @@
     @apply bg-white text-black;
   }
   
-  .no-print {
+  /* Hide all UI elements */
+  .no-print,
+  nav,
+  aside,
+  header:not(.print-content header),
+  footer:not(.print-content footer),
+  button,
+  [role="button"],
+  .sidebar,
+  [data-sidebar],
+  [class*="sidebar"],
+  [class*="navigation"],
+  [class*="nav-"],
+  [class*="menu"],
+  dialog:not([open]),
+  [role="dialog"]:not([data-state="open"]) {
+    display: none !important;
+  }
+  
+  /* Show only contract content */
+  .print-content,
+  #contract-content,
+  .contract-details-content {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Ensure dialog content is visible when printing */
+  [role="dialog"][data-state="open"] {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+  
+  /* Hide dialog overlay */
+  [data-radix-dialog-overlay],
+  [role="dialog"] ~ div[data-radix-portal] {
     display: none !important;
   }
   
   @page {
     margin: 1cm;
+    size: A4;
+  }
+  
+  /* Prevent page breaks inside important sections */
+  .print-content > div,
+  .contract-section {
+    page-break-inside: avoid;
   }
 }

@@ -3615,3 +3615,7 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Set pickup odometer minimum value to vehicle's registered odometer in contract form
 
 - [ ] Fix driving license date fields to be editable after selecting existing user in contract form (needs user confirmation if issue persists)
+
+## PDF Export Issues
+- [x] Fix PDF export to only include contract content without navigation and UI elements
+- [x] Ensure car inspection, signatures, and all contract-related sections are included in PDF
