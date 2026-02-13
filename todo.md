@@ -3605,11 +3605,3 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ### Phase 4: Delivery
 - [ ] Save checkpoint with vehicle creation fix
-
-- [x] Fix Maintenance Tracking page to always show left sidebar navigation
-
-- [x] Remove breadcrumb navigation from Maintenance Tracking page
-
-- [x] Fix vehicle creation error with empty string date fields in published site
-
-- [x] Debug and fix persistent vehicle creation error with empty strings still being passed to database

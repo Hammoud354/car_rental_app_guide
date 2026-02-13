@@ -180,33 +180,12 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (!db) {
     throw new Error("Database not available");
   }
-  // Remove optional fields that are empty strings or undefined to let database use defaults
+  // Set null for optional timestamp fields if not provided or empty string
   const cleanedVehicle: any = { ...vehicle };
-  
-  // List of optional fields that should be omitted if empty or undefined
-  const optionalFields = [
-    'insuranceExpiryDate',
-    'registrationExpiryDate', 
-    'nextMaintenanceDate',
-    'nextMaintenanceKm',
-    'weeklyRate',
-    'monthlyRate',
-    'mileage',
-    'insuranceCost',
-    'purchaseCost',
-    'vin',
-    'insurancePolicyNumber',
-    'photoUrl',
-    'notes'
-  ];
-  
-  // Remove fields that are empty strings or undefined (but keep 0 for numeric fields)
-  optionalFields.forEach(field => {
-    if (cleanedVehicle[field] === '' || cleanedVehicle[field] === undefined) {
-      delete cleanedVehicle[field];
-    }
-  });
-  
+  if (cleanedVehicle.insuranceExpiryDate === undefined || cleanedVehicle.insuranceExpiryDate === '') cleanedVehicle.insuranceExpiryDate = null;
+  if (cleanedVehicle.registrationExpiryDate === undefined || cleanedVehicle.registrationExpiryDate === '') cleanedVehicle.registrationExpiryDate = null;
+  if (cleanedVehicle.nextMaintenanceDate === undefined || cleanedVehicle.nextMaintenanceDate === '') cleanedVehicle.nextMaintenanceDate = null;
+  if (cleanedVehicle.nextMaintenanceKm === undefined || cleanedVehicle.nextMaintenanceKm === '') cleanedVehicle.nextMaintenanceKm = null;
   // Always set status to Available for new vehicles
   cleanedVehicle.status = "Available";
   const result = await db.insert(vehicles).values(cleanedVehicle);
