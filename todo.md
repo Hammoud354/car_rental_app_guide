@@ -3257,3 +3257,47 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Create component style guide (COMPONENT_STYLE_GUIDE.md)
 - [x] Test visual consistency across all pages (TypeScript compilation successful)
 - [ ] Save checkpoint and deliver
+
+
+## Landing Page Redesign with Demo & WhatsApp Integration
+
+### Phase 1: Subscription Tiers Design
+- [x] Analyze app features to create tier structure
+- [x] Design 3 subscription tiers ($50-$85/month range): Starter ($50), Professional ($70), Enterprise ($85)
+- [x] Define features for each tier
+- [x] Create tier comparison table (SUBSCRIPTION_TIERS.md)
+
+### Phase 2: Landing Page with Animations
+- [x] Create hero section with fading text animation (4 rotating messages)
+- [x] Update copy to emphasize "Car Rental Management System" (not fleet)
+- [x] Add smooth scroll animations
+- [x] Design features section (6 key features)
+- [x] Design pricing/tiers section (3 tiers with comparison)
+- [x] Add "See Demo" CTA button
+
+### Phase 3: Demo Account System
+- [x] Create demo user account with dummy data
+- [x] Implement 10-minute session timer
+- [x] Add auto-logout after 10 minutes
+- [x] Show countdown timer in demo mode
+- [x] Restrict demo account from making changes (read-only)
+
+### Phase 4: WhatsApp Integration
+- [x] Create "Contact Us" button → WhatsApp (+96176354131) with business inquiry questions
+- [x] Create "Sign Up" button → WhatsApp with subscription tier questions
+- [x] Design WhatsApp message templates
+- [x] Add "Sign In" button → login page
+
+### Phase 5: Dummy Data Creation
+- [ ] Create dummy vehicles (5-10 cars)
+- [ ] Create dummy contracts (active, completed, pending)
+- [ ] Create dummy clients
+- [ ] Create dummy maintenance records
+- [ ] Create dummy P&L data
+
+### Phase 6: Testing & Delivery
+- [ ] Test demo account flow
+- [ ] Test 10-minute auto-logout
+- [ ] Test WhatsApp redirects
+- [ ] Test animations
+- [ ] Save checkpoint and deliver

@@ -120,6 +120,44 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    loginDemo: publicProcedure.mutation(async ({ ctx }) => {
+      // Find or create demo user
+      let demoUser = await db.getUserByUsername('demo@system');
+      
+      if (!demoUser) {
+        // Create demo user if it doesn't exist
+        const bcrypt = await import('bcrypt');
+        const hashedPassword = await bcrypt.hash('demo123', 10);
+        
+        demoUser = await db.createUser({
+          username: 'demo@system',
+          password: hashedPassword,
+          name: 'Demo User',
+          email: 'demo@example.com',
+          phone: '+96176354131',
+          country: 'Lebanon',
+        });
+        
+        // Populate demo data will be done in Phase 5
+      }
+      
+      // Create session cookie with 10-minute expiration
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.cookie(COOKIE_NAME, `user-${demoUser.id}`, {
+        ...cookieOptions,
+        maxAge: 10 * 60 * 1000, // 10 minutes
+      });
+      
+      return {
+        success: true,
+        user: {
+          id: demoUser.id,
+          name: demoUser.name,
+          email: demoUser.email,
+          username: demoUser.username,
+        },
+      };
+    }),
     requestPasswordReset: publicProcedure
       .input(z.object({
         email: z.string().email(),

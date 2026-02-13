@@ -32,11 +32,14 @@ import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
 import ProfitLoss from "./pages/ProfitLoss";
+import Demo from "./pages/Demo";
+import Home from "./pages/Home";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path="/" component={Landing} />
+      <Route path="/" component={Home} />
+      <Route path="/demo" component={Demo} />
       <Route path="/login" component={SignIn} />
       <Route path="/signin" component={SignIn} />
       <Route path="/signup" component={SignUp} />
