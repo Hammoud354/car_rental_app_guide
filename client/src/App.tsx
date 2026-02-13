@@ -31,6 +31,7 @@ import CompanySettings from "./pages/CompanySettings";
 import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
+import UserManagement from "./pages/UserManagement";
 import ProfitLoss from "./pages/ProfitLoss";
 import Demo from "./pages/Demo";
 import Home from "./pages/Home";
@@ -63,6 +64,7 @@ function Router() {
       <Route path="/settings" component={Settings} />
       <Route path="/whatsapp-settings" component={WhatsAppSettings} />
       <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/user-management" component={UserManagement} />
       <Route path="/admin/audit-logs" component={AuditLogs} />
       <Route path="/analysis" component={Analysis} />
       <Route path="/reservations" component={Reservations} />

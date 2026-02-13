@@ -216,7 +216,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Starter Plan */}
-          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col">
             <CardHeader className="pb-3 pt-5">
               <CardTitle className="text-lg">Starter</CardTitle>
               <div className="mt-2">
@@ -225,8 +225,8 @@ export default function Home() {
               </div>
               <CardDescription className="mt-0.5 text-sm">For small agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pb-5">
-              <ul className="space-y-2.5">
+            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
+              <ul className="space-y-2.5 flex-1">
                 {[
                   "Up to 15 vehicles",
                   "Unlimited contracts",
@@ -242,7 +242,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" variant="outline" onClick={handleSignUp}>
+              <Button className="w-full mt-4" variant="outline" onClick={handleSignUp}>
                 Get Started
               </Button>
             </CardContent>
@@ -259,8 +259,8 @@ export default function Home() {
               </div>
               <CardDescription className="mt-0.5 text-sm">For growing agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pb-5">
-              <ul className="space-y-2.5">
+            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
+              <ul className="space-y-2.5 flex-1">
                 {[
                   "Up to 50 vehicles",
                   "Unlimited clients",
@@ -277,14 +277,14 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" onClick={handleSignUp}>
+              <Button className="w-full mt-4" onClick={handleSignUp}>
                 Get Started
               </Button>
             </CardContent>
           </Card>
 
           {/* Enterprise Plan */}
-          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col delay-200">
             <CardHeader className="pb-3 pt-5">
               <CardTitle className="text-lg">Enterprise</CardTitle>
               <div className="mt-2">
@@ -293,8 +293,8 @@ export default function Home() {
               </div>
               <CardDescription className="mt-0.5 text-sm">For large agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pb-5">
-              <ul className="space-y-2.5">
+            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
+              <ul className="space-y-2.5 flex-1">
                 {[
                   "Unlimited vehicles",
                   "Unlimited clients",
@@ -311,7 +311,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" onClick={handleSignUp}>
+              <Button className="w-full mt-4" onClick={handleSignUp}>
                 Get Started
               </Button>
             </CardContent>
