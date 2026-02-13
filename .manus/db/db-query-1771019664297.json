@@ -1,0 +1,80 @@
+{
+  "query": "SELECT id, contractNumber, pickupKm, returnKm, status FROM rentalContracts LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, contractNumber, pickupKm, returnKm, status FROM rentalContracts LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "contractNumber": "CTR-001",
+      "pickupKm": "NULL",
+      "returnKm": "130000",
+      "status": "completed"
+    },
+    {
+      "id": "2",
+      "contractNumber": "CTR-002",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "3",
+      "contractNumber": "CONTRACT-1770934660084",
+      "pickupKm": "10000",
+      "returnKm": "10500",
+      "status": "completed"
+    },
+    {
+      "id": "4",
+      "contractNumber": "CTR-INV-1770934660077",
+      "pickupKm": "NULL",
+      "returnKm": "10500",
+      "status": "completed"
+    },
+    {
+      "id": "6",
+      "contractNumber": "CONTRACT2-1770934665351",
+      "pickupKm": "10000",
+      "returnKm": "10400",
+      "status": "completed"
+    },
+    {
+      "id": "9",
+      "contractNumber": "CTR-ACTIVE-1770934673920",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "status": "active"
+    },
+    {
+      "id": "10",
+      "contractNumber": "CTR-PAY-1770934678237",
+      "pickupKm": "NULL",
+      "returnKm": "5200",
+      "status": "completed"
+    },
+    {
+      "id": "11",
+      "contractNumber": "CTR-LATE-1770934686396",
+      "pickupKm": "NULL",
+      "returnKm": "8200",
+      "status": "completed"
+    },
+    {
+      "id": "12",
+      "contractNumber": "CTR-001",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "status": "overdue"
+    },
+    {
+      "id": "13",
+      "contractNumber": "CTR-002",
+      "pickupKm": "NULL",
+      "returnKm": "NULL",
+      "status": "active"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcontractNumber\tpickupKm\treturnKm\tstatus\n1\tCTR-001\tNULL\t130000\tcompleted\n2\tCTR-002\tNULL\tNULL\tactive\n3\tCONTRACT-1770934660084\t10000\t10500\tcompleted\n4\tCTR-INV-1770934660077\tNULL\t10500\tcompleted\n6\tCONTRACT2-1770934665351\t10000\t10400\tcompleted\n9\tCTR-ACTIVE-1770934673920\tNULL\tNULL\tactive\n10\tCTR-PAY-1770934678237\tNULL\t5200\tcompleted\n11\tCTR-LATE-1770934686396\tNULL\t8200\tcompleted\n12\tCTR-001\tNULL\tNULL\toverdue\n13\tCTR-002\tNULL\tNULL\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 1566
+}

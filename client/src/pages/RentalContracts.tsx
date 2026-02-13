@@ -316,6 +316,12 @@ export default function RentalContracts() {
       return;
     }
     
+    // Validate pickup odometer is entered
+    if (!pickupKm || pickupKm <= 0) {
+      toast.error("Please enter a valid pickup odometer reading (must be greater than 0)");
+      return;
+    }
+    
     const data = {
       vehicleId: parseInt(formData.get("vehicleId") as string),
       clientFirstName: formData.get("clientFirstName") as string,

@@ -3659,3 +3659,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Implemented dynamic status calculation in getAllVehicles() function
 - [x] Vehicles now automatically show correct status based on active contracts
 - [x] Tested in both Fleet Management and Contract Creation - working perfectly
+
+
+## Bug Fix - Return Odometer Not Pre-filling with Pickup Odometer
+- [x] Return Odometer field shows empty when marking contract as returned
+- [x] Should automatically pre-fill with the pickup odometer value from the contract
+- [x] Investigate ReturnVehicleDialog component to find the issue
+- [x] Fix the pre-filling logic and test thoroughly
+- [x] Root cause: Contracts were being created with pickupKm = 0 or null
+- [x] Fixed ReturnVehicleDialog to handle null/0 pickupKm gracefully with warning message
+- [x] Added validation to contract creation to require pickupKm > 0
+- [x] Return odometer now pre-fills correctly when pickupKm exists

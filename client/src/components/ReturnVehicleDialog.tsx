@@ -41,9 +41,14 @@ export function ReturnVehicleDialog({
   
   // Auto-populate returnKm with pickupKm when dialog opens, and reset when closed
   useEffect(() => {
-    if (open && pickupKm) {
+    if (open && pickupKm && pickupKm > 0) {
+      // Pre-fill with pickup odometer value
       setReturnKm(pickupKm.toString());
       setValidationError("");
+    } else if (open && (!pickupKm || pickupKm === 0)) {
+      // If no pickup odometer was recorded, show warning
+      setReturnKm("");
+      setValidationError("Warning: No pickup odometer was recorded for this contract. Please enter the return odometer reading.");
     } else if (!open) {
       // Reset form when dialog closes
       setReturnKm("");
@@ -56,7 +61,7 @@ export function ReturnVehicleDialog({
   
   // Real-time validation for return odometer
   useEffect(() => {
-    if (returnKm && pickupKm) {
+    if (returnKm && pickupKm && pickupKm > 0) {
       const returnKmNum = parseInt(returnKm);
       if (!isNaN(returnKmNum) && returnKmNum <= pickupKm) {
         setValidationError(`Return odometer must be greater than pickup odometer (${pickupKm.toLocaleString()} km)`);
@@ -123,7 +128,7 @@ export function ReturnVehicleDialog({
     setValidationError("");
 
     // Validate return odometer
-    if (returnKm && pickupKm) {
+    if (returnKm && pickupKm && pickupKm > 0) {
       const returnKmNum = parseInt(returnKm);
       if (isNaN(returnKmNum)) {
         setValidationError("Return odometer must be a valid number");
