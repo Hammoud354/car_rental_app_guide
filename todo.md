@@ -3605,3 +3605,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ### Phase 4: Delivery
 - [ ] Save checkpoint with vehicle creation fix
+
+- [x] Fix Maintenance Tracking page to always show left sidebar navigation

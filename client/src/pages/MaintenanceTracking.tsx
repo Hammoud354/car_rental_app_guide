@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import SidebarLayout from "@/components/SidebarLayout";
 
 export default function MaintenanceTracking() {
   const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
@@ -74,15 +75,16 @@ export default function MaintenanceTracking() {
   const upcomingVehicles = vehicles?.filter(v => getMaintenanceStatus(v).status === "upcoming") || [];
 
   return (
-    <div className="container mx-auto py-8 input-client">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 input-client">
-        <Link href="/">
-          <span className="hover:text-foreground cursor-pointer input-client">Overview</span>
-        </Link>
-        <ChevronRight className="h-4 w-4 input-client" />
-        <span className="text-foreground font-medium input-client">Maintenance Tracking</span>
-      </div>
+    <SidebarLayout>
+      <div className="container mx-auto py-8 input-client">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 input-client">
+          <Link href="/">
+            <span className="hover:text-foreground cursor-pointer input-client">Overview</span>
+          </Link>
+          <ChevronRight className="h-4 w-4 input-client" />
+          <span className="text-foreground font-medium input-client">Maintenance Tracking</span>
+        </div>
 
       <div className="mb-8 flex justify-between items-start input-client">
         <div>
@@ -302,7 +304,8 @@ export default function MaintenanceTracking() {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </SidebarLayout>
   );
 }
 
