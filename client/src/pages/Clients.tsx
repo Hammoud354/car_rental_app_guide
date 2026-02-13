@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle, Upload } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle, Upload, Download } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -17,6 +17,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
+import { exportClientsToCSV } from "@shared/csvExport";
 
 // Helper function to check license expiry status
 const getLicenseExpiryStatus = (expiryDate: Date | string) => {
@@ -198,6 +199,21 @@ export default function Clients() {
             <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Bulk Import
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                if (!clients || clients.length === 0) {
+                  toast.error("No clients to export");
+                  return;
+                }
+                exportClientsToCSV(clients);
+                toast.success(`Exported ${clients.length} clients`);
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
             </Button>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>

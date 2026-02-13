@@ -16,7 +16,7 @@ import { trpc } from "@/lib/trpc";
 import html2pdf from 'html2pdf.js';
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3 } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
@@ -25,6 +25,7 @@ import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } f
 import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTemplate } from "@/lib/templateParser";
 import { generateThumbnail } from "@/lib/thumbnailGenerator";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
+import { exportContractsToCSV } from "@shared/csvExport";
 
 export default function RentalContracts() {
   const [, setLocation] = useLocation();
@@ -422,6 +423,21 @@ export default function RentalContracts() {
               <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
             </div>
             <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  if (!contracts || contracts.length === 0) {
+                    toast.error("No contracts to export");
+                    return;
+                  }
+                  exportContractsToCSV(contracts);
+                  toast.success(`Exported ${contracts.length} contracts`);
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+              
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gray-900 hover:bg-gray-800">

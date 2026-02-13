@@ -44,9 +44,27 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   // All sections expanded by default
   const [expandedSections] = useState<Set<string>>(new Set(["main", "management", "clients-invoices"]));
   const [isCollapsed, setIsCollapsed] = useState(() => {
+    // Auto-collapse on mobile devices
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      return true;
+    }
     const saved = localStorage.getItem('sidebarCollapsed');
     return saved === 'true';
   });
+  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Handle window resize for mobile responsiveness
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsCollapsed(true);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('sidebarCollapsed', String(isCollapsed));
@@ -87,7 +105,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   ];
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd] flex">
+    <div className="min-h-screen bg-[#fbfbfd] flex relative">
       {/* Left Sidebar */}
       <aside className={cn(
         "bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm",

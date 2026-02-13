@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download } from "lucide-react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
@@ -21,6 +21,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
+import { exportVehiclesToCSV } from "@shared/csvExport";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
@@ -316,6 +317,21 @@ export default function FleetManagement() {
             <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Bulk Import
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                if (!vehicles || vehicles.length === 0) {
+                  toast.error("No vehicles to export");
+                  return;
+                }
+                exportVehiclesToCSV(vehicles);
+                toast.success(`Exported ${vehicles.length} vehicles`);
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
             </Button>
             
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
