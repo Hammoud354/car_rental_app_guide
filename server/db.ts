@@ -180,15 +180,38 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (!db) {
     throw new Error("Database not available");
   }
-  // Set null for optional timestamp fields if not provided or empty string
-  const cleanedVehicle: any = { ...vehicle };
-  if (cleanedVehicle.insuranceExpiryDate === undefined || cleanedVehicle.insuranceExpiryDate === '') cleanedVehicle.insuranceExpiryDate = null;
-  if (cleanedVehicle.registrationExpiryDate === undefined || cleanedVehicle.registrationExpiryDate === '') cleanedVehicle.registrationExpiryDate = null;
-  if (cleanedVehicle.nextMaintenanceDate === undefined || cleanedVehicle.nextMaintenanceDate === '') cleanedVehicle.nextMaintenanceDate = null;
-  if (cleanedVehicle.nextMaintenanceKm === undefined || cleanedVehicle.nextMaintenanceKm === '') cleanedVehicle.nextMaintenanceKm = null;
-  // Always set status to Available for new vehicles
-  cleanedVehicle.status = "Available";
-  const result = await db.insert(vehicles).values(cleanedVehicle);
+  
+  // Build insert object explicitly, only including fields with actual values
+  const insertData: any = {
+    userId: vehicle.userId,
+    plateNumber: vehicle.plateNumber,
+    brand: vehicle.brand,
+    model: vehicle.model,
+    year: vehicle.year,
+    color: vehicle.color,
+    category: vehicle.category,
+    status: "Available", // Always set to Available for new vehicles
+    dailyRate: vehicle.dailyRate,
+  };
+  
+  // Only add optional fields if they have values (not empty string or undefined)
+  if (vehicle.weeklyRate && vehicle.weeklyRate !== '') insertData.weeklyRate = vehicle.weeklyRate;
+  if (vehicle.monthlyRate && vehicle.monthlyRate !== '') insertData.monthlyRate = vehicle.monthlyRate;
+  if (vehicle.mileage !== undefined && vehicle.mileage !== null) insertData.mileage = vehicle.mileage;
+  if (vehicle.vin && vehicle.vin !== '') insertData.vin = vehicle.vin;
+  if (vehicle.insurancePolicyNumber && vehicle.insurancePolicyNumber !== '') insertData.insurancePolicyNumber = vehicle.insurancePolicyNumber;
+  if (vehicle.insuranceCost && vehicle.insuranceCost !== '') insertData.insuranceCost = vehicle.insuranceCost;
+  if (vehicle.purchaseCost && vehicle.purchaseCost !== '') insertData.purchaseCost = vehicle.purchaseCost;
+  if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
+  if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
+  
+  // For timestamp fields, only add if they exist
+  if (vehicle.insuranceExpiryDate) insertData.insuranceExpiryDate = vehicle.insuranceExpiryDate;
+  if (vehicle.registrationExpiryDate) insertData.registrationExpiryDate = vehicle.registrationExpiryDate;
+  if (vehicle.nextMaintenanceDate) insertData.nextMaintenanceDate = vehicle.nextMaintenanceDate;
+  if (vehicle.nextMaintenanceKm !== undefined && vehicle.nextMaintenanceKm !== null) insertData.nextMaintenanceKm = vehicle.nextMaintenanceKm;
+  
+  const result = await db.insert(vehicles).values(insertData);
   const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
   const created = await db.select().from(vehicles).where(eq(vehicles.id, insertId)).limit(1);
   if (created.length === 0) {

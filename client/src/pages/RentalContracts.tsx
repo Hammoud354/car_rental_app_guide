@@ -80,12 +80,6 @@ export default function RentalContracts() {
     { enabled: !!selectedVehicleId && selectedVehicleId !== "" }
   );
   
-  // Auto-populate pickup odometer when last reading is available
-  useEffect(() => {
-    if (lastOdometerReading && lastOdometerReading > 0) {
-      setPickupKm(lastOdometerReading);
-    }
-  }, [lastOdometerReading]);
   const [returnKm, setReturnKm] = useState<number>(0);
   
   // Fetch all users for Super Admin
@@ -110,6 +104,21 @@ export default function RentalContracts() {
   
   // Use predefined world nationalities list
   const nationalities = WORLD_NATIONALITIES;
+  
+  // Auto-populate pickup odometer when vehicle is selected
+  useEffect(() => {
+    if (selectedVehicleId) {
+      const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+      const registeredMileage = vehicle?.mileage || 0;
+      
+      // Use last odometer reading if available, otherwise use registered mileage
+      if (lastOdometerReading && lastOdometerReading > 0) {
+        setPickupKm(lastOdometerReading);
+      } else if (registeredMileage > 0) {
+        setPickupKm(registeredMileage);
+      }
+    }
+  }, [selectedVehicleId, lastOdometerReading, vehicles]);
   
   // Find invoice for selected contract
   const contractInvoice = selectedContract 
@@ -476,8 +485,8 @@ export default function RentalContracts() {
                                   return (
                                     <span className="flex items-center gap-2">
                                       <span>{statusEmoji[vehicle.status]}</span>
-                                      <span>{vehicle.plateNumber}</span>
-                                      <span className="text-xs text-muted-foreground">[{vehicle.status}]</span>
+                                      <span className="font-semibold">{vehicle.plateNumber}</span>
+                                      <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
                                     </span>
                                   );
                                 })()
@@ -527,7 +536,8 @@ export default function RentalContracts() {
                                       />
                                       <span className="flex items-center gap-2 flex-1">
                                         <span>{statusEmoji[vehicle.status]}</span>
-                                        <span>{vehicle.plateNumber}</span>
+                                        <span className="font-semibold">{vehicle.plateNumber}</span>
+                                        <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
                                         <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
                                           [{vehicle.status}]
                                         </span>
@@ -728,7 +738,6 @@ export default function RentalContracts() {
                           label="Issue Date"
                           value={licenseIssueDate}
                           onChange={setLicenseIssueDate}
-                          yearOnly
                           maxDate={new Date()} // Only allow current or past dates
                         />
                       </div>
@@ -738,8 +747,7 @@ export default function RentalContracts() {
                           label="Expiry Date"
                           value={licenseExpiryDate}
                           onChange={setLicenseExpiryDate}
-                          minDate={new Date(new Date().getFullYear(), 0, 1)} // Minimum: current year
-                          yearOnly
+                          minDate={new Date()} // Minimum: today (future dates only)
                           required
                         />
                       </div>
@@ -800,17 +808,33 @@ export default function RentalContracts() {
                           id="pickupKm"
                           name="pickupKm"
                           type="number"
-                          min="0"
+                          min={(() => {
+                            const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+                            return vehicle?.mileage || 0;
+                          })()}
                           value={pickupKm}
                           onChange={(e) => setPickupKm(parseInt(e.target.value) || 0)}
                           placeholder="Enter current odometer reading"
                           required
                         />
-                        {lastOdometerReading && lastOdometerReading > 0 && (
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Auto-filled from last completed contract ({lastOdometerReading.toLocaleString()} km). You can edit if needed.
-                          </p>
-                        )}
+                        {(() => {
+                          const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+                          const registeredMileage = vehicle?.mileage || 0;
+                          if (lastOdometerReading && lastOdometerReading > 0) {
+                            return (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Auto-filled from last completed contract ({lastOdometerReading.toLocaleString()} km). Minimum: {registeredMileage.toLocaleString()} km (registered mileage).
+                              </p>
+                            );
+                          } else if (registeredMileage > 0) {
+                            return (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Minimum: {registeredMileage.toLocaleString()} km (vehicle's registered mileage).
+                              </p>
+                            );
+                          }
+                          return null;
+                        })()}
                       </div>
                     </div>
 

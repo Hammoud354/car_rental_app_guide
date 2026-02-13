@@ -283,6 +283,7 @@ export const appRouter = router({
         purchaseCost: z.string().optional(),
         insuranceExpiryDate: z.date().optional(),
         registrationExpiryDate: z.date().optional(),
+        nextMaintenanceDate: z.date().optional(),
         photoUrl: z.string().optional(),
         notes: z.string().optional(),
         targetUserId: z.number().optional(), // For Super Admin to assign vehicle to specific user
@@ -322,8 +323,6 @@ export const appRouter = router({
           insurancePolicyNumber: z.string().max(100).optional(),
           insuranceCost: z.string().optional(),
           purchaseCost: z.string().optional(),
-          insuranceExpiryDate: z.date().optional(),
-          registrationExpiryDate: z.date().optional(),
           photoUrl: z.string().optional(),
           notes: z.string().optional(),
         }),

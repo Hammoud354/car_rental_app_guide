@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, weeklyRate, monthlyRate, mileage, vin, insurancePolicyNumber, insuranceCost, purchaseCost) VALUES (870189, 'SQLTEST2', 'Toyota', 'Hilux', 2020, 'White', 'Truck', 'Available', 25, 23, 21, 10000, '123123123123', 'X11001100', 350, 25000);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, weeklyRate, monthlyRate, mileage, vin, insurancePolicyNumber, insuranceCost, purchaseCost) VALUES (870189, 'SQLTEST2', 'Toyota', 'Hilux', 2020, 'White', 'Truck', 'Available', 25, 23, 21, 10000, '123123123123', 'X11001100', 350, 25000);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1493
+}

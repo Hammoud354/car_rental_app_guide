@@ -1,0 +1,45 @@
+{
+  "query": "SHOW CREATE TABLE vehicles;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SHOW CREATE TABLE vehicles;",
+  "rows": [
+    {
+      "Table": "vehicles",
+      "Create Table": "CREATE TABLE `vehicles` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `plateNumber` varchar(20) NOT NULL,",
+    "  `brand` varchar(100) NOT NULL,",
+    "  `model` varchar(100) NOT NULL,",
+    "  `year` int(11) NOT NULL,",
+    "  `color` varchar(50) NOT NULL,",
+    "  `category` enum('Economy','Compact','Midsize','SUV','Luxury','Van','Truck') NOT NULL,",
+    "  `status` enum('Available','Rented','Maintenance','Out of Service') NOT NULL DEFAULT 'Available',",
+    "  `dailyRate` decimal(10,2) NOT NULL,",
+    "  `weeklyRate` decimal(10,2) DEFAULT NULL,",
+    "  `monthlyRate` decimal(10,2) DEFAULT NULL,",
+    "  `mileage` int(11) DEFAULT '0',",
+    "  `vin` varchar(17) DEFAULT NULL,",
+    "  `insurancePolicyNumber` varchar(100) DEFAULT NULL,",
+    "  `insuranceExpiryDate` timestamp NULL DEFAULT NULL,",
+    "  `registrationExpiryDate` timestamp NULL DEFAULT NULL,",
+    "  `photoUrl` text DEFAULT NULL,",
+    "  `notes` text DEFAULT NULL,",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `insuranceCost` decimal(10,2) DEFAULT NULL,",
+    "  `userId` int(11) NOT NULL,",
+    "  `purchaseCost` decimal(10,2) DEFAULT NULL,",
+    "  `nextMaintenanceDate` timestamp NULL DEFAULT NULL,",
+    "  `nextMaintenanceKm` int(11) DEFAULT NULL,",
+    "  `maintenanceIntervalKm` int(11) DEFAULT '5000',",
+    "  `maintenanceIntervalMonths` int(11) DEFAULT '6',",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `vehicles_plateNumber_unique` (`plateNumber`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=90001"
+  ],
+  "stdout": "Table\tCreate Table\nvehicles\tCREATE TABLE `vehicles` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `plateNumber` varchar(20) NOT NULL,\n  `brand` varchar(100) NOT NULL,\n  `model` varchar(100) NOT NULL,\n  `year` int(11) NOT NULL,\n  `color` varchar(50) NOT NULL,\n  `category` enum('Economy','Compact','Midsize','SUV','Luxury','Van','Truck') NOT NULL,\n  `status` enum('Available','Rented','Maintenance','Out of Service') NOT NULL DEFAULT 'Available',\n  `dailyRate` decimal(10,2) NOT NULL,\n  `weeklyRate` decimal(10,2) DEFAULT NULL,\n  `monthlyRate` decimal(10,2) DEFAULT NULL,\n  `mileage` int(11) DEFAULT '0',\n  `vin` varchar(17) DEFAULT NULL,\n  `insurancePolicyNumber` varchar(100) DEFAULT NULL,\n  `insuranceExpiryDate` timestamp NULL DEFAULT NULL,\n  `registrationExpiryDate` timestamp NULL DEFAULT NULL,\n  `photoUrl` text DEFAULT NULL,\n  `notes` text DEFAULT NULL,\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `insuranceCost` decimal(10,2) DEFAULT NULL,\n  `userId` int(11) NOT NULL,\n  `purchaseCost` decimal(10,2) DEFAULT NULL,\n  `nextMaintenanceDate` timestamp NULL DEFAULT NULL,\n  `nextMaintenanceKm` int(11) DEFAULT NULL,\n  `maintenanceIntervalKm` int(11) DEFAULT '5000',\n  `maintenanceIntervalMonths` int(11) DEFAULT '6',\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `vehicles_plateNumber_unique` (`plateNumber`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin AUTO_INCREMENT=90001\n",
+  "stderr": "",
+  "execution_time_ms": 1493
+}

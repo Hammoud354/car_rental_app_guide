@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, weeklyRate, monthlyRate, mileage, vin, insurancePolicyNumber, insuranceExpiryDate, insuranceCost, purchaseCost, registrationExpiryDate, nextMaintenanceDate, nextMaintenanceKm) VALUES (870189, 'SQLTEST1', 'Toyota', 'Corolla', 2022, 'White', 'Economy', 'Available', 25, 22, 19, 10000, '123123123123', 'X11001100', '', 350, 25000, '', '', '');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO vehicles (userId, plateNumber, brand, model, year, color, category, status, dailyRate, weeklyRate, monthlyRate, mileage, vin, insurancePolicyNumber, insuranceExpiryDate, insuranceCost, purchaseCost, registrationExpiryDate, nextMaintenanceDate, nextMaintenanceKm) VALUES (870189, 'SQLTEST1', 'Toyota', 'Corolla', 2022, 'White', 'Economy', 'Available', 25, 22, 19, 10000, '123123123123', 'X11001100', '', 350, 25000, '', '', '');",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1292 (22007) at line 1: Incorrect timestamp value: '' for column 'insuranceExpiryDate' at row 1"
+  ]
+}

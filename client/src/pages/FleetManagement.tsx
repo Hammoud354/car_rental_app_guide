@@ -205,8 +205,11 @@ export default function FleetManagement() {
       mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+      insuranceExpiryDate: formData.get("insuranceExpiryDate") ? new Date(formData.get("insuranceExpiryDate") as string) : undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
+      registrationExpiryDate: formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined,
+      nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
       notes: formData.get("notes") as string || undefined,
       targetUserId: selectedTargetUserId || undefined, // For Super Admin to assign to specific user
     });
@@ -533,8 +536,23 @@ export default function FleetManagement() {
                 </div>
 
                 <div>
+                  <Label htmlFor="insuranceExpiryDate">Insurance Expiry Date</Label>
+                  <Input id="insuranceExpiryDate" name="insuranceExpiryDate" type="date" />
+                </div>
+
+                <div>
                   <Label htmlFor="insuranceCost">Annual Insurance Cost ($)</Label>
                   <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
+                </div>
+
+                <div>
+                  <Label htmlFor="registrationExpiryDate">Registration Expiry Date</Label>
+                  <Input id="registrationExpiryDate" name="registrationExpiryDate" type="date" />
+                </div>
+
+                <div>
+                  <Label htmlFor="nextMaintenanceDate">Next Maintenance Date</Label>
+                  <Input id="nextMaintenanceDate" name="nextMaintenanceDate" type="date" />
                 </div>
 
                 <div>

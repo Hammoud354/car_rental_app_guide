@@ -3605,3 +3605,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ### Phase 4: Delivery
 - [ ] Save checkpoint with vehicle creation fix
+
+- [ ] Add date picker fields for insurance expiry, registration expiry, and next maintenance date to Add Vehicle form
+
+## Contract Form Improvements
+- [x] Show Car Maker and Model next to plate number in contract vehicle selection dropdown
+- [x] Display all driving license details when selecting existing user in contract form
+- [x] Fix driving license date pickers to show full date (Year, Month, Day) instead of just year
+- [x] Set pickup odometer minimum value to vehicle's registered odometer in contract form
+
+- [ ] Fix driving license date fields to be editable after selecting existing user in contract form (needs user confirmation if issue persists)
