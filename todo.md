@@ -3206,3 +3206,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Console scan confirming ZERO oklch() in exported node
 - [ ] Test PDF export on Client Card, Contract Detail, Reports, Admin
 - [ ] Verify no OKLCH in any export scenario
+
+
+## PDF Export Bug Fixes
+- [x] Fix validation to only reject var() in color-related properties (not all CSS variables)
+- [x] Update Print button in RentalContracts.tsx to use createSanitizedPdfClone
+- [x] Update Print button in CarDamageInspection.tsx to use createSanitizedPdfClone
+- [x] Test PDF export and Print functionality

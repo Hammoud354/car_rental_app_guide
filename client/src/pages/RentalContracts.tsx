@@ -1359,11 +1359,36 @@ export default function RentalContracts() {
               <div className="grid grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
-                  onClick={() => {
-                    // Small delay to ensure dialog is fully rendered
-                    setTimeout(() => {
+                  onClick={async () => {
+                    const contractElement = document.getElementById('contract-content');
+                    if (!contractElement) {
+                      toast.error('Contract content not found');
+                      return;
+                    }
+                    
+                    try {
+                      // Create sanitized clone for print
+                      const printClone = await createSanitizedPdfClone(contractElement);
+                      
+                      // Hide original, show clone
+                      contractElement.style.display = 'none';
+                      contractElement.parentNode?.insertBefore(printClone, contractElement);
+                      
+                      // Wait for styles to apply
+                      await new Promise(r => setTimeout(r, 200));
+                      
+                      // Print
                       window.print();
-                    }, 100);
+                      
+                      // Cleanup after print dialog closes
+                      setTimeout(() => {
+                        contractElement.style.display = '';
+                        cleanupSanitizedClone(printClone);
+                      }, 1000);
+                    } catch (error: any) {
+                      console.error('Print failed:', error);
+                      toast.error('Print failed: ' + error.message);
+                    }
                   }} 
                   variant="outline"
                   className="h-10 w-full"

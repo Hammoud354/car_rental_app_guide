@@ -297,8 +297,10 @@ export function validateNoModernCss(element: HTMLElement): {valid: boolean, issu
       if (value && value.includes('color-mix')) {
         issues.push(`color-mix found in ${prop}: ${value}`);
       }
-      if (value && value.includes('var(')) {
-        issues.push(`CSS variable found in ${prop}: ${value}`);
+      // Only reject var() in color-related properties
+      const colorRelatedProps = ['color', 'background', 'border', 'fill', 'stroke', 'outline'];
+      if (value && value.includes('var(') && colorRelatedProps.some(cp => prop.toLowerCase().includes(cp))) {
+        issues.push(`CSS color variable found in ${prop}: ${value}`);
       }
     }
   });

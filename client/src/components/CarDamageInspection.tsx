@@ -505,7 +505,37 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
               <div className="flex gap-3">
                 <Button 
                   type="button" 
-                  onClick={() => window.print()}
+                  onClick={async () => {
+                    const inspectionElement = document.querySelector('.space-y-6') as HTMLElement;
+                    if (!inspectionElement) {
+                      toast.error('Inspection content not found');
+                      return;
+                    }
+                    
+                    try {
+                      // Create sanitized clone for print
+                      const printClone = await createSanitizedPdfClone(inspectionElement);
+                      
+                      // Hide original, show clone
+                      inspectionElement.style.display = 'none';
+                      inspectionElement.parentNode?.insertBefore(printClone, inspectionElement);
+                      
+                      // Wait for styles to apply
+                      await new Promise(r => setTimeout(r, 200));
+                      
+                      // Print
+                      window.print();
+                      
+                      // Cleanup after print dialog closes
+                      setTimeout(() => {
+                        inspectionElement.style.display = '';
+                        cleanupSanitizedClone(printClone);
+                      }, 1000);
+                    } catch (error: any) {
+                      console.error('Print failed:', error);
+                      toast.error('Print failed: ' + error.message);
+                    }
+                  }}
                   className="flex items-center gap-2"
                 >
                   <Printer className="h-4 w-4" />
