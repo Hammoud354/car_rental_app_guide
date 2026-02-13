@@ -645,6 +645,7 @@ export const appRouter = router({
           contractNumber,
           signatureData: input.signatureData || null,
           fuelLevel: input.fuelLevel || "Full",
+          pickupKm: input.pickupKm || null,
           // Insurance fields
           insurancePackage: input.insurancePackage,
           insuranceCost: input.insuranceCost,

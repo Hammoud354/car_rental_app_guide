@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, contractNumber, vehicleId, pickupKm, createdAt FROM rentalContracts ORDER BY id DESC LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, contractNumber, vehicleId, pickupKm, createdAt FROM rentalContracts ORDER BY id DESC LIMIT 1;",
+  "rows": [
+    {
+      "id": "60005",
+      "contractNumber": "CTR-003",
+      "vehicleId": "60031",
+      "pickupKm": "NULL",
+      "createdAt": "2026-02-13 21:58:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tcontractNumber\tvehicleId\tpickupKm\tcreatedAt\n60005\tCTR-003\t60031\tNULL\t2026-02-13 21:58:00\n",
+  "stderr": "",
+  "execution_time_ms": 1565
+}

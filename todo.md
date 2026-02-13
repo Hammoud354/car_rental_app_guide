@@ -3670,3 +3670,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fixed ReturnVehicleDialog to handle null/0 pickupKm gracefully with warning message
 - [x] Added validation to contract creation to require pickupKm > 0
 - [x] Return odometer now pre-fills correctly when pickupKm exists
+
+
+## Bug Fix - Warning Message Shows Incorrectly for Pickup Odometer
+- [x] Warning message "No pickup odometer was recorded" appears even when pickup odometer is entered
+- [x] Pickup odometer value shows automatically in the field but warning still appears
+- [x] Investigate why pickupKm value is not being recognized correctly in ReturnVehicleDialog
+- [x] Fix the condition that checks for valid pickupKm values
+- [x] **ROOT CAUSE**: Backend contract creation was NOT saving pickupKm to database
+- [x] Fixed by adding `pickupKm: input.pickupKm || null` to createRentalContract call
+- [x] Now new contracts will save pickup odometer correctly and return dialog will pre-fill
