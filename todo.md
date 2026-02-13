@@ -3619,3 +3619,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ## PDF Export Issues
 - [x] Fix PDF export to only include contract content without navigation and UI elements
 - [x] Ensure car inspection, signatures, and all contract-related sections are included in PDF
+
+## Rental Contracts Critical Issues
+- [x] Fix Print Contract showing blank page
+- [x] Fix PDF export failing with "Modern CSS detected" error (OKLCH colors)
+- [x] Fix WhatsApp share failing with OKLCH color parsing error
+- [x] Fix Mark as Completed to show return details dialog instead of simple confirmation

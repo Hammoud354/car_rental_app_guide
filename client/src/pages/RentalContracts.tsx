@@ -1107,10 +1107,9 @@ export default function RentalContracts() {
                             size="sm"
                             className="w-full"
                             onClick={() => {
-                              // Open return inspection dialog
-                              setSelectedContractForReturn(contract.id);
-                              setReturnKm(0);
-                              setReturnInspectionOpen(true);
+                              // Open full return vehicle dialog
+                              setSelectedContract(contract);
+                              setIsReturnDialogOpen(true);
                             }}
                           >
                             <Check className="mr-2 h-4 w-4" />

@@ -466,16 +466,14 @@
   aside,
   header:not(.print-content header),
   footer:not(.print-content footer),
-  button,
-  [role="button"],
+  button:not(.print-content button),
+  [role="button"]:not(.print-content [role="button"]),
   .sidebar,
   [data-sidebar],
   [class*="sidebar"],
   [class*="navigation"],
   [class*="nav-"],
-  [class*="menu"],
-  dialog:not([open]),
-  [role="dialog"]:not([data-state="open"]) {
+  [class*="menu"] {
     display: none !important;
   }
   
@@ -494,7 +492,7 @@
   }
   
   /* Ensure dialog content is visible when printing */
-  [role="dialog"][data-state="open"] {
+  [role="dialog"] {
     position: static !important;
     width: 100% !important;
     height: auto !important;
@@ -503,11 +501,21 @@
     border: none !important;
     box-shadow: none !important;
     background: white !important;
+    display: block !important;
   }
   
-  /* Hide dialog overlay */
-  [data-radix-dialog-overlay],
-  [role="dialog"] ~ div[data-radix-portal] {
+  /* Hide dialog overlay and portal wrapper */
+  [data-radix-dialog-overlay] {
+    display: none !important;
+  }
+  
+  /* Show dialog content */
+  [role="dialog"] * {
+    display: revert !important;
+  }
+  
+  /* But still hide buttons in dialog */
+  [role="dialog"] button {
     display: none !important;
   }
   
