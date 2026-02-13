@@ -3583,3 +3583,25 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ### Phase 3: Delivery
 - [x] Super admin vehicle creation fix complete and tested
 - [x] Ready to save checkpoint with super admin creation fix
+
+
+## Vehicle Creation SQL Error Fix
+
+### Phase 1: Investigation
+- [x] Check database schema for vehicles table
+- [x] Identify which fields are required vs optional (insuranceExpiryDate, registrationExpiryDate, nextMaintenanceDate are nullable)
+- [x] Review the SQL error message - Drizzle was trying to use `default` for nullable timestamp fields
+- [x] Root cause: MySQL doesn't allow `default` for nullable timestamp fields without explicit defaults
+
+### Phase 2: Fix Implementation
+- [x] Update vehicle creation logic to set null for optional timestamp fields
+- [x] Fix createVehicle function to explicitly set null instead of undefined
+- [x] Added null checks for insuranceExpiryDate, registrationExpiryDate, nextMaintenanceDate, nextMaintenanceKm
+
+### Phase 3: Testing
+- [ ] Test vehicle creation with minimal required fields
+- [ ] Test vehicle creation with all fields populated
+- [ ] Verify vehicle appears in fleet list after creation
+
+### Phase 4: Delivery
+- [ ] Save checkpoint with vehicle creation fix

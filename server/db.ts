@@ -180,10 +180,12 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (!db) {
     throw new Error("Database not available");
   }
-  // Filter out undefined values to prevent database errors
-  const cleanedVehicle = Object.fromEntries(
-    Object.entries(vehicle).filter(([_, value]) => value !== undefined)
-  ) as InsertVehicle;
+  // Set null for optional timestamp fields if not provided or empty string
+  const cleanedVehicle: any = { ...vehicle };
+  if (cleanedVehicle.insuranceExpiryDate === undefined || cleanedVehicle.insuranceExpiryDate === '') cleanedVehicle.insuranceExpiryDate = null;
+  if (cleanedVehicle.registrationExpiryDate === undefined || cleanedVehicle.registrationExpiryDate === '') cleanedVehicle.registrationExpiryDate = null;
+  if (cleanedVehicle.nextMaintenanceDate === undefined || cleanedVehicle.nextMaintenanceDate === '') cleanedVehicle.nextMaintenanceDate = null;
+  if (cleanedVehicle.nextMaintenanceKm === undefined || cleanedVehicle.nextMaintenanceKm === '') cleanedVehicle.nextMaintenanceKm = null;
   // Always set status to Available for new vehicles
   cleanedVehicle.status = "Available";
   const result = await db.insert(vehicles).values(cleanedVehicle);
