@@ -3607,3 +3607,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Save checkpoint with vehicle creation fix
 
 - [x] Fix Maintenance Tracking page to always show left sidebar navigation
+
+- [x] Remove breadcrumb navigation from Maintenance Tracking page

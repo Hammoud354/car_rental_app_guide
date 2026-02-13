@@ -77,16 +77,7 @@ export default function MaintenanceTracking() {
   return (
     <SidebarLayout>
       <div className="container mx-auto py-8 input-client">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 input-client">
-          <Link href="/">
-            <span className="hover:text-foreground cursor-pointer input-client">Overview</span>
-          </Link>
-          <ChevronRight className="h-4 w-4 input-client" />
-          <span className="text-foreground font-medium input-client">Maintenance Tracking</span>
-        </div>
-
-      <div className="mb-8 flex justify-between items-start input-client">
+        <div className="mb-8 flex justify-between items-start input-client">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2 input-client">
             <Wrench className="h-8 w-8 input-client" />
