@@ -3172,3 +3172,37 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test both functions in browser
 - [x] Verify PDF downloads correctly
 - [x] Verify print preview shows content
+
+
+## CRITICAL: Structural OKLCH Elimination from PDF Pipeline
+### Phase 1: Hard Root Cause Verification
+- [x] Add runtime logging to capture exact stack trace of PDF failure
+- [x] Log computed styles of failing element before export (getComputedStyle)
+- [x] Confirm whether computed values contain oklch()
+- [x] Determine if problem is at rendering stage or theme definition stage
+- [x] Created pdfExportDiagnostic.ts with comprehensive logging
+- [x] Updated RentalContracts.tsx to use diagnostic clone
+
+### Phase 2: Absolute Isolation
+- [ ] Create fully isolated PDF rendering environment
+- [ ] Clone DOM node and traverse every element
+- [ ] Read computed styles and convert all OKLCH to RGB/HEX
+- [ ] Strip all CSS variables from clone
+- [ ] Render PDF from sanitized clone only
+- [ ] Destroy clone after export
+
+### Phase 3: Tailwind & Theme Audit
+- [ ] Search entire project for oklch(, color-mix(, CSS variables
+- [ ] Audit Tailwind color palette for OKLCH generation
+- [ ] Audit :root color definitions
+- [ ] Redefine Tailwind colors manually in HEX if needed
+
+### Phase 4: PDF-Safe Mode
+- [ ] Implement pdf-safe-mode flag
+- [ ] Replace theme variables with HEX values in PDF mode
+- [ ] Remove hover styles, transitions, advanced CSS functions
+
+### Phase 5: Proof of Elimination
+- [ ] Console scan confirming ZERO oklch() in exported node
+- [ ] Test PDF export on Client Card, Contract Detail, Reports, Admin
+- [ ] Verify no OKLCH in any export scenario
