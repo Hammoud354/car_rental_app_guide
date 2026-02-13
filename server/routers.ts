@@ -121,6 +121,8 @@ export const appRouter = router({
       } as const;
     }),
     loginDemo: publicProcedure.mutation(async ({ ctx }) => {
+      const { seedDemoData } = await import('./seedDemoData');
+      
       // Find or create demo user
       let demoUser = await db.getUserByUsername('demo@system');
       
@@ -138,7 +140,8 @@ export const appRouter = router({
           country: 'Lebanon',
         });
         
-        // Populate demo data will be done in Phase 5
+        // Populate demo data for new demo user
+        await seedDemoData(demoUser.id);
       }
       
       // Create session cookie with 10-minute expiration
