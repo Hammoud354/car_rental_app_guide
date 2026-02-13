@@ -1686,5 +1686,56 @@ export const appRouter = router({
         };
       }),
   }),
+  // Admin-only user management
+  admin: router({
+    getAllUsers: superAdminProcedure.query(async ({ ctx }) => {
+      const users = await db.getAllUsers();
+      // Don't return passwords
+      return users.map(user => ({
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        country: user.country,
+        role: user.role,
+        createdAt: user.createdAt,
+      }));
+    }),
+    updateUserRole: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        role: z.enum(['admin', 'user']),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const updatedUser = await db.updateUserRole(input.userId, input.role, ctx.user.id);
+        return { success: true, user: updatedUser };
+      }),
+    updateUser: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        name: z.string(),
+        email: z.string().email(),
+        phone: z.string(),
+        country: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateUser(input.userId, {
+          name: input.name,
+          email: input.email,
+          phone: input.phone,
+          country: input.country,
+        });
+        return { success: true };
+      }),
+    deleteUser: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteUser(input.userId, ctx.user.id);
+        return { success: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

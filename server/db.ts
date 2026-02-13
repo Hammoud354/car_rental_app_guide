@@ -2352,3 +2352,28 @@ export async function deleteWhatsappTemplate(id: number) {
 
   return { success: true };
 }
+
+
+// ============================================================================
+// User Management Functions (Admin Only)
+// ============================================================================
+
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) throw new Error('Database not initialized');
+  
+  const allUsers = await db.select().from(users);
+  return allUsers;
+}
+
+export async function updateUser(userId: number, data: { name: string; email: string; phone: string; country: string }) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not initialized');
+  
+  await db
+    .update(users)
+    .set(data)
+    .where(eq(users.id, userId));
+  
+  return { success: true };
+}

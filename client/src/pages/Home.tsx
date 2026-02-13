@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   Car, FileText, Users, BarChart3, Wrench, DollarSign, 
-  Clock, Zap, Check, ArrowRight, MessageCircle,
-  LogIn, UserPlus, Sparkles
+  Clock, Check, ArrowRight, MessageCircle,
+  LogIn, UserPlus
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
@@ -105,13 +105,8 @@ export default function Home() {
       </nav>
 
       {/* Hero Section with Enhanced Fading Text */}
-      <section className="container py-16 md:py-20">
+      <section className="container py-10 md:py-12">
         <div className="mx-auto max-w-4xl text-center space-y-6">
-          <Badge variant="outline" className="px-3 py-1">
-            <Zap className="h-3 w-3 mr-1.5" />
-            Professional Fleet Management
-          </Badge>
-          
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-700">
             Car Rental
             <br />
@@ -152,7 +147,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="container py-12 md:py-16">
+      <section className="container py-8 md:py-10">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything You Need</h2>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -198,12 +193,12 @@ export default function Home() {
               className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4"
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              <CardHeader className="pb-3">
-                <feature.icon className="h-9 w-9 text-primary mb-2" />
-                <CardTitle className="text-lg">{feature.title}</CardTitle>
+              <CardHeader className="pb-2 pt-4">
+                <feature.icon className="h-8 w-8 text-primary mb-1.5" />
+                <CardTitle className="text-base">{feature.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription>{feature.description}</CardDescription>
+              <CardContent className="pb-4">
+                <CardDescription className="text-sm">{feature.description}</CardDescription>
               </CardContent>
             </Card>
           ))}
@@ -211,7 +206,7 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container py-12 md:py-16">
+      <section className="container py-8 md:py-10">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-3">Simple Pricing</h2>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -222,15 +217,15 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Starter Plan */}
           <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Starter</CardTitle>
-              <div className="mt-3">
-                <span className="text-3xl font-bold">$50</span>
+            <CardHeader className="pb-3 pt-5">
+              <CardTitle className="text-lg">Starter</CardTitle>
+              <div className="mt-2">
+                <span className="text-2xl font-bold">$50</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-1">For small agencies</CardDescription>
+              <CardDescription className="mt-0.5 text-sm">For small agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pb-5">
               <ul className="space-y-2.5">
                 {[
                   "Up to 15 vehicles",
@@ -256,15 +251,15 @@ export default function Home() {
           {/* Professional Plan */}
           <Card className="border-primary shadow-lg relative animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
             <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Most Popular</Badge>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Professional</CardTitle>
-              <div className="mt-3">
-                <span className="text-3xl font-bold">$70</span>
+            <CardHeader className="pb-3 pt-5">
+              <CardTitle className="text-lg">Professional</CardTitle>
+              <div className="mt-2">
+                <span className="text-2xl font-bold">$70</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-1">For growing agencies</CardDescription>
+              <CardDescription className="mt-0.5 text-sm">For growing agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pb-5">
               <ul className="space-y-2.5">
                 {[
                   "Up to 50 vehicles",
@@ -290,15 +285,15 @@ export default function Home() {
 
           {/* Enterprise Plan */}
           <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl">Enterprise</CardTitle>
-              <div className="mt-3">
-                <span className="text-3xl font-bold">$85</span>
+            <CardHeader className="pb-3 pt-5">
+              <CardTitle className="text-lg">Enterprise</CardTitle>
+              <div className="mt-2">
+                <span className="text-2xl font-bold">$85</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-1">For large agencies</CardDescription>
+              <CardDescription className="mt-0.5 text-sm">For large agencies</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 pb-5">
               <ul className="space-y-2.5">
                 {[
                   "Unlimited vehicles",
@@ -331,7 +326,6 @@ export default function Home() {
           <div className="relative px-6 py-12 md:py-16 text-center">
             <div className="mx-auto max-w-2xl space-y-6">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-2">
-                <Sparkles className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium text-primary">Start Your Journey</span>
               </div>
               

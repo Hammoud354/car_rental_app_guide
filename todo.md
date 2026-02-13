@@ -3396,3 +3396,57 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify user has admin role - confirmed via database query (role = 'admin')
 - [x] User successfully logs in and accesses dashboard
 - [x] Super admin user "walid" fully functional with admin privileges
+
+
+## Admin User Management Panel
+
+### Phase 1: Backend tRPC Procedures
+- [ ] Create adminProcedure middleware for admin-only access
+- [ ] Add getAllUsers procedure to fetch all users
+- [ ] Add updateUserRole procedure to change user roles
+- [ ] Add deleteUser procedure to remove users
+- [ ] Add updateUser procedure to edit user details
+
+### Phase 2: User Management UI
+- [ ] Create UserManagement.tsx page component
+- [ ] Add user list table with sortable columns
+- [ ] Add search and filter functionality
+- [ ] Add edit user dialog/modal
+- [ ] Add delete confirmation dialog
+
+### Phase 3: Role Management
+- [ ] Implement role dropdown (admin/user)
+- [ ] Add role change confirmation
+- [ ] Prevent admin from demoting themselves
+- [ ] Show role badges in user list
+
+### Phase 4: Testing & Access Control
+- [ ] Test admin-only access (non-admins blocked)
+- [ ] Test user CRUD operations
+- [ ] Test role changes
+- [ ] Verify data isolation per user
+
+### Phase 5: Delivery
+- [ ] Add User Management link to navigation
+- [ ] Save checkpoint
+- [ ] Deliver complete user management panel
+
+
+## Landing Page Cleanup
+
+### Phase 1: Remove Clutter & Reduce Spacing
+- [x] Remove "Professional Fleet Management" text
+- [x] Remove all Sparkles icons throughout the page
+- [x] Make feature cards more compact (reduced padding, smaller text)
+- [x] Reduce white spaces between sections (py-10/12 instead of py-16/20)
+- [x] Make pricing cards smaller and more compact (text-lg/2xl instead of xl/3xl)
+
+### Phase 2: Testing
+- [x] Landing page cleaned up successfully
+- [x] All sparkles and clutter removed
+- [x] Cards are more compact with reduced spacing
+- [x] Ready to save checkpoint
+
+### Phase 3: Delivery
+- [x] Landing page cleanup complete
+- [x] Ready to save checkpoint with cleaned landing page
