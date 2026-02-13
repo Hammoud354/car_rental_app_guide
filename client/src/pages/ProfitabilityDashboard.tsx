@@ -87,14 +87,7 @@ export default function ProfitabilityDashboard() {
             <FileSpreadsheet className="h-4 w-4" />
             Export to Excel
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => window.open('/api/trpc/export.profitabilityPDF', '_blank')}
-            className="flex items-center gap-2"
-          >
-            <FileText className="h-4 w-4" />
-            Export to PDF
-          </Button>
+
         </div>
       </div>
 

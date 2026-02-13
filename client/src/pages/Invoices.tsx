@@ -466,35 +466,6 @@ export default function Invoices() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 border-t pt-4">
-                  <Button onClick={handleExportPDF} className="flex-1 print:hidden">
-                    <Download className="w-4 h-4 mr-2" />
-                    Export PDF
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      // Print only the invoice content
-                      const printContent = document.getElementById('invoice-content');
-                      if (!printContent) return;
-                      
-                      const printWindow = window.open('', '', 'height=600,width=800');
-                      if (!printWindow) return;
-                      
-                      printWindow.document.write('<html><head><title>Invoice</title>');
-                      printWindow.document.write('<style>');
-                      printWindow.document.write('body { font-family: Arial, sans-serif; margin: 20px; color: black; }');
-                      printWindow.document.write('table { width: 100%; border-collapse: collapse; }');
-                      printWindow.document.write('th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }');
-                      printWindow.document.write('</style></head><body>');
-                      printWindow.document.write(printContent.innerHTML);
-                      printWindow.document.write('</body></html>');
-                      printWindow.document.close();
-                      printWindow.print();
-                    }} 
-                    variant="outline" 
-                    className="flex-1 print:hidden"
-                  >
-                    Print Invoice
-                  </Button>
                   <Button 
                     onClick={() => {
                       if (!invoiceDetails) {

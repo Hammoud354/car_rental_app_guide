@@ -3628,3 +3628,7 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 - [x] Fix Return Odometer to auto-populate with Pickup Odometer value when dialog opens
 - [x] Add real-time error message when Return Odometer is less than Pickup Odometer
+
+## Remove Non-Working Features
+- [x] Remove all Export PDF buttons and functionality from entire application
+- [x] Remove all Print buttons and functionality from entire application
