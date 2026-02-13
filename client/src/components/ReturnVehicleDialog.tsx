@@ -39,12 +39,33 @@ export function ReturnVehicleDialog({
   const [damageInspection, setDamageInspection] = useState<string>("");
   const [validationError, setValidationError] = useState<string>("");
   
-  // Auto-populate returnKm with pickupKm when dialog opens
+  // Auto-populate returnKm with pickupKm when dialog opens, and reset when closed
   useEffect(() => {
     if (open && pickupKm) {
       setReturnKm(pickupKm.toString());
+      setValidationError("");
+    } else if (!open) {
+      // Reset form when dialog closes
+      setReturnKm("");
+      setReturnFuelLevel("");
+      setReturnNotes("");
+      setDamageInspection("");
+      setValidationError("");
     }
   }, [open, pickupKm]);
+  
+  // Real-time validation for return odometer
+  useEffect(() => {
+    if (returnKm && pickupKm) {
+      const returnKmNum = parseInt(returnKm);
+      if (!isNaN(returnKmNum) && returnKmNum <= pickupKm) {
+        setValidationError(`Return odometer must be greater than pickup odometer (${pickupKm.toLocaleString()} km)`);
+      } else if (validationError && validationError.includes("Return odometer")) {
+        // Clear validation error if it was about odometer and now it's valid
+        setValidationError("");
+      }
+    }
+  }, [returnKm, pickupKm]);
   
   // Calculate over-limit KM fee
   const calculateOverLimitFee = () => {

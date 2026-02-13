@@ -3626,4 +3626,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix WhatsApp share failing with OKLCH color parsing error
 - [x] Fix Mark as Completed to show return details dialog instead of simple confirmation
 
-- [x] Fix Return Odometer validation to prevent values less than Pickup Odometer and set minimum to Pickup Odometer
+- [x] Fix Return Odometer to auto-populate with Pickup Odometer value when dialog opens
+- [x] Add real-time error message when Return Odometer is less than Pickup Odometer
