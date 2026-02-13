@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { 
   Car, FileText, Users, BarChart3, Wrench, DollarSign, 
-  Clock, Shield, Zap, Check, ArrowRight, MessageCircle,
-  LogIn, UserPlus
+  Clock, Zap, Check, ArrowRight, MessageCircle,
+  LogIn, UserPlus, Sparkles
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
@@ -14,6 +14,7 @@ export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(true);
   
   const fadingTexts = [
     "Streamline your rental operations with ease",
@@ -22,10 +23,14 @@ export default function Home() {
     "Built for agencies who demand efficiency and control"
   ];
 
-  // Fading text animation
+  // Enhanced fading text animation with smooth transitions
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTextIndex((prev) => (prev + 1) % fadingTexts.length);
+      setIsAnimating(false);
+      setTimeout(() => {
+        setCurrentTextIndex((prev) => (prev + 1) % fadingTexts.length);
+        setIsAnimating(true);
+      }, 500);
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -75,120 +80,130 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-b from-background to-gray-50">
       {/* Navigation */}
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-14 items-center justify-between">
           <div className="flex items-center gap-2">
-            <Car className="h-6 w-6 text-primary" />
-            <span className="font-semibold text-lg">Car Rental Management System</span>
+            <Car className="h-5 w-5 text-primary" />
+            <span className="font-semibold">Car Rental Management</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={handleContactUs}>
-              <MessageCircle className="h-4 w-4 mr-2" />
-              Contact Us
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={handleContactUs}>
+              <MessageCircle className="h-4 w-4 mr-1.5" />
+              Contact
             </Button>
             <Link href="/login">
-              <Button variant="outline">
-                <LogIn className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="sm">
+                <LogIn className="h-4 w-4 mr-1.5" />
                 Sign In
               </Button>
             </Link>
-            <Button onClick={handleSignUp}>
-              <UserPlus className="h-4 w-4 mr-2" />
+            <Button size="sm" onClick={handleSignUp}>
+              <UserPlus className="h-4 w-4 mr-1.5" />
               Sign Up
             </Button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section with Fading Text */}
-      <section className="container py-24 md:py-32">
-        <div className="mx-auto max-w-4xl text-center space-y-8">
-          <Badge variant="outline" className="px-4 py-1.5">
+      {/* Hero Section with Enhanced Fading Text */}
+      <section className="container py-16 md:py-20">
+        <div className="mx-auto max-w-4xl text-center space-y-6">
+          <Badge variant="outline" className="px-3 py-1">
             <Zap className="h-3 w-3 mr-1.5" />
-            Professional Fleet Management Software
+            Professional Fleet Management
           </Badge>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-700">
             Car Rental
             <br />
             <span className="text-primary">Management System</span>
           </h1>
           
-          {/* Fading Text Animation */}
-          <div className="h-16 flex items-center justify-center">
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl transition-opacity duration-1000 animate-in fade-in">
+          {/* Enhanced Fading Text Animation */}
+          <div className="h-20 flex items-center justify-center">
+            <p 
+              className={`text-lg md:text-xl text-muted-foreground max-w-2xl transition-all duration-700 ${
+                isAnimating 
+                  ? 'opacity-100 translate-y-0 scale-100' 
+                  : 'opacity-0 translate-y-4 scale-95'
+              }`}
+            >
               {fadingTexts[currentTextIndex]}
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
             <Link href="/demo">
-              <Button size="lg" className="text-lg px-8">
+              <Button size="lg" className="text-base px-6 group">
                 See Demo
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="text-lg px-8" onClick={handleContactUs}>
-              <MessageCircle className="mr-2 h-5 w-5" />
+            <Button size="lg" variant="outline" className="text-base px-6" onClick={handleContactUs}>
+              <MessageCircle className="mr-2 h-4 w-4" />
               Contact Us
             </Button>
           </div>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-500">
             <Clock className="inline h-4 w-4 mr-1" />
-            Try our 10-minute demo with full access to dummy data
+            Try our 10-minute demo with full access
           </p>
         </div>
       </section>
 
       {/* Features Grid */}
-      <section className="container py-16 md:py-24">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need to Manage Your Fleet</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive tools designed specifically for car rental agencies
+      <section className="container py-12 md:py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything You Need</h2>
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            Comprehensive tools designed for car rental agencies
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             {
               icon: Car,
               title: "Fleet Management",
-              description: "Track all your vehicles, availability, and maintenance schedules in one centralized dashboard"
+              description: "Track all vehicles, availability, and maintenance schedules in one place"
             },
             {
               icon: FileText,
               title: "Contract Management",
-              description: "Create, modify, and track rental contracts with automated reminders and expiry notifications"
+              description: "Create and track rental contracts with automated notifications"
             },
             {
               icon: Users,
               title: "Client Database",
-              description: "Maintain comprehensive client records with rental history and contact information"
+              description: "Maintain comprehensive client records with rental history"
             },
             {
               icon: DollarSign,
               title: "P&L Analysis",
-              description: "Track profitability per vehicle with detailed revenue, costs, and maintenance expenses"
+              description: "Track profitability per vehicle with detailed revenue and costs"
             },
             {
               icon: BarChart3,
               title: "Analytics & Insights",
-              description: "Real-time dashboards showing utilization rates, revenue trends, and performance metrics"
+              description: "Real-time dashboards showing utilization and revenue trends"
             },
             {
               icon: Wrench,
               title: "Maintenance Tracking",
-              description: "Log repairs, schedule maintenance, and track costs to keep your fleet in top condition"
+              description: "Log repairs, schedule maintenance, and track costs"
             }
           ].map((feature, i) => (
-            <Card key={i} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <feature.icon className="h-10 w-10 text-primary mb-2" />
-                <CardTitle>{feature.title}</CardTitle>
+            <Card 
+              key={i} 
+              className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4"
+              style={{ animationDelay: `${i * 100}ms` }}
+            >
+              <CardHeader className="pb-3">
+                <feature.icon className="h-9 w-9 text-primary mb-2" />
+                <CardTitle className="text-lg">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">{feature.description}</CardDescription>
+                <CardDescription>{feature.description}</CardDescription>
               </CardContent>
             </Card>
           ))}
@@ -196,27 +211,27 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="container py-16 md:py-24 bg-gray-50">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your business size and needs
+      <section className="container py-12 md:py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Simple Pricing</h2>
+          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+            Choose the plan that fits your business
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Starter Plan */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Starter</CardTitle>
-              <div className="mt-4">
-                <span className="text-4xl font-bold">$50</span>
+          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Starter</CardTitle>
+              <div className="mt-3">
+                <span className="text-3xl font-bold">$50</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-2">Perfect for small agencies</CardDescription>
+              <CardDescription className="mt-1">For small agencies</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {[
                   "Up to 15 vehicles",
                   "Unlimited contracts",
@@ -226,8 +241,8 @@ export default function Home() {
                   "WhatsApp integration",
                   "Email support (48h)"
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -239,18 +254,18 @@ export default function Home() {
           </Card>
 
           {/* Professional Plan */}
-          <Card className="border-primary shadow-lg relative">
-            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">Most Popular</Badge>
-            <CardHeader>
-              <CardTitle className="text-2xl">Professional</CardTitle>
-              <div className="mt-4">
-                <span className="text-4xl font-bold">$70</span>
+          <Card className="border-primary shadow-lg relative animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Most Popular</Badge>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Professional</CardTitle>
+              <div className="mt-3">
+                <span className="text-3xl font-bold">$70</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-2">Ideal for growing agencies</CardDescription>
+              <CardDescription className="mt-1">For growing agencies</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {[
                   "Up to 50 vehicles",
                   "Unlimited clients",
@@ -261,8 +276,8 @@ export default function Home() {
                   "Excel export",
                   "Priority support (24h)"
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -274,90 +289,88 @@ export default function Home() {
           </Card>
 
           {/* Enterprise Plan */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Enterprise</CardTitle>
-              <div className="mt-4">
-                <span className="text-4xl font-bold">$85</span>
+          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl">Enterprise</CardTitle>
+              <div className="mt-3">
+                <span className="text-3xl font-bold">$85</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="mt-2">For established agencies</CardDescription>
+              <CardDescription className="mt-1">For large agencies</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {[
                   "Unlimited vehicles",
-                  "Custom branding",
-                  "Multi-location support",
-                  "API access",
+                  "Unlimited clients",
+                  "Multi-user access",
                   "Custom reports",
-                  "WhatsApp automation",
-                  "Phone support",
-                  "Onboarding call"
+                  "API access",
+                  "White-label option",
+                  "Dedicated account manager",
+                  "24/7 priority support"
                 ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
-              <Button className="w-full" variant="outline" onClick={handleSignUp}>
+              <Button className="w-full" onClick={handleSignUp}>
                 Get Started
               </Button>
             </CardContent>
           </Card>
         </div>
-
-        <p className="text-center mt-8 text-muted-foreground">
-          All plans include a 7-day free trial. No credit card required.
-        </p>
       </section>
 
-      {/* CTA Section */}
-      <section className="container py-16 md:py-24">
-        <Card className="bg-primary text-primary-foreground">
-          <CardContent className="p-12 text-center space-y-6">
-            <h2 className="text-3xl md:text-4xl font-bold">Ready to Transform Your Operations?</h2>
-            <p className="text-lg opacity-90 max-w-2xl mx-auto">
-              Join agencies worldwide who trust our system to manage their fleet efficiently
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Link href="/demo">
-                <Button size="lg" variant="secondary" className="text-lg px-8">
-                  Try 10-Minute Demo
+      {/* Redesigned CTA Section */}
+      <section className="container py-16 md:py-20">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20">
+          <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+          <div className="relative px-6 py-12 md:py-16 text-center">
+            <div className="mx-auto max-w-2xl space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium text-primary">Start Your Journey</span>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-bold">
+                Ready to Transform Your
+                <br />
+                <span className="text-primary">Rental Operations?</span>
+              </h2>
+              
+              <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
+                Join agencies worldwide who trust our platform to streamline their operations and boost profitability
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                <Link href="/demo">
+                  <Button size="lg" className="text-base px-8 group">
+                    Try Demo Now
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Button size="lg" variant="outline" className="text-base px-8" onClick={handleContactUs}>
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  Talk to Us
                 </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent border-white text-white hover:bg-white/10" onClick={handleContactUs}>
-                Talk to Us
-              </Button>
+              </div>
+              
+              <p className="text-sm text-muted-foreground">
+                No credit card required • 10-minute demo • Full feature access
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-background">
-        <div className="container py-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Car className="h-5 w-5 text-primary" />
-              <span className="font-semibold">Car Rental Management System</span>
-            </div>
-            <div className="flex gap-6 text-sm text-muted-foreground">
-              <button onClick={handleContactUs} className="hover:text-foreground transition-colors">
-                Contact Us
-              </button>
-              <Link href="/login" className="hover:text-foreground transition-colors">
-                Sign In
-              </Link>
-              <button onClick={handleSignUp} className="hover:text-foreground transition-colors">
-                Sign Up
-              </button>
-            </div>
-          </div>
-          <div className="text-center mt-6 text-sm text-muted-foreground">
-            © 2026 Car Rental Management System. All rights reserved.
-          </div>
+      <footer className="border-t bg-background py-8">
+        <div className="container text-center text-sm text-muted-foreground">
+          <p>© 2026 Car Rental Management System. All rights reserved.</p>
+          <p className="mt-2">Built for agencies who demand efficiency and control.</p>
         </div>
       </footer>
     </div>
