@@ -3162,3 +3162,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify layout integrity preserved
 - [x] Verify theme consistency int### Phase 6: Deliver comprehensive fix
 - [x] Document the architectural solution
+
+## CRITICAL: Fix View Contract Export and Print
+- [x] Investigate View Contract page export/print implementations
+- [x] Identify which component handles the View Contract page (RentalContracts.tsx Contract Details Dialog)
+- [x] Fix Export to PDF button (already has createPdfSafeClone fix)
+- [x] Fix Print button (added RGB color overrides to @media print CSS)
+- [x] Enhanced pdfExportSafe.ts to explicitly set all computed color values
+- [x] Test both functions in browser
+- [x] Verify PDF downloads correctly
+- [x] Verify print preview shows content

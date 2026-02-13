@@ -125,12 +125,20 @@ const COLOR_PROPERTIES = [
 function sanitizeElement(element: HTMLElement): void {
   const computedStyle = window.getComputedStyle(element);
 
+  // Build a list of all styles that need to be set
+  const stylesToSet: Array<{prop: string, value: string}> = [];
+
   // Convert each color property
   for (const prop of COLOR_PROPERTIES) {
     const value = computedStyle.getPropertyValue(prop);
-    if (value && value.includes('oklch(')) {
-      const safeValue = convertColorToSafe(value);
-      element.style.setProperty(prop, safeValue, 'important');
+    if (value) {
+      if (value.includes('oklch(')) {
+        const safeValue = convertColorToSafe(value);
+        stylesToSet.push({prop, value: safeValue});
+      } else {
+        // Even if not OKLCH, explicitly set the computed value to prevent inheritance
+        stylesToSet.push({prop, value});
+      }
     }
   }
 
@@ -141,9 +149,14 @@ function sanitizeElement(element: HTMLElement): void {
       const value = computedStyle.getPropertyValue(propName);
       if (value && value.includes('oklch(')) {
         const safeValue = convertColorToSafe(value);
-        element.style.setProperty(propName, safeValue, 'important');
+        stylesToSet.push({prop: propName, value: safeValue});
       }
     }
+  }
+
+  // Apply all styles as inline styles with !important
+  for (const {prop, value} of stylesToSet) {
+    element.style.setProperty(prop, value, 'important');
   }
 }
 

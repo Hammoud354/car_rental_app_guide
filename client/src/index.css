@@ -282,6 +282,29 @@
 }
 
 @media print {
+  /* Override OKLCH colors with RGB/HEX for print compatibility */
+  :root {
+    --background: #fcfcfc !important;
+    --foreground: #000000 !important;
+    --card: #ffffff !important;
+    --card-foreground: #000000 !important;
+    --popover: #ffffff !important;
+    --popover-foreground: #000000 !important;
+    --primary: #1a1a1a !important;
+    --primary-foreground: #fafafa !important;
+    --secondary: #f5f5f5 !important;
+    --secondary-foreground: #1a1a1a !important;
+    --muted: #f5f5f5 !important;
+    --muted-foreground: #737373 !important;
+    --accent: #f5f5f5 !important;
+    --accent-foreground: #1a1a1a !important;
+    --destructive: #ef4444 !important;
+    --destructive-foreground: #fafafa !important;
+    --border: #e5e5e5 !important;
+    --input: #e5e5e5 !important;
+    --ring: #1a1a1a !important;
+  }
+  
   /* Hide sidebar navigation and non-printable elements */
   nav,
   aside,
