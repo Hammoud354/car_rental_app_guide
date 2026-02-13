@@ -1686,5 +1686,94 @@ export const appRouter = router({
         };
       }),
   }),
+
+  bulkImport: router({
+    importVehicles: protectedProcedure
+      .input(z.object({
+        vehicles: z.array(z.object({
+          brand: z.string(),
+          model: z.string(),
+          year: z.string(),
+          licensePlate: z.string(),
+          vin: z.string().optional(),
+          color: z.string().optional(),
+          mileage: z.string().optional(),
+          category: z.string().optional(),
+          status: z.string().optional(),
+          dailyRate: z.string().optional(),
+          purchaseCost: z.string().optional(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user.id;
+        const results = [];
+        
+        for (const vehicle of input.vehicles) {
+          try {
+            const created = await db.createVehicle({
+              userId,
+              brand: vehicle.brand,
+              model: vehicle.model,
+              year: parseInt(vehicle.year),
+              plateNumber: vehicle.licensePlate,
+              vin: vehicle.vin || '',
+              color: vehicle.color || 'White',
+              mileage: vehicle.mileage ? parseInt(vehicle.mileage) : 0,
+              category: (vehicle.category as any) || 'Midsize',
+              status: (vehicle.status as any) || 'Available',
+              dailyRate: vehicle.dailyRate || '0',
+              purchaseCost: vehicle.purchaseCost || '0',
+            });
+            results.push({ success: true, licensePlate: vehicle.licensePlate });
+          } catch (error: any) {
+            results.push({ success: false, licensePlate: vehicle.licensePlate, error: error.message });
+          }
+        }
+        
+        return { results };
+      }),
+    
+    importClients: protectedProcedure
+      .input(z.object({
+        clients: z.array(z.object({
+          name: z.string(),
+          email: z.string().optional(),
+          phone: z.string().optional(),
+          drivingLicenseNumber: z.string().optional(),
+          nationality: z.string().optional(),
+          address: z.string().optional(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user.id;
+        const results = [];
+        
+        for (const client of input.clients) {
+          try {
+            // Split name into first and last
+            const nameParts = client.name.trim().split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            
+            const created = await db.createClient({
+              userId,
+              firstName,
+              lastName,
+              email: client.email,
+              phone: client.phone,
+              drivingLicenseNumber: client.drivingLicenseNumber || 'N/A',
+              licenseExpiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+              nationality: client.nationality,
+              address: client.address,
+            });
+            results.push({ success: true, name: client.name });
+          } catch (error: any) {
+            results.push({ success: false, name: client.name, error: error.message });
+          }
+        }
+        
+        return { results };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

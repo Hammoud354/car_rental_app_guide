@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload } from "lucide-react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { SearchableSelect } from "@/components/SearchableSelect";
+import { BulkImportDialog } from "@/components/BulkImportDialog";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
@@ -28,6 +29,7 @@ export default function FleetManagement() {
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -310,6 +312,11 @@ export default function FleetManagement() {
                 Maintenance Tracking
               </Button>
             </Link>
+            
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Bulk Import
+            </Button>
             
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
               setIsAddDialogOpen(open);
@@ -992,6 +999,21 @@ export default function FleetManagement() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        type="vehicles"
+        onImport={async (vehicles) => {
+          const result = await utils.client.bulkImport.importVehicles.mutate({ vehicles });
+          if (result.results.some(r => r.success)) {
+            await utils.fleet.list.invalidate();
+            toast.success(`Imported ${result.results.filter(r => r.success).length} vehicles`);
+          }
+          return result;
+        }}
+      />
     </SidebarLayout>
   );
 }

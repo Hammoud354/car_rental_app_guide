@@ -3529,3 +3529,39 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test user working correctly
 - [x] Ready to save checkpoint with test user
 - [x] Ready to deliver test user credentials
+
+
+## Priority Features Implementation
+
+### Phase 1: Bulk Data Import (CSV/Excel)
+- [x] Create CSV parser utility for vehicle data
+- [x] Create CSV parser utility for client data
+- [x] Create BulkImportDialog component
+- [x] Add tRPC procedures for bulk import
+- [x] Integrate import button on Fleet page
+- [x] Integrate import button on Clients page
+- [x] Bulk import feature complete and ready for testing
+
+### Phase 2: Data Export (CSV/Excel)
+- [ ] Add export button to Fleet page
+- [ ] Add export button to Clients page
+- [ ] Add export button to Contracts page
+- [ ] Implement CSV generation for vehicles
+- [ ] Implement CSV generation for clients
+- [ ] Implement CSV generation for contracts
+- [ ] Test export functionality
+
+### Phase 3: Mobile-Responsive Design
+- [ ] Optimize dashboard layout for mobile (< 768px)
+- [ ] Make navigation sidebar collapsible on mobile
+- [ ] Ensure all tables are scrollable/responsive on mobile
+- [ ] Optimize forms for touch input
+- [ ] Test on multiple mobile screen sizes
+- [ ] Add hamburger menu for mobile navigation
+
+### Phase 4: Testing & Delivery
+- [ ] Test all features end-to-end
+- [ ] Verify mobile responsiveness
+- [ ] Test import/export with real data
+- [ ] Save final checkpoint
+- [ ] Deliver complete feature set

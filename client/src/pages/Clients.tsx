@@ -9,13 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle, Upload } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
+import { BulkImportDialog } from "@/components/BulkImportDialog";
 
 // Helper function to check license expiry status
 const getLicenseExpiryStatus = (expiryDate: Date | string) => {
@@ -40,6 +41,7 @@ export default function Clients() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isContractsDialogOpen, setIsContractsDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -192,8 +194,13 @@ export default function Clients() {
             <h2 className="text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
             <p className="text-gray-600">Manage customer information and rental history</p>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Bulk Import
+            </Button>
+            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+              <DialogTrigger asChild>
               <Button className="bg-gray-900 hover:bg-gray-800 text-white">
                 <Plus className="mr-2 h-4 w-4" />
                 New Client
@@ -321,6 +328,7 @@ export default function Clients() {
               </form>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -812,6 +820,21 @@ export default function Clients() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      
+      {/* Bulk Import Dialog */}
+      <BulkImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        type="clients"
+        onImport={async (clients) => {
+          const result = await utils.client.bulkImport.importClients.mutate({ clients });
+          if (result.results.some(r => r.success)) {
+            await utils.clients.list.invalidate();
+            toast.success(`Imported ${result.results.filter(r => r.success).length} clients`);
+          }
+          return result;
+        }}
+      />
     </SidebarLayout>
   );
 }
