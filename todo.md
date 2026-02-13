@@ -3648,3 +3648,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] When a contract is deleted, the associated vehicle should automatically return to "Available" status
 - [x] Implement vehicle status update in contract deletion procedure
 - [x] Test that deleting a contract returns vehicle to Available status
+
+
+## Bug Fix - Vehicle Still Shows Rented After Contract Deletion
+- [x] BMW X5 contract was deleted but vehicle still shows as "Rented" in Fleet Management
+- [x] Vehicle also shows as "Rented" when creating new contracts
+- [x] Investigate why the deleteRentalContract fix isn't working
+- [x] Check if vehicle status is being calculated dynamically instead of from database
+- [x] Fix the issue so vehicles immediately show as Available after contract deletion
+- [x] Implemented dynamic status calculation in getAllVehicles() function
+- [x] Vehicles now automatically show correct status based on active contracts
+- [x] Tested in both Fleet Management and Contract Creation - working perfectly

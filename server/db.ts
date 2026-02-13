@@ -112,7 +112,8 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
   const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
   const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, targetUserId));
   
-  // Calculate total maintenance cost for each vehicle
+  // Calculate total maintenance cost and effective status for each vehicle
+  const now = new Date();
   const vehiclesWithCosts = await Promise.all(
     allVehicles.map(async (vehicle) => {
       const records = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.vehicleId, vehicle.id));
@@ -120,8 +121,36 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
         const cost = record.cost ? parseFloat(record.cost.toString()) : 0;
         return sum + cost;
       }, 0);
+      
+      // Check if vehicle has any active contracts
+      const activeContracts = await db.select()
+        .from(rentalContracts)
+        .where(
+          and(
+            eq(rentalContracts.vehicleId, vehicle.id),
+            or(
+              eq(rentalContracts.status, 'active'),
+              eq(rentalContracts.status, 'overdue')
+            ),
+            lte(rentalContracts.rentalStartDate, now),
+            gte(rentalContracts.rentalEndDate, now)
+          )
+        );
+      
+      // Calculate effective status:
+      // - If Maintenance or Out of Service, keep that status (takes priority)
+      // - If has active contracts, show as Rented
+      // - Otherwise, show as Available
+      let effectiveStatus = vehicle.status;
+      if (vehicle.status === 'Available' && activeContracts.length > 0) {
+        effectiveStatus = 'Rented';
+      } else if (vehicle.status === 'Rented' && activeContracts.length === 0) {
+        effectiveStatus = 'Available';
+      }
+      
       return {
         ...vehicle,
+        status: effectiveStatus,
         totalMaintenanceCost: totalMaintenanceCost.toFixed(2)
       };
     })
