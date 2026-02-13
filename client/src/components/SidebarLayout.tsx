@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   Building2, BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -92,6 +92,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         { href: "/reservations", label: "Reservations", icon: CalendarDays },
         { href: "/rental-contracts", label: "Contracts", icon: FileText },
         { href: "/maintenance", label: "Maintenance", icon: Wrench },
+        { href: "/ai-maintenance", label: "AI Maintenance", icon: Sparkles },
       ],
     },
     {

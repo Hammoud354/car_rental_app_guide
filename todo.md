@@ -3700,18 +3700,21 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [x] Added maintenanceTasks table to schema
   - [x] Created database helper functions in db.ts
   - [x] Added tRPC procedures in routers.ts
-- [ ] Build maintenance task management system:
+- [x] Build maintenance task management system:
   - [x] Backend API complete (tRPC procedures)
-  - [ ] Display AI-generated tasks with priority badges
-  - [ ] Allow users to override/customize any recommendation
-  - [ ] Smart alerts based on mileage/time triggers
-  - [ ] Track completed vs pending tasks
-  - [ ] Show cost estimates for each task
-- [ ] Create maintenance dashboard:
-  - [ ] Upcoming maintenance timeline view
-  - [ ] Overdue tasks with escalating priority
-  - [ ] Per-vehicle maintenance history
-  - [ ] Cost tracking and budget forecasting
+  - [x] Display AI-generated tasks with priority badges
+  - [x] Allow users to override/customize any recommendation
+  - [x] Smart alerts based on mileage/time triggers
+  - [x] Track completed vs pending tasks
+  - [x] Show cost estimates for each task
+- [x] Create maintenance dashboard:
+  - [x] Upcoming maintenance timeline view (Overview tab)
+  - [x] Overdue tasks with escalating priority (Status badges)
+  - [x] Per-vehicle maintenance history (By Vehicle tab)
+  - [x] Cost tracking and budget forecasting (Task estimates)
+  - [x] Created dedicated AI Maintenance page with 3 tabs
+  - [x] Added to App routing and sidebar navigation
+  - [x] Comprehensive UI with priority badges, status tracking, override functionality
 - [ ] Implement predictive maintenance features:
   - [ ] AI learns from usage patterns to refine schedules
   - [ ] Seasonal adjustments (winter/summer maintenance)

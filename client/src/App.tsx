@@ -35,6 +35,7 @@ import UserManagement from "./pages/UserManagement";
 import ProfitLoss from "./pages/ProfitLoss";
 import Demo from "./pages/Demo";
 import Home from "./pages/Home";
+import AIMaintenance from "./pages/AIMaintenance";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/profit-loss" component={ProfitLoss} />
       <Route path="/maintenance" component={Maintenance} />
       <Route path="/maintenance-tracking" component={MaintenanceTracking} />
+      <Route path="/ai-maintenance" component={AIMaintenance} />
       <Route path="/fleet" component={Fleet} />
       <Route path="/fleet-management" component={FleetManagement} />
       <Route path="/vehicle/:id" component={VehicleDetails} />
