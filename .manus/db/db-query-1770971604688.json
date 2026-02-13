@@ -1,0 +1,115 @@
+{
+  "query": "SELECT v.id, v.brand, v.model, v.userId, u.username \nFROM vehicles v \nLEFT JOIN users u ON v.userId = u.id \nLIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT v.id, v.brand, v.model, v.userId, u.username \nFROM vehicles v \nLEFT JOIN users u ON v.userId = u.id \nLIMIT 15;",
+  "rows": [
+    {
+      "id": "1",
+      "brand": "Toyota",
+      "model": "Corolla",
+      "userId": "840001",
+      "username": "oauth_5HANethK6yyJBGGbZaNzUd"
+    },
+    {
+      "id": "2",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840262",
+      "username": "testuser-1770927806677"
+    },
+    {
+      "id": "3",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840263",
+      "username": "testuser-1770927809543"
+    },
+    {
+      "id": "4",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840264",
+      "username": "testuser-1770927811167"
+    },
+    {
+      "id": "5",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840266",
+      "username": "testuser-1770927814198"
+    },
+    {
+      "id": "6",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840270",
+      "username": "testuser-1770927833782"
+    },
+    {
+      "id": "7",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840273",
+      "username": "testuser-1770927836460"
+    },
+    {
+      "id": "8",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840275",
+      "username": "testuser-1770927837973"
+    },
+    {
+      "id": "9",
+      "brand": "Honda",
+      "model": "Civic",
+      "userId": "840278",
+      "username": "nophone-1770927839489"
+    },
+    {
+      "id": "10",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840281",
+      "username": "testuser-1770927841004"
+    },
+    {
+      "id": "11",
+      "brand": "Ford",
+      "model": "Focus",
+      "userId": "840282",
+      "username": "noalerts-1770927842517"
+    },
+    {
+      "id": "12",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840288",
+      "username": "testuser-1770927879304"
+    },
+    {
+      "id": "13",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840289",
+      "username": "testuser-1770927882258"
+    },
+    {
+      "id": "14",
+      "brand": "Toyota",
+      "model": "Camry",
+      "userId": "840290",
+      "username": "testuser-1770927884458"
+    },
+    {
+      "id": "15",
+      "brand": "Honda",
+      "model": "Civic",
+      "userId": "840291",
+      "username": "nophone-1770927886131"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tbrand\tmodel\tuserId\tusername\n1\tToyota\tCorolla\t840001\toauth_5HANethK6yyJBGGbZaNzUd\n2\tToyota\tCamry\t840262\ttestuser-1770927806677\n3\tToyota\tCamry\t840263\ttestuser-1770927809543\n4\tToyota\tCamry\t840264\ttestuser-1770927811167\n5\tToyota\tCamry\t840266\ttestuser-1770927814198\n6\tToyota\tCamry\t840270\ttestuser-1770927833782\n7\tToyota\tCamry\t840273\ttestuser-1770927836460\n8\tToyota\tCamry\t840275\ttestuser-1770927837973\n9\tHonda\tCivic\t840278\tnophone-1770927839489\n10\tToyota\tCamry\t840281\ttestuser-1770927841004\n11\tFord\tFocus\t840282\tnoalerts-1770927842517\n12\tToyota\tCamry\t840288\ttestuser-1770927879304\n13\tToyota\tCamry\t840289\ttestuser-1770927882258\n14\tToyota\tCamry\t840290\ttestuser-1770927884458\n15\tHonda\tCivic\t840291\tnophone-1770927886131\n",
+  "stderr": "",
+  "execution_time_ms": 1722
+}

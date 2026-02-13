@@ -107,19 +107,10 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
     return [];
   }
   
-  // Super Admin can see all vehicles or filter by specific user
-  const isAdmin = await isSuperAdmin(userId);
-  let allVehicles;
-  
-  if (isAdmin) {
-    // Super Admin: if filterUserId is provided, show only that user's data; otherwise show all
-    allVehicles = filterUserId 
-      ? await db.select().from(vehicles).where(eq(vehicles.userId, filterUserId))
-      : await db.select().from(vehicles);
-  } else {
-    // Regular user: always show only their own data
-    allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
-  }
+  // All users (including super admin) see only their own data by default
+  // Super Admin can optionally filter by specific user in admin panel
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, targetUserId));
   
   // Calculate total maintenance cost for each vehicle
   const vehiclesWithCosts = await Promise.all(
@@ -146,17 +137,9 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
     return [];
   }
   
-  // Get all vehicles first
-  const isAdmin = await isSuperAdmin(userId);
-  let allVehicles;
-  
-  if (isAdmin) {
-    allVehicles = filterUserId 
-      ? await db.select().from(vehicles).where(eq(vehicles.userId, filterUserId))
-      : await db.select().from(vehicles);
-  } else {
-    allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, userId));
-  }
+  // Get all vehicles first - all users see only their own data by default
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, targetUserId));
   
   // Filter out vehicles with active contracts (status = 'Active')
   const availableVehicles = await Promise.all(
@@ -186,13 +169,8 @@ export async function getVehicleById(id: number, userId: number) {
     return undefined;
   }
   
-  // Check if user is Super Admin
-  const isAdmin = await isSuperAdmin(userId);
-  
-  // Super Admin can view any vehicle, regular users only their own
-  const result = isAdmin
-    ? await db.select().from(vehicles).where(eq(vehicles.id, id)).limit(1)
-    : await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
+  // All users (including super admin) can only view their own vehicles
+  const result = await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
   
   return result.length > 0 ? result[0] : undefined;
 }
@@ -231,15 +209,8 @@ export async function deleteVehicle(id: number, userId: number) {
     throw new Error("Database not available");
   }
   
-  // Check if user is Super Admin
-  const isAdmin = await isSuperAdmin(userId);
-  
-  // Super Admin can delete any vehicle, regular users only their own
-  if (isAdmin) {
-    await db.delete(vehicles).where(eq(vehicles.id, id));
-  } else {
-    await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
-  }
+  // All users (including super admin) can only delete their own vehicles
+  await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
 }
 
 // Maintenance Records Queries
@@ -273,15 +244,9 @@ export async function getAllRentalContracts(userId: number, filterUserId?: numbe
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  // Super Admin can see all contracts or filter by specific user
-  const isAdmin = await isSuperAdmin(userId);
-  
-  if (isAdmin) {
-    return filterUserId
-      ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, filterUserId))
-      : await db.select().from(rentalContracts);
-  }
-  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
+  // All users (including super admin) see only their own contracts by default
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId));
 }
 
 export async function getRentalContractById(id: number, userId: number) {
@@ -350,21 +315,14 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  // Super Admin can see all contracts, regular users only see their own
-  const isAdmin = await isSuperAdmin(userId);
-  
-  // Determine which userId to filter by
-  const targetUserId = filterUserId || userId;
+  // All users (including super admin) see only their own contracts by default
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
   
   if (!status) {
     // Return all contracts if no status specified
-    return isAdmin && filterUserId
-      ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId))
-      : await db.select().from(rentalContracts).where(eq(rentalContracts.userId, userId));
+    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId));
   }
-  return isAdmin && filterUserId
-    ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status)))
-    : await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, userId), eq(rentalContracts.status, status)));
+  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status)));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
@@ -688,15 +646,9 @@ export async function getAllClients(userId: number, filterUserId?: number | null
   const db = await getDb();
   if (!db) return [];
   
-  // Super Admin can see all clients or filter by specific user
-  const isAdmin = await isSuperAdmin(userId);
-  
-  if (isAdmin) {
-    return filterUserId
-      ? await db.select().from(clients).where(eq(clients.userId, filterUserId))
-      : await db.select().from(clients);
-  }
-  return await db.select().from(clients).where(eq(clients.userId, userId));
+  // All users (including super admin) see only their own clients by default
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  return await db.select().from(clients).where(eq(clients.userId, targetUserId));
 }
 
 export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
@@ -1880,12 +1832,8 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Super Admin can see all invoices, regular users only see their own
-  const isAdmin = await isSuperAdmin(userId);
-  
-  const [invoice] = isAdmin
-    ? await db.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1)
-    : await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
+  // All users (including super admin) see only their own invoices
+  const [invoice] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
   
   if (!invoice) return null;
   
@@ -1909,11 +1857,8 @@ export async function listInvoices(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // Super Admin can see all invoices, regular users only see their own
-  const isAdmin = await isSuperAdmin(userId);
-  const results = isAdmin
-    ? await db.select().from(invoices).orderBy(desc(invoices.createdAt))
-    : await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
+  // All users (including super admin) see only their own invoices
+  const results = await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
   return results;
 }
 
