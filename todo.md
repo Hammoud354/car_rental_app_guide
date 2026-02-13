@@ -3609,3 +3609,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix Maintenance Tracking page to always show left sidebar navigation
 
 - [x] Remove breadcrumb navigation from Maintenance Tracking page
+
+- [x] Fix vehicle creation error with empty string date fields in published site

@@ -180,12 +180,27 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (!db) {
     throw new Error("Database not available");
   }
-  // Set null for optional timestamp fields if not provided or empty string
+  // Set null for optional fields if not provided or empty string
   const cleanedVehicle: any = { ...vehicle };
-  if (cleanedVehicle.insuranceExpiryDate === undefined || cleanedVehicle.insuranceExpiryDate === '') cleanedVehicle.insuranceExpiryDate = null;
-  if (cleanedVehicle.registrationExpiryDate === undefined || cleanedVehicle.registrationExpiryDate === '') cleanedVehicle.registrationExpiryDate = null;
-  if (cleanedVehicle.nextMaintenanceDate === undefined || cleanedVehicle.nextMaintenanceDate === '') cleanedVehicle.nextMaintenanceDate = null;
-  if (cleanedVehicle.nextMaintenanceKm === undefined || cleanedVehicle.nextMaintenanceKm === '') cleanedVehicle.nextMaintenanceKm = null;
+  
+  // Handle date fields - convert empty strings and undefined to null
+  if (cleanedVehicle.insuranceExpiryDate === '' || cleanedVehicle.insuranceExpiryDate === undefined) cleanedVehicle.insuranceExpiryDate = null;
+  if (cleanedVehicle.registrationExpiryDate === '' || cleanedVehicle.registrationExpiryDate === undefined) cleanedVehicle.registrationExpiryDate = null;
+  if (cleanedVehicle.nextMaintenanceDate === '' || cleanedVehicle.nextMaintenanceDate === undefined) cleanedVehicle.nextMaintenanceDate = null;
+  
+  // Handle numeric fields - convert empty strings and undefined to null (but keep 0)
+  if (cleanedVehicle.nextMaintenanceKm === '' || cleanedVehicle.nextMaintenanceKm === undefined) cleanedVehicle.nextMaintenanceKm = null;
+  if (cleanedVehicle.weeklyRate === '' || cleanedVehicle.weeklyRate === undefined) cleanedVehicle.weeklyRate = null;
+  if (cleanedVehicle.monthlyRate === '' || cleanedVehicle.monthlyRate === undefined) cleanedVehicle.monthlyRate = null;
+  if (cleanedVehicle.mileage === '' || cleanedVehicle.mileage === undefined) cleanedVehicle.mileage = null;
+  if (cleanedVehicle.insuranceCost === '' || cleanedVehicle.insuranceCost === undefined) cleanedVehicle.insuranceCost = null;
+  if (cleanedVehicle.purchaseCost === '' || cleanedVehicle.purchaseCost === undefined) cleanedVehicle.purchaseCost = null;
+  
+  // Handle string fields - convert empty strings and undefined to null
+  if (cleanedVehicle.vin === '' || cleanedVehicle.vin === undefined) cleanedVehicle.vin = null;
+  if (cleanedVehicle.insurancePolicyNumber === '' || cleanedVehicle.insurancePolicyNumber === undefined) cleanedVehicle.insurancePolicyNumber = null;
+  if (cleanedVehicle.photoUrl === '' || cleanedVehicle.photoUrl === undefined) cleanedVehicle.photoUrl = null;
+  if (cleanedVehicle.notes === '' || cleanedVehicle.notes === undefined) cleanedVehicle.notes = null;
   // Always set status to Available for new vehicles
   cleanedVehicle.status = "Available";
   const result = await db.insert(vehicles).values(cleanedVehicle);
