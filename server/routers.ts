@@ -1773,5 +1773,116 @@ export const appRouter = router({
         return { results };
       }),
   }),
+
+  // AI Maintenance Router
+  aiMaintenance: router({
+    generateSchedule: protectedProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { generateMaintenanceSchedule } = await import("./aiMaintenanceGenerator");
+        
+        // Get vehicle data
+        const vehicle = await db.getVehicleById(input.vehicleId, ctx.user.id);
+        if (!vehicle) {
+          throw new Error("Vehicle not found");
+        }
+        
+        // Generate AI schedule
+        const schedule = await generateMaintenanceSchedule(vehicle);
+        
+        // Save tasks to database
+        const savedTasks = [];
+        for (const task of schedule.tasks) {
+          const saved = await db.createMaintenanceTask({
+            userId: ctx.user.id,
+            vehicleId: input.vehicleId,
+            taskName: task.taskName,
+            description: task.description,
+            priority: task.priority,
+            category: task.category,
+            estimatedCost: task.estimatedCost.toString(),
+            estimatedDuration: task.estimatedDuration,
+            triggerType: task.triggerType,
+            triggerMileage: task.triggerMileage,
+            triggerDate: task.triggerDate,
+            intervalMileage: task.intervalMileage,
+            intervalMonths: task.intervalMonths,
+            aiGenerated: true,
+            aiReasoning: task.aiReasoning,
+            status: "Pending",
+          });
+          savedTasks.push(saved);
+        }
+        
+        return {
+          tasks: savedTasks,
+          summary: schedule.summary,
+          totalEstimatedAnnualCost: schedule.totalEstimatedAnnualCost,
+        };
+      }),
+    
+    getTasksByVehicle: protectedProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getMaintenanceTasksByVehicleId(input.vehicleId, ctx.user.id);
+      }),
+    
+    getAllTasks: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAllMaintenanceTasks(ctx.user.id);
+      }),
+    
+    getUpcomingTasks: protectedProcedure
+      .input(z.object({ daysAhead: z.number().optional() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getUpcomingMaintenanceTasks(ctx.user.id, input.daysAhead);
+      }),
+    
+    getOverdueTasks: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getOverdueMaintenanceTasks(ctx.user.id);
+      }),
+    
+    updateTask: protectedProcedure
+      .input(z.object({
+        taskId: z.number(),
+        updates: z.object({
+          taskName: z.string().optional(),
+          description: z.string().optional(),
+          priority: z.enum(["Critical", "Important", "Recommended", "Optional"]).optional(),
+          estimatedCost: z.string().optional(),
+          estimatedDuration: z.number().optional(),
+          triggerMileage: z.number().optional(),
+          triggerDate: z.date().optional(),
+          status: z.enum(["Pending", "Overdue", "Completed", "Skipped", "Dismissed"]).optional(),
+          userOverridden: z.boolean().optional(),
+          overrideNotes: z.string().optional(),
+        }),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.updateMaintenanceTask(input.taskId, ctx.user.id, input.updates);
+      }),
+    
+    completeTask: protectedProcedure
+      .input(z.object({
+        taskId: z.number(),
+        completedMileage: z.number().optional(),
+        actualCost: z.string().optional(),
+        maintenanceRecordId: z.number().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.completeMaintenanceTask(input.taskId, ctx.user.id, {
+          completedMileage: input.completedMileage,
+          actualCost: input.actualCost,
+          maintenanceRecordId: input.maintenanceRecordId,
+        });
+      }),
+    
+    deleteTask: protectedProcedure
+      .input(z.object({ taskId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.deleteMaintenanceTask(input.taskId, ctx.user.id);
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

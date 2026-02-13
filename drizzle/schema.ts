@@ -93,11 +93,23 @@ export const vehicles = mysqlTable("vehicles", {
   insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Annual or total insurance cost
   purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
   registrationExpiryDate: timestamp("registrationExpiryDate"),
+  // AI Maintenance - Vehicle specifications for intelligent scheduling
+  engineType: varchar("engineType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Hybrid", "Electric"
+  transmission: varchar("transmission", { length: 50 }), // e.g., "Automatic", "Manual", "CVT"
+  fuelType: varchar("fuelType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Electric", "Hybrid"
+  engineSize: varchar("engineSize", { length: 20 }), // e.g., "2.0L", "1.6L"
+  purchaseDate: timestamp("purchaseDate"), // When vehicle was acquired
+  averageDailyKm: int("averageDailyKm"), // Average daily usage for predictive maintenance
+  usagePattern: varchar("usagePattern", { length: 50 }), // e.g., "City", "Highway", "Mixed"
+  climate: varchar("climate", { length: 50 }), // e.g., "Hot", "Cold", "Moderate", "Humid"
+  lastServiceDate: timestamp("lastServiceDate"), // Last major service date
+  lastServiceKm: int("lastServiceKm"), // Mileage at last service
   // Maintenance schedule tracking
   nextMaintenanceDate: timestamp("nextMaintenanceDate"), // Next scheduled maintenance date
   nextMaintenanceKm: int("nextMaintenanceKm"), // Next maintenance at this mileage
   maintenanceIntervalKm: int("maintenanceIntervalKm").default(5000), // Maintenance every X km (default 5000km)
   maintenanceIntervalMonths: int("maintenanceIntervalMonths").default(6), // Maintenance every X months (default 6 months)
+  aiMaintenanceEnabled: boolean("aiMaintenanceEnabled").default(true), // Whether AI maintenance is enabled for this vehicle
   photoUrl: text("photoUrl"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -138,6 +150,45 @@ export const maintenanceRecords = mysqlTable("maintenanceRecords", {
 
 export type MaintenanceRecord = typeof maintenanceRecords.$inferSelect;
 export type InsertMaintenanceRecord = typeof maintenanceRecords.$inferInsert;
+
+/**
+ * AI-generated maintenance tasks table
+ * Stores intelligent maintenance recommendations with priority levels
+ */
+export const maintenanceTasks = mysqlTable("maintenanceTasks", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table
+  vehicleId: int("vehicleId").notNull(),
+  taskName: varchar("taskName", { length: 200 }).notNull(), // e.g., "Engine Oil Change", "Brake Inspection"
+  description: text("description"), // Detailed description of the task
+  priority: mysqlEnum("priority", ["Critical", "Important", "Recommended", "Optional"]).notNull(),
+  category: varchar("category", { length: 100 }), // e.g., "Engine", "Brakes", "Tires", "Fluids"
+  estimatedCost: decimal("estimatedCost", { precision: 10, scale: 2 }), // AI-estimated cost
+  estimatedDuration: int("estimatedDuration"), // Estimated time in minutes
+  // Trigger conditions
+  triggerType: mysqlEnum("triggerType", ["Mileage", "Time", "Both"]).notNull(),
+  triggerMileage: int("triggerMileage"), // Trigger at this mileage
+  triggerDate: timestamp("triggerDate"), // Trigger at this date
+  intervalMileage: int("intervalMileage"), // Repeat every X km
+  intervalMonths: int("intervalMonths"), // Repeat every X months
+  // Status tracking
+  status: mysqlEnum("status", ["Pending", "Overdue", "Completed", "Skipped", "Dismissed"]).default("Pending").notNull(),
+  completedAt: timestamp("completedAt"),
+  completedMileage: int("completedMileage"),
+  actualCost: decimal("actualCost", { precision: 10, scale: 2 }),
+  // AI metadata
+  aiGenerated: boolean("aiGenerated").default(true), // Whether this was AI-generated or manually created
+  aiReasoning: text("aiReasoning"), // AI's explanation for this recommendation
+  userOverridden: boolean("userOverridden").default(false), // Whether user modified AI recommendation
+  overrideNotes: text("overrideNotes"), // User's notes when overriding
+  // Linked maintenance record (when completed)
+  maintenanceRecordId: int("maintenanceRecordId"), // Links to maintenanceRecords table when task is completed
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MaintenanceTask = typeof maintenanceTasks.$inferSelect;
+export type InsertMaintenanceTask = typeof maintenanceTasks.$inferInsert;
 
 /**
  * Clients table for managing rental customers

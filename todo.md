@@ -3680,3 +3680,40 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] **ROOT CAUSE**: Backend contract creation was NOT saving pickupKm to database
 - [x] Fixed by adding `pickupKm: input.pickupKm || null` to createRentalContract call
 - [x] Now new contracts will save pickup odometer correctly and return dialog will pre-fill
+
+
+## AI-Powered Maintenance System
+- [x] Design intelligent maintenance architecture with LLM integration
+- [ ] Enhance vehicle creation form to collect comprehensive data:
+  - [x] Vehicle specifications (make, model, year, engine type, transmission) - Schema updated
+  - [x] Current mileage and purchase date - Schema updated
+  - [x] Usage patterns (daily/weekly mileage, rental frequency) - Schema updated
+  - [x] Operating environment (climate, terrain, city/highway) - Schema updated
+  - [x] Service history (last maintenance date, major repairs) - Schema updated
+  - [ ] Update vehicle creation UI form to include new fields
+- [x] Create AI maintenance schedule generator:
+  - [x] Integrate with LLM to analyze vehicle data
+  - [x] Generate personalized maintenance tasks based on manufacturer specs
+  - [x] Calculate optimal service intervals (mileage-based and time-based)
+  - [x] Classify tasks by priority: Critical, Important, Recommended, Optional
+  - [x] Created aiMaintenanceGenerator.ts service
+  - [x] Added maintenanceTasks table to schema
+  - [x] Created database helper functions in db.ts
+  - [x] Added tRPC procedures in routers.ts
+- [ ] Build maintenance task management system:
+  - [x] Backend API complete (tRPC procedures)
+  - [ ] Display AI-generated tasks with priority badges
+  - [ ] Allow users to override/customize any recommendation
+  - [ ] Smart alerts based on mileage/time triggers
+  - [ ] Track completed vs pending tasks
+  - [ ] Show cost estimates for each task
+- [ ] Create maintenance dashboard:
+  - [ ] Upcoming maintenance timeline view
+  - [ ] Overdue tasks with escalating priority
+  - [ ] Per-vehicle maintenance history
+  - [ ] Cost tracking and budget forecasting
+- [ ] Implement predictive maintenance features:
+  - [ ] AI learns from usage patterns to refine schedules
+  - [ ] Seasonal adjustments (winter/summer maintenance)
+  - [ ] High-mileage vehicle special considerations
+  - [ ] Fleet-wide maintenance optimization

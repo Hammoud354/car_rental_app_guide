@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2405,4 +2405,166 @@ export async function updateUser(userId: number, data: { name: string; email: st
     .where(eq(users.id, userId));
   
   return { success: true };
+}
+
+
+// ============================================================================
+// AI Maintenance Tasks Functions
+// ============================================================================
+
+export async function createMaintenanceTask(task: InsertMaintenanceTask) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(maintenanceTasks).values(task);
+  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  const created = await db.select().from(maintenanceTasks).where(eq(maintenanceTasks.id, insertId)).limit(1);
+  
+  if (created.length === 0) {
+    throw new Error("Failed to retrieve created maintenance task");
+  }
+  
+  return created[0];
+}
+
+export async function getMaintenanceTasksByVehicleId(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get maintenance tasks: database not available");
+    return [];
+  }
+  
+  return await db
+    .select()
+    .from(maintenanceTasks)
+    .where(and(
+      eq(maintenanceTasks.vehicleId, vehicleId),
+      eq(maintenanceTasks.userId, userId)
+    ))
+    .orderBy(maintenanceTasks.priority, maintenanceTasks.triggerDate);
+}
+
+export async function getAllMaintenanceTasks(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get maintenance tasks: database not available");
+    return [];
+  }
+  
+  return await db
+    .select()
+    .from(maintenanceTasks)
+    .where(eq(maintenanceTasks.userId, userId))
+    .orderBy(maintenanceTasks.status, maintenanceTasks.priority);
+}
+
+export async function updateMaintenanceTask(
+  taskId: number,
+  userId: number,
+  updates: Partial<InsertMaintenanceTask>
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(maintenanceTasks)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(and(
+      eq(maintenanceTasks.id, taskId),
+      eq(maintenanceTasks.userId, userId)
+    ));
+  
+  const updated = await db
+    .select()
+    .from(maintenanceTasks)
+    .where(eq(maintenanceTasks.id, taskId))
+    .limit(1);
+  
+  return updated[0];
+}
+
+export async function completeMaintenanceTask(
+  taskId: number,
+  userId: number,
+  data: {
+    completedMileage?: number;
+    actualCost?: string;
+    maintenanceRecordId?: number;
+  }
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .update(maintenanceTasks)
+    .set({
+      status: "Completed",
+      completedAt: new Date(),
+      completedMileage: data.completedMileage,
+      actualCost: data.actualCost,
+      maintenanceRecordId: data.maintenanceRecordId,
+      updatedAt: new Date()
+    })
+    .where(and(
+      eq(maintenanceTasks.id, taskId),
+      eq(maintenanceTasks.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function deleteMaintenanceTask(taskId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db
+    .delete(maintenanceTasks)
+    .where(and(
+      eq(maintenanceTasks.id, taskId),
+      eq(maintenanceTasks.userId, userId)
+    ));
+  
+  return { success: true };
+}
+
+export async function getUpcomingMaintenanceTasks(userId: number, daysAhead: number = 30) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get upcoming maintenance tasks: database not available");
+    return [];
+  }
+  
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + daysAhead);
+  
+  return await db
+    .select()
+    .from(maintenanceTasks)
+    .where(and(
+      eq(maintenanceTasks.userId, userId),
+      eq(maintenanceTasks.status, "Pending"),
+      // Tasks due within the next X days
+      sql`${maintenanceTasks.triggerDate} <= ${futureDate}`
+    ))
+    .orderBy(maintenanceTasks.triggerDate, maintenanceTasks.priority);
+}
+
+export async function getOverdueMaintenanceTasks(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get overdue maintenance tasks: database not available");
+    return [];
+  }
+  
+  const today = new Date();
+  
+  return await db
+    .select()
+    .from(maintenanceTasks)
+    .where(and(
+      eq(maintenanceTasks.userId, userId),
+      eq(maintenanceTasks.status, "Pending"),
+      sql`${maintenanceTasks.triggerDate} < ${today}`
+    ))
+    .orderBy(maintenanceTasks.priority, maintenanceTasks.triggerDate);
 }
