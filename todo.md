@@ -3811,3 +3811,31 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [ ] Cost savings vs industry average
 - [ ] Test analytics with real maintenance data
 - [ ] Save checkpoint
+
+
+## Enhance AI Maintenance to Use Odometer as Primary Baseline
+- [x] Update AI maintenance generator to prioritize odometer readings over time-based schedules
+- [x] Calculate current vehicle mileage from latest contract return odometer
+- [x] Track total kilometers driven across all contracts
+- [x] Generate maintenance recommendations based on kilometer milestones:
+  - [x] Oil change every 5,000 km
+  - [x] Brake inspection every 20,000 km
+  - [x] Major service every 30,000 km
+  - [x] Tire rotation every 10,000 km
+  - [x] All standard manufacturer intervals included in AI prompt
+- [x] Update AI prompts to focus on odometer-based intervals
+  - [x] Added **PRIMARY FOCUS: ODOMETER-BASED MAINTENANCE** section
+  - [x] Forced AI to always use "Mileage" or "Both" trigger types
+  - [x] Included exact calculation examples
+  - [x] Specified standard km intervals for all maintenance types
+- [x] Add "Next Service Due At" display showing target odometer reading
+- [x] Show current mileage vs service milestone progress
+  - [x] Added visual progress bar (green/yellow/red based on urgency)
+  - [x] Shows current odometer prominently
+  - [x] Displays next service milestone
+  - [x] Shows km remaining until service
+- [x] Alert when vehicle approaches maintenance threshold (within 500 km)
+  - [x] Progress bar turns red when < 500 km
+  - [x] Text becomes bold and red for urgent attention
+- [x] Test with real contract odometer data (AI generator already analyzes contract pickup/return data)
+- [x] Ready to save checkpoint

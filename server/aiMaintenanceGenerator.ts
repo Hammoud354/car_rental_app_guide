@@ -200,17 +200,37 @@ MAINTENANCE HISTORY (real service records):
 DATA QUALITY: ${dataAssessment.quality}
 ${dataAssessment.insights}
 
-Based on this REAL operational data, generate 8-15 maintenance tasks with:
-1. Priority classification (Critical/Important/Recommended/Optional)
-2. Realistic cost estimates
-3. Mileage or time-based triggers
-4. Clear reasoning based on the actual usage patterns
+**PRIMARY FOCUS: ODOMETER-BASED MAINTENANCE**
+Generate 8-15 maintenance tasks using ODOMETER READINGS as the PRIMARY baseline. Odometer is the most reliable indicator of vehicle wear.
 
-Consider:
-- The vehicle's actual usage intensity (${Math.round(usage.averageKmPerDay)} km/day)
-- Time since last maintenance
-- Vehicle age and category
-- Typical wear patterns for this usage profile
+**CRITICAL REQUIREMENTS:**
+1. **ALWAYS use triggerType "Mileage" or "Both"** - Never use "Time" alone
+2. **Calculate exact triggerMileage** based on current odometer + interval
+3. **Use standard manufacturer intervals:**
+   - Oil Change: every 5,000 km
+   - Oil Filter: every 5,000 km
+   - Air Filter: every 15,000 km
+   - Brake Inspection: every 20,000 km
+   - Brake Pads: every 40,000-60,000 km
+   - Tire Rotation: every 10,000 km
+   - Major Service: every 30,000 km
+   - Transmission Fluid: every 60,000 km
+4. Priority classification based on urgency (Critical/Important/Recommended/Optional)
+5. Realistic cost estimates for ${vehicle.brand} ${vehicle.model}
+
+**ANALYSIS FACTORS:**
+- Current Mileage: ${currentMileage.toLocaleString()} km
+- KM Since Last Service: ${kmSinceLastMaintenance.toLocaleString()} km
+- Usage Intensity: ${Math.round(usage.averageKmPerDay)} km/day (${usage.averageKmPerDay > 100 ? 'HIGH' : usage.averageKmPerDay > 50 ? 'MODERATE' : 'LOW'} usage)
+- Vehicle Age: ${vehicleAge} years
+- Category: ${vehicle.category}
+
+**EXAMPLE CALCULATION:**
+If current mileage is 42,000 km and last oil change was at 40,000 km:
+- Next oil change due at: 45,000 km (40,000 + 5,000)
+- triggerMileage: 45000
+- intervalMileage: 5000
+- triggerType: "Mileage"
 
 Return ONLY valid JSON matching this schema:
 {

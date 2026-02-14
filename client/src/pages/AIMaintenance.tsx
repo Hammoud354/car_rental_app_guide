@@ -275,10 +275,50 @@ export default function AIMaintenance() {
                             )}
                           </div>
                         </CardHeader>
-                        <CardContent className="space-y-2">
-                          <div className="text-xs text-muted-foreground space-y-1">
+                        <CardContent className="space-y-3">
+                          {/* Odometer Display */}
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">Current Odometer</span>
+                              <span className="font-bold text-lg">{vehicle.mileage?.toLocaleString() || 0} km</span>
+                            </div>
+                            
+                            {/* Next Service Milestone (example: every 5k km) */}
+                            {vehicle.mileage && (() => {
+                              const currentMileage = vehicle.mileage;
+                              const serviceInterval = 5000;
+                              const nextServiceMileage = Math.ceil(currentMileage / serviceInterval) * serviceInterval;
+                              const kmUntilService = nextServiceMileage - currentMileage;
+                              const progressPercent = ((currentMileage % serviceInterval) / serviceInterval) * 100;
+                              
+                              return (
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="text-muted-foreground">Next Service</span>
+                                    <span className="font-semibold">{nextServiceMileage.toLocaleString()} km</span>
+                                  </div>
+                                  <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div 
+                                      className={`h-2 rounded-full transition-all ${
+                                        kmUntilService < 500 ? 'bg-red-500' : 
+                                        kmUntilService < 1000 ? 'bg-yellow-500' : 
+                                        'bg-green-500'
+                                      }`}
+                                      style={{ width: `${progressPercent}%` }}
+                                    />
+                                  </div>
+                                  <div className="text-xs text-center">
+                                    <span className={kmUntilService < 500 ? 'text-red-600 font-semibold' : 'text-muted-foreground'}>
+                                      {kmUntilService.toLocaleString()} km until service
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                          
+                          <div className="text-xs text-muted-foreground pt-2 border-t">
                             <div>Year: {vehicle.year}</div>
-                            <div>Mileage: {vehicle.mileage?.toLocaleString()} km</div>
                           </div>
                           <Button
                             onClick={() => handleGenerateSchedule(vehicle.id)}
