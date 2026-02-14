@@ -3720,3 +3720,35 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [ ] Seasonal adjustments (winter/summer maintenance)
   - [ ] High-mileage vehicle special considerations
   - [ ] Fleet-wide maintenance optimization
+
+
+## Enhance Vehicle Creation Form with AI Maintenance Fields
+- [ ] Add 9 AI maintenance fields to vehicle creation dialog in Fleet Management
+- [ ] Fields to add: engineType, transmissionType, fuelType, purchaseDate, averageDailyKm, primaryUse, operatingClimate, lastServiceDate, serviceHistory
+- [ ] Update form validation to handle optional AI fields
+- [ ] Update backend vehicle creation to save AI maintenance data
+- [ ] Test vehicle creation with AI fields and verify schedule generation works
+
+
+## Redesign AI Maintenance System - Data-Driven Approach
+- [x] Remove AI maintenance fields from vehicle creation form (keep it simple)
+- [x] Update AI generator to analyze real operational data:
+  - [x] Extract odometer readings from pickup/return in contracts
+  - [x] Calculate average daily/monthly mileage from contract history
+  - [x] Analyze maintenance records to understand service patterns
+  - [x] Consider vehicle age (calculated from year field)
+  - [x] Generate recommendations based on actual usage, not estimates
+  - [x] Completely rewrote aiMaintenanceGenerator.ts to be data-driven
+  - [x] Added getRentalContractsByVehicle function in db.ts
+  - [x] Fixed all TypeScript errors (field names, type annotations)
+  - [x] AI now analyzes real contract odometer data and maintenance history
+- [ ] Create Maintenance Records tab in vehicle details:
+  - [ ] Add maintenance record creation form (date, type, cost, odometer, notes)
+  - [ ] Display maintenance history timeline
+  - [ ] Show last service date and mileage
+  - [ ] Calculate total maintenance costs
+- [x] Update AI recommendation trigger:
+  - [x] Auto-generate schedule when vehicle has sufficient data (3+ contracts or 1+ maintenance record)
+  - [x] Show "Insufficient data" message for new vehicles (via dataQuality assessment)
+  - [x] Provide manual trigger button for early generation (via AI Maintenance page)
+  - [x] Backend implementation complete with data quality checks

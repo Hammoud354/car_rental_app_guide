@@ -2568,3 +2568,24 @@ export async function getOverdueMaintenanceTasks(userId: number) {
     ))
     .orderBy(maintenanceTasks.priority, maintenanceTasks.triggerDate);
 }
+
+
+/**
+ * Get all rental contracts for a specific vehicle (for AI maintenance analysis)
+ */
+export async function getRentalContractsByVehicle(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get rental contracts by vehicle: database not available");
+    return [];
+  }
+  
+  return await db
+    .select()
+    .from(rentalContracts)
+    .where(and(
+      eq(rentalContracts.vehicleId, vehicleId),
+      eq(rentalContracts.userId, userId)
+    ))
+    .orderBy(rentalContracts.rentalStartDate);
+}

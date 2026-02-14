@@ -212,6 +212,16 @@ export default function FleetManagement() {
       nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
       notes: formData.get("notes") as string || undefined,
       targetUserId: selectedTargetUserId || undefined, // For Super Admin to assign to specific user
+      // AI Maintenance fields
+      engineType: formData.get("engineType") as string || undefined,
+      transmissionType: formData.get("transmissionType") as string || undefined,
+      fuelType: formData.get("fuelType") as string || undefined,
+      purchaseDate: formData.get("purchaseDate") ? new Date(formData.get("purchaseDate") as string) : undefined,
+      averageDailyKm: formData.get("averageDailyKm") ? parseInt(formData.get("averageDailyKm") as string) : undefined,
+      primaryUse: formData.get("primaryUse") as string || undefined,
+      operatingClimate: formData.get("operatingClimate") as string || undefined,
+      lastServiceDate: formData.get("lastServiceDate") ? new Date(formData.get("lastServiceDate") as string) : undefined,
+      serviceHistory: formData.get("serviceHistory") as string || undefined,
     });
   };
 
@@ -563,6 +573,125 @@ export default function FleetManagement() {
                 <div>
                   <Label htmlFor="notes">Notes</Label>
                   <Textarea id="notes" name="notes" rows={3} />
+                </div>
+
+                {/* AI Maintenance Fields */}
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <h3 className="text-sm font-semibold">AI Maintenance Data (Optional)</h3>
+                    <span className="text-xs text-muted-foreground">Enables intelligent maintenance scheduling</span>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="engineType">Engine Type</Label>
+                      <Select name="engineType">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select engine type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Gasoline">Gasoline</SelectItem>
+                          <SelectItem value="Diesel">Diesel</SelectItem>
+                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                          <SelectItem value="Electric">Electric</SelectItem>
+                          <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="transmissionType">Transmission</Label>
+                      <Select name="transmissionType">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select transmission" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Manual">Manual</SelectItem>
+                          <SelectItem value="Automatic">Automatic</SelectItem>
+                          <SelectItem value="CVT">CVT</SelectItem>
+                          <SelectItem value="DCT">DCT (Dual Clutch)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label htmlFor="fuelType">Fuel Type</Label>
+                      <Select name="fuelType">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select fuel type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Regular">Regular</SelectItem>
+                          <SelectItem value="Premium">Premium</SelectItem>
+                          <SelectItem value="Diesel">Diesel</SelectItem>
+                          <SelectItem value="Electric">Electric</SelectItem>
+                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="purchaseDate">Purchase Date</Label>
+                      <Input id="purchaseDate" name="purchaseDate" type="date" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label htmlFor="averageDailyKm">Average Daily KM</Label>
+                      <Input id="averageDailyKm" name="averageDailyKm" type="number" min="0" step="1" placeholder="e.g., 50" />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="primaryUse">Primary Use</Label>
+                      <Select name="primaryUse">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select primary use" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Rental">Rental</SelectItem>
+                          <SelectItem value="Fleet">Fleet</SelectItem>
+                          <SelectItem value="Personal">Personal</SelectItem>
+                          <SelectItem value="Commercial">Commercial</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <Label htmlFor="operatingClimate">Operating Climate</Label>
+                      <Select name="operatingClimate">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select climate" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Hot">Hot</SelectItem>
+                          <SelectItem value="Cold">Cold</SelectItem>
+                          <SelectItem value="Moderate">Moderate</SelectItem>
+                          <SelectItem value="Humid">Humid</SelectItem>
+                          <SelectItem value="Arid">Arid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="lastServiceDate">Last Service Date</Label>
+                      <Input id="lastServiceDate" name="lastServiceDate" type="date" />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <Label htmlFor="serviceHistory">Service History Notes</Label>
+                    <Textarea 
+                      id="serviceHistory" 
+                      name="serviceHistory" 
+                      rows={2} 
+                      placeholder="e.g., Recent oil change, new tires, brake service..."
+                    />
+                  </div>
                 </div>
 
                 <DialogFooter>

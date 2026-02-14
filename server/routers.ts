@@ -287,6 +287,16 @@ export const appRouter = router({
         photoUrl: z.string().optional(),
         notes: z.string().optional(),
         targetUserId: z.number().optional(), // For Super Admin to assign vehicle to specific user
+        // AI Maintenance fields
+        engineType: z.string().optional(),
+        transmissionType: z.string().optional(),
+        fuelType: z.string().optional(),
+        purchaseDate: z.date().optional(),
+        averageDailyKm: z.number().int().optional(),
+        primaryUse: z.string().optional(),
+        operatingClimate: z.string().optional(),
+        lastServiceDate: z.date().optional(),
+        serviceHistory: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
@@ -1788,7 +1798,7 @@ export const appRouter = router({
         }
         
         // Generate AI schedule
-        const schedule = await generateMaintenanceSchedule(vehicle);
+        const schedule = await generateMaintenanceSchedule(vehicle, ctx.user.id);
         
         // Save tasks to database
         const savedTasks = [];

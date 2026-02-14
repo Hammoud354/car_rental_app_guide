@@ -1,12 +1,18 @@
 /**
- * AI-Powered Maintenance Schedule Generator
+ * AI-Powered Maintenance Schedule Generator (Data-Driven)
  * 
- * This service uses LLM to analyze vehicle specifications and generate
- * intelligent, personalized maintenance schedules with priority classification.
+ * This service uses LLM to analyze REAL operational data from contracts and
+ * maintenance records to generate intelligent, personalized maintenance schedules.
+ * 
+ * Data Sources:
+ * - Contract odometer readings (pickup/return) for usage patterns
+ * - Maintenance history records for service patterns
+ * - Vehicle age and current mileage
  */
 
 import { invokeLLM } from "./_core/llm";
 import type { Vehicle } from "../drizzle/schema";
+import * as db from "./db";
 
 export interface MaintenanceTaskRecommendation {
   taskName: string;
@@ -27,109 +33,211 @@ export interface MaintenanceSchedule {
   tasks: MaintenanceTaskRecommendation[];
   summary: string;
   totalEstimatedAnnualCost: number;
+  dataQuality: "Excellent" | "Good" | "Fair" | "Insufficient";
+  dataInsights: string;
+}
+
+interface VehicleUsageData {
+  totalContracts: number;
+  totalKmDriven: number;
+  averageKmPerDay: number;
+  averageKmPerContract: number;
+  firstContractDate?: Date;
+  lastContractDate?: Date;
+  maintenanceRecords: number;
+  lastMaintenanceDate?: Date;
+  lastMaintenanceKm?: number;
+  totalMaintenanceCost: number;
 }
 
 /**
- * Generate AI-powered maintenance schedule for a vehicle
+ * Analyze vehicle usage from contract history
+ */
+async function analyzeVehicleUsage(vehicleId: number, userId: number): Promise<VehicleUsageData> {
+  // Get all contracts for this vehicle
+  const contracts = await db.getRentalContractsByVehicle(vehicleId, userId);
+  
+  let totalKmDriven = 0;
+  let contractsWithOdometer = 0;
+  let firstDate: Date | undefined;
+  let lastDate: Date | undefined;
+  
+  for (const contract of contracts) {
+    if (contract.pickupKm && contract.returnKm && contract.returnKm > contract.pickupKm) {
+      totalKmDriven += (contract.returnKm - contract.pickupKm);
+      contractsWithOdometer++;
+    }
+    
+    const contractDate = new Date(contract.rentalStartDate);
+    if (!firstDate || contractDate < firstDate) firstDate = contractDate;
+    if (!lastDate || contractDate > lastDate) lastDate = contractDate;
+  }
+  
+  // Calculate average daily usage
+  let averageKmPerDay = 0;
+  if (firstDate && lastDate && totalKmDriven > 0) {
+    const daysBetween = Math.max(1, Math.floor((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)));
+    averageKmPerDay = totalKmDriven / daysBetween;
+  }
+  // Get maintenance records
+  const maintenanceRecords = await db.getMaintenanceRecordsByVehicleId(vehicleId, userId);
+  const totalMaintenanceCost = maintenanceRecords.reduce((sum: number, record: any) => 
+    sum + (parseFloat(record.cost as string) || 0), 0);
+  
+  const lastMaintenance = maintenanceRecords.length > 0 
+    ? maintenanceRecords.sort((a: any, b: any) => 
+        new Date(b.performedAt).getTime() - new Date(a.performedAt).getTime()
+      )[0]
+    : null;
+  
+  return {
+    totalContracts: contracts.length,
+    totalKmDriven,
+    averageKmPerDay,
+    averageKmPerContract: contractsWithOdometer > 0 ? totalKmDriven / contractsWithOdometer : 0,
+    firstContractDate: firstDate,
+    lastContractDate: lastDate,
+    maintenanceRecords: maintenanceRecords.length,
+    lastMaintenanceDate: lastMaintenance ? new Date(lastMaintenance.performedAt) : undefined,
+    lastMaintenanceKm: lastMaintenance?.mileageAtService || undefined,
+    totalMaintenanceCost,
+  };
+}
+
+/**
+ * Assess data quality for AI recommendations
+ */
+function assessDataQuality(usage: VehicleUsageData, vehicle: Vehicle): {
+  quality: "Excellent" | "Good" | "Fair" | "Insufficient";
+  insights: string;
+} {
+  const hasContracts = usage.totalContracts >= 3;
+  const hasMaintenanceHistory = usage.maintenanceRecords >= 1;
+  const hasUsageData = usage.totalKmDriven > 0;
+  
+  if (hasContracts && hasMaintenanceHistory && hasUsageData) {
+    return {
+      quality: "Excellent",
+      insights: `Rich data available: ${usage.totalContracts} contracts, ${usage.maintenanceRecords} maintenance records, ${usage.totalKmDriven}km driven. AI can provide highly accurate recommendations.`
+    };
+  }
+  
+  if ((hasContracts || hasMaintenanceHistory) && hasUsageData) {
+    return {
+      quality: "Good",
+      insights: `Moderate data: ${usage.totalContracts} contracts, ${usage.maintenanceRecords} maintenance records. AI recommendations are reliable but will improve with more data.`
+    };
+  }
+  
+  if (hasContracts || hasMaintenanceHistory || vehicle.mileage) {
+    return {
+      quality: "Fair",
+      insights: `Limited data: ${usage.totalContracts} contracts, ${usage.maintenanceRecords} maintenance records. AI will provide basic recommendations based on vehicle age and mileage.`
+    };
+  }
+  
+  return {
+    quality: "Insufficient",
+    insights: "Insufficient operational data. Please complete a few rental contracts or add maintenance records to enable AI recommendations."
+  };
+}
+
+/**
+ * Generate AI-powered maintenance schedule using real operational data
  */
 export async function generateMaintenanceSchedule(
-  vehicle: Vehicle
+  vehicle: Vehicle,
+  userId: number
 ): Promise<MaintenanceSchedule> {
+  // Analyze real usage data
+  const usage = await analyzeVehicleUsage(vehicle.id, userId);
+  const dataAssessment = assessDataQuality(usage, vehicle);
+  
+  // If insufficient data, return early with guidance
+  if (dataAssessment.quality === "Insufficient") {
+    return {
+      tasks: [],
+      summary: "Insufficient data for AI recommendations. Complete 3+ rental contracts or add maintenance records to enable intelligent scheduling.",
+      totalEstimatedAnnualCost: 0,
+      dataQuality: "Insufficient",
+      dataInsights: dataAssessment.insights,
+    };
+  }
+  
   const currentDate = new Date();
   const vehicleAge = vehicle.year ? currentDate.getFullYear() - vehicle.year : 0;
-  const mileage = vehicle.mileage || 0;
+  const currentMileage = vehicle.mileage || 0;
   
-  // Calculate months since last service
-  const monthsSinceService = vehicle.lastServiceDate 
-    ? Math.floor((currentDate.getTime() - new Date(vehicle.lastServiceDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
-    : null;
+  // Calculate km since last maintenance
+  const kmSinceLastMaintenance = usage.lastMaintenanceKm 
+    ? currentMileage - usage.lastMaintenanceKm
+    : currentMileage;
   
-  // Calculate km since last service
-  const kmSinceService = vehicle.lastServiceKm 
-    ? mileage - vehicle.lastServiceKm
-    : null;
+  // Build comprehensive prompt with REAL data
+  const prompt = `You are an automotive maintenance expert. Analyze this vehicle's REAL operational data and generate a personalized maintenance schedule.
 
-  const prompt = `You are an expert automotive maintenance advisor. Analyze the following vehicle and generate a comprehensive, personalized maintenance schedule.
-
-**Vehicle Information:**
-- Make & Model: ${vehicle.brand} ${vehicle.model}
+VEHICLE INFORMATION:
+- Make/Model: ${vehicle.brand} ${vehicle.model}
 - Year: ${vehicle.year} (${vehicleAge} years old)
-- Current Mileage: ${mileage.toLocaleString()} km
-- Engine Type: ${vehicle.engineType || "Not specified"}
-- Transmission: ${vehicle.transmission || "Not specified"}
-- Fuel Type: ${vehicle.fuelType || "Not specified"}
-- Engine Size: ${vehicle.engineSize || "Not specified"}
+- Current Mileage: ${currentMileage.toLocaleString()} km
 - Category: ${vehicle.category}
-- Usage Pattern: ${vehicle.usagePattern || "Mixed"}
-- Average Daily Usage: ${vehicle.averageDailyKm || "Not specified"} km/day
-- Climate: ${vehicle.climate || "Moderate"}
-- Last Service: ${vehicle.lastServiceDate ? new Date(vehicle.lastServiceDate).toLocaleDateString() : "Unknown"} ${monthsSinceService !== null ? `(${monthsSinceService} months ago)` : ""}
-- Mileage at Last Service: ${vehicle.lastServiceKm ? vehicle.lastServiceKm.toLocaleString() + " km" : "Unknown"} ${kmSinceService !== null ? `(${kmSinceService.toLocaleString()} km ago)` : ""}
 
-**Instructions:**
-Generate a maintenance schedule with tasks classified by priority:
-- **Critical**: Safety-critical items that must be addressed immediately (e.g., brake failure, tire damage)
-- **Important**: Items that affect reliability and should be done soon (e.g., oil change overdue, worn brake pads)
-- **Recommended**: Preventive maintenance to optimize performance (e.g., scheduled service, filter replacement)
-- **Optional**: Enhancement items that improve comfort or longevity (e.g., interior detailing, paint protection)
+REAL USAGE DATA (from actual rental contracts):
+- Total Contracts: ${usage.totalContracts}
+- Total KM Driven: ${usage.totalKmDriven.toLocaleString()} km
+- Average KM per Day: ${Math.round(usage.averageKmPerDay)} km
+- Average KM per Contract: ${Math.round(usage.averageKmPerContract)} km
+- First Contract: ${usage.firstContractDate?.toLocaleDateString() || 'N/A'}
+- Last Contract: ${usage.lastContractDate?.toLocaleDateString() || 'N/A'}
 
-For each task, provide:
-1. Task name (concise, e.g., "Engine Oil Change")
-2. Detailed description (what needs to be done and why)
-3. Priority level (Critical/Important/Recommended/Optional)
-4. Category (Engine/Brakes/Tires/Fluids/Electrical/Body/Interior/etc.)
-5. Estimated cost in USD
-6. Estimated duration in minutes
-7. Trigger type (Mileage/Time/Both)
-8. Trigger mileage (if mileage-based)
-9. Trigger date (if time-based, as YYYY-MM-DD)
-10. Interval mileage (how often to repeat in km)
-11. Interval months (how often to repeat in months)
-12. AI reasoning (brief explanation of why this task is recommended at this priority)
+MAINTENANCE HISTORY (real service records):
+- Total Maintenance Records: ${usage.maintenanceRecords}
+- Last Maintenance: ${usage.lastMaintenanceDate?.toLocaleDateString() || 'Never'}
+- Last Maintenance KM: ${usage.lastMaintenanceKm?.toLocaleString() || 'N/A'} km
+- KM Since Last Service: ${kmSinceLastMaintenance.toLocaleString()} km
+- Total Maintenance Spent: $${usage.totalMaintenanceCost.toFixed(2)}
+
+DATA QUALITY: ${dataAssessment.quality}
+${dataAssessment.insights}
+
+Based on this REAL operational data, generate 8-15 maintenance tasks with:
+1. Priority classification (Critical/Important/Recommended/Optional)
+2. Realistic cost estimates
+3. Mileage or time-based triggers
+4. Clear reasoning based on the actual usage patterns
 
 Consider:
-- Vehicle age and typical wear patterns
-- Manufacturer maintenance schedules for this make/model
-- Current mileage and usage intensity
-- Climate effects (hot climates = more AC maintenance, cold = battery/coolant focus)
-- Usage pattern (city driving = more brake wear, highway = less frequent service)
-- Time since last service
+- The vehicle's actual usage intensity (${Math.round(usage.averageKmPerDay)} km/day)
+- Time since last maintenance
+- Vehicle age and category
+- Typical wear patterns for this usage profile
 
-Return ONLY valid JSON in this exact format:
+Return ONLY valid JSON matching this schema:
 {
   "tasks": [
     {
-      "taskName": "Engine Oil Change",
-      "description": "Replace engine oil and oil filter to maintain engine lubrication and prevent wear",
-      "priority": "Important",
-      "category": "Engine",
-      "estimatedCost": 50,
-      "estimatedDuration": 30,
-      "triggerType": "Both",
-      "triggerMileage": ${mileage + 5000},
-      "triggerDate": "${new Date(currentDate.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}",
-      "intervalMileage": 5000,
-      "intervalMonths": 6,
-      "aiReasoning": "Based on ${kmSinceService || 0} km since last service, oil change is due soon"
+      "taskName": "string",
+      "description": "string",
+      "priority": "Critical" | "Important" | "Recommended" | "Optional",
+      "category": "Engine" | "Transmission" | "Brakes" | "Tires" | "Fluids" | "Electrical" | "Suspension" | "Body" | "Interior" | "Safety",
+      "estimatedCost": number,
+      "estimatedDuration": number (minutes),
+      "triggerType": "Mileage" | "Time" | "Both",
+      "triggerMileage": number (optional),
+      "intervalMileage": number (optional),
+      "intervalMonths": number (optional),
+      "aiReasoning": "string explaining why this task is needed based on the data"
     }
   ],
-  "summary": "Brief overview of the maintenance schedule and key priorities",
-  "totalEstimatedAnnualCost": 500
-}
-
-Generate 8-15 tasks covering all major maintenance categories. Be specific and practical.`;
+  "summary": "Brief summary of the maintenance plan based on actual usage",
+  "totalEstimatedAnnualCost": number
+}`;
 
   try {
     const response = await invokeLLM({
       messages: [
-        {
-          role: "system",
-          content: "You are an expert automotive maintenance advisor. Provide accurate, practical maintenance recommendations in valid JSON format only."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
+        { role: "system", content: "You are an expert automotive maintenance advisor. Analyze real operational data and provide data-driven maintenance recommendations." },
+        { role: "user", content: prompt }
       ],
       response_format: {
         type: "json_schema",
@@ -146,33 +254,17 @@ Generate 8-15 tasks covering all major maintenance categories. Be specific and p
                   properties: {
                     taskName: { type: "string" },
                     description: { type: "string" },
-                    priority: { 
-                      type: "string",
-                      enum: ["Critical", "Important", "Recommended", "Optional"]
-                    },
+                    priority: { type: "string", enum: ["Critical", "Important", "Recommended", "Optional"] },
                     category: { type: "string" },
                     estimatedCost: { type: "number" },
                     estimatedDuration: { type: "number" },
-                    triggerType: { 
-                      type: "string",
-                      enum: ["Mileage", "Time", "Both"]
-                    },
-                    triggerMileage: { type: ["number", "null"] },
-                    triggerDate: { type: ["string", "null"] },
-                    intervalMileage: { type: ["number", "null"] },
-                    intervalMonths: { type: ["number", "null"] },
+                    triggerType: { type: "string", enum: ["Mileage", "Time", "Both"] },
+                    triggerMileage: { type: "number" },
+                    intervalMileage: { type: "number" },
+                    intervalMonths: { type: "number" },
                     aiReasoning: { type: "string" }
                   },
-                  required: [
-                    "taskName",
-                    "description",
-                    "priority",
-                    "category",
-                    "estimatedCost",
-                    "estimatedDuration",
-                    "triggerType",
-                    "aiReasoning"
-                  ],
+                  required: ["taskName", "description", "priority", "category", "estimatedCost", "estimatedDuration", "triggerType", "aiReasoning"],
                   additionalProperties: false
                 }
               },
@@ -187,81 +279,19 @@ Generate 8-15 tasks covering all major maintenance categories. Be specific and p
     });
 
     const content = response.choices[0].message.content;
-    if (!content) {
+    if (!content || typeof content !== 'string') {
       throw new Error("No content in LLM response");
     }
 
-    const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
-    const schedule: MaintenanceSchedule = JSON.parse(contentStr);
+    const schedule = JSON.parse(content);
     
-    // Convert string dates to Date objects
-    schedule.tasks = schedule.tasks.map(task => ({
-      ...task,
-      triggerDate: task.triggerDate ? new Date(task.triggerDate) : undefined
-    }));
-
-    return schedule;
+    return {
+      ...schedule,
+      dataQuality: dataAssessment.quality,
+      dataInsights: dataAssessment.insights,
+    };
   } catch (error) {
-    console.error("[AI Maintenance] Error generating schedule:", error);
-    
-    // Fallback to basic schedule if AI fails
-    return generateFallbackSchedule(vehicle);
+    console.error("AI maintenance generation error:", error);
+    throw new Error(`Failed to generate maintenance schedule: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-}
-
-/**
- * Generate a basic fallback schedule if AI fails
- */
-function generateFallbackSchedule(vehicle: Vehicle): MaintenanceSchedule {
-  const mileage = vehicle.mileage || 0;
-  const currentDate = new Date();
-  
-  const tasks: MaintenanceTaskRecommendation[] = [
-    {
-      taskName: "Engine Oil Change",
-      description: "Replace engine oil and oil filter",
-      priority: "Important",
-      category: "Engine",
-      estimatedCost: 50,
-      estimatedDuration: 30,
-      triggerType: "Both",
-      triggerMileage: mileage + 5000,
-      triggerDate: new Date(currentDate.getTime() + 180 * 24 * 60 * 60 * 1000),
-      intervalMileage: 5000,
-      intervalMonths: 6,
-      aiReasoning: "Standard maintenance interval"
-    },
-    {
-      taskName: "Brake Inspection",
-      description: "Inspect brake pads, rotors, and brake fluid",
-      priority: "Recommended",
-      category: "Brakes",
-      estimatedCost: 30,
-      estimatedDuration: 45,
-      triggerType: "Both",
-      triggerMileage: mileage + 10000,
-      triggerDate: new Date(currentDate.getTime() + 365 * 24 * 60 * 60 * 1000),
-      intervalMileage: 10000,
-      intervalMonths: 12,
-      aiReasoning: "Regular safety inspection"
-    },
-    {
-      taskName: "Tire Rotation",
-      description: "Rotate tires to ensure even wear",
-      priority: "Recommended",
-      category: "Tires",
-      estimatedCost: 25,
-      estimatedDuration: 30,
-      triggerType: "Mileage",
-      triggerMileage: mileage + 8000,
-      intervalMileage: 8000,
-      aiReasoning: "Extend tire life"
-    }
-  ];
-
-  return {
-    tasks,
-    summary: "Basic maintenance schedule (AI generation unavailable)",
-    totalEstimatedAnnualCost: 200
-  };
 }
