@@ -291,6 +291,15 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
   return created[0];
 }
 
+export async function deleteMaintenanceRecord(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  await db.delete(maintenanceRecords).where(and(eq(maintenanceRecords.id, id), eq(maintenanceRecords.userId, userId)));
+  return { success: true };
+}
+
 // Rental Contract Queries
 export async function getAllRentalContracts(userId: number, filterUserId?: number | null) {
   const db = await getDb();

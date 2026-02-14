@@ -373,6 +373,12 @@ export const appRouter = router({
         return await db.createMaintenanceRecord({ ...input, userId: ctx.user?.id || 1 });
       }),
 
+    deleteMaintenanceRecord: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.deleteMaintenanceRecord(input.id, ctx.user?.id || 1);
+      }),
+
     getAnalysis: publicProcedure
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {

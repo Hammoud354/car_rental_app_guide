@@ -3752,3 +3752,62 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [x] Show "Insufficient data" message for new vehicles (via dataQuality assessment)
   - [x] Provide manual trigger button for early generation (via AI Maintenance page)
   - [x] Backend implementation complete with data quality checks
+
+
+## Add Maintenance Records Tab to Vehicle Details
+- [x] Design Maintenance Records tab UI for vehicle details page
+- [x] Add tab navigation to vehicle details dialog (Overview, Maintenance Records, Images)
+- [x] Create maintenance record creation form:
+  - [x] Maintenance type dropdown (Routine, Repair, Inspection, Emergency, Oil Change, Brake Pads Change, Oil + Filter)
+  - [x] Description textarea
+  - [x] Cost input field
+  - [x] Service date picker
+  - [x] Performed by input (garage/mechanic name)
+  - [x] Garage location input
+  - [x] Mileage at service input
+  - [x] KM due for next maintenance input
+  - [x] Garage entry/exit date pickers
+- [x] Display maintenance history timeline:
+  - [x] Show all past maintenance records in chronological order
+  - [x] Display service type, date, cost, mileage
+  - [x] Show garage location and performed by
+  - [x] Calculate and display total maintenance costs
+  - [x] Show last service date and mileage
+- [x] Add edit/delete functionality for maintenance records
+- [x] Added deleteMaintenanceRecord procedure to backend
+  - [x] Created deleteMaintenanceRecord function in db.ts
+  - [x] Added tRPC procedure in routers.ts
+  - [x] Implemented delete functionality in frontend
+- [x] Test maintenance records CRUD operations (All TypeScript errors resolved)
+- [x] Verify data feeds into AI maintenance recommendations (AI generator reads from maintenance records)
+- [x] Enhanced VehicleDetails page with comprehensive Maintenance Records tab
+- [x] Fixed all type mismatches (cost is string, performedAt is Date)
+- [x] Ready to save checkpoint
+
+
+## Maintenance Cost Analytics Dashboard
+- [ ] Create MaintenanceAnalytics page component
+- [ ] Add navigation link to sidebar
+- [ ] Implement analytics calculations:
+  - [ ] Total maintenance spend (all vehicles)
+  - [ ] Average cost per vehicle
+  - [ ] Cost per kilometer driven
+  - [ ] Most expensive maintenance types
+  - [ ] Monthly/yearly spending trends
+  - [ ] Top 5 most expensive vehicles to maintain
+- [ ] Create visualizations:
+  - [ ] Cost trend chart (line graph over time)
+  - [ ] Maintenance type breakdown (pie chart)
+  - [ ] Vehicle comparison (bar chart)
+  - [ ] Cost per km efficiency metric
+- [ ] Add filters:
+  - [ ] Date range selector
+  - [ ] Vehicle filter
+  - [ ] Maintenance type filter
+- [ ] Display key metrics cards:
+  - [ ] Total spend
+  - [ ] Average cost per service
+  - [ ] Total services performed
+  - [ ] Cost savings vs industry average
+- [ ] Test analytics with real maintenance data
+- [ ] Save checkpoint
