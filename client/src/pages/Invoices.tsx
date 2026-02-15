@@ -502,7 +502,62 @@ export default function Invoices() {
                 {/* Action Buttons */}
                 <div className="flex gap-3 justify-end print:hidden">
                   <Button 
-                    onClick={() => window.print()} 
+                    onClick={() => {
+                      const printContent = document.getElementById('invoice-content');
+                      if (!printContent) {
+                        toast.error("Invoice content not found");
+                        return;
+                      }
+                      
+                      // Create a new window for printing
+                      const printWindow = window.open('', '_blank');
+                      if (!printWindow) {
+                        toast.error("Please allow popups to print");
+                        return;
+                      }
+                      
+                      // Write the invoice content to the new window with styles
+                      printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <title>Invoice ${invoiceDetails.invoiceNumber}</title>
+                            <style>
+                              * { margin: 0; padding: 0; box-sizing: border-box; }
+                              body { font-family: Arial, sans-serif; padding: 20px; }
+                              @media print {
+                                body { padding: 0; }
+                                @page { margin: 0.5in; }
+                              }
+                            </style>
+                            ${Array.from(document.styleSheets)
+                              .map(sheet => {
+                                try {
+                                  return Array.from(sheet.cssRules)
+                                    .map(rule => rule.cssText)
+                                    .join('\n');
+                                } catch (e) {
+                                  return '';
+                                }
+                              })
+                              .join('\n')}
+                          </head>
+                          <body>
+                            ${printContent.innerHTML}
+                          </body>
+                        </html>
+                      `);
+                      
+                      printWindow.document.close();
+                      
+                      // Wait for content to load, then print
+                      printWindow.onload = () => {
+                        setTimeout(() => {
+                          printWindow.print();
+                          printWindow.close();
+                        }, 250);
+                      };
+                    }} 
                     variant="outline"
                   >
                     🖨️ Print Invoice

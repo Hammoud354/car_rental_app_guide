@@ -4334,3 +4334,23 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Test with contracts expiring in 1, 2, and 3 days
 - [ ] Verify alerts appear on Dashboard
 - [ ] Test quick action buttons work correctly
+
+
+## Invoice Print Functionality Fix
+
+### Issue
+- [x] Print Invoice button shows blank page in print preview
+- [x] Print function not targeting invoice content correctly
+- [x] Invoice content hidden or not loaded when printing
+
+### Fix Requirements
+- [x] Update print function to target invoice container/section only (opens in new window)
+- [x] Ensure invoice content is fully loaded before printing (250ms delay)
+- [x] Add/fix print styles (@media print) to show invoice content (copies all stylesheets)
+- [x] Remove any display:none rules that hide invoice in print mode (isolated window)
+- [ ] Test print preview shows formatted invoice exactly as displayed
+
+### Testing
+- [ ] Test print button shows invoice content in preview
+- [ ] Verify all invoice details are visible and formatted correctly
+- [ ] Check print layout matches screen display
