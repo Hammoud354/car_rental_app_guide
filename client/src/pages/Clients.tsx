@@ -148,7 +148,7 @@ export default function Clients() {
     
     const formData = new FormData(e.currentTarget);
     
-    updateClient.mutate({
+    const updateData = {
       id: selectedClient.id,
       firstName: formData.get("firstName") as string || undefined,
       lastName: formData.get("lastName") as string || undefined,
@@ -160,7 +160,10 @@ export default function Clients() {
       licenseExpiryDate: editLicenseExpiryDate,
       email: formData.get("email") as string || undefined,
       notes: formData.get("notes") as string || undefined,
-    });
+    };
+    
+    console.log('Updating client with data:', updateData);
+    updateClient.mutate(updateData);
   };
 
   const handleDeleteClick = (clientId: number, clientName: string) => {
@@ -510,7 +513,7 @@ export default function Clients() {
             <DialogTitle>Edit Client</DialogTitle>
           </DialogHeader>
           {selectedClient && (
-            <form onSubmit={handleEditSubmit} className="space-y-6">
+            <form key={selectedClient.id} onSubmit={handleEditSubmit} className="space-y-6">
               {/* Personal Information */}
               <div>
                 <h3 className="font-semibold mb-4">Personal Information</h3>
