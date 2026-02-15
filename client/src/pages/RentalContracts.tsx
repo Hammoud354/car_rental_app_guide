@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
+import { ContractPDFTemplate } from "@/components/ContractPDFTemplate";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
 import { InsuranceDepositSelector } from "@/components/InsuranceDepositSelector";
@@ -1399,6 +1400,19 @@ export default function RentalContracts() {
                 </div>
               );
             })()}
+            {/* Hidden PDF Template for Export */}
+            {selectedContract && (() => {
+              const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+              return (
+                <ContractPDFTemplate 
+                  contract={{
+                    ...selectedContract,
+                    clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`
+                  }} 
+                  vehicle={vehicle || null} 
+                />
+              );
+            })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
               {/* Button grid layout - 2 columns, equal sizing */}
               <div className="grid grid-cols-2 gap-3 w-full">
@@ -1421,11 +1435,12 @@ export default function RentalContracts() {
                     }
                     
                     try {
-                      toast.info("Generating PDF...");
+                      toast.info("Generating PDF... This may take a moment");
                       
-                      const element = document.getElementById('contract-content');
+                      // Use the dedicated PDF template instead of screen content
+                      const element = document.getElementById('contract-pdf-template');
                       if (!element) {
-                        toast.error("Contract content not found");
+                        toast.error("PDF template not found");
                         return;
                       }
                       
@@ -1433,14 +1448,15 @@ export default function RentalContracts() {
                       const html2pdf = (await import('html2pdf.js')).default;
                       
                       const opt = {
-                        margin: [10, 10, 10, 10] as [number, number, number, number], // top, right, bottom, left
+                        margin: [15, 15, 15, 15] as [number, number, number, number],
                         filename: `Contract-${selectedContract.contractNumber}.pdf`,
-                        image: { type: 'jpeg' as const, quality: 0.85 },
+                        image: { type: 'jpeg' as const, quality: 0.90 },
                         html2canvas: { 
-                          scale: 1.5,
+                          scale: 2,
                           useCORS: true,
                           logging: false,
-                          windowHeight: element.scrollHeight
+                          windowHeight: element.scrollHeight,
+                          windowWidth: element.scrollWidth
                         },
                         jsPDF: { 
                           unit: 'mm', 
@@ -1450,10 +1466,9 @@ export default function RentalContracts() {
                         },
                         pagebreak: { 
                           mode: ['avoid-all', 'css', 'legacy'],
-                          before: '.page-break-before',
-                          after: '.page-break-after',
-                          avoid: ['img', '.no-break']
-                        }
+                          avoid: ['img', 'table', '.no-break']
+                        },
+                        enableLinks: false
                       };
                       
                       await html2pdf().set(opt).from(element).save();

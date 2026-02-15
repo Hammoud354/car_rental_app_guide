@@ -4008,3 +4008,30 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test PDF export with sample contract
 - [x] Verify all fields display correctly
 - [ ] Create checkpoint and deliver
+
+## Fix PDF Export - Null Fields and Poor Readability
+
+### Issue Description
+- [x] PDF exports show null/missing data fields instead of actual values
+- [x] Some fields display "null", "N/A", or "Unknown" instead of real data
+- [x] PDF layout is not clear and professional
+- [x] Data is difficult to read and not well-organized
+
+### Investigation
+- [x] Check contract data structure in database
+- [x] Identify which fields are showing null values (vehicle info, optional fields)
+- [x] Review PDF content generation in RentalContracts.tsx
+- [x] Analyze data mapping from database to PDF display
+
+### Fix Implementation
+- [x] Handle null/undefined values properly (hide empty fields or show meaningful defaults)
+- [x] Ensure all contract data is correctly mapped to PDF
+- [x] Redesign PDF layout with better spacing, typography, and sections
+- [x] Add proper headers, labels, and formatting for professional appearance
+- [x] Created dedicated ContractPDFTemplate component with professional design
+
+### Testing & Delivery
+- [x] Test PDF export with real contract data
+- [x] Verify no null values appear in PDF
+- [x] Confirm all fields are readable and well-formatted
+- [ ] Create checkpoint and deliver
