@@ -991,52 +991,21 @@ export const appRouter = router({
   // Export Router
   export: router({
     profitabilityExcel: protectedProcedure.query(async ({ ctx }) => {
-      const XLSX = await import('xlsx');
       const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id);
       
-      // Prepare data for Excel
-      const data = vehicles.map((v: any) => ({
-        'Plate Number': v.plateNumber,
-        'Brand': v.brand,
-        'Model': v.model,
-        'Year': v.year,
-        'Total Revenue': `$${v.totalRevenue.toFixed(2)}`,
-        'Maintenance Cost': `$${v.totalMaintenanceCost.toFixed(2)}`,
-        'Insurance Cost': `$${v.insuranceCost.toFixed(2)}`,
-        'Net Profit': `$${v.netProfit.toFixed(2)}`,
-        'Profit Margin': `${v.profitMargin.toFixed(1)}%`,
-        'Number of Rentals': v.rentalCount
+      // Return raw data for client-side Excel generation
+      return vehicles.map((v: any) => ({
+        plateNumber: v.plateNumber,
+        brand: v.brand,
+        model: v.model,
+        year: v.year,
+        totalRevenue: v.totalRevenue,
+        totalMaintenanceCost: v.totalMaintenanceCost,
+        insuranceCost: v.insuranceCost,
+        netProfit: v.netProfit,
+        profitMargin: v.profitMargin,
+        rentalCount: v.rentalCount
       }));
-      
-      // Create workbook and worksheet
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(data);
-      
-      // Set column widths
-      ws['!cols'] = [
-        { wch: 15 }, // Plate Number
-        { wch: 12 }, // Brand
-        { wch: 12 }, // Model
-        { wch: 6 },  // Year
-        { wch: 15 }, // Total Revenue
-        { wch: 18 }, // Maintenance Cost
-        { wch: 15 }, // Insurance Cost
-        { wch: 12 }, // Net Profit
-        { wch: 14 }, // Profit Margin
-        { wch: 18 }  // Number of Rentals
-      ];
-      
-      XLSX.utils.book_append_sheet(wb, ws, 'Profitability Report');
-      
-      // Generate buffer
-      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-      
-      // Set response headers
-      ctx.res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      ctx.res.setHeader('Content-Disposition', `attachment; filename="profitability-report-${new Date().toISOString().split('T')[0]}.xlsx"`);
-      ctx.res.send(buffer);
-      
-      return { success: true };
     }),
     
     profitabilityPDF: protectedProcedure.query(async ({ ctx }) => {

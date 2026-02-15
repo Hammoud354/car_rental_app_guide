@@ -3893,3 +3893,26 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Add save functionality to persist edits
 - [ ] Test editing and saving from Maintenance Tracking page
 - [ ] Save checkpoint
+
+## Fix Non-Working Print and Export Buttons
+
+### Phase 1: Identify All Print/Export Buttons
+- [x] Search for all Print buttons across the application
+- [x] Search for all Export buttons (PDF, Excel, etc.)
+- [x] List all pages with Print/Export functionality
+
+### Phase 2: Investigate Root Causes
+- [x] Check button implementations and event handlers
+- [x] Identify missing dependencies or broken code
+- [x] Determine if buttons are placeholders or have broken functionality
+
+### Phase 3: Implement Working Functionality
+- [x] Fix Print functionality for all pages (window.print() already working)
+- [x] Fix PDF Export functionality (html2pdf.js already implemented)
+- [x] Fix Excel Export functionality (ProfitabilityDashboard fixed)
+- [x] Test each button individually
+
+### Phase 4: Testing & Delivery
+- [x] Test all Print buttons work correctly
+- [x] Test all Export buttons work correctly
+- [ ] Create checkpoint and deliver

@@ -29,6 +29,7 @@ export default function ProfitabilityDashboard() {
     { vehicleId: selectedVehicleId! },
     { enabled: selectedVehicleId !== null }
   );
+  const exportQuery = trpc.export.profitabilityExcel.useQuery(undefined, { enabled: false });
 
   if (isLoading) {
     return (
@@ -81,7 +82,65 @@ export default function ProfitabilityDashboard() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => window.open('/api/trpc/export.profitabilityExcel', '_blank')}
+            onClick={async () => {
+              try {
+                const { toast } = await import('sonner');
+                toast.info("Generating Excel file...");
+                
+                const XLSX = await import('xlsx');
+                const result = await exportQuery.refetch();
+                
+                if (!result.data || result.data.length === 0) {
+                  toast.error("No data to export");
+                  return;
+                }
+                
+                // Prepare data for Excel
+                const excelData = result.data.map((v: any) => ({
+                  'Plate Number': v.plateNumber,
+                  'Brand': v.brand,
+                  'Model': v.model,
+                  'Year': v.year,
+                  'Total Revenue': `$${v.totalRevenue.toFixed(2)}`,
+                  'Maintenance Cost': `$${v.totalMaintenanceCost.toFixed(2)}`,
+                  'Insurance Cost': `$${v.insuranceCost.toFixed(2)}`,
+                  'Net Profit': `$${v.netProfit.toFixed(2)}`,
+                  'Profit Margin': `${v.profitMargin.toFixed(1)}%`,
+                  'Number of Rentals': v.rentalCount
+                }));
+                
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(excelData);
+                
+                // Set column widths
+                ws['!cols'] = [
+                  { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 6 },
+                  { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 12 },
+                  { wch: 14 }, { wch: 18 }
+                ];
+                
+                XLSX.utils.book_append_sheet(wb, ws, 'Profitability Report');
+                
+                // Generate and download
+                const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+                const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `profitability-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                toast.success("Excel file downloaded successfully!");
+              } catch (error: any) {
+                const { toast } = await import('sonner');
+                console.error("Excel export error:", error);
+                toast.error(`Failed to export Excel: ${error.message || 'Unknown error'}`);
+              }
+            }}
             className="flex items-center gap-2"
           >
             <FileSpreadsheet className="h-4 w-4" />
