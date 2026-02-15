@@ -4157,3 +4157,31 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Verify no more DialogContent warnings in console
 - [ ] Test all dialogs still function correctly
 - [ ] Create checkpoint and deliver
+
+## CRITICAL: Client Update Not Saving to Database
+
+### Issue Description
+- [ ] Client edit shows "Client updated successfully" message
+- [ ] But data is NOT actually saved to the database
+- [ ] After closing dialog and reopening, old data still shows
+- [ ] After page refresh, changes are lost (old values remain)
+- [ ] Backend update procedure completes without errors but doesn't persist changes
+
+### Investigation
+- [ ] Check backend clients.update procedure in routers.ts
+- [ ] Review db.updateClient() function in db.ts
+- [ ] Verify SQL UPDATE query is correct
+- [ ] Check if transaction is being committed
+- [ ] Add logging to see what data reaches the database layer
+
+### Fix Implementation
+- [ ] Fix the database update query to properly save changes
+- [ ] Ensure transaction commits successfully
+- [ ] Verify all fields are being updated correctly
+- [ ] Add proper error handling if update fails
+
+### Testing & Delivery
+- [ ] Test editing client name, phone, email, etc.
+- [ ] Verify changes persist after closing dialog
+- [ ] Confirm changes remain after page refresh
+- [ ] Create checkpoint and deliver

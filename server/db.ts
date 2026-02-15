@@ -779,8 +779,26 @@ export async function updateClient(id: number, userId: number, updates: Partial<
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db.update(clients).set(updates).where(and(eq(clients.id, id), eq(clients.userId, userId)));
-  return await getClientById(id, userId);
+  console.log('[DB] updateClient called with:', { id, userId, updates });
+  
+  // First check if the client exists
+  const existingClient = await getClientById(id, userId);
+  if (!existingClient) {
+    console.error('[DB] Client not found:', { id, userId });
+    throw new Error(`Client with id ${id} not found or doesn't belong to user ${userId}`);
+  }
+  
+  console.log('[DB] Existing client before update:', existingClient);
+  
+  // Perform the update
+  const result: any = await db.update(clients).set(updates).where(and(eq(clients.id, id), eq(clients.userId, userId)));
+  console.log('[DB] update result (affected rows):', result);
+  
+  // Fetch the updated client
+  const updatedClient = await getClientById(id, userId);
+  console.log('[DB] fetched updated client after update:', updatedClient);
+  
+  return updatedClient;
 }
 
 export async function deleteClient(id: number, userId: number): Promise<void> {

@@ -944,6 +944,8 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         const { id, ...updates } = input;
+        console.log('[Router] clients.update called with:', { id, updates, userId: ctx.user?.id || 1 });
+        
         // Validate license expiry date is in the future if provided
         if (updates.licenseExpiryDate) {
           const today = new Date();
@@ -952,7 +954,10 @@ export const appRouter = router({
             throw new Error('License expiry date must be in the future');
           }
         }
-        return await db.updateClient(id, ctx.user?.id || 1, updates);
+        
+        const result = await db.updateClient(id, ctx.user?.id || 1, updates);
+        console.log('[Router] clients.update result:', result);
+        return result;
       }),
     
     delete: publicProcedure
