@@ -29,6 +29,7 @@ import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/cur
 export default function Invoices() {
   const { user } = useAuth();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
+  const utils = trpc.useUtils();
   const [selectedInvoice, setSelectedInvoice] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
@@ -74,8 +75,8 @@ export default function Invoices() {
   const updatePaymentMutation = trpc.invoices.updatePaymentStatus.useMutation({
     onSuccess: () => {
       toast.success("Payment status updated successfully");
-      trpc.useUtils().invoices.list.invalidate();
-      trpc.useUtils().invoices.getById.invalidate();
+      utils.invoices.list.invalidate();
+      utils.invoices.getById.invalidate();
       setPaymentStatus("");
       setPaymentMethod("");
       setSelectedInvoice(null); // Close the dialog

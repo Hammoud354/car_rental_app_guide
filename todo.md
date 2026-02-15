@@ -4298,3 +4298,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Find driving license expiry date input fields with max="2036" constraint
 - [x] Remove or extend the max date constraint to allow dates beyond 2036 (now allows up to 50 years in the future)
 - [ ] Test that future dates beyond 2036 can be selected in production
+
+
+## Invoice Status Update Cache Issue
+
+- [x] Find invoice status update mutation in Invoices page
+- [x] Add proper cache invalidation (utils.invoices.list.invalidate())
+- [x] Fix React error #321 caused by calling useUtils inside mutation callback
+- [ ] Verify UI updates immediately after status change without page refresh in production
