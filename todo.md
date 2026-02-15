@@ -4528,3 +4528,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - Replaced inline onClick (lines 587-612) with onClick={handleExportPDF}
 - Export PDF button now calls the correct function with new window approach
 - Should now produce identical output to Print Preview
+
+
+## PDF Download Not Triggering
+
+### Issue
+- Export PDF button now calls correct function (handleExportPDF)
+- New window opens and generates PDF
+- Window closes before PDF download completes
+- User reports PDF is not downloadable
+
+### Fix Applied
+- [x] Added 2-second delay before window.close() to allow download to complete
+- [x] Show success message in window before closing
+- [x] Window now closes automatically after PDF download completes

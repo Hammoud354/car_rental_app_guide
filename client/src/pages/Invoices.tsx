@@ -191,9 +191,12 @@ export default function Invoices() {
                   heightLeft -= pageHeight;
                 }
                 
-                // Save and close
+                // Save PDF
                 pdf.save("${invoiceDetails?.invoiceNumber || 'invoice'}.pdf");
-                window.close();
+                
+                // Show success message and close after delay to ensure download completes
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;font-size:18px;color:#10b981;">✓ PDF Downloaded Successfully! This window will close automatically...</div>';
+                setTimeout(() => window.close(), 2000);
               }, 1500);
             </script>
           </body>
