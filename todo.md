@@ -3916,3 +3916,26 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test all Print buttons work correctly
 - [x] Test all Export buttons work correctly
 - [ ] Create checkpoint and deliver
+
+## Fix Export to PDF Bug on Profitability Dashboard
+
+### Issue Description
+- [x] Export to PDF button freezes website for 5 seconds
+- [x] Shows "Failed to export PDF" error
+- [x] Exports Excel file instead of PDF file
+
+### Investigation
+- [x] Check Export to PDF button implementation in ProfitabilityDashboard.tsx
+- [x] Verify html2pdf.js is being used correctly
+- [x] Check if button is accidentally calling Excel export function
+
+### Fix Implementation
+- [x] Fix PDF export to use html2pdf.js properly
+- [x] Ensure PDF export doesn't freeze the UI (added setTimeout)
+- [x] Add proper loading indicators (improved toast message)
+- [x] Test PDF export generates correct file format
+
+### Testing & Delivery
+- [x] Test Export to PDF button works without freezing
+- [x] Verify PDF file is generated (not Excel)
+- [ ] Create checkpoint and deliver

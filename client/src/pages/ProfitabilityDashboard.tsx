@@ -70,7 +70,7 @@ export default function ProfitabilityDashboard() {
     : 0;
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-8 space-y-6" id="profitability-dashboard-content">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
@@ -151,26 +151,39 @@ export default function ProfitabilityDashboard() {
             onClick={async () => {
               try {
                 const { toast } = await import('sonner');
-                toast.info("Generating PDF...");
+                toast.info("Generating PDF... This may take a moment.");
                 
-                const element = document.querySelector('.p-8.space-y-6') as HTMLElement;
-                if (!element) {
-                  toast.error("Dashboard content not found");
-                  return;
-                }
-                
-                const html2pdf = (await import('html2pdf.js')).default;
-                
-                const opt = {
-                  margin: 10,
-                  filename: 'profitability-dashboard.pdf',
-                  image: { type: 'jpeg' as const, quality: 0.98 },
-                  html2canvas: { scale: 2 },
-                  jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' as const }
-                };
-                
-                await html2pdf().set(opt).from(element).save();
-                toast.success("PDF downloaded successfully!");
+                // Use setTimeout to prevent UI freeze
+                setTimeout(async () => {
+                  try {
+                    const element = document.getElementById('profitability-dashboard-content');
+                    if (!element) {
+                      toast.error("Dashboard content not found");
+                      return;
+                    }
+                    
+                    const html2pdf = (await import('html2pdf.js')).default;
+                    
+                    // Optimized settings to reduce processing time
+                    const opt = {
+                      margin: 10,
+                      filename: `profitability-dashboard-${new Date().toISOString().split('T')[0]}.pdf`,
+                      image: { type: 'jpeg' as const, quality: 0.85 },
+                      html2canvas: { 
+                        scale: 1.5,
+                        useCORS: true,
+                        logging: false
+                      },
+                      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' as const }
+                    };
+                    
+                    await html2pdf().set(opt).from(element).save();
+                    toast.success("PDF downloaded successfully!");
+                  } catch (error: any) {
+                    console.error("PDF export error:", error);
+                    toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
+                  }
+                }, 100);
               } catch (error: any) {
                 const { toast } = await import('sonner');
                 console.error("PDF export error:", error);
