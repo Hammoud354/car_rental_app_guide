@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
+import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
 import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -159,6 +160,128 @@ function ExportToExcelButton() {
   );
 }
 
+function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null }) {
+  const { data: expiredVehicles, isLoading: loadingExpired } = trpc.fleet.getExpiredInsurance.useQuery(undefined, {
+    enabled: !filterUserId, // Only load for own data
+  });
+  const { data: expiringVehicles, isLoading: loadingExpiring } = trpc.fleet.getExpiringInsurance.useQuery(
+    { daysThreshold: 30 },
+    { enabled: !filterUserId }
+  );
+  
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+  
+  if (loadingExpired || loadingExpiring) return null;
+  
+  const expired = expiredVehicles || [];
+  const expiring = expiringVehicles || [];
+  const totalIssues = expired.length + expiring.length;
+  
+  if (totalIssues === 0) return null;
+  
+  const handleRenewClick = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
+    setIsRenewalDialogOpen(true);
+  };
+  
+  return (
+    <>
+      <Card className="bg-orange-50 border-orange-200 shadow-md">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+              </div>
+              <CardTitle className="text-lg font-semibold text-orange-900">Insurance Expiry Alert</CardTitle>
+            </div>
+            <Link href="/fleet-management">
+              <Button variant="outline" size="sm" className="border-orange-300 text-orange-700 hover:bg-orange-100">
+                View Fleet
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
+              <div className="text-3xl font-bold text-red-600">{expired.length}</div>
+              <div className="text-sm text-red-700 mt-1">Expired Policies</div>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
+              <div className="text-3xl font-bold text-yellow-600">{expiring.length}</div>
+              <div className="text-sm text-yellow-700 mt-1">Expiring Soon (30d)</div>
+            </div>
+          </div>
+          
+          {expired.length > 0 && (
+            <div className="mb-3">
+              <h4 className="text-sm font-semibold text-red-900 mb-2">Expired Insurance:</h4>
+              <div className="space-y-2">
+                {expired.slice(0, 3).map((vehicle: any) => (
+                  <div key={vehicle.id} className="flex items-center justify-between p-2 bg-red-50 rounded border border-red-200">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm text-red-900">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                      <div className="text-xs text-red-700">Expired: {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</div>
+                    </div>
+                    <Button size="sm" variant="outline" className="border-red-300 text-red-700" onClick={() => handleRenewClick(vehicle)}>
+                      Renew Now
+                    </Button>
+                  </div>
+                ))}
+                {expired.length > 3 && (
+                  <p className="text-xs text-red-700 text-center">+{expired.length - 3} more expired</p>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {expiring.length > 0 && (
+            <div>
+              <h4 className="text-sm font-semibold text-yellow-900 mb-2">Expiring Soon:</h4>
+              <div className="space-y-2">
+                {expiring.slice(0, 3).map((vehicle: any) => {
+                  const daysLeft = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                  return (
+                    <div key={vehicle.id} className="flex items-center justify-between p-2 bg-yellow-50 rounded border border-yellow-200">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-yellow-900">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                        <div className="text-xs text-yellow-700">{daysLeft} days remaining</div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700" onClick={() => handleRenewClick(vehicle)}>
+                        Renew
+                      </Button>
+                    </div>
+                  );
+                })}
+                {expiring.length > 3 && (
+                  <p className="text-xs text-yellow-700 text-center">+{expiring.length - 3} more expiring</p>
+                )}
+              </div>
+            </div>
+          )}
+          
+          <div className="mt-4 p-3 bg-orange-100 rounded-lg flex items-start gap-2">
+            <Clock className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-orange-800">
+              <strong>Action Required:</strong> {totalIssues} vehicle{totalIssues > 1 ? 's' : ''} {totalIssues > 1 ? 'need' : 'needs'} insurance renewal. Renew policies to maintain legal compliance and coverage.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {selectedVehicle && (
+        <InsuranceRenewalDialog
+          vehicle={selectedVehicle}
+          open={isRenewalDialogOpen}
+          onOpenChange={setIsRenewalDialogOpen}
+        />
+      )}
+    </>
+  );
+}
+
 function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery({ filterUserId: filterUserId || undefined });
   
@@ -217,6 +340,7 @@ export default function Dashboard() {
     inMaintenance: true,
     expiringDocs: true,
     overdueAlert: true,
+    insuranceAlert: true,
     fleetStatus: true,
     fleetComposition: true,
   });
@@ -352,6 +476,17 @@ export default function Dashboard() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
+                      <Label htmlFor="insuranceAlert" className="flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        Insurance Expiry Alert
+                      </Label>
+                      <Switch
+                        id="insuranceAlert"
+                        checked={widgetVisibility.insuranceAlert}
+                        onCheckedChange={() => toggleWidget('insuranceAlert')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
                       <Label htmlFor="fleetStatus" className="flex items-center gap-2">
                         <Eye className="h-4 w-4" />
                         Fleet Status Chart
@@ -411,6 +546,9 @@ export default function Dashboard() {
 
           {/* Overdue Contracts Alert Widget */}
           {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
+
+          {/* Insurance Expiry Alert Widget */}
+          {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

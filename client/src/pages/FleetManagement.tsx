@@ -205,7 +205,10 @@ export default function FleetManagement() {
       mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+      insuranceProvider: formData.get("insuranceProvider") as string || undefined,
+      insurancePolicyStartDate: formData.get("insurancePolicyStartDate") ? new Date(formData.get("insurancePolicyStartDate") as string) : undefined,
       insuranceExpiryDate: formData.get("insuranceExpiryDate") ? new Date(formData.get("insuranceExpiryDate") as string) : undefined,
+      insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
       registrationExpiryDate: formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined,
@@ -253,6 +256,10 @@ export default function FleetManagement() {
         mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
         vin: formData.get("vin") as string || undefined,
         insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+        insuranceProvider: formData.get("insuranceProvider") as string || undefined,
+        insurancePolicyStartDate: formData.get("insurancePolicyStartDate") ? new Date(formData.get("insurancePolicyStartDate") as string) : undefined,
+        insuranceExpiryDate: formData.get("insuranceExpiryDate") ? new Date(formData.get("insuranceExpiryDate") as string) : undefined,
+        insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
         notes: formData.get("notes") as string || undefined,
@@ -541,19 +548,35 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="insurancePolicyNumber">Insurance Policy Number</Label>
-                  <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
-                </div>
+                <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                  <h4 className="font-medium text-sm">Insurance Information</h4>
+                  
+                  <div>
+                    <Label htmlFor="insuranceProvider">Insurance Provider</Label>
+                    <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" />
+                  </div>
 
-                <div>
-                  <Label htmlFor="insuranceExpiryDate">Insurance Expiry Date</Label>
-                  <Input id="insuranceExpiryDate" name="insuranceExpiryDate" type="date" />
-                </div>
+                  <div>
+                    <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
+                    <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
+                  </div>
 
-                <div>
-                  <Label htmlFor="insuranceCost">Annual Insurance Cost ($)</Label>
-                  <Input id="insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="insurancePolicyStartDate">Policy Start Date</Label>
+                      <Input id="insurancePolicyStartDate" name="insurancePolicyStartDate" type="date" />
+                    </div>
+                    <div>
+                      <Label htmlFor="insuranceExpiryDate">Policy Expiry Date</Label>
+                      <Input id="insuranceExpiryDate" name="insuranceExpiryDate" type="date" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="insuranceAnnualPremium">Annual Premium ($)</Label>
+                    <Input id="insuranceAnnualPremium" name="insuranceAnnualPremium" type="number" step="0.01" min="0" placeholder="0.00" />
+                    <p className="text-xs text-muted-foreground mt-1">You'll be prompted to renew when policy expires</p>
+                  </div>
                 </div>
 
                 <div>
@@ -1020,14 +1043,52 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="edit-insurancePolicyNumber">Insurance Policy Number</Label>
-                  <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
-                </div>
+                <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
+                  <h4 className="font-medium text-sm">Insurance Information</h4>
+                  
+                  <div>
+                    <Label htmlFor="edit-insuranceProvider">Insurance Provider</Label>
+                    <Input id="edit-insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" defaultValue={selectedVehicle.insuranceProvider || ""} />
+                  </div>
 
-                <div>
-                  <Label htmlFor="edit-insuranceCost">Annual Insurance Cost ($)</Label>
-                  <Input id="edit-insuranceCost" name="insuranceCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.insuranceCost || ""} />
+                  <div>
+                    <Label htmlFor="edit-insurancePolicyNumber">Policy Number</Label>
+                    <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="edit-insurancePolicyStartDate">Policy Start Date</Label>
+                      <Input 
+                        id="edit-insurancePolicyStartDate" 
+                        name="insurancePolicyStartDate" 
+                        type="date" 
+                        defaultValue={selectedVehicle.insurancePolicyStartDate ? new Date(selectedVehicle.insurancePolicyStartDate).toISOString().split('T')[0] : ""}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-insuranceExpiryDate">Policy Expiry Date</Label>
+                      <Input 
+                        id="edit-insuranceExpiryDate" 
+                        name="insuranceExpiryDate" 
+                        type="date" 
+                        defaultValue={selectedVehicle.insuranceExpiryDate ? new Date(selectedVehicle.insuranceExpiryDate).toISOString().split('T')[0] : ""}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="edit-insuranceAnnualPremium">Annual Premium ($)</Label>
+                    <Input 
+                      id="edit-insuranceAnnualPremium" 
+                      name="insuranceAnnualPremium" 
+                      type="number" 
+                      step="0.01" 
+                      min="0" 
+                      placeholder="0.00" 
+                      defaultValue={selectedVehicle.insuranceAnnualPremium || ""}
+                    />
+                  </div>
                 </div>
 
                 <div>

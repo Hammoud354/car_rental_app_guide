@@ -2631,3 +2631,98 @@ export async function getRentalContractsByVehicle(vehicleId: number, userId: num
     ))
     .orderBy(rentalContracts.rentalStartDate);
 }
+
+
+/**
+ * Insurance Tracking Functions
+ */
+
+/**
+ * Get vehicles with insurance expiring within specified days
+ */
+export async function getVehiclesWithExpiringInsurance(userId: number, daysThreshold: number = 30) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get vehicles with expiring insurance: database not available");
+    return [];
+  }
+  
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + daysThreshold);
+  
+  return await db
+    .select()
+    .from(vehicles)
+    .where(and(
+      eq(vehicles.userId, userId),
+      sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
+      sql`${vehicles.insuranceExpiryDate} > ${today}`,
+      sql`${vehicles.insuranceExpiryDate} <= ${futureDate}`
+    ))
+    .orderBy(vehicles.insuranceExpiryDate);
+}
+
+/**
+ * Get vehicles with expired insurance
+ */
+export async function getVehiclesWithExpiredInsurance(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get vehicles with expired insurance: database not available");
+    return [];
+  }
+  
+  const today = new Date();
+  
+  return await db
+    .select()
+    .from(vehicles)
+    .where(and(
+      eq(vehicles.userId, userId),
+      sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
+      sql`${vehicles.insuranceExpiryDate} < ${today}`
+    ))
+    .orderBy(vehicles.insuranceExpiryDate);
+}
+
+/**
+ * Renew vehicle insurance with new policy details
+ */
+export async function renewVehicleInsurance(
+  vehicleId: number,
+  userId: number,
+  policyStartDate: Date,
+  policyExpiryDate: Date,
+  annualPremium: string,
+  insuranceProvider?: string,
+  policyNumber?: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const updateData: any = {
+    insurancePolicyStartDate: policyStartDate,
+    insuranceExpiryDate: policyExpiryDate,
+    insuranceAnnualPremium: annualPremium,
+    updatedAt: new Date()
+  };
+  
+  if (insuranceProvider !== undefined) {
+    updateData.insuranceProvider = insuranceProvider;
+  }
+  
+  if (policyNumber !== undefined) {
+    updateData.insurancePolicyNumber = policyNumber;
+  }
+  
+  await db
+    .update(vehicles)
+    .set(updateData)
+    .where(and(
+      eq(vehicles.id, vehicleId),
+      eq(vehicles.userId, userId)
+    ));
+  
+  return { success: true, message: "Insurance renewed successfully" };
+}

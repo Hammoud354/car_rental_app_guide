@@ -4261,3 +4261,33 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Test login flow with valid credentials in production
 - [ ] Test error handling for invalid credentials
 - [ ] Verify session persistence across page refreshes
+
+
+## Vehicle Insurance Tracking
+
+### Database Schema
+- [x] Add insurancePolicyStartDate field to vehicles table
+- [x] Add insuranceAnnualPremium field to vehicles table
+- [x] Add insurancePolicyNumber field to vehicles table (optional)
+- [x] Add insuranceProvider field to vehicles table (optional)
+- [x] Push database migration
+
+### Backend Implementation
+- [x] Create procedure to get vehicles with expiring insurance (within 30 days)
+- [x] Create procedure to get vehicles with expired insurance
+- [x] Create procedure to update insurance policy details
+- [x] Add insurance renewal functionality
+
+### Frontend Implementation
+- [x] Add insurance fields to Add Vehicle form
+- [x] Add insurance fields to Edit Vehicle form
+- [x] Display insurance status badge on vehicle cards (Active/Expiring Soon/Expired)
+- [x] Create insurance renewal dialog with premium update
+- [x] Add insurance expiry notifications to dashboard
+- [x] Show days until expiry or days overdue
+
+### Testing
+- [ ] Test adding vehicle with insurance details in production
+- [ ] Test insurance expiry detection in production
+- [ ] Test insurance renewal with updated premium in production
+- [ ] Verify notifications appear for expiring insurance in production

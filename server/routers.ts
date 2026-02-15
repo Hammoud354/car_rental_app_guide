@@ -279,9 +279,12 @@ export const appRouter = router({
         mileage: z.number().int().optional(),
         vin: z.string().max(17).optional(),
         insurancePolicyNumber: z.string().max(100).optional(),
-        insuranceCost: z.string().optional(),
-        purchaseCost: z.string().optional(),
+        insuranceProvider: z.string().max(200).optional(),
+        insurancePolicyStartDate: z.date().optional(),
         insuranceExpiryDate: z.date().optional(),
+        insuranceAnnualPremium: z.string().optional(),
+        insuranceCost: z.string().optional(), // Legacy field
+        purchaseCost: z.string().optional(),
         registrationExpiryDate: z.date().optional(),
         nextMaintenanceDate: z.date().optional(),
         photoUrl: z.string().optional(),
@@ -331,6 +334,10 @@ export const appRouter = router({
           mileage: z.number().int().optional(),
           vin: z.string().max(17).optional(),
           insurancePolicyNumber: z.string().max(100).optional(),
+          insuranceProvider: z.string().max(200).optional(),
+          insurancePolicyStartDate: z.date().optional(),
+          insuranceExpiryDate: z.date().optional(),
+          insuranceAnnualPremium: z.string().optional(),
           insuranceCost: z.string().optional(),
           purchaseCost: z.string().optional(),
           photoUrl: z.string().optional(),
@@ -509,6 +516,42 @@ export const appRouter = router({
       
       return { success: true, whatsappUrl, alertCount: alerts.length };
     }),
+
+    // Insurance Tracking
+    getExpiringInsurance: protectedProcedure
+      .input(z.object({ daysThreshold: z.number().default(30) }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehiclesWithExpiringInsurance(ctx.user.id, input.daysThreshold);
+      }),
+
+    getExpiredInsurance: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getVehiclesWithExpiredInsurance(ctx.user.id);
+      }),
+
+    renewInsurance: protectedProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        newPolicyStartDate: z.date(),
+        newAnnualPremium: z.string(),
+        insuranceProvider: z.string().optional(),
+        policyNumber: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Calculate new expiry date (1 year from start date)
+        const expiryDate = new Date(input.newPolicyStartDate);
+        expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+        return await db.renewVehicleInsurance(
+          input.vehicleId,
+          ctx.user.id,
+          input.newPolicyStartDate,
+          expiryDate,
+          input.newAnnualPremium,
+          input.insuranceProvider,
+          input.policyNumber
+        );
+      }),
   }),
 
   // Rental Contracts Router

@@ -89,8 +89,11 @@ export const vehicles = mysqlTable("vehicles", {
   mileage: int("mileage").default(0),
   vin: varchar("vin", { length: 17 }),
   insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 100 }),
-  insuranceExpiryDate: timestamp("insuranceExpiryDate"),
-  insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Annual or total insurance cost
+  insuranceProvider: varchar("insuranceProvider", { length: 200 }), // Insurance company name
+  insurancePolicyStartDate: timestamp("insurancePolicyStartDate"), // When current policy started
+  insuranceExpiryDate: timestamp("insuranceExpiryDate"), // When current policy expires (1 year from start)
+  insuranceAnnualPremium: decimal("insuranceAnnualPremium", { precision: 10, scale: 2 }), // Annual insurance premium cost
+  insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Legacy field - kept for backward compatibility
   purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
   registrationExpiryDate: timestamp("registrationExpiryDate"),
   // AI Maintenance - Vehicle specifications for intelligent scheduling
