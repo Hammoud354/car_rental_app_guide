@@ -379,6 +379,25 @@ export const appRouter = router({
         return await db.deleteMaintenanceRecord(input.id, ctx.user?.id || 1);
       }),
 
+    updateMaintenanceRecord: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"]).optional(),
+        description: z.string().min(1).optional(),
+        cost: z.string().optional(),
+        performedAt: z.date().optional(),
+        performedBy: z.string().optional(),
+        garageLocation: z.string().optional(),
+        mileageAtService: z.number().optional(),
+        kmDueForNextMaintenance: z.number().optional(),
+        garageEntryDate: z.date().optional(),
+        garageExitDate: z.date().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { id, ...updates } = input;
+        return await db.updateMaintenanceRecord(id, ctx.user?.id || 1, updates);
+      }),
+
     getAnalysis: publicProcedure
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {

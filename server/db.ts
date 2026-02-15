@@ -300,6 +300,21 @@ export async function deleteMaintenanceRecord(id: number, userId: number) {
   return { success: true };
 }
 
+export async function updateMaintenanceRecord(id: number, userId: number, updates: Partial<InsertMaintenanceRecord>) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  await db.update(maintenanceRecords)
+    .set(updates)
+    .where(and(eq(maintenanceRecords.id, id), eq(maintenanceRecords.userId, userId)));
+  const updated = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, id)).limit(1);
+  if (updated.length === 0) {
+    throw new Error("Maintenance record not found or unauthorized");
+  }
+  return updated[0];
+}
+
 // Rental Contract Queries
 export async function getAllRentalContracts(userId: number, filterUserId?: number | null) {
   const db = await getDb();

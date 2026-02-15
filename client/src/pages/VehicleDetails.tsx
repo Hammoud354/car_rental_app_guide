@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Car, Calendar, DollarSign, FileText, Wrench, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Car, Calendar, DollarSign, FileText, Wrench, Plus, Trash2, Edit } from "lucide-react";
 import { VehicleImageUpload, VehicleImageGallery } from "@/components/VehicleImageUpload";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
@@ -43,7 +43,20 @@ export default function VehicleDetails() {
     },
   });
 
+  const updateMaintenance = trpc.fleet.updateMaintenanceRecord.useMutation({
+    onSuccess: () => {
+      toast({ title: "Maintenance record updated successfully" });
+      refetchMaintenance();
+      setEditingRecordId(null);
+      resetMaintenanceForm();
+    },
+    onError: (error: any) => {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    },
+  });
+
   // Maintenance form state
+  const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
   const [maintenanceType, setMaintenanceType] = useState("");
   const [description, setDescription] = useState("");
   const [cost, setCost] = useState("");
@@ -54,6 +67,7 @@ export default function VehicleDetails() {
   const [kmDueMaintenance, setKmDueMaintenance] = useState("");
 
   const resetMaintenanceForm = () => {
+    setEditingRecordId(null);
     setMaintenanceType("");
     setDescription("");
     setCost("");
@@ -64,23 +78,53 @@ export default function VehicleDetails() {
     setKmDueMaintenance("");
   };
 
+  const handleEditRecord = (record: any) => {
+    setEditingRecordId(record.id);
+    setMaintenanceType(record.maintenanceType);
+    setDescription(record.description || "");
+    setCost(record.cost || "");
+    setServiceDate(new Date(record.performedAt).toISOString().split("T")[0]);
+    setPerformedBy(record.performedBy || "");
+    setGarageLocation(record.garageLocation || "");
+    setMileageAtService(record.mileageAtService?.toString() || "");
+    setKmDueMaintenance(record.kmDueForNextMaintenance?.toString() || "");
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleAddMaintenance = () => {
     if (!maintenanceType || !cost || !serviceDate) {
       toast({ title: "Please fill in all required fields", variant: "destructive" });
       return;
     }
 
-    createMaintenance.mutate({
-      vehicleId,
-      maintenanceType: maintenanceType as "Routine" | "Repair" | "Inspection" | "Emergency" | "Oil Change" | "Brake Pads Change" | "Oil + Filter",
-      description: description || "",
-      cost: cost || undefined,
-      performedAt: new Date(serviceDate),
-      performedBy: performedBy || undefined,
-      garageLocation: garageLocation || undefined,
-      mileageAtService: mileageAtService ? parseInt(mileageAtService) : undefined,
-      kmDueMaintenance: kmDueMaintenance ? parseInt(kmDueMaintenance) : undefined,
-    });
+    if (editingRecordId) {
+      // Update existing record
+      updateMaintenance.mutate({
+        id: editingRecordId,
+        maintenanceType: maintenanceType as "Routine" | "Repair" | "Inspection" | "Emergency" | "Oil Change" | "Brake Pads Change" | "Oil + Filter",
+        description: description || undefined,
+        cost: cost || undefined,
+        performedAt: new Date(serviceDate),
+        performedBy: performedBy || undefined,
+        garageLocation: garageLocation || undefined,
+        mileageAtService: mileageAtService ? parseInt(mileageAtService) : undefined,
+        kmDueForNextMaintenance: kmDueMaintenance ? parseInt(kmDueMaintenance) : undefined,
+      });
+    } else {
+      // Create new record
+      createMaintenance.mutate({
+        vehicleId,
+        maintenanceType: maintenanceType as "Routine" | "Repair" | "Inspection" | "Emergency" | "Oil Change" | "Brake Pads Change" | "Oil + Filter",
+        description: description || "",
+        cost: cost || undefined,
+        performedAt: new Date(serviceDate),
+        performedBy: performedBy || undefined,
+        garageLocation: garageLocation || undefined,
+        mileageAtService: mileageAtService ? parseInt(mileageAtService) : undefined,
+        kmDueMaintenance: kmDueMaintenance ? parseInt(kmDueMaintenance) : undefined,
+      });
+    }
   };
 
   if (isLoading) {
@@ -281,9 +325,19 @@ export default function VehicleDetails() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Plus className="h-5 w-5" />
-                      Add Maintenance Record
+                      {editingRecordId ? <Edit className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                      {editingRecordId ? "Edit Maintenance Record" : "Add Maintenance Record"}
                     </CardTitle>
+                    {editingRecordId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetMaintenanceForm}
+                        className="mt-2"
+                      >
+                        Cancel Edit
+                      </Button>
+                    )}
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -383,18 +437,18 @@ export default function VehicleDetails() {
 
                     <Button 
                       onClick={handleAddMaintenance} 
-                      disabled={createMaintenance.isPending}
+                      disabled={createMaintenance.isPending || updateMaintenance.isPending}
                       className="w-full"
                     >
-                      {createMaintenance.isPending ? (
+                      {(createMaintenance.isPending || updateMaintenance.isPending) ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Adding...
+                          {editingRecordId ? "Updating..." : "Adding..."}
                         </>
                       ) : (
                         <>
-                          <Plus className="mr-2 h-4 w-4" />
-                          Add Maintenance Record
+                          {editingRecordId ? <Edit className="mr-2 h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+                          {editingRecordId ? "Update Maintenance Record" : "Add Maintenance Record"}
                         </>
                       )}
                     </Button>
@@ -504,18 +558,28 @@ export default function VehicleDetails() {
                               )}
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              if (confirm("Delete this maintenance record?")) {
-                                deleteMaintenance.mutate({ id: record.id });
-                              }
-                            }}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditRecord(record)}
+                              className="text-primary hover:text-primary"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => {
+                                if (confirm("Delete this maintenance record?")) {
+                                  deleteMaintenance.mutate({ id: record.id });
+                                }
+                              }}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       ))}
                   </div>
