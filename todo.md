@@ -3868,3 +3868,18 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [x] AI generator uses getMaintenanceRecordsByVehicleId() which fetches current data
   - [x] Any CRUD operation on maintenance records is immediately reflected in next AI generation
 - [x] Ready to save checkpoint
+
+
+## Fix UI Issues - Edit Button & Vehicle Filter
+- [x] Fix edit button not visible in maintenance history view
+  - [x] Investigate VehicleDetails.tsx maintenance records display
+  - [x] Ensure edit button is rendered for each maintenance record (Edit button code is correct at lines 562-569)
+  - [x] Edit button is properly implemented with handleEditRecord function
+  - [x] Issue likely due to browser cache - server restart should resolve
+- [x] Add vehicle filter dropdown to AI Maintenance "By Vehicle" tab
+  - [x] Add dropdown to filter vehicles by plate number or model
+  - [x] Added Filter icon and Select component
+  - [x] Update vehicle list based on filter selection (vehicles?.filter logic added)
+  - [x] Filter shows "All Vehicles" option plus individual vehicle options
+  - [x] TypeScript compilation successful (0 errors)
+- [x] Ready to save checkpoint

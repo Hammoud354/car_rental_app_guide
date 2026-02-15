@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw } from "lucide-react";
+import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import SidebarLayout from "@/components/SidebarLayout";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,6 +20,7 @@ export default function AIMaintenance() {
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [overrideNotes, setOverrideNotes] = useState("");
+  const [vehicleFilter, setVehicleFilter] = useState<string>("all");
 
   // Fetch vehicles
   const { data: vehicles } = trpc.fleet.list.useQuery();
@@ -349,7 +351,25 @@ export default function AIMaintenance() {
 
           {/* By Vehicle Tab */}
           <TabsContent value="vehicles" className="space-y-6">
-            {vehicles?.map((vehicle: any) => {
+            {/* Vehicle Filter */}
+            <div className="flex items-center gap-4 mb-6">
+              <Filter className="h-5 w-5 text-muted-foreground" />
+              <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
+                <SelectTrigger className="w-[300px]">
+                  <SelectValue placeholder="Filter by vehicle" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Vehicles</SelectItem>
+                  {vehicles?.map((v: any) => (
+                    <SelectItem key={v.id} value={v.id.toString()}>
+                      {v.plateNumber} - {v.brand} {v.model}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {vehicles?.filter((v: any) => vehicleFilter === "all" || v.id.toString() === vehicleFilter).map((vehicle: any) => {
               const tasks = tasksByVehicle[vehicle.id] || [];
               if (tasks.length === 0) return null;
 
