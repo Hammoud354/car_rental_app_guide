@@ -30,7 +30,7 @@ export function DateDropdownSelector({
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
   const minYear = minDate ? minDate.getFullYear() : (yearOnly ? 1950 : 1990);
-  const maxYear = maxDate ? maxDate.getFullYear() : (yearOnly ? 2050 : currentYear + 10);
+  const maxYear = maxDate ? maxDate.getFullYear() : (yearOnly ? 2050 : currentYear + 50);
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
   const months = [
     { value: 0, label: "January" },

@@ -4291,3 +4291,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Test insurance expiry detection in production
 - [ ] Test insurance renewal with updated premium in production
 - [ ] Verify notifications appear for expiring insurance in production
+
+
+## Driving License Date Limit Fix
+
+- [x] Find driving license expiry date input fields with max="2036" constraint
+- [x] Remove or extend the max date constraint to allow dates beyond 2036 (now allows up to 50 years in the future)
+- [ ] Test that future dates beyond 2036 can be selected in production
