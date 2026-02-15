@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
-import { getLoginUrl } from "@/const";
+
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -55,9 +55,7 @@ export default function Home() {
     window.open(`https://wa.me/96176354131?text=${message}`, "_blank");
   };
 
-  const handleAuthRedirect = () => {
-    window.location.href = getLoginUrl();
-  };
+
 
   if (loading) {
     return (
@@ -81,14 +79,18 @@ export default function Home() {
               <MessageCircle className="h-4 w-4 mr-1.5" />
               Contact
             </Button>
-            <Button variant="outline" size="sm" onClick={handleAuthRedirect}>
-              <LogIn className="h-4 w-4 mr-1.5" />
-              Sign In
-            </Button>
-            <Button size="sm" onClick={handleAuthRedirect}>
-              <UserPlus className="h-4 w-4 mr-1.5" />
-              Sign Up
-            </Button>
+            <Link href="/signin">
+              <Button variant="outline" size="sm">
+                <LogIn className="h-4 w-4 mr-1.5" />
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button size="sm">
+                <UserPlus className="h-4 w-4 mr-1.5" />
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -231,9 +233,11 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" variant="outline" onClick={handleAuthRedirect}>
-                Get Started
-              </Button>
+              <Link href="/signup" className="w-full">
+                <Button className="w-full mt-4" variant="outline">
+                  Get Started
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -266,9 +270,11 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" onClick={handleAuthRedirect}>
-                Get Started
-              </Button>
+              <Link href="/signup" className="w-full">
+                <Button className="w-full mt-4">
+                  Get Started
+                </Button>
+              </Link>
             </CardContent>
           </Card>
 
@@ -300,9 +306,11 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" onClick={handleAuthRedirect}>
-                Get Started
-              </Button>
+              <Link href="/signup" className="w-full">
+                <Button className="w-full mt-4">
+                  Get Started
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

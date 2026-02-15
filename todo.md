@@ -4232,3 +4232,32 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Investigate login URL configuration in const.ts or authentication setup
 - [x] Fix the URL to point to correct Manus OAuth login portal
 - [ ] Test authentication flow after fix
+
+
+## Custom Authentication System
+
+### Frontend Pages
+- [x] Create dedicated Login page with email/password form (SignIn.tsx already exists)
+- [x] Create dedicated Sign Up page with registration form (SignUp.tsx already exists)
+- [x] Add form validation for email format and password strength
+- [x] Add loading states and error handling for auth forms
+- [x] Update Home.tsx buttons to navigate to /signin and /signup routes
+
+### Backend Implementation
+- [x] Create authentication procedures in routers.ts (auth.login, auth.signUp, auth.logout)
+- [x] Add password hashing with bcrypt
+- [x] Implement session cookie management
+- [x] Add session management with remember me functionality
+- [x] Create database helpers for user authentication (getUserByUsername, createUser)
+
+### Routes & Navigation
+- [x] Add /signin route in App.tsx
+- [x] Add /signup route in App.tsx  
+- [x] Update navigation buttons to use internal auth pages
+- [x] Add redirect logic after successful login (redirects to /dashboard)
+
+### Testing
+- [ ] Test user registration flow in production
+- [ ] Test login flow with valid credentials in production
+- [ ] Test error handling for invalid credentials
+- [ ] Verify session persistence across page refreshes
