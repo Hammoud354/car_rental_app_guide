@@ -522,25 +522,22 @@ export default function Invoices() {
                         <html>
                           <head>
                             <title>Invoice ${invoiceDetails.invoiceNumber}</title>
+                            <script src="https://cdn.tailwindcss.com"></script>
                             <style>
                               * { margin: 0; padding: 0; box-sizing: border-box; }
-                              body { font-family: Arial, sans-serif; padding: 20px; }
+                              body { font-family: Arial, sans-serif; padding: 32px; background: white; }
                               @media print {
                                 body { padding: 0; }
                                 @page { margin: 0.5in; }
                               }
+                              table { border-collapse: collapse; width: 100%; }
+                              th, td { text-align: left; padding: 12px; }
+                              thead tr { border-bottom: 2px solid #000; }
+                              tbody tr { border-bottom: 1px solid #e5e7eb; }
+                              .border-b { border-bottom: 1px solid #e5e7eb; }
+                              .border-b-2 { border-bottom: 2px solid #000; }
+                              .border-t-2 { border-top: 2px solid #000; }
                             </style>
-                            ${Array.from(document.styleSheets)
-                              .map(sheet => {
-                                try {
-                                  return Array.from(sheet.cssRules)
-                                    .map(rule => rule.cssText)
-                                    .join('\n');
-                                } catch (e) {
-                                  return '';
-                                }
-                              })
-                              .join('\n')}
                           </head>
                           <body>
                             ${printContent.innerHTML}
@@ -550,12 +547,12 @@ export default function Invoices() {
                       
                       printWindow.document.close();
                       
-                      // Wait for content to load, then print
+                      // Wait for Tailwind CDN and content to load, then print
                       printWindow.onload = () => {
                         setTimeout(() => {
                           printWindow.print();
                           printWindow.close();
-                        }, 250);
+                        }, 1000);
                       };
                     }} 
                     variant="outline"

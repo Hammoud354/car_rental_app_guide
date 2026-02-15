@@ -4350,7 +4350,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Remove any display:none rules that hide invoice in print mode (isolated window)
 - [ ] Test print preview shows formatted invoice exactly as displayed
 
+### New Issue Found
+- [x] Print output shows plain text without formatting (no tables, borders, styling)
+- [x] Stylesheet copying not working correctly in new window
+- [x] Need to use inline styles or better stylesheet injection method (using Tailwind CDN + inline styles)
+
 ### Testing
 - [ ] Test print button shows invoice content in preview
 - [ ] Verify all invoice details are visible and formatted correctly
-- [ ] Check print layout matches screen display
+- [ ] Check print layout matches screen display with proper tables and borders
