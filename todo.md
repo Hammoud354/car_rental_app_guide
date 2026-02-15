@@ -4545,3 +4545,6 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ## Fix Contract PDF Export
 - [x] Fix contract PDF export to display all data properly with professional formatting using window.open approach
+
+## Fix Contract Print Functionality
+- [x] Fix contract print to display all data properly using window.open approach (matching invoice print)

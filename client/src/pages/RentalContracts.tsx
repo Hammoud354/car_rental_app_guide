@@ -1433,7 +1433,57 @@ export default function RentalContracts() {
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => {
-                    window.print();
+                    if (!selectedContract) {
+                      toast.error("No contract selected");
+                      return;
+                    }
+                    
+                    const printContent = document.getElementById('contract-content');
+                    if (!printContent) {
+                      toast.error("Contract content not found");
+                      return;
+                    }
+                    
+                    // Create a new window for printing
+                    const printWindow = window.open('', '_blank');
+                    if (!printWindow) {
+                      toast.error("Please allow popups to print");
+                      return;
+                    }
+                    
+                    // Write the contract content to the new window with styles
+                    printWindow.document.write(`
+                      <!DOCTYPE html>
+                      <html>
+                        <head>
+                          <title>Contract ${selectedContract.contractNumber}</title>
+                          <script src="https://cdn.tailwindcss.com"></script>
+                          <style>
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+                            body { font-family: Arial, sans-serif; padding: 32px; background: white; }
+                            @media print {
+                              body { padding: 0; }
+                              @page { margin: 0.5in; }
+                            }
+                            .border { border: 1px solid #e5e7eb; }
+                            .rounded-lg { border-radius: 8px; }
+                          </style>
+                        </head>
+                        <body>
+                          ${printContent.innerHTML}
+                        </body>
+                      </html>
+                    `);
+                    
+                    printWindow.document.close();
+                    
+                    // Wait for Tailwind CDN and content to load, then print
+                    printWindow.onload = () => {
+                      setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                      }, 1000);
+                    };
                   }} 
                   variant="outline"
                   className="h-10 w-full"
