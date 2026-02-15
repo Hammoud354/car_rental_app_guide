@@ -222,19 +222,9 @@ export async function createSanitizedPdfClone(element: HTMLElement): Promise<HTM
     clone.classList.add('dark');
   }
   
-  // Inject PDF-safe CSS if not already present
-  if (!document.getElementById('pdf-safe-colors')) {
-    const link = document.createElement('link');
-    link.id = 'pdf-safe-colors';
-    link.rel = 'stylesheet';
-    link.href = '/src/pdf-safe-colors.css';
-    document.head.appendChild(link);
-    // Wait for CSS to load
-    await new Promise(resolve => {
-      link.onload = resolve;
-      setTimeout(resolve, 100); // Fallback
-    });
-  }
+  // PDF-safe CSS no longer needed - all colors are now HEX in main CSS
+  // The complete Tailwind color palette has been added to index.css in HEX format
+  // This eliminates the need for a separate pdf-safe-colors.css file
   
   // Append to body (needed for getComputedStyle)
   clone.style.position = 'absolute';
