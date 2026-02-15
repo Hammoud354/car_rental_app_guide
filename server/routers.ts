@@ -712,6 +712,7 @@ export const appRouter = router({
           clientPhone: input.clientPhone || null,
           clientAddress: input.clientAddress || null,
           drivingLicenseNumber: input.drivingLicenseNumber,
+          licenseIssueDate: input.licenseIssueDate || null,
           licenseExpiryDate: input.licenseExpiryDate,
           rentalStartDate: input.rentalStartDate,
           rentalEndDate: input.rentalEndDate,

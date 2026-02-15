@@ -4306,3 +4306,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add proper cache invalidation (utils.invoices.list.invalidate())
 - [x] Fix React error #321 caused by calling useUtils inside mutation callback
 - [ ] Verify UI updates immediately after status change without page refresh in production
+
+
+## Contract Completion Database Error
+
+- [x] Investigate SQL insert error when completing contract after inspection
+- [x] Fix missing licenseIssueDate field in contract creation query (added to line 715)
+- [x] Ensure all required fields are included in the insert statement
+- [ ] Test contract completion flow in production
