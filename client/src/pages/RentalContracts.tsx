@@ -1449,75 +1449,99 @@ export default function RentalContracts() {
                     }
                     
                     try {
-                      toast.info("Generating PDF... This may take a moment");
-                      
-                      // Use the visible contract content
                       const element = document.getElementById('contract-content');
                       if (!element) {
                         toast.error("Contract content not found");
                         return;
                       }
+
+                      toast.info("Generating PDF...");
                       
-                      // Store original styles
-                      const originalOverflow = element.style.overflow;
-                      const originalHeight = element.style.height;
-                      const originalMaxHeight = element.style.maxHeight;
-                      
-                      // Temporarily make element fully visible for capture
-                      element.style.overflow = 'visible';
-                      element.style.height = 'auto';
-                      element.style.maxHeight = 'none';
-                      element.style.display = 'block';
-                      
-                      // Force reflow
-                      element.offsetHeight;
-                      
-                      // Wait for content to render
-                      await new Promise(resolve => setTimeout(resolve, 500));
-                      
-                      // Capture with html2canvas
-                      const canvas = await html2canvas(element, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: false,
-                        backgroundColor: "#ffffff",
-                        windowHeight: element.scrollHeight,
-                        height: element.scrollHeight
-                      });
-                      
-                      // Restore original styles
-                      element.style.overflow = originalOverflow;
-                      element.style.height = originalHeight;
-                      element.style.maxHeight = originalMaxHeight;
-                      
-                      // Create PDF
-                      const imgData = canvas.toDataURL("image/png");
-                      const pdf = new jsPDF({
-                        orientation: "portrait",
-                        unit: "mm",
-                        format: "a4",
-                      });
-                      
-                      const imgWidth = 210; // A4 width in mm
-                      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                      
-                      // Handle multi-page PDFs
-                      const pageHeight = 297; // A4 height in mm
-                      let heightLeft = imgHeight;
-                      let position = 0;
-                      
-                      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-                      heightLeft -= pageHeight;
-                      
-                      while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                      // Open contract in new window with Tailwind CDN (same as invoice approach)
+                      const printWindow = window.open('', '_blank', 'width=800,height=600');
+                      if (!printWindow) {
+                        toast.error("Please allow popups to export PDF");
+                        return;
                       }
                       
-                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
-                      toast.success("PDF downloaded successfully!");
+                      // Write the contract content to the new window with Tailwind
+                      printWindow.document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <title>Contract ${selectedContract.contractNumber}</title>
+                            <script src="https://cdn.tailwindcss.com"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+                            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+                            <style>
+                              * { margin: 0; padding: 0; box-sizing: border-box; }
+                              body { font-family: Arial, sans-serif; padding: 32px; background: white; }
+                              .border { border: 1px solid #e5e7eb; }
+                              .rounded-lg { border-radius: 8px; }
+                            </style>
+                          </head>
+                          <body>
+                            <div id="pdf-content">
+                              ${element.innerHTML}
+                            </div>
+                            <script>
+                              // Wait for Tailwind and libraries to load
+                              setTimeout(async () => {
+                                const content = document.getElementById('pdf-content');
+                                const { jsPDF } = window.jspdf;
+                                
+                                // Capture with html2canvas
+                                const canvas = await html2canvas(content, {
+                                  scale: 2,
+                                  useCORS: true,
+                                  logging: false,
+                                  backgroundColor: "#ffffff",
+                                  windowHeight: content.scrollHeight,
+                                  height: content.scrollHeight
+                                });
+                                
+                                // Create PDF
+                                const imgData = canvas.toDataURL("image/png");
+                                const pdf = new jsPDF({
+                                  orientation: "portrait",
+                                  unit: "mm",
+                                  format: "a4"
+                                });
+                                
+                                const imgWidth = 210;
+                                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                                const pageHeight = 297;
+                                let heightLeft = imgHeight;
+                                let position = 0;
+                                
+                                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                                heightLeft -= pageHeight;
+                                
+                                while (heightLeft >= 0) {
+                                  position = heightLeft - imgHeight;
+                                  pdf.addPage();
+                                  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                                  heightLeft -= pageHeight;
+                                }
+                                
+                                // Save PDF
+                                pdf.save("Contract-${selectedContract.contractNumber}.pdf");
+                                
+                                // Show success message and close after delay to ensure download completes
+                                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;font-size:18px;color:#10b981;">✓ PDF Downloaded Successfully! This window will close automatically...</div>';
+                                setTimeout(() => window.close(), 2000);
+                              }, 1500);
+                            </script>
+                          </body>
+                        </html>
+                      `);
+                      
+                      printWindow.document.close();
+                      
+                      // Show success message after a delay
+                      setTimeout(() => {
+                        toast.success("PDF generated successfully");
+                      }, 1000);
                     } catch (error: any) {
                       console.error("PDF export error:", error);
                       toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);

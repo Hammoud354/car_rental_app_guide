@@ -4542,3 +4542,6 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Added 2-second delay before window.close() to allow download to complete
 - [x] Show success message in window before closing
 - [x] Window now closes automatically after PDF download completes
+
+## Fix Contract PDF Export
+- [x] Fix contract PDF export to display all data properly with professional formatting using window.open approach
