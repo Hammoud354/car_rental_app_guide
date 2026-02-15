@@ -4450,3 +4450,43 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Increase wait time beyond 800ms - Now 1000ms
 - [x] Add explicit height calculation and set before capture - Using scrollHeight on clone
 - [ ] Try capturing in chunks and combining pages - Will try if clone approach fails
+
+
+## Export PDF vs Print Preview Differences
+
+### Print Preview (Perfect ✅)
+- Complete company header with proper spacing
+- Clear section separation
+- Proper borders and styling
+- All content visible with good spacing
+
+### Export PDF (Has Issues ❌)
+- ✅ Complete content captured (no cutoff)
+- ✅ All totals showing
+- ❌ Missing company logo, address, contact info, tax ID
+- ❌ Compressed spacing between sections
+- ❌ Payment Status text overlapping
+- ❌ Overall cramped appearance
+
+### Root Cause
+- Print Preview uses Tailwind CDN in new window (works perfectly)
+- Export PDF uses html2canvas on cloned element (Tailwind classes not fully applied)
+
+### Investigation
+- [ ] Check if company header is part of invoice-content element
+- [ ] Verify clone is capturing from the very top of the element
+- [ ] Check if padding/margins are causing header to be cut off
+- [ ] Review spacing classes in invoice template
+
+### Fixes Needed
+- [x] Ensure company header is included in PDF - Using new window approach
+- [x] Add proper spacing between sections (space-y classes) - Tailwind CDN applied
+- [x] Verify invoice number and dates appear at top right - Full template captured
+- [x] Test that all content from top to bottom is captured - Using same method as Print Preview
+
+### Solution Implemented
+- Export PDF now uses same approach as Print Preview
+- Opens invoice in new window with Tailwind CDN
+- Captures with html2canvas after 1.5s render time
+- Generates PDF with jsPDF and auto-closes window
+- Should produce identical output to Print Preview

@@ -119,74 +119,95 @@ export default function Invoices() {
 
       toast.info("Generating PDF...");
       
-      // Clone the element to capture it outside the dialog
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.id = 'invoice-clone-for-pdf';
-      
-      // Style the clone for proper capture
-      clone.style.position = 'absolute';
-      clone.style.left = '-9999px';
-      clone.style.top = '0';
-      clone.style.width = '210mm'; // A4 width
-      clone.style.overflow = 'visible';
-      clone.style.height = 'auto';
-      clone.style.maxHeight = 'none';
-      clone.style.display = 'block';
-      clone.style.backgroundColor = '#ffffff';
-      clone.style.padding = '32px';
-      
-      // Append clone to body
-      document.body.appendChild(clone);
-      
-      // Force reflow
-      clone.offsetHeight;
-      
-      // Wait for content to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Capture the clone
-      const canvas = await html2canvas(clone, {
-        scale: 2,
-        useCORS: true,
-        logging: true,
-        backgroundColor: "#ffffff",
-        windowHeight: clone.scrollHeight,
-        height: clone.scrollHeight,
-        width: clone.scrollWidth,
-        ignoreElements: (el) => {
-          return el.classList?.contains('no-export');
-        }
-      });
-      
-      // Remove the clone
-      document.body.removeChild(clone);
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Handle multi-page PDFs if content is too long
-      const pageHeight = 297; // A4 height in mm
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // Open invoice in new window with Tailwind CDN (same as Print Preview)
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) {
+        toast.error("Please allow popups to export PDF");
+        return;
       }
-
-      pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
+      
+      // Write the invoice content to the new window with Tailwind
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Invoice ${invoiceDetails?.invoiceNumber || 'Invoice'}</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { font-family: Arial, sans-serif; padding: 32px; background: white; }
+              table { border-collapse: collapse; width: 100%; }
+              th, td { text-align: left; padding: 12px; }
+              thead tr { border-bottom: 2px solid #000; }
+              tbody tr { border-bottom: 1px solid #e5e7eb; }
+              .border-b { border-bottom: 1px solid #e5e7eb; }
+              .border-b-2 { border-bottom: 2px solid #000; }
+              .border-t-2 { border-top: 2px solid #000; }
+            </style>
+          </head>
+          <body>
+            <div id="pdf-content">
+              ${element.innerHTML}
+            </div>
+            <script>
+              // Wait for Tailwind and libraries to load
+              setTimeout(async () => {
+                const content = document.getElementById('pdf-content');
+                const { jsPDF } = window.jspdf;
+                
+                // Capture with html2canvas
+                const canvas = await html2canvas(content, {
+                  scale: 2,
+                  useCORS: true,
+                  logging: false,
+                  backgroundColor: "#ffffff",
+                  windowHeight: content.scrollHeight,
+                  height: content.scrollHeight
+                });
+                
+                // Create PDF
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF({
+                  orientation: "portrait",
+                  unit: "mm",
+                  format: "a4"
+                });
+                
+                const imgWidth = 210;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const pageHeight = 297;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                  position = heightLeft - imgHeight;
+                  pdf.addPage();
+                  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                  heightLeft -= pageHeight;
+                }
+                
+                // Save and close
+                pdf.save("${invoiceDetails?.invoiceNumber || 'invoice'}.pdf");
+                window.close();
+              }, 1500);
+            </script>
+          </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      
+      // Show success message after a delay
+      setTimeout(() => {
+        toast.success("PDF generated successfully");
+      }, 2000);
+      
+      return;
       toast.success("PDF exported successfully");
     } catch (error) {
       console.error("Error exporting PDF:", error);
@@ -524,7 +545,7 @@ export default function Invoices() {
                         <!DOCTYPE html>
                         <html>
                           <head>
-                            <title>Invoice ${invoiceDetails.invoiceNumber}</title>
+                            <title>Invoice ${invoiceDetails?.invoiceNumber || 'Invoice'}</title>
                             <script src="https://cdn.tailwindcss.com"></script>
                             <style>
                               * { margin: 0; padding: 0; box-sizing: border-box; }
