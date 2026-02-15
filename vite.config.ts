@@ -170,6 +170,17 @@ export default defineConfig({
   },
   server: {
     host: true,
+    watch: {
+      ignored: [
+        '**/node_modules/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/.manus/**',
+        '**/.manus-logs/**',
+        '**/drizzle/**'
+      ],
+      usePolling: false,
+    },
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",
