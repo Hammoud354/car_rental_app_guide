@@ -4059,3 +4059,28 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify logo displays correctly
 - [x] Confirm all company info appears properly
 - [ ] Create checkpoint and deliver
+
+## Fix Completely Blank PDF Export
+
+### Issue Description
+- [x] PDF exports are generating completely blank pages with no data
+- [x] Contract CNT-39529 exported as blank white page
+- [x] No text, no branding, no contract information visible
+
+### Investigation
+- [x] Check if ContractPDFTemplate is rendering correctly
+- [x] Verify html2pdf.js is capturing the correct element (missing ID)
+- [x] Check if the PDF template element has visibility issues
+- [x] Review browser console for errors during PDF generation
+
+### Fix Implementation
+- [x] Ensure PDF template element is properly rendered in DOM (added wrapper div)
+- [x] Fix element visibility and display properties (positioned off-screen with proper dimensions)
+- [x] Verify html2pdf.js configuration is correct (added id="contract-pdf-template")
+- [x] Test with different contracts to confirm fix
+
+### Testing & Delivery
+- [x] Generate PDF and verify all data appears
+- [x] Check company branding displays correctly
+- [x] Confirm all contract fields are visible
+- [ ] Create checkpoint and deliver

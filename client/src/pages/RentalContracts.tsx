@@ -1404,14 +1404,25 @@ export default function RentalContracts() {
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
-                <ContractPDFTemplate 
-                  contract={{
-                    ...selectedContract,
-                    clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`
-                  }} 
-                  vehicle={vehicle || null}
-                  companyProfile={companyProfile || null}
-                />
+                <div 
+                  id="contract-pdf-template" 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '-9999px', 
+                    top: '0',
+                    width: '210mm', // A4 width
+                    backgroundColor: 'white'
+                  }}
+                >
+                  <ContractPDFTemplate 
+                    contract={{
+                      ...selectedContract,
+                      clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`
+                    }} 
+                    vehicle={vehicle || null}
+                    companyProfile={companyProfile || null}
+                  />
+                </div>
               );
             })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
