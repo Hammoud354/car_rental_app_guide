@@ -3986,3 +3986,25 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test in browser and verify OKLCH count is 0
 - [x] Verify PDF export works without OKLCH errors
 - [ ] Create checkpoint and deliver
+
+## Fix Partial Data Display in PDF Export
+
+### Issue Description
+- [x] PDF exports from Rental Contracts page show incomplete data
+- [x] Some fields are cut off or not displaying (e.g., "Client Information" header is cut, "Final Amount" value is cut)
+- [x] PDF appears to have layout/overflow issues
+
+### Investigation
+- [x] Check RentalContracts.tsx PDF export implementation
+- [x] Identify which fields are missing or cut off
+- [x] Determine if it's a layout issue or data mapping issue (html2pdf config issue)
+
+### Fix Implementation
+- [x] Ensure all contract fields are included in PDF export
+- [x] Fix layout to prevent text cutoff (added windowHeight: element.scrollHeight)
+- [x] Verify all data displays completely (added proper pagebreak settings)
+
+### Testing & Delivery
+- [x] Test PDF export with sample contract
+- [x] Verify all fields display correctly
+- [ ] Create checkpoint and deliver

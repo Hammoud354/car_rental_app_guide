@@ -1433,11 +1433,27 @@ export default function RentalContracts() {
                       const html2pdf = (await import('html2pdf.js')).default;
                       
                       const opt = {
-                        margin: 10,
+                        margin: [10, 10, 10, 10] as [number, number, number, number], // top, right, bottom, left
                         filename: `Contract-${selectedContract.contractNumber}.pdf`,
-                        image: { type: 'jpeg' as const, quality: 0.98 },
-                        html2canvas: { scale: 2 },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+                        image: { type: 'jpeg' as const, quality: 0.85 },
+                        html2canvas: { 
+                          scale: 1.5,
+                          useCORS: true,
+                          logging: false,
+                          windowHeight: element.scrollHeight
+                        },
+                        jsPDF: { 
+                          unit: 'mm', 
+                          format: 'a4', 
+                          orientation: 'portrait' as const,
+                          compress: true
+                        },
+                        pagebreak: { 
+                          mode: ['avoid-all', 'css', 'legacy'],
+                          before: '.page-break-before',
+                          after: '.page-break-after',
+                          avoid: ['img', '.no-break']
+                        }
                       };
                       
                       await html2pdf().set(opt).from(element).save();
