@@ -4359,3 +4359,20 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Test print button shows invoice content in preview
 - [ ] Verify all invoice details are visible and formatted correctly
 - [ ] Check print layout matches screen display with proper tables and borders
+
+
+## Invoice PDF Export Detail Completeness
+
+### Requirement
+- [x] Remove OKLCH color conversion that prevents PDF generation
+- [x] Use standard RGB/HEX colors directly for PDF compatibility
+- [ ] Update PDF export to show ALL details exactly as print preview template
+- [ ] Verify all invoice sections are included in PDF (header, client info, line items, totals)
+- [ ] Check that formatting, spacing, and layout match preview exactly in PDF
+- [ ] Confirm company logo, contact details, and tax information display correctly in PDF
+- [ ] Ensure PDF shows complete invoice template, not simplified version
+
+### Testing
+- [ ] Export PDF and compare with preview template side-by-side
+- [ ] Verify no missing sections or truncated content in PDF
+- [ ] Check PDF quality and readability

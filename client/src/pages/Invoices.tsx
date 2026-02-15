@@ -129,73 +129,53 @@ export default function Invoices() {
       element.style.height = 'auto';
       element.style.maxHeight = 'none';
       
-      // Create a PDF-safe clone with all OKLCH colors converted to RGB/HEX
-      const safeClone = await createSanitizedPdfClone(element);
+      // Wait a moment for any dynamic content to render
+      await new Promise(resolve => setTimeout(resolve, 100));
       
-      // Make the clone visible with same dimensions as original
-      safeClone.style.position = 'static';
-      safeClone.style.left = '0';
-      safeClone.style.top = '0';
-      safeClone.style.overflow = 'visible';
-      safeClone.style.height = 'auto';
-      safeClone.style.maxHeight = 'none';
+      // Use html2canvas to capture the element directly
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        ignoreElements: (element) => {
+          // Skip elements that might cause issues
+          return element.classList?.contains('no-export');
+        }
+      });
       
-      try {
-        // Wait a moment for styles to apply
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Use html2canvas to capture the SAFE CLONE (not the original)
-        const canvas = await html2canvas(safeClone, {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: "#ffffff",
-        });
-        
-        // Restore original styles
-        element.style.overflow = originalOverflow;
-        element.style.height = originalHeight;
-        element.style.maxHeight = originalMaxHeight;
-        
-        // Clean up the safe clone
-        cleanupSanitizedClone(safeClone);
+      // Restore original styles
+      element.style.overflow = originalOverflow;
+      element.style.height = originalHeight;
+      element.style.maxHeight = originalMaxHeight;
 
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "mm",
-          format: "a4",
-        });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-        const imgWidth = 210; // A4 width in mm
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        // Handle multi-page PDFs if content is too long
-        const pageHeight = 297; // A4 height in mm
-        let heightLeft = imgHeight;
-        let position = 0;
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Handle multi-page PDFs if content is too long
+      const pageHeight = 297; // A4 height in mm
+      let heightLeft = imgHeight;
+      let position = 0;
 
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
         pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
-
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-
-        pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
-        toast.success("PDF exported successfully");
-      } catch (innerError: any) {
-        // Clean up the safe clone even if there's an error
-        cleanupSanitizedClone(safeClone);
-        // Restore original styles
-        element.style.overflow = originalOverflow;
-        element.style.height = originalHeight;
-        element.style.maxHeight = originalMaxHeight;
-        throw innerError;
       }
+
+      pdf.save(`${invoiceDetails?.invoiceNumber || "invoice"}.pdf`);
+      toast.success("PDF exported successfully");
     } catch (error) {
       console.error("Error exporting PDF:", error);
       toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
