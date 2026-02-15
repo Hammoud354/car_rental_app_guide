@@ -4376,3 +4376,25 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Export PDF and compare with preview template side-by-side
 - [ ] Verify no missing sections or truncated content in PDF
 - [ ] Check PDF quality and readability
+
+
+## PDF Export Issues
+
+### Invoice PDF Problems
+- [x] PDF is cutting off content at the bottom (Total USD, Total LBP missing) - Fixed with scrollHeight
+- [ ] Company logo not showing in PDF (may need CORS or base64 encoding)
+- [ ] Company contact details (address, phone, email, tax ID) not showing
+- [ ] Payment status badge styling missing
+- [ ] LBP section background/border styling not captured
+- [x] Need to fix height calculation to capture full invoice content - Added windowHeight and height params
+
+### Contract PDF Problems  
+- [x] Contract PDF export showing completely empty page - Fixed by using visible #contract-content instead of hidden template
+- [x] Need to identify correct element ID for contract content - Using #contract-content
+- [x] Implement contract PDF export similar to invoice export - Now uses same html2canvas + jsPDF approach
+
+### Fix Approach
+- [ ] Increase wait time before capture to ensure all content renders
+- [ ] Fix element height/overflow settings to show full content
+- [ ] Ensure html2canvas captures complete element height
+- [ ] Test with longer invoices to verify multi-page support

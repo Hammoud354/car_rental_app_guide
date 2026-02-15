@@ -128,16 +128,22 @@ export default function Invoices() {
       element.style.overflow = 'visible';
       element.style.height = 'auto';
       element.style.maxHeight = 'none';
+      element.style.display = 'block';
       
-      // Wait a moment for any dynamic content to render
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Force reflow to ensure height is calculated
+      element.offsetHeight;
+      
+      // Wait longer for all content and styles to render
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Use html2canvas to capture the element directly
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        logging: false,
+        logging: true,
         backgroundColor: "#ffffff",
+        windowHeight: element.scrollHeight,
+        height: element.scrollHeight,
         ignoreElements: (element) => {
           // Skip elements that might cause issues
           return element.classList?.contains('no-export');

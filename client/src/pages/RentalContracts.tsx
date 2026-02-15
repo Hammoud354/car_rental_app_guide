@@ -1451,41 +1451,72 @@ export default function RentalContracts() {
                     try {
                       toast.info("Generating PDF... This may take a moment");
                       
-                      // Use the dedicated PDF template instead of screen content
-                      const element = document.getElementById('contract-pdf-template');
+                      // Use the visible contract content
+                      const element = document.getElementById('contract-content');
                       if (!element) {
-                        toast.error("PDF template not found");
+                        toast.error("Contract content not found");
                         return;
                       }
                       
-                      // Use html2pdf library
-                      const html2pdf = (await import('html2pdf.js')).default;
+                      // Store original styles
+                      const originalOverflow = element.style.overflow;
+                      const originalHeight = element.style.height;
+                      const originalMaxHeight = element.style.maxHeight;
                       
-                      const opt = {
-                        margin: [15, 15, 15, 15] as [number, number, number, number],
-                        filename: `Contract-${selectedContract.contractNumber}.pdf`,
-                        image: { type: 'jpeg' as const, quality: 0.90 },
-                        html2canvas: { 
-                          scale: 2,
-                          useCORS: true,
-                          logging: false,
-                          windowHeight: element.scrollHeight,
-                          windowWidth: element.scrollWidth
-                        },
-                        jsPDF: { 
-                          unit: 'mm', 
-                          format: 'a4', 
-                          orientation: 'portrait' as const,
-                          compress: true
-                        },
-                        pagebreak: { 
-                          mode: ['avoid-all', 'css', 'legacy'],
-                          avoid: ['img', 'table', '.no-break']
-                        },
-                        enableLinks: false
-                      };
+                      // Temporarily make element fully visible for capture
+                      element.style.overflow = 'visible';
+                      element.style.height = 'auto';
+                      element.style.maxHeight = 'none';
+                      element.style.display = 'block';
                       
-                      await html2pdf().set(opt).from(element).save();
+                      // Force reflow
+                      element.offsetHeight;
+                      
+                      // Wait for content to render
+                      await new Promise(resolve => setTimeout(resolve, 500));
+                      
+                      // Capture with html2canvas
+                      const canvas = await html2canvas(element, {
+                        scale: 2,
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: "#ffffff",
+                        windowHeight: element.scrollHeight,
+                        height: element.scrollHeight
+                      });
+                      
+                      // Restore original styles
+                      element.style.overflow = originalOverflow;
+                      element.style.height = originalHeight;
+                      element.style.maxHeight = originalMaxHeight;
+                      
+                      // Create PDF
+                      const imgData = canvas.toDataURL("image/png");
+                      const pdf = new jsPDF({
+                        orientation: "portrait",
+                        unit: "mm",
+                        format: "a4",
+                      });
+                      
+                      const imgWidth = 210; // A4 width in mm
+                      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                      
+                      // Handle multi-page PDFs
+                      const pageHeight = 297; // A4 height in mm
+                      let heightLeft = imgHeight;
+                      let position = 0;
+                      
+                      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                      heightLeft -= pageHeight;
+                      
+                      while (heightLeft >= 0) {
+                        position = heightLeft - imgHeight;
+                        pdf.addPage();
+                        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight;
+                      }
+                      
+                      pdf.save(`Contract-${selectedContract.contractNumber}.pdf`);
                       toast.success("PDF downloaded successfully!");
                     } catch (error: any) {
                       console.error("PDF export error:", error);
