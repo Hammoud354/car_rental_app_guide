@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
+import { getLoginUrl } from "@/const";
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -54,18 +55,8 @@ export default function Home() {
     window.open(`https://wa.me/96176354131?text=${message}`, "_blank");
   };
 
-  const handleSignUp = () => {
-    const message = encodeURIComponent(
-      "Hello! I'd like to sign up for the Car Rental Management System.\n\n" +
-      "My details:\n" +
-      "1. Company name:\n" +
-      "2. Number of vehicles:\n" +
-      "3. Monthly rental volume:\n" +
-      "4. Interested in tier: (Starter $50 / Professional $70 / Enterprise $85)\n" +
-      "5. Specific features needed:\n" +
-      "6. Preferred payment method:\n"
-    );
-    window.open(`https://wa.me/96176354131?text=${message}`, "_blank");
+  const handleAuthRedirect = () => {
+    window.location.href = getLoginUrl();
   };
 
   if (loading) {
@@ -90,13 +81,11 @@ export default function Home() {
               <MessageCircle className="h-4 w-4 mr-1.5" />
               Contact
             </Button>
-            <Link href="/login">
-              <Button variant="outline" size="sm">
-                <LogIn className="h-4 w-4 mr-1.5" />
-                Sign In
-              </Button>
-            </Link>
-            <Button size="sm" onClick={handleSignUp}>
+            <Button variant="outline" size="sm" onClick={handleAuthRedirect}>
+              <LogIn className="h-4 w-4 mr-1.5" />
+              Sign In
+            </Button>
+            <Button size="sm" onClick={handleAuthRedirect}>
               <UserPlus className="h-4 w-4 mr-1.5" />
               Sign Up
             </Button>
@@ -242,7 +231,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" variant="outline" onClick={handleSignUp}>
+              <Button className="w-full mt-4" variant="outline" onClick={handleAuthRedirect}>
                 Get Started
               </Button>
             </CardContent>
@@ -277,7 +266,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" onClick={handleSignUp}>
+              <Button className="w-full mt-4" onClick={handleAuthRedirect}>
                 Get Started
               </Button>
             </CardContent>
@@ -311,7 +300,7 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <Button className="w-full mt-4" onClick={handleSignUp}>
+              <Button className="w-full mt-4" onClick={handleAuthRedirect}>
                 Get Started
               </Button>
             </CardContent>

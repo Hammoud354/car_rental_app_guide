@@ -4224,3 +4224,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Enhanced logging added to routers.ts (lines 931-956) and db.ts (lines 778-784)
 - [ ] Cannot test due to dev server crash - needs production environment testing
 - [ ] Once server runs, check logs for [Router] and [DB] prefixed messages to diagnose issue
+
+## Bug Fixes
+
+### Login/Sign-up Button Navigation Issue
+- [x] Sign-up button is navigating to WhatsApp instead of authentication page
+- [x] Investigate login URL configuration in const.ts or authentication setup
+- [x] Fix the URL to point to correct Manus OAuth login portal
+- [ ] Test authentication flow after fix
