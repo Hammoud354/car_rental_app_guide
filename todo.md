@@ -4314,3 +4314,23 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix missing licenseIssueDate field in contract creation query (added to line 715)
 - [x] Ensure all required fields are included in the insert statement
 - [ ] Test contract completion flow in production
+
+
+## Contract Expiry Alert System
+
+### Backend Implementation
+- [x] Create database helper to get contracts expiring within N days (getExpiringContracts in db.ts)
+- [x] Add tRPC procedure contracts.getExpiring to fetch expiring contracts
+- [x] Include contract details (client name, vehicle, end date, days remaining)
+
+### Frontend Implementation
+- [x] Create ContractExpiryAlert widget component for Dashboard
+- [x] Add color-coded badges (red for 1 day, orange for 2-3 days)
+- [x] Show days remaining and contract details
+- [x] Add quick action buttons (View)
+- [x] Add widget to Dashboard with toggle in settings
+
+### Testing
+- [ ] Test with contracts expiring in 1, 2, and 3 days
+- [ ] Verify alerts appear on Dashboard
+- [ ] Test quick action buttons work correctly

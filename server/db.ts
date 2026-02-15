@@ -1,4 +1,4 @@
-import { eq, and, or, lte, gte, lt, sql, desc } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -671,6 +671,34 @@ export async function getOverdueStatistics(userId: number, filterUserId?: number
   const avgDaysOverdue = count > 0 ? Math.round(totalDaysOverdue / count) : 0;
   
   return { count, totalLateFees, avgDaysOverdue };
+}
+
+export async function getExpiringContracts(userId: number, daysAhead: number = 3, filterUserId?: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get expiring contracts: database not available");
+    return [];
+  }
+  
+  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const futureDate = new Date(today);
+  futureDate.setDate(today.getDate() + daysAhead);
+  
+  // Get active contracts expiring within the specified days
+  const contracts = await db.select().from(rentalContracts)
+    .where(
+      and(
+        eq(rentalContracts.userId, targetUserId),
+        eq(rentalContracts.status, "active"),
+        gte(rentalContracts.rentalEndDate, today),
+        lte(rentalContracts.rentalEndDate, futureDate)
+      )
+    )
+    .orderBy(asc(rentalContracts.rentalEndDate));
+  
+  return contracts;
 }
 
 export async function updateContractStatus(contractId: number, status: "active" | "completed" | "overdue") {

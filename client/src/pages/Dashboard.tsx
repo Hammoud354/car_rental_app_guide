@@ -282,6 +282,88 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
   );
 }
 
+function ContractExpiryWidget({ filterUserId }: { filterUserId: number | null }) {
+  const { data: expiringContracts, isLoading } = trpc.contracts.getExpiring.useQuery(
+    { daysAhead: 3, filterUserId: filterUserId || undefined },
+    { enabled: true }
+  );
+  
+  if (isLoading || !expiringContracts || expiringContracts.length === 0) return null;
+  
+  const getDaysRemaining = (endDate: Date | string) => {
+    const end = new Date(endDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diffTime = end.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+  
+  const getUrgencyColor = (daysRemaining: number) => {
+    if (daysRemaining <= 1) return { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', badge: 'bg-red-100 text-red-800' };
+    if (daysRemaining <= 2) return { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900', badge: 'bg-orange-100 text-orange-800' };
+    return { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900', badge: 'bg-yellow-100 text-yellow-800' };
+  };
+  
+  return (
+    <Card className="bg-blue-50 border-blue-200 shadow-md">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Clock className="h-5 w-5 text-blue-600" />
+            </div>
+            <CardTitle className="text-lg font-semibold text-blue-900">Contracts Expiring Soon</CardTitle>
+          </div>
+          <Link href="/rental-contracts">
+            <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+              View All
+            </Button>
+          </Link>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          {expiringContracts.map((contract: any) => {
+            const daysRemaining = getDaysRemaining(contract.rentalEndDate);
+            const colors = getUrgencyColor(daysRemaining);
+            return (
+              <div key={contract.id} className={`flex items-center justify-between p-3 ${colors.bg} rounded-lg border ${colors.border}`}>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-semibold ${colors.text}">{contract.contractNumber}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
+                      {daysRemaining === 0 ? 'Expires Today' : daysRemaining === 1 ? '1 day left' : `${daysRemaining} days left`}
+                    </span>
+                  </div>
+                  <div className="text-sm ${colors.text}">
+                    Client: {contract.clientFirstName} {contract.clientLastName}
+                  </div>
+                  <div className="text-xs text-gray-600">
+                    End Date: {new Date(contract.rentalEndDate).toLocaleDateString()}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link href={`/rental-contracts?contract=${contract.id}`}>
+                    <Button size="sm" variant="outline" className={`border-${daysRemaining <= 1 ? 'red' : daysRemaining <= 2 ? 'orange' : 'yellow'}-300`}>
+                      View
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-4 p-3 bg-blue-100 rounded-lg flex items-start gap-2">
+          <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-blue-800">
+            <strong>Reminder:</strong> {expiringContracts.length} contract{expiringContracts.length > 1 ? 's' : ''} expiring within 3 days. Contact clients to arrange returns or extensions.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery({ filterUserId: filterUserId || undefined });
   
@@ -340,6 +422,7 @@ export default function Dashboard() {
     inMaintenance: true,
     expiringDocs: true,
     overdueAlert: true,
+    contractExpiryAlert: true,
     insuranceAlert: true,
     fleetStatus: true,
     fleetComposition: true,
@@ -476,6 +559,17 @@ export default function Dashboard() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
+                      <Label htmlFor="contractExpiryAlert" className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Contract Expiry Alert
+                      </Label>
+                      <Switch
+                        id="contractExpiryAlert"
+                        checked={widgetVisibility.contractExpiryAlert}
+                        onCheckedChange={() => toggleWidget('contractExpiryAlert')}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
                       <Label htmlFor="insuranceAlert" className="flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
                         Insurance Expiry Alert
@@ -546,6 +640,9 @@ export default function Dashboard() {
 
           {/* Overdue Contracts Alert Widget */}
           {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
+
+          {/* Contract Expiry Alert Widget */}
+          {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
 
           {/* Insurance Expiry Alert Widget */}
           {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}

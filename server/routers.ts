@@ -571,6 +571,16 @@ export const appRouter = router({
       return await db.getOverdueStatistics(ctx.user.id, input?.filterUserId);
     }),
     
+    getExpiring: protectedProcedure
+      .input(z.object({ 
+        daysAhead: z.number().int().positive().default(3),
+        filterUserId: z.number().optional() 
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const daysAhead = input?.daysAhead || 3;
+        return await db.getExpiringContracts(ctx.user.id, daysAhead, input?.filterUserId);
+      }),
+    
     getDashboardStatistics: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
