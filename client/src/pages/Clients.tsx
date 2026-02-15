@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -88,9 +88,11 @@ export default function Clients() {
   });
 
   const updateClient = trpc.clients.update.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Client updated successfully");
-      utils.clients.list.invalidate();
+      // Invalidate both the list and individual client queries
+      await utils.clients.list.invalidate();
+      await utils.clients.getById.invalidate();
       setIsEditDialogOpen(false);
       setSelectedClient(null);
     },
@@ -228,6 +230,7 @@ export default function Clients() {
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Add New Client</DialogTitle>
+                <DialogDescription>Enter the client's personal and driving license information.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateSubmit} className="space-y-6">
                 {/* Personal Information */}
@@ -511,6 +514,7 @@ export default function Clients() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Client</DialogTitle>
+            <DialogDescription>Update the client's information below.</DialogDescription>
           </DialogHeader>
           {selectedClient && (
             <form key={selectedClient.id} onSubmit={handleEditSubmit} className="space-y-6">
@@ -682,6 +686,7 @@ export default function Clients() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Client Details</DialogTitle>
+            <DialogDescription>View complete client information and rental history.</DialogDescription>
           </DialogHeader>
           {selectedClient && (
             <div className="space-y-4">
@@ -744,6 +749,7 @@ export default function Clients() {
             <DialogTitle>
               Rental History - {selectedClient?.firstName} {selectedClient?.lastName}
             </DialogTitle>
+            <DialogDescription>View all rental contracts for this client.</DialogDescription>
           </DialogHeader>
           {selectedClient && (
             <div className="space-y-4">

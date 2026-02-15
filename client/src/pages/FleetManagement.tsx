@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -361,6 +361,7 @@ export default function FleetManagement() {
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-mono">Add New Vehicle</DialogTitle>
+                <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddVehicle} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -839,6 +840,7 @@ export default function FleetManagement() {
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="font-mono">Edit Vehicle</DialogTitle>
+                <DialogDescription>Update vehicle information below.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleEditVehicle} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -1058,6 +1060,7 @@ export default function FleetManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Custom Car Maker</DialogTitle>
+            <DialogDescription>Add a new car manufacturer to the system.</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -1100,6 +1103,7 @@ export default function FleetManagement() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Custom Car Model</DialogTitle>
+            <DialogDescription>Add a new car model for the selected manufacturer.</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();

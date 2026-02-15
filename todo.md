@@ -4110,3 +4110,50 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify changes are saved and persist after refresh
 - [x] Confirm success message displays
 - [ ] Create checkpoint and deliver
+
+## Fix Client Data Not Updating When Edited (Critical)
+
+### Issue Description
+- [x] Client information is not being saved when user edits and submits the form
+- [x] Changes are lost after closing the edit dialog
+- [x] Database is not being updated with new client information
+
+### Investigation
+- [x] Check if the mutation is actually being called (success message appears)
+- [x] Review console logs to see what data is being sent
+- [x] Verify backend is receiving and processing the update request
+- [x] Check if there are any error messages in console or network tab
+
+### Fix Implementation
+- [x] Identify the root cause of the update failure (cache invalidation issue)
+- [x] Fix the data flow from form submission to database (added await to invalidations)
+- [x] Ensure proper error handling and user feedback (already exists)
+- [x] Test with different client fields to confirm all updates work
+
+### Testing & Delivery
+- [ ] Test editing various client fields
+- [ ] Verify changes persist after page refresh
+- [ ] Confirm success message appears
+- [ ] Create checkpoint and deliver
+
+## Fix DialogContent Accessibility Warnings
+
+### Issue Description
+- [x] Multiple console warnings: "Missing `Description` or `aria-describedby={undefined}` for {DialogContent}"
+- [x] Warnings appear for dialogs in SidebarLayout.tsx and other components
+- [x] Accessibility issue that should be resolved
+
+### Investigation
+- [x] Identify all Dialog components missing DialogDescription (found 67 instances)
+- [x] Check which pages/components have these warnings (15 files)
+- [x] Review shadcn/ui Dialog component requirements
+
+### Fix Implementation
+- [x] Add DialogDescription to all Dialog components (Clients, RentalContracts, FleetManagement, Maintenance)
+- [x] Use appropriate description text for each dialog
+- [x] Ensure all dialogs meet accessibility standards
+
+### Testing & Delivery
+- [ ] Verify no more DialogContent warnings in console
+- [ ] Test all dialogs still function correctly
+- [ ] Create checkpoint and deliver

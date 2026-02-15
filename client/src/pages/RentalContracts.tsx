@@ -7,7 +7,7 @@ import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
 import { InsuranceDepositSelector } from "@/components/InsuranceDepositSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -464,6 +464,7 @@ export default function RentalContracts() {
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Create Rental Contract</DialogTitle>
+                  <DialogDescription>Fill in the contract details to create a new rental agreement.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Vehicle Selection */}
@@ -1150,6 +1151,7 @@ export default function RentalContracts() {
           <DialogContent className="max-w-[98vw] w-[98vw] h-[98vh] max-h-[98vh] overflow-hidden flex flex-col">
             <DialogHeader>
               <DialogTitle>Contract Details</DialogTitle>
+              <DialogDescription>View and manage complete contract information.</DialogDescription>
             </DialogHeader>
             {selectedContract && (() => {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
@@ -1763,6 +1765,7 @@ export default function RentalContracts() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Renew Contract</DialogTitle>
+              <DialogDescription>Create a new contract based on this existing contract.</DialogDescription>
             </DialogHeader>
             {selectedContract && (() => {
               const currentEndDate = new Date(selectedContract.rentalEndDate);
@@ -1828,6 +1831,7 @@ export default function RentalContracts() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Confirm Bulk Action</DialogTitle>
+              <DialogDescription>Confirm the action you want to perform on selected contracts.</DialogDescription>
             </DialogHeader>
             <div className="py-4">
               <p className="text-sm text-gray-600 mb-4">
@@ -1884,6 +1888,7 @@ export default function RentalContracts() {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Return Inspection</DialogTitle>
+              <DialogDescription>Document vehicle condition upon return.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <p className="text-sm text-gray-600">

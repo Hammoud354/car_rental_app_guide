@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -181,6 +181,7 @@ export default function Maintenance() {
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto input-client">
                 <DialogHeader>
                   <DialogTitle>Add Maintenance Record</DialogTitle>
+                  <DialogDescription>Record maintenance work performed on a vehicle.</DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleAddMaintenance} className="space-y-4 input-client">
                   <div>
@@ -350,6 +351,7 @@ export default function Maintenance() {
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto input-client">
                 <DialogHeader>
                   <DialogTitle>Edit Maintenance Record</DialogTitle>
+                  <DialogDescription>Update maintenance record details.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 input-client">
                   <div className="grid grid-cols-2 gap-4 input-client">
@@ -501,6 +503,7 @@ export default function Maintenance() {
                   <DialogTitle>
                     Maintenance History - {vehicles?.find(v => v.id === viewingHistory)?.plateNumber}
                   </DialogTitle>
+                  <DialogDescription>View all maintenance records for this vehicle.</DialogDescription>
                 </DialogHeader>
                 
                 {/* Total Cost Summary */}
