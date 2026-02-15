@@ -4398,3 +4398,31 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Fix element height/overflow settings to show full content
 - [ ] Ensure html2canvas captures complete element height
 - [ ] Test with longer invoices to verify multi-page support
+
+
+## Professional Invoice PDF Requirements
+
+### Critical Issues to Fix
+- [ ] Invoice PDF still cutting off content at bottom (Total USD, Total LBP missing)
+- [ ] Company logo not appearing in PDF
+- [ ] Company contact details not showing (address, phone, email, tax ID)
+- [ ] Payment status badge styling missing/cut off
+- [ ] LBP section background and borders not captured
+- [ ] Missing client/bill-to information section
+
+### Investigation Steps
+- [x] Check if dialog container is limiting height - FOUND: Dialog has max-h-[90vh] overflow-y-auto
+- [x] Verify invoice-content element includes all sections - Confirmed, all sections present
+- [x] Test if scrollHeight is being calculated correctly - Fixed by removing dialog constraints
+- [x] Check for CSS that might hide content during capture - Dialog overflow was hiding content
+- [x] Verify all invoice template sections are rendering - All sections rendering correctly
+
+### Professional Invoice Requirements
+- [x] Company branding (logo, name, contact info, tax ID) - Present in template
+- [x] Client/bill-to information - Added "BILL TO" section with client name and contract
+- [x] Clear invoice number and dates - Present in template
+- [x] Itemized charges table with proper formatting - Present with days, unit price, amount
+- [x] Subtotals, tax, and grand totals (both currencies) - USD and LBP sections complete
+- [x] Payment status and method - Present with badge styling
+- [x] Professional styling (borders, spacing, colors) - Borders, gray backgrounds, proper spacing
+- [x] Notes section if applicable - Present if notes exist

@@ -119,10 +119,21 @@ export default function Invoices() {
 
       toast.info("Generating PDF...");
       
-      // Store original styles
+      // Find and store dialog container styles
+      const dialogContent = element.closest('[role="dialog"]');
+      const originalDialogMaxHeight = dialogContent ? (dialogContent as HTMLElement).style.maxHeight : '';
+      const originalDialogOverflow = dialogContent ? (dialogContent as HTMLElement).style.overflow : '';
+      
+      // Store original element styles
       const originalOverflow = element.style.overflow;
       const originalHeight = element.style.height;
       const originalMaxHeight = element.style.maxHeight;
+      
+      // Temporarily remove dialog constraints
+      if (dialogContent) {
+        (dialogContent as HTMLElement).style.maxHeight = 'none';
+        (dialogContent as HTMLElement).style.overflow = 'visible';
+      }
       
       // Temporarily make element fully visible for capture
       element.style.overflow = 'visible';
@@ -134,7 +145,7 @@ export default function Invoices() {
       element.offsetHeight;
       
       // Wait longer for all content and styles to render
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 800));
       
       // Use html2canvas to capture the element directly
       const canvas = await html2canvas(element, {
@@ -154,6 +165,12 @@ export default function Invoices() {
       element.style.overflow = originalOverflow;
       element.style.height = originalHeight;
       element.style.maxHeight = originalMaxHeight;
+      
+      // Restore dialog styles
+      if (dialogContent) {
+        (dialogContent as HTMLElement).style.maxHeight = originalDialogMaxHeight;
+        (dialogContent as HTMLElement).style.overflow = originalDialogOverflow;
+      }
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
@@ -350,6 +367,17 @@ export default function Invoices() {
                           Due Date: {new Date(invoiceDetails.dueDate).toLocaleDateString()}
                         </p>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Bill To Section */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-gray-600">BILL TO:</p>
+                    <div className="text-base">
+                      <p className="font-semibold">{invoiceDetails.clientName}</p>
+                      {invoiceDetails.contractId && (
+                        <p className="text-sm text-gray-600">Contract: {invoiceDetails.contractId}</p>
+                      )}
                     </div>
                   </div>
 
