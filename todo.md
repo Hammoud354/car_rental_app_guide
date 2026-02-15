@@ -4490,3 +4490,41 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - Captures with html2canvas after 1.5s render time
 - Generates PDF with jsPDF and auto-closes window
 - Should produce identical output to Print Preview
+
+
+## URGENT: Export PDF Not Working After Multiple Fixes
+
+### Status
+- User reports Export PDF still produces same bad output after:
+  * Multiple code fixes
+  * Page refresh (hard refresh with Ctrl+Shift+R)
+  * Closing and reopening page
+  * Latest checkpoint deployed (3f500727)
+
+### Possible Causes
+- [ ] Dev server not running (EMFILE error preventing restart)
+- [ ] Changes not being served to browser
+- [ ] Build process not picking up changes
+- [ ] User testing on production instead of dev
+- [ ] Code changes didn't save correctly
+
+### Investigation Steps
+- [x] Check latest exported PDF to confirm issue persists - CONFIRMED: Still old format
+- [x] Verify handleExportPDF function in current code - Code is correct (new window approach)
+- [x] Check if dev server is actually running - Restarted successfully
+- [ ] Verify user is accessing correct URL
+- [ ] Check browser console for errors
+- [ ] Verify popup is actually opening (user may not see it)
+
+### Critical Finding
+- Code in Invoices.tsx shows new window approach (lines 122-210)
+- Dev server restarted successfully
+- User refreshed page
+- PDF STILL shows old format (missing company details, compressed)
+- ROOT CAUSE FOUND: Export PDF button had inline onClick using OLD html2pdf.js library
+- The new handleExportPDF function was never being called!
+
+### Fix Applied
+- Replaced inline onClick (lines 587-612) with onClick={handleExportPDF}
+- Export PDF button now calls the correct function with new window approach
+- Should now produce identical output to Print Preview
