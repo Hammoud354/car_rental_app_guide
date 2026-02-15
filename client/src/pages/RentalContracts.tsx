@@ -1409,7 +1409,8 @@ export default function RentalContracts() {
                     ...selectedContract,
                     clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`
                   }} 
-                  vehicle={vehicle || null} 
+                  vehicle={vehicle || null}
+                  companyProfile={companyProfile || null}
                 />
               );
             })()}

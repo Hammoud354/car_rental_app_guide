@@ -4035,3 +4035,27 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify no null values appear in PDF
 - [x] Confirm all fields are readable and well-formatted
 - [ ] Create checkpoint and deliver
+
+## Add Company Branding to PDF Export
+
+### Task Description
+- [x] Integrate company logo, name, address, and contact info into PDF contract exports
+- [x] Use existing company profile data from the application
+- [x] Display branding in professional header section of PDF
+
+### Investigation
+- [x] Check if company profile system exists in the application (trpc.company.getProfile)
+- [x] Identify company profile data structure and fields
+- [x] Review how company profile is currently fetched in RentalContracts.tsx
+
+### Implementation
+- [x] Update ContractPDFTemplate to accept company profile data
+- [x] Design professional header with logo and company info
+- [x] Pass company profile data from RentalContracts to PDF template
+- [x] Handle cases where company profile is not set (conditional rendering)
+
+### Testing & Delivery
+- [x] Test PDF export with company branding
+- [x] Verify logo displays correctly
+- [x] Confirm all company info appears properly
+- [ ] Create checkpoint and deliver

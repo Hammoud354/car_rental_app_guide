@@ -1,5 +1,14 @@
 import React from 'react';
 
+interface CompanyProfile {
+  companyName: string;
+  logoUrl?: string | null;
+  registrationNumber?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  address?: string | null;
+}
+
 interface Vehicle {
   plateNumber: string;
   brand: string;
@@ -42,9 +51,10 @@ interface Contract {
 interface ContractPDFTemplateProps {
   contract: Contract;
   vehicle: Vehicle | null;
+  companyProfile?: CompanyProfile | null;
 }
 
-export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle }) => {
+export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile }) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -75,6 +85,38 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         color: '#000000'
       }}
     >
+      {/* Company Branding Header */}
+      {companyProfile && (
+        <div style={{ marginBottom: '25px', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              {companyProfile.logoUrl && (
+                <img 
+                  src={companyProfile.logoUrl} 
+                  alt={companyProfile.companyName}
+                  style={{ height: '60px', width: '60px', objectFit: 'contain' }}
+                />
+              )}
+              <div>
+                <div style={{ fontSize: '18pt', fontWeight: 'bold', color: '#1e40af', marginBottom: '5px' }}>
+                  {companyProfile.companyName}
+                </div>
+                {companyProfile.registrationNumber && (
+                  <div style={{ fontSize: '9pt', color: '#6b7280' }}>
+                    Reg. No: {companyProfile.registrationNumber}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', fontSize: '9pt', color: '#4b5563', lineHeight: '1.4' }}>
+              {companyProfile.phone && <div>{companyProfile.phone}</div>}
+              {companyProfile.email && <div>{companyProfile.email}</div>}
+              {companyProfile.address && <div>{companyProfile.address}</div>}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '30px', borderBottom: '3px solid #2563EB', paddingBottom: '15px' }}>
         <h1 style={{ fontSize: '24pt', fontWeight: 'bold', margin: '0 0 10px 0', color: '#1e40af' }}>
