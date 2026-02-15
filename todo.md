@@ -44,7 +44,7 @@
 - [x] Create maintenance history view for each vehicle
 - [x] Display all past maintenance records
 - [x] Show maintenance timeline
-- [ ] Add edit/delete maintenance records
+- [x] Add edit/delete maintenance records
 
 ### Phase 4: Testing & Delivery
 - [x] Test maintenance CRUD operations
@@ -3883,3 +3883,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
   - [x] Filter shows "All Vehicles" option plus individual vehicle options
   - [x] TypeScript compilation successful (0 errors)
 - [x] Ready to save checkpoint
+
+
+## Add Edit Functionality to Maintenance History Card in Maintenance Tracking
+- [ ] Locate Maintenance Tracking page and View Maintenance History button
+- [ ] Find the dialog/card that opens when clicking View Maintenance History
+- [ ] Add edit button to each maintenance record in the history card
+- [ ] Implement inline editing or edit dialog for maintenance records
+- [ ] Add save functionality to persist edits
+- [ ] Test editing and saving from Maintenance Tracking page
+- [ ] Save checkpoint
