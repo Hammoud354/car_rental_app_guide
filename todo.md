@@ -4426,3 +4426,27 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Payment status and method - Present with badge styling
 - [x] Professional styling (borders, spacing, colors) - Borders, gray backgrounds, proper spacing
 - [x] Notes section if applicable - Present if notes exist
+
+
+## Invoice PDF Still Cutting Off (Persistent Issue)
+
+### Current Status
+- Dialog constraint fix applied but PDF still cuts off at "Total (USD)" and "Total (LBP)"
+- BILL TO section now showing correctly
+- Company header, line items, subtotals visible
+- Missing: Total (USD) row and entire LBP total section
+
+### Investigation Needed
+- [ ] Check if changes were actually deployed/applied
+- [ ] Verify html2canvas is capturing full scrollHeight
+- [ ] Check browser console for html2canvas errors during export
+- [ ] Test if element height is being calculated correctly
+- [ ] Consider alternative: Clone element outside dialog for capture
+- [ ] Consider alternative: Use different PDF library (jsPDF autoTable, pdfmake)
+
+### Alternative Approaches to Try
+- [x] Clone invoice-content element and append to body (outside dialog) for capture - IMPLEMENTED
+- [x] Use window.scrollTo to ensure full content is in viewport - Not needed with clone
+- [x] Increase wait time beyond 800ms - Now 1000ms
+- [x] Add explicit height calculation and set before capture - Using scrollHeight on clone
+- [ ] Try capturing in chunks and combining pages - Will try if clone approach fails

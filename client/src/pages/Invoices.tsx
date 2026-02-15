@@ -119,58 +119,47 @@ export default function Invoices() {
 
       toast.info("Generating PDF...");
       
-      // Find and store dialog container styles
-      const dialogContent = element.closest('[role="dialog"]');
-      const originalDialogMaxHeight = dialogContent ? (dialogContent as HTMLElement).style.maxHeight : '';
-      const originalDialogOverflow = dialogContent ? (dialogContent as HTMLElement).style.overflow : '';
+      // Clone the element to capture it outside the dialog
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.id = 'invoice-clone-for-pdf';
       
-      // Store original element styles
-      const originalOverflow = element.style.overflow;
-      const originalHeight = element.style.height;
-      const originalMaxHeight = element.style.maxHeight;
+      // Style the clone for proper capture
+      clone.style.position = 'absolute';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.width = '210mm'; // A4 width
+      clone.style.overflow = 'visible';
+      clone.style.height = 'auto';
+      clone.style.maxHeight = 'none';
+      clone.style.display = 'block';
+      clone.style.backgroundColor = '#ffffff';
+      clone.style.padding = '32px';
       
-      // Temporarily remove dialog constraints
-      if (dialogContent) {
-        (dialogContent as HTMLElement).style.maxHeight = 'none';
-        (dialogContent as HTMLElement).style.overflow = 'visible';
-      }
+      // Append clone to body
+      document.body.appendChild(clone);
       
-      // Temporarily make element fully visible for capture
-      element.style.overflow = 'visible';
-      element.style.height = 'auto';
-      element.style.maxHeight = 'none';
-      element.style.display = 'block';
+      // Force reflow
+      clone.offsetHeight;
       
-      // Force reflow to ensure height is calculated
-      element.offsetHeight;
+      // Wait for content to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Wait longer for all content and styles to render
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Use html2canvas to capture the element directly
-      const canvas = await html2canvas(element, {
+      // Capture the clone
+      const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
         logging: true,
         backgroundColor: "#ffffff",
-        windowHeight: element.scrollHeight,
-        height: element.scrollHeight,
-        ignoreElements: (element) => {
-          // Skip elements that might cause issues
-          return element.classList?.contains('no-export');
+        windowHeight: clone.scrollHeight,
+        height: clone.scrollHeight,
+        width: clone.scrollWidth,
+        ignoreElements: (el) => {
+          return el.classList?.contains('no-export');
         }
       });
       
-      // Restore original styles
-      element.style.overflow = originalOverflow;
-      element.style.height = originalHeight;
-      element.style.maxHeight = originalMaxHeight;
-      
-      // Restore dialog styles
-      if (dialogContent) {
-        (dialogContent as HTMLElement).style.maxHeight = originalDialogMaxHeight;
-        (dialogContent as HTMLElement).style.overflow = originalDialogOverflow;
-      }
+      // Remove the clone
+      document.body.removeChild(clone);
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
