@@ -152,7 +152,7 @@ function ExportToExcelButton() {
     <Button
       onClick={handleExport}
       disabled={isExporting}
-      className="bg-green-600 hover:bg-green-700 text-white"
+      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
     >
       <FileSpreadsheet className="mr-2 h-4 w-4" />
       {isExporting ? "Exporting..." : "Export to Excel"}
@@ -481,12 +481,12 @@ export default function Dashboard() {
     <SidebarLayout>
       <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h2 className="text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
-              <p className="text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
+              <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Widget Settings Dialog */}
               <Dialog>
                 <DialogTrigger asChild>
@@ -606,13 +606,13 @@ export default function Dashboard() {
                 </DialogContent>
               </Dialog>
               {isSuperAdmin && allUsers && allUsers.length > 0 && (
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   <Select
                     value={selectedUserId === null ? "all" : selectedUserId.toString()}
                     onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
                   >
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px]">
                       <SelectValue placeholder="Select user" />
                     </SelectTrigger>
                     <SelectContent>
@@ -628,8 +628,8 @@ export default function Dashboard() {
               )}
               <ExportToExcelButton />
               {user?.role === "super_admin" && (
-                <Link href="/admin/users">
-                  <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                <Link href="/admin/users" className="w-full sm:w-auto">
+                  <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full sm:w-auto whitespace-nowrap">
                     <Crown className="mr-2 h-4 w-4" />
                     Super Admin Panel
                   </Button>
