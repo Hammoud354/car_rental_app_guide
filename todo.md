@@ -4583,3 +4583,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix all button groups to wrap on mobile (flex-wrap)
 - [x] Fix all dialogs to be mobile-friendly (FleetManagement already has w-[95vw] sm:w-full)
 - [x] Test every page on 375px mobile viewport
+
+## Fix Fleet Management Page Mobile Button Layout
+- [x] Fix Fleet Management page header buttons to be clearly visible on mobile
+- [x] Make button groups stack vertically or wrap properly on mobile
+- [x] Ensure all action buttons are touch-friendly and full-width on small screens

@@ -323,15 +323,15 @@ export default function FleetManagement() {
             <p className="text-muted-foreground mt-2">Manage your vehicle inventory and track maintenance</p>
           </div>
           
-          <div className="flex gap-3">
-            <Link href="/maintenance-tracking">
-              <Button variant="outline">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <Link href="/maintenance-tracking" className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full sm:w-auto whitespace-nowrap">
                 <Wrench className="h-4 w-4 mr-2" />
                 Maintenance Tracking
               </Button>
             </Link>
             
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="w-full sm:w-auto whitespace-nowrap">
               <Upload className="h-4 w-4 mr-2" />
               Bulk Import
             </Button>
@@ -346,6 +346,7 @@ export default function FleetManagement() {
                 exportVehiclesToCSV(vehicles);
                 toast.success(`Exported ${vehicles.length} vehicles`);
               }}
+              className="w-full sm:w-auto whitespace-nowrap"
             >
               <Download className="h-4 w-4 mr-2" />
               Export CSV
@@ -360,7 +361,7 @@ export default function FleetManagement() {
               }
             }}>
               <DialogTrigger asChild>
-              <Button className="font-mono bg-gray-900 hover:bg-gray-800">
+              <Button className="font-mono bg-gray-900 hover:bg-gray-800 w-full sm:w-auto whitespace-nowrap">
                 <Plus className="mr-2 h-4 w-4" />
                 ADD VEHICLE
               </Button>
