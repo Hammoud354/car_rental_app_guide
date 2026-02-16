@@ -4593,3 +4593,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix horizontal scrolling in Add New Vehicle dialog on mobile
 - [x] Ensure dialog width is constrained to viewport
 - [x] Ensure all form fields fit within dialog without overflow
+
+## Fix Renew Contract Dialog Theme
+- [x] Fix Renew Contract dialog background to match website theme
+- [x] Replace dark blue/slate background with standard light background
+- [x] Ensure proper semantic color usage (bg-background, text-foreground)

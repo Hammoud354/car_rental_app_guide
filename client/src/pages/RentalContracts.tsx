@@ -1881,10 +1881,10 @@ export default function RentalContracts() {
               
               return (
                 <div className="space-y-4">
-                  <div className="bg-gray-700 p-4 rounded-lg space-y-3">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-3 border border-border">
                     <div>
-                      <div className="text-sm text-gray-400">Current End Date</div>
-                      <div className="font-semibold">{currentEndDate.toLocaleDateString()}</div>
+                      <div className="text-sm text-muted-foreground">Current End Date</div>
+                      <div className="font-semibold text-foreground">{currentEndDate.toLocaleDateString()}</div>
                     </div>
                     <div>
                       <Label htmlFor="additionalDays">Additional Days</Label>
@@ -1894,18 +1894,18 @@ export default function RentalContracts() {
                         min="1"
                         value={additionalDays}
                         onChange={(e) => setAdditionalDays(parseInt(e.target.value) || 1)}
-                        className="bg-gray-600 text-white input-client"
+                        className="input-client"
                       />
                     </div>
                     <div>
-                      <div className="text-sm text-gray-400">New End Date</div>
-                      <div className="font-semibold text-gray-900">{newEndDate.toLocaleDateString()}</div>
+                      <div className="text-sm text-muted-foreground">New End Date</div>
+                      <div className="font-semibold text-foreground">{newEndDate.toLocaleDateString()}</div>
                     </div>
-                    <div className="border-t border-gray-600 pt-3 mt-3">
-                      <div className="text-sm text-gray-400">Daily Rate</div>
-                      <div>${dailyRateNum.toFixed(2)}</div>
-                      <div className="text-sm text-gray-400 mt-2">Additional Cost</div>
-                      <div className="text-xl font-bold text-gray-900">${additionalCost.toFixed(2)}</div>
+                    <div className="border-t border-border pt-3 mt-3">
+                      <div className="text-sm text-muted-foreground">Daily Rate</div>
+                      <div className="text-foreground">${dailyRateNum.toFixed(2)}</div>
+                      <div className="text-sm text-muted-foreground mt-2">Additional Cost</div>
+                      <div className="text-xl font-bold text-foreground">${additionalCost.toFixed(2)}</div>
                     </div>
                   </div>
                   <DialogFooter>
