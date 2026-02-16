@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   Building2, BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
@@ -107,10 +107,45 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] flex relative">
+      {/* Mobile Header with Hamburger Menu */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-50 shadow-sm">
+        <Link href="/">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-[#1e40af] flex items-center justify-center">
+              <Building2 className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-sm font-bold text-gray-900">
+              {companyProfile?.companyName || "Car Rental"}
+            </span>
+          </div>
+        </Link>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6 text-gray-700" />
+          ) : (
+            <Menu className="h-6 w-6 text-gray-700" />
+          )}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/50 z-40"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar */}
       <aside className={cn(
         "bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm",
-        isCollapsed ? "w-20" : "w-72"
+        "md:relative fixed inset-y-0 left-0 z-40",
+        "md:translate-x-0",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+        isCollapsed ? "w-20 md:w-20" : "w-72 md:w-72"
       )}>
         {/* Logo & Toggle Button */}
         <div className="p-6 border-b border-gray-200 relative">
@@ -171,6 +206,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                       return (
                         <Link key={item.href} href={item.href}>
                           <div
+                            onClick={() => setIsMobileMenuOpen(false)}
                             className={cn(
                               "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 group",
                               isCollapsed ? "justify-center" : "gap-3",
@@ -243,7 +279,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-8 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 mt-16 md:mt-0">
             {children}
           </div>
         </main>

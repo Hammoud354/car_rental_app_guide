@@ -4548,3 +4548,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ## Fix Contract Print Functionality
 - [x] Fix contract print to display all data properly using window.open approach (matching invoice print)
+
+## Mobile & Tablet Responsive Design Optimization
+- [x] Optimize SidebarLayout component for mobile with hamburger menu
+- [x] Make all data tables responsive with horizontal scroll and mobile card views
+- [x] Optimize forms for mobile touch interaction with larger touch targets
+- [x] Make dialogs mobile-friendly with full-screen on small devices
+- [x] Optimize Dashboard widgets for mobile stacking (already responsive with grid)
+- [x] Make Fleet Management page responsive (forms, dialogs, buttons)
+- [x] Make Rental Contracts page responsive (inherits from layout)
+- [x] Make Clients page responsive (card-based layout)
+- [x] Make Invoices page responsive (table with horizontal scroll)
+- [x] Make Maintenance page responsive (inherits from layout)
+- [x] Optimize button groups and action buttons for mobile
+- [x] Test all pages on mobile (320px), tablet (768px), and desktop (1024px+) breakpoints

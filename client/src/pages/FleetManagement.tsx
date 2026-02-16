@@ -365,13 +365,13 @@ export default function FleetManagement() {
                 ADD VEHICLE
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="font-mono">Add New Vehicle</DialogTitle>
                 <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddVehicle} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="plateNumber">Plate Number *</Label>
                     <Input id="plateNumber" name="plateNumber" required className="input-client" />
@@ -382,7 +382,7 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label>Car Maker *</Label>
                     <Popover open={makerOpen} onOpenChange={setMakerOpen}>
@@ -504,7 +504,7 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="color">Color *</Label>
                     <Input id="color" name="color" required className="input-client" />
@@ -533,7 +533,7 @@ export default function FleetManagement() {
                   <Input id="mileage" name="mileage" type="number" min="0" />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
                     <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client" />
@@ -561,7 +561,7 @@ export default function FleetManagement() {
                     <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="insurancePolicyStartDate">Policy Start Date</Label>
                       <Input id="insurancePolicyStartDate" name="insurancePolicyStartDate" type="date" />
@@ -606,7 +606,7 @@ export default function FleetManagement() {
                     <span className="text-xs text-muted-foreground">Enables intelligent maintenance scheduling</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="engineType">Engine Type</Label>
                       <Select name="engineType">
@@ -718,11 +718,11 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={createMutation.isPending}>
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
                     {createMutation.isPending ? "Adding..." : "Add Vehicle"}
                   </Button>
                 </DialogFooter>
@@ -860,13 +860,13 @@ export default function FleetManagement() {
         {/* Edit Dialog */}
         {selectedVehicle && (
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="font-mono">Edit Vehicle</DialogTitle>
                 <DialogDescription>Update vehicle information below.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleEditVehicle} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit-plateNumber">Plate Number *</Label>
                     <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required className="input-client" />
@@ -877,7 +877,7 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label>Car Maker *</Label>
                     <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
@@ -999,7 +999,7 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="edit-color">Color *</Label>
                     <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client" />
@@ -1028,7 +1028,7 @@ export default function FleetManagement() {
                   <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="edit-dailyRate">Daily Rate ($) *</Label>
                     <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" required className="input-client" />
@@ -1056,7 +1056,7 @@ export default function FleetManagement() {
                     <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="edit-insurancePolicyStartDate">Policy Start Date</Label>
                       <Input 
@@ -1101,11 +1101,11 @@ export default function FleetManagement() {
                   <Textarea id="edit-notes" name="notes" rows={3} defaultValue={selectedVehicle.notes || ""} />
                 </div>
 
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={updateMutation.isPending}>
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
                     {updateMutation.isPending ? "Updating..." : "Update Vehicle"}
                   </Button>
                 </DialogFooter>

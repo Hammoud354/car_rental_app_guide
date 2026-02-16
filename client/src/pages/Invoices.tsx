@@ -411,7 +411,9 @@ export default function Invoices() {
                   {/* Line Items */}
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg mb-4">Itemized Charges</h3>
-                    <table className="w-full table-fixed">
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                      <div className="inline-block min-w-full align-middle px-4 sm:px-0">
+                        <table className="w-full min-w-[600px]">
                       <thead className="border-b-2">
                         <tr className="text-left">
                           <th className="pb-3 font-medium w-1/2">Description</th>
@@ -436,7 +438,9 @@ export default function Invoices() {
                           </tr>
                         ))}
                       </tbody>
-                    </table>
+                        </table>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Totals */}
