@@ -4588,3 +4588,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix Fleet Management page header buttons to be clearly visible on mobile
 - [x] Make button groups stack vertically or wrap properly on mobile
 - [x] Ensure all action buttons are touch-friendly and full-width on small screens
+
+## Fix Add New Vehicle Dialog Horizontal Scroll on Mobile
+- [x] Fix horizontal scrolling in Add New Vehicle dialog on mobile
+- [x] Ensure dialog width is constrained to viewport
+- [x] Ensure all form fields fit within dialog without overflow

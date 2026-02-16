@@ -366,7 +366,7 @@ export default function FleetManagement() {
                 ADD VEHICLE
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="font-mono">Add New Vehicle</DialogTitle>
                 <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
@@ -861,7 +861,7 @@ export default function FleetManagement() {
         {/* Edit Dialog */}
         {selectedVehicle && (
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="font-mono">Edit Vehicle</DialogTitle>
                 <DialogDescription>Update vehicle information below.</DialogDescription>
