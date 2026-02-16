@@ -4568,3 +4568,18 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure all button groups wrap properly on mobile
 - [x] Add viewport constraints to prevent content overflow
 - [x] Test on mobile viewport (375px, 390px, 414px widths)
+
+## Comprehensive Responsive Design Audit & Fixes
+- [x] Audit Clients page for responsive issues
+- [x] Audit RentalContracts page for responsive issues
+- [x] Audit Maintenance page for responsive issues
+- [x] Audit Invoices page for responsive issues (already had ResponsiveTable wrapper)
+- [x] Audit ProfitLoss page for responsive issues (already responsive with md: breakpoints)
+- [x] Audit ProfitabilityDashboard page for responsive issues
+- [x] Audit AdminUsers page for responsive issues
+- [x] Fix all table layouts to wrap or scroll on mobile
+- [x] Fix all form grids to stack on mobile (grid-cols-1 sm:grid-cols-2/3)
+- [x] Fix all page headers to stack on mobile (flex-col sm:flex-row)
+- [x] Fix all button groups to wrap on mobile (flex-wrap)
+- [x] Fix all dialogs to be mobile-friendly (FleetManagement already has w-[95vw] sm:w-full)
+- [x] Test every page on 375px mobile viewport

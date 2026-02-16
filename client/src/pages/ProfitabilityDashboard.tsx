@@ -72,9 +72,9 @@ export default function ProfitabilityDashboard() {
   return (
     <div className="p-8 space-y-6" id="profitability-dashboard-content">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Vehicle Profitability Dashboard</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Vehicle Profitability Dashboard</h1>
           <p className="text-muted-foreground mt-2">
             Comprehensive financial analysis of your fleet performance
           </p>
@@ -362,7 +362,7 @@ export default function ProfitabilityDashboard() {
           {vehicleDetails && (
             <div className="space-y-6">
               {/* Summary Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <Card>
                   <CardContent className="pt-4 px-4">
                     <div className="text-sm text-muted-foreground mb-2">Total Revenue</div>

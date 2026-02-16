@@ -195,12 +195,12 @@ export default function Clients() {
   return (
     <SidebarLayout>
         
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
-            <h2 className="text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
-            <p className="text-gray-600">Manage customer information and rental history</p>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
+            <p className="text-sm sm:text-base text-gray-600">Manage customer information and rental history</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Bulk Import
@@ -236,7 +236,7 @@ export default function Clients() {
                 {/* Personal Information */}
                 <div>
                   <h3 className="font-semibold mb-4">Personal Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input id="firstName" name="firstName" required className="input-client" />
@@ -306,7 +306,7 @@ export default function Clients() {
                 {/* Driving License */}
                 <div className="border-t border-gray-700 pt-4">
                   <h3 className="font-semibold mb-4">Driving License</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
                       <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                       <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
@@ -817,7 +817,7 @@ export default function Clients() {
                 </div>
               )}
               <div className="pt-4 border-t border-gray-700">
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                   <div>
                     <Label className="text-gray-400 text-xs">Total Contracts</Label>
                     <p className="text-2xl font-bold text-white">{clientContracts.length}</p>

@@ -433,9 +433,9 @@ export default function RentalContracts() {
           ) : (
           <>
           
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Rental Contracts</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Rental Contracts</h1>
               <p className="text-gray-600 mt-1">Manage rental agreements and client information</p>
             </div>
             <div className="flex gap-3">
@@ -668,7 +668,7 @@ export default function RentalContracts() {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="clientFirstName">First Name *</Label>
                         <Input id="clientFirstName" name="clientFirstName" required className="input-client" />
@@ -735,7 +735,7 @@ export default function RentalContracts() {
                   {/* Driving License */}
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-4">Driving License</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="col-span-2">
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
@@ -765,7 +765,7 @@ export default function RentalContracts() {
                   {/* Rental Period */}
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-4">Rental Period</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <DateDropdownSelector
                           id="rentalStartDate"
@@ -847,7 +847,7 @@ export default function RentalContracts() {
                     </div>
 
                     <h3 className="font-semibold mb-4">Pricing</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
                         <Input
@@ -1191,7 +1191,7 @@ export default function RentalContracts() {
                   {/* Client Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-gray-900">Client Information</h3>
-                    <div className="grid grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
                         <div className="text-sm text-muted-foreground">Full Name</div>
                         <div className="font-semibold">{selectedContract.clientFirstName} {selectedContract.clientLastName}</div>
@@ -1228,7 +1228,7 @@ export default function RentalContracts() {
                   {/* Vehicle Information */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3 text-gray-900">Vehicle Information</h3>
-                    <div className="grid grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
                         <div className="text-sm text-muted-foreground">Plate Number</div>
                         <div className="font-semibold">{vehicle?.plateNumber || "N/A"}</div>
@@ -1313,7 +1313,7 @@ export default function RentalContracts() {
                   {selectedContract.status === 'completed' && selectedContract.returnedAt && (
                     <div>
                       <h3 className="font-semibold text-lg mb-3 text-gray-900">Return Information</h3>
-                      <div className="grid grid-cols-2 gap-4 bg-green-50 border-2 border-green-200 p-4 rounded-lg">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-green-50 border-2 border-green-200 p-4 rounded-lg">
                         <div>
                           <div className="text-sm text-gray-600">Returned On</div>
                           <div className="font-semibold text-gray-900">{new Date(selectedContract.returnedAt).toLocaleDateString()} {new Date(selectedContract.returnedAt).toLocaleTimeString()}</div>
@@ -1429,7 +1429,7 @@ export default function RentalContracts() {
             })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
               {/* Button grid layout - 2 columns, equal sizing */}
-              <div className="grid grid-cols-2 gap-3 w-full">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
                   onClick={() => {

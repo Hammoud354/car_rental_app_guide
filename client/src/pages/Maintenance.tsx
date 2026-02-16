@@ -207,7 +207,7 @@ export default function Maintenance() {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="maintenanceType">Maintenance Type *</Label>
                       <Select name="maintenanceType" required>
@@ -236,7 +236,7 @@ export default function Maintenance() {
                     <Textarea id="description" name="description" rows={3} required placeholder="Describe the maintenance work performed..." />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="garageLocation">Garage Location</Label>
                       <Input id="garageLocation" name="garageLocation" placeholder="e.g., Downtown Auto Center" className="input-client" />
@@ -247,7 +247,7 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="garageEntryDate">Garage Entry Date</Label>
                       <Input id="garageEntryDate" name="garageEntryDate" type="date" className="input-client" />
@@ -258,7 +258,7 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 input-client">
                     <div>
                       <Label htmlFor="mileageAtService">
                         Kilometer Reading
@@ -354,7 +354,7 @@ export default function Maintenance() {
                   <DialogDescription>Update maintenance record details.</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 input-client">
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="edit-maintenanceType">Maintenance Type *</Label>
                       <Select 
@@ -398,7 +398,7 @@ export default function Maintenance() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="edit-garageLocation">Garage Location</Label>
                       <Input 
@@ -421,7 +421,7 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="edit-garageEntryDate">Garage Entry Date</Label>
                       <Input 
@@ -444,7 +444,7 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 input-client">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
                     <div>
                       <Label htmlFor="edit-mileageAtService">Kilometer Reading</Label>
                       <Input 
@@ -561,7 +561,7 @@ export default function Maintenance() {
 
                           <p className="text-gray-900 font-medium mb-3 input-client">{record.description}</p>
 
-                          <div className="grid grid-cols-2 gap-4 text-sm input-client">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm input-client">
                             {record.garageLocation && (
                               <div className="flex items-center gap-2 text-gray-600 input-client">
                                 <MapPin className="h-4 w-4 input-client" />
