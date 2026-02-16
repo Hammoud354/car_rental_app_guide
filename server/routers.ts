@@ -1946,6 +1946,19 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         return await db.deleteMaintenanceTask(input.taskId, ctx.user.id);
       }),
+
+    // Insurance Policy Management
+    getVehicleInsurancePolicies: protectedProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehicleInsurancePolicies(input.vehicleId, ctx.user.id);
+      }),
+
+    getActiveInsurancePolicy: protectedProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getActiveInsurancePolicy(input.vehicleId, ctx.user.id);
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

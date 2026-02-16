@@ -508,3 +508,25 @@ export const whatsappTemplates = mysqlTable("whatsappTemplates", {
 
 export type WhatsappTemplate = typeof whatsappTemplates.$inferSelect;
 export type InsertWhatsappTemplate = typeof whatsappTemplates.$inferInsert;
+
+/**
+ * Insurance policies table - tracks all insurance policies for vehicles over time
+ * Each policy is a separate record, preserving historical data for accurate P&L analysis
+ */
+export const insurancePolicies = mysqlTable("insurancePolicies", {
+  id: int("id").autoincrement().primaryKey(),
+  vehicleId: int("vehicleId").notNull(), // Foreign key to vehicles table
+  userId: int("userId").notNull(), // Foreign key to users table
+  policyNumber: varchar("policyNumber", { length: 100 }),
+  insuranceProvider: varchar("insuranceProvider", { length: 200 }),
+  policyStartDate: timestamp("policyStartDate").notNull(),
+  policyEndDate: timestamp("policyEndDate").notNull(),
+  annualPremium: decimal("annualPremium", { precision: 10, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["active", "expired", "cancelled"]).default("active").notNull(),
+  notes: text("notes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type InsurancePolicy = typeof insurancePolicies.$inferSelect;
+export type InsertInsurancePolicy = typeof insurancePolicies.$inferInsert;

@@ -1,6 +1,6 @@
 import { eq, and, or, lte, gte, lt, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -2716,6 +2716,7 @@ export async function getVehiclesWithExpiredInsurance(userId: number) {
 
 /**
  * Renew vehicle insurance with new policy details
+ * Creates a new insurance policy record while preserving historical data
  */
 export async function renewVehicleInsurance(
   vehicleId: number,
@@ -2729,6 +2730,29 @@ export async function renewVehicleInsurance(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Mark previous active policies as expired
+  await db
+    .update(insurancePolicies)
+    .set({ status: 'expired', updatedAt: new Date() })
+    .where(and(
+      eq(insurancePolicies.vehicleId, vehicleId),
+      eq(insurancePolicies.userId, userId),
+      eq(insurancePolicies.status, 'active')
+    ));
+  
+  // Create new insurance policy record
+  await db.insert(insurancePolicies).values({
+    vehicleId,
+    userId,
+    policyNumber: policyNumber || null,
+    insuranceProvider: insuranceProvider || null,
+    policyStartDate,
+    policyEndDate: policyExpiryDate,
+    annualPremium,
+    status: 'active'
+  });
+  
+  // Update vehicle record with current policy info (for quick reference)
   const updateData: any = {
     insurancePolicyStartDate: policyStartDate,
     insuranceExpiryDate: policyExpiryDate,
@@ -2753,4 +2777,87 @@ export async function renewVehicleInsurance(
     ));
   
   return { success: true, message: "Insurance renewed successfully" };
+}
+
+/**
+ * Get all insurance policies for a vehicle
+ */
+export async function getVehicleInsurancePolicies(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return await db
+    .select()
+    .from(insurancePolicies)
+    .where(and(
+      eq(insurancePolicies.vehicleId, vehicleId),
+      eq(insurancePolicies.userId, userId)
+    ))
+    .orderBy(desc(insurancePolicies.policyStartDate));
+}
+
+/**
+ * Get active insurance policy for a vehicle
+ */
+export async function getActiveInsurancePolicy(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const policies = await db
+    .select()
+    .from(insurancePolicies)
+    .where(and(
+      eq(insurancePolicies.vehicleId, vehicleId),
+      eq(insurancePolicies.userId, userId),
+      eq(insurancePolicies.status, 'active')
+    ))
+    .limit(1);
+  
+  return policies.length > 0 ? policies[0] : null;
+}
+
+/**
+ * Get insurance cost for a specific date range
+ * Used for accurate P&L calculations
+ */
+export async function getInsuranceCostForPeriod(
+  vehicleId: number,
+  userId: number,
+  startDate: Date,
+  endDate: Date
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Get all policies that overlap with the date range
+  const policies = await db
+    .select()
+    .from(insurancePolicies)
+    .where(and(
+      eq(insurancePolicies.vehicleId, vehicleId),
+      eq(insurancePolicies.userId, userId),
+      or(
+        and(
+          lte(insurancePolicies.policyStartDate, endDate),
+          gte(insurancePolicies.policyEndDate, startDate)
+        )
+      )
+    ));
+  
+  // Calculate prorated cost for each policy based on overlap
+  let totalCost = 0;
+  for (const policy of policies) {
+    const policyStart = new Date(policy.policyStartDate);
+    const policyEnd = new Date(policy.policyEndDate);
+    const overlapStart = policyStart > startDate ? policyStart : startDate;
+    const overlapEnd = policyEnd < endDate ? policyEnd : endDate;
+    
+    const overlapDays = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24));
+    const policyDays = Math.ceil((policyEnd.getTime() - policyStart.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const proratedCost = (parseFloat(policy.annualPremium) / policyDays) * overlapDays;
+    totalCost += proratedCost;
+  }
+  
+  return totalCost;
 }

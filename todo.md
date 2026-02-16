@@ -4598,3 +4598,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix Renew Contract dialog background to match website theme
 - [x] Replace dark blue/slate background with standard light background
 - [x] Ensure proper semantic color usage (bg-background, text-foreground)
+
+## Fix Insurance Renewal Cost Tracking
+- [x] Ensure new insurance policy costs are added separately without affecting previous policy costs
+- [x] Verify each insurance policy period maintains its original cost in database
+- [x] Ensure P&L and analysis reports use correct policy costs per time period
+- [x] Test that renewing insurance doesn't retroactively change historical financial data

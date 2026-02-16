@@ -239,6 +239,13 @@
       "when": 1771187227903,
       "tag": "0034_pink_jack_flag",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1771282604196,
+      "tag": "0035_fat_wild_pack",
+      "breakpoints": true
     }
   ]
 }
