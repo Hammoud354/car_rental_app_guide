@@ -4626,3 +4626,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix buttons shifting position when Customize dialog opens (still occurring)
 - [x] Remove flex-wrap from button containers to prevent reflow
 - [x] Lock button positions to prevent any movement when dialogs open
+
+## Fix Dashboard Header Text Wrapping
+- [x] Prevent subtitle text from wrapping when dialog opens
+- [x] Ensure metric cards (Total Fleet, Total Revenue, etc.) stay in fixed position
+- [x] Add whitespace-nowrap or width constraints to prevent text reflow
