@@ -121,12 +121,17 @@ export default function Clients() {
       return;
     }
     
+    const dateOfBirthStr = formData.get("dateOfBirth") as string;
     createClient.mutate({
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       nationality: createSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
+      dateOfBirth: dateOfBirthStr ? dateOfBirthStr : undefined,
+      placeOfBirth: formData.get("placeOfBirth") as string || undefined,
+      passportIdNumber: formData.get("passportIdNumber") as string || undefined,
+      registrationNumber: formData.get("registrationNumber") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
       licenseIssueDate: createLicenseIssueDate,
       licenseExpiryDate: createLicenseExpiryDate!,
@@ -150,6 +155,7 @@ export default function Clients() {
     
     const formData = new FormData(e.currentTarget);
     
+    const dateOfBirthStr = formData.get("dateOfBirth") as string;
     const updateData = {
       id: selectedClient.id,
       firstName: formData.get("firstName") as string || undefined,
@@ -157,6 +163,10 @@ export default function Clients() {
       nationality: editSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
+      dateOfBirth: dateOfBirthStr || undefined,
+      placeOfBirth: formData.get("placeOfBirth") as string || undefined,
+      passportIdNumber: formData.get("passportIdNumber") as string || undefined,
+      registrationNumber: formData.get("registrationNumber") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string || undefined,
       licenseIssueDate: editLicenseIssueDate,
       licenseExpiryDate: editLicenseExpiryDate,
@@ -299,6 +309,22 @@ export default function Clients() {
                     <div className="col-span-2">
                       <Label htmlFor="address">Address</Label>
                       <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
+                    </div>
+                    <div>
+                      <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                      <Input id="dateOfBirth" name="dateOfBirth" type="date" className="input-client" />
+                    </div>
+                    <div>
+                      <Label htmlFor="placeOfBirth">Place of Birth</Label>
+                      <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
+                    </div>
+                    <div>
+                      <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                      <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                    </div>
+                    <div>
+                      <Label htmlFor="registrationNumber">Registration Number</Label>
+                      <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
                     </div>
                   </div>
                 </div>
@@ -614,6 +640,46 @@ export default function Clients() {
                       name="address" 
                       defaultValue={selectedClient.address || ""}
                       placeholder="Street, City, State, ZIP" 
+                      className="input-client" 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-dateOfBirth">Date of Birth</Label>
+                    <Input 
+                      id="edit-dateOfBirth" 
+                      name="dateOfBirth" 
+                      type="date" 
+                      defaultValue={selectedClient.dateOfBirth || ""}
+                      className="input-client" 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-placeOfBirth">Place of Birth</Label>
+                    <Input 
+                      id="edit-placeOfBirth" 
+                      name="placeOfBirth" 
+                      defaultValue={selectedClient.placeOfBirth || ""}
+                      placeholder="City, Country" 
+                      className="input-client" 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
+                    <Input 
+                      id="edit-passportIdNumber" 
+                      name="passportIdNumber" 
+                      defaultValue={selectedClient.passportIdNumber || ""}
+                      placeholder="Passport or National ID" 
+                      className="input-client" 
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-registrationNumber">Registration Number</Label>
+                    <Input 
+                      id="edit-registrationNumber" 
+                      name="registrationNumber" 
+                      defaultValue={selectedClient.registrationNumber || ""}
+                      placeholder="Business/Company Registration" 
                       className="input-client" 
                     />
                   </div>

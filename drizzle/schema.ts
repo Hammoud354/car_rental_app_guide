@@ -208,6 +208,10 @@ export const clients = mysqlTable("clients", {
   licenseIssueDate: timestamp("licenseIssueDate"),
   licenseExpiryDate: timestamp("licenseExpiryDate").notNull(),
   email: varchar("email", { length: 320 }),
+  dateOfBirth: date("dateOfBirth"), // Client's date of birth
+  placeOfBirth: varchar("placeOfBirth", { length: 200 }), // Client's place of birth
+  passportIdNumber: varchar("passportIdNumber", { length: 100 }), // Passport or national ID number
+  registrationNumber: varchar("registrationNumber", { length: 100 }), // Business/company registration number if applicable
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

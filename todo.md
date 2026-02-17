@@ -4668,3 +4668,15 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Set explicit width and height on day button elements - w-full h-9
 - [x] Ensure buttons fill grid cells without overflow
 - [x] Remove white space - removed h-[280px] wrapper div
+
+## Add New Client Fields
+- [x] Add dateOfBirth field to client schema
+- [x] Add placeOfBirth field to client schema
+- [x] Add passportIdNumber field to client schema
+- [x] Add registrationNumber field to client schema
+- [x] Update database with db:push
+- [x] Add fields to client creation form UI
+- [x] Add fields to client edit form UI
+- [x] Update create procedure input schema
+- [x] Update edit procedure input schema
+- [x] Add date conversion logic in mutations

@@ -246,6 +246,13 @@
       "when": 1771282604196,
       "tag": "0035_fat_wild_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "5",
+      "when": 1771371112028,
+      "tag": "0036_empty_king_cobra",
+      "breakpoints": true
     }
   ]
 }

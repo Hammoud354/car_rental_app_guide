@@ -950,6 +950,10 @@ export const appRouter = router({
         nationality: z.string().max(100).optional(),
         phone: z.string().max(20).optional(),
         address: z.string().optional(),
+        dateOfBirth: z.string().optional(), // Date string from HTML date input
+        placeOfBirth: z.string().max(200).optional(),
+        passportIdNumber: z.string().max(100).optional(),
+        registrationNumber: z.string().max(100).optional(),
         drivingLicenseNumber: z.string().min(1).max(100),
         licenseIssueDate: z.date().optional(),
         licenseExpiryDate: z.date(),
@@ -978,8 +982,10 @@ export const appRouter = router({
           userId = ctx.user?.id || 1;
         }
         
-        const { targetUserId: _, ...clientData } = input;
-        return await db.createClient({ ...clientData, userId });
+        const { targetUserId: _, dateOfBirth, ...clientData } = input;
+        // Convert dateOfBirth string to Date if provided
+        const dateOfBirthDate = dateOfBirth ? new Date(dateOfBirth) : undefined;
+        return await db.createClient({ ...clientData, dateOfBirth: dateOfBirthDate, userId });
       }),
     
     update: publicProcedure
@@ -990,6 +996,10 @@ export const appRouter = router({
         nationality: z.string().max(100).optional(),
         phone: z.string().max(20).optional(),
         address: z.string().optional(),
+        dateOfBirth: z.string().optional(), // Date string from HTML date input
+        placeOfBirth: z.string().max(200).optional(),
+        passportIdNumber: z.string().max(100).optional(),
+        registrationNumber: z.string().max(100).optional(),
         drivingLicenseNumber: z.string().max(100).optional(),
         licenseIssueDate: z.date().optional(),
         licenseExpiryDate: z.date().optional(),
@@ -997,19 +1007,23 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const { id, ...updates } = input;
+        const { id, dateOfBirth, ...updates } = input;
         console.log('[Router] clients.update called with:', { id, updates, userId: ctx.user?.id || 1 });
         
+        // Convert dateOfBirth string to Date if provided
+        const dateOfBirthDate = dateOfBirth ? new Date(dateOfBirth) : undefined;
+        const finalUpdates = { ...updates, ...(dateOfBirthDate !== undefined ? { dateOfBirth: dateOfBirthDate } : {}) };
+        
         // Validate license expiry date is in the future if provided
-        if (updates.licenseExpiryDate) {
+        if (finalUpdates.licenseExpiryDate) {
           const today = new Date();
           today.setHours(0, 0, 0, 0); // Reset time to start of day
-          if (updates.licenseExpiryDate < today) {
+          if (finalUpdates.licenseExpiryDate < today) {
             throw new Error('License expiry date must be in the future');
           }
         }
         
-        const result = await db.updateClient(id, ctx.user?.id || 1, updates);
+        const result = await db.updateClient(id, ctx.user?.id || 1, finalUpdates);
         console.log('[Router] clients.update result:', result);
         return result;
       }),
