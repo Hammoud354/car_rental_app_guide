@@ -107,6 +107,8 @@ export function DatePickerWithYearNav({
             onSelect={onDateChange}
             month={month}
             onMonthChange={setMonth}
+            fixedWeeks
+            showOutsideDays
             initialFocus
           />
         </div>

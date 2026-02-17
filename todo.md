@@ -4638,3 +4638,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Set consistent calendar height for all months - h-[280px]
 - [x] Adjust week row spacing to be uniform - mt-1 instead of mt-2
 - [x] Remove white space below calendar grid
+
+## Fix Calendar Grid Layout for Consistency
+- [x] Implement 6-row fixed grid layout for all months - added fixedWeeks prop
+- [x] Show outside days for consistent appearance
+- [x] Remove all dynamic margins - removed mt-1 from week rows
+- [x] Ensure uniform day spacing - reduced month gap to gap-1
