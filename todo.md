@@ -4662,3 +4662,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Set grid-template-columns to repeat(7, 1fr) for equal columns
 - [x] Set fixed row heights for uniform vertical spacing - h-9 per day
 - [x] Eliminate all white space with proper grid sizing
+
+## Fix Calendar Day Button Sizing
+- [x] Remove aspect-square from day button - removed from CalendarDayButton
+- [x] Set explicit width and height on day button elements - w-full h-9
+- [x] Ensure buttons fill grid cells without overflow
+- [x] Remove white space - removed h-[280px] wrapper div

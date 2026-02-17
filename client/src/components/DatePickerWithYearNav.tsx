@@ -100,18 +100,16 @@ export function DatePickerWithYearNav({
             </SelectContent>
           </Select>
         </div>
-        <div className="h-[280px] flex flex-col">
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={onDateChange}
-            month={month}
-            onMonthChange={setMonth}
-            fixedWeeks
-            showOutsideDays
-            initialFocus
-          />
-        </div>
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={onDateChange}
+          month={month}
+          onMonthChange={setMonth}
+          fixedWeeks
+          showOutsideDays
+          initialFocus
+        />
       </PopoverContent>
     </Popover>
   );
