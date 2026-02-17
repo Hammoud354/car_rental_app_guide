@@ -484,7 +484,7 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
-              <p className="text-base sm:text-lg text-gray-600 whitespace-nowrap">Welcome back. Here's what's happening today.</p>
+              <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               {/* Settings and Admin Controls Group */}
