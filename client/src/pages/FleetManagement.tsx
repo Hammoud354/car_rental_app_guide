@@ -22,6 +22,7 @@ import { useUserFilter } from "@/contexts/UserFilterContext";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
 import { exportVehiclesToCSV } from "@shared/csvExport";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
@@ -52,6 +53,12 @@ export default function FleetManagement() {
   const [customMakerName, setCustomMakerName] = useState("");
   const [customModelName, setCustomModelName] = useState("");
   const [customModelMakerId, setCustomModelMakerId] = useState<number | null>(null);
+  
+  // Insurance date states
+  const [insuranceStartDate, setInsuranceStartDate] = useState<Date | undefined>();
+  const [insuranceExpiryDate, setInsuranceExpiryDate] = useState<Date | undefined>();
+  const [editInsuranceStartDate, setEditInsuranceStartDate] = useState<Date | undefined>();
+  const [editInsuranceExpiryDate, setEditInsuranceExpiryDate] = useState<Date | undefined>();
 
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
@@ -96,6 +103,22 @@ export default function FleetManagement() {
       }
     }
   }, [selectedVehicle, editCarModels, editSelectedMakerId]);
+  
+  // Initialize insurance dates when vehicle is selected for editing
+  useEffect(() => {
+    if (selectedVehicle) {
+      setEditInsuranceStartDate(selectedVehicle.insurancePolicyStartDate ? new Date(selectedVehicle.insurancePolicyStartDate) : undefined);
+      setEditInsuranceExpiryDate(selectedVehicle.insuranceExpiryDate ? new Date(selectedVehicle.insuranceExpiryDate) : undefined);
+    }
+  }, [selectedVehicle]);
+  
+  // Reset insurance dates when Add dialog closes
+  useEffect(() => {
+    if (!isAddDialogOpen) {
+      setInsuranceStartDate(undefined);
+      setInsuranceExpiryDate(undefined);
+    }
+  }, [isAddDialogOpen]);
   
   // Filter vehicles based on search query
   const filteredVehicles = vehicles?.filter((vehicle) => {
@@ -206,8 +229,8 @@ export default function FleetManagement() {
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
       insuranceProvider: formData.get("insuranceProvider") as string || undefined,
-      insurancePolicyStartDate: formData.get("insurancePolicyStartDate") ? new Date(formData.get("insurancePolicyStartDate") as string) : undefined,
-      insuranceExpiryDate: formData.get("insuranceExpiryDate") ? new Date(formData.get("insuranceExpiryDate") as string) : undefined,
+      insurancePolicyStartDate: insuranceStartDate,
+      insuranceExpiryDate: insuranceExpiryDate,
       insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
@@ -257,8 +280,8 @@ export default function FleetManagement() {
         vin: formData.get("vin") as string || undefined,
         insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
         insuranceProvider: formData.get("insuranceProvider") as string || undefined,
-        insurancePolicyStartDate: formData.get("insurancePolicyStartDate") ? new Date(formData.get("insurancePolicyStartDate") as string) : undefined,
-        insuranceExpiryDate: formData.get("insuranceExpiryDate") ? new Date(formData.get("insuranceExpiryDate") as string) : undefined,
+        insurancePolicyStartDate: editInsuranceStartDate,
+        insuranceExpiryDate: editInsuranceExpiryDate,
         insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
@@ -536,12 +559,20 @@ export default function FleetManagement() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="insurancePolicyStartDate">Policy Start Date</Label>
-                      <Input id="insurancePolicyStartDate" name="insurancePolicyStartDate" type="date" />
+                      <Label>Policy Start Date</Label>
+                      <DatePickerWithYearNav
+                        date={insuranceStartDate}
+                        onDateChange={setInsuranceStartDate}
+                        placeholder="Select start date"
+                      />
                     </div>
                     <div>
-                      <Label htmlFor="insuranceExpiryDate">Policy Expiry Date</Label>
-                      <Input id="insuranceExpiryDate" name="insuranceExpiryDate" type="date" />
+                      <Label>Policy Expiry Date</Label>
+                      <DatePickerWithYearNav
+                        date={insuranceExpiryDate}
+                        onDateChange={setInsuranceExpiryDate}
+                        placeholder="Select expiry date"
+                      />
                     </div>
                   </div>
 
@@ -1062,21 +1093,19 @@ export default function FleetManagement() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="edit-insurancePolicyStartDate">Policy Start Date</Label>
-                      <Input 
-                        id="edit-insurancePolicyStartDate" 
-                        name="insurancePolicyStartDate" 
-                        type="date" 
-                        defaultValue={selectedVehicle.insurancePolicyStartDate ? new Date(selectedVehicle.insurancePolicyStartDate).toISOString().split('T')[0] : ""}
+                      <Label>Policy Start Date</Label>
+                      <DatePickerWithYearNav
+                        date={editInsuranceStartDate}
+                        onDateChange={setEditInsuranceStartDate}
+                        placeholder="Select start date"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-insuranceExpiryDate">Policy Expiry Date</Label>
-                      <Input 
-                        id="edit-insuranceExpiryDate" 
-                        name="insuranceExpiryDate" 
-                        type="date" 
-                        defaultValue={selectedVehicle.insuranceExpiryDate ? new Date(selectedVehicle.insuranceExpiryDate).toISOString().split('T')[0] : ""}
+                      <Label>Policy Expiry Date</Label>
+                      <DatePickerWithYearNav
+                        date={editInsuranceExpiryDate}
+                        onDateChange={setEditInsuranceExpiryDate}
+                        placeholder="Select expiry date"
                       />
                     </div>
                   </div>

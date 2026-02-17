@@ -4616,3 +4616,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix unprofessional button placement on main Dashboard page
 - [x] Reorganize Export to Excel and Admin Panel buttons
 - [x] Create clean, professional button grouping on Dashboard header
+
+## Add Year Navigation to Insurance Date Pickers
+- [x] Add year dropdown/navigation to insurance policy date pickers
+- [x] Make it easy to jump between years for annual insurance policies
+- [x] Apply to all insurance-related date fields (start date, expiry date)
