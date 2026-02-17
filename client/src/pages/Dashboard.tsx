@@ -481,7 +481,7 @@ export default function Dashboard() {
     <SidebarLayout>
       <div className="space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
               <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
