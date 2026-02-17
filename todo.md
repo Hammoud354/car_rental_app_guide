@@ -4628,6 +4628,6 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Lock button positions to prevent any movement when dialogs open
 
 ## Fix Calendar Date Picker Display
-- [x] Fix calendar cutting off bottom rows (days 22-28 not fully visible)
-- [x] Increase calendar component height to show all weeks
+- [x] Fix calendar cutting off bottom rows (days 22-28 not fully visible) - max-height didn't work
+- [x] Remove Radix UI popover height constraints with h-auto max-h-none
 - [x] Ensure all days of the month are visible and clickable

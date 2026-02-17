@@ -66,7 +66,7 @@ export function DatePickerWithYearNav({
           {date ? format(date, "PPP") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0 max-h-[500px]" align="start">
+      <PopoverContent className="w-auto p-0 h-auto max-h-none" align="start">
         <div className="flex items-center justify-between p-3 border-b">
           <Select
             value={month.getMonth().toString()}
