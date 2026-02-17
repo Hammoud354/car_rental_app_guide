@@ -316,57 +316,29 @@ export default function FleetManagement() {
           </Card>
         ) : null}
         
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
           <div>
             <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">Fleet Operations</div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Fleet Management</h1>
             <p className="text-muted-foreground mt-2">Manage your vehicle inventory and track maintenance</p>
           </div>
           
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Link href="/maintenance-tracking" className="w-full sm:w-auto">
-              <Button variant="outline" className="w-full sm:w-auto whitespace-nowrap">
-                <Wrench className="h-4 w-4 mr-2" />
-                Maintenance Tracking
-              </Button>
-            </Link>
-            
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="w-full sm:w-auto whitespace-nowrap">
-              <Upload className="h-4 w-4 mr-2" />
-              Bulk Import
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                if (!vehicles || vehicles.length === 0) {
-                  toast.error("No vehicles to export");
-                  return;
-                }
-                exportVehiclesToCSV(vehicles);
-                toast.success(`Exported ${vehicles.length} vehicles`);
-              }}
-              className="w-full sm:w-auto whitespace-nowrap"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
-            
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
+            {/* Primary Action Button */}
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
               setIsAddDialogOpen(open);
               if (!open) {
-                // Reset form state when dialog closes
                 setSelectedMakerId(null);
                 setSelectedModelId(null);
               }
             }}>
               <DialogTrigger asChild>
-              <Button className="font-mono bg-gray-900 hover:bg-gray-800 w-full sm:w-auto whitespace-nowrap">
-                <Plus className="mr-2 h-4 w-4" />
-                ADD VEHICLE
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
+                <Button className="font-mono bg-gray-900 hover:bg-gray-800 whitespace-nowrap">
+                  <Plus className="mr-2 h-4 w-4" />
+                  ADD VEHICLE
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
                 <DialogTitle className="font-mono">Add New Vehicle</DialogTitle>
                 <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
@@ -730,6 +702,37 @@ export default function FleetManagement() {
               </form>
             </DialogContent>
           </Dialog>
+          
+          {/* Secondary Action Buttons */}
+          <div className="flex flex-wrap gap-2">
+            <Link href="/maintenance-tracking">
+              <Button variant="outline" className="whitespace-nowrap">
+                <Wrench className="h-4 w-4 mr-2" />
+                Maintenance
+              </Button>
+            </Link>
+            
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="whitespace-nowrap">
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                if (!vehicles || vehicles.length === 0) {
+                  toast.error("No vehicles to export");
+                  return;
+                }
+                exportVehiclesToCSV(vehicles);
+                toast.success(`Exported ${vehicles.length} vehicles`);
+              }}
+              className="whitespace-nowrap"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
           </div>
         </div>
 

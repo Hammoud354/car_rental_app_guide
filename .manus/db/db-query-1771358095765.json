@@ -1,0 +1,9 @@
+{
+  "query": "\nSET FOREIGN_KEY_CHECKS = 0;\n\nDELETE FROM invoiceLineItems;\nDELETE FROM invoices;\nDELETE FROM contractAmendments;\nDELETE FROM damageMarks;\nDELETE FROM rentalContracts;\nDELETE FROM maintenanceTasks;\nDELETE FROM maintenanceRecords;\nDELETE FROM insurancePolicies;\nDELETE FROM vehicleImages;\nDELETE FROM vehicles;\nDELETE FROM clients;\nDELETE FROM carModels;\nDELETE FROM carMakers;\nDELETE FROM nationalities;\nDELETE FROM auditLogs;\nDELETE FROM dashboardPreferences;\nDELETE FROM whatsappTemplates;\nDELETE FROM companySettings;\nDELETE FROM companyProfiles;\n\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \nSET FOREIGN_KEY_CHECKS = 0;\n\nDELETE FROM invoiceLineItems;\nDELETE FROM invoices;\nDELETE FROM contractAmendments;\nDELETE FROM damageMarks;\nDELETE FROM rentalContracts;\nDELETE FROM maintenanceTasks;\nDELETE FROM maintenanceRecords;\nDELETE FROM insurancePolicies;\nDELETE FROM vehicleImages;\nDELETE FROM vehicles;\nDELETE FROM clients;\nDELETE FROM carModels;\nDELETE FROM carMakers;\nDELETE FROM nationalities;\nDELETE FROM auditLogs;\nDELETE FROM dashboardPreferences;\nDELETE FROM whatsappTemplates;\nDELETE FROM companySettings;\nDELETE FROM companyProfiles;\n\nSET FOREIGN_KEY_CHECKS = 1;\n",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 6472
+}
