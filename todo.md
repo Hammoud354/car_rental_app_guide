@@ -4650,3 +4650,15 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Prevent flex shrinking/growing - added flex-shrink-0 flex-grow-0
 - [x] Ensure uniform horizontal and vertical spacing
 - [x] Make spacing identical across all rows and columns
+
+## Convert Calendar to CSS Grid Layout
+- [x] Replace flexbox with CSS Grid for week rows - grid grid-cols-7
+- [x] Set grid-template-columns to repeat(7, 1fr) for equal columns
+- [x] Set fixed row heights for uniform vertical spacing - h-9 per day
+- [x] Eliminate all white space with proper grid sizing
+
+## Convert Calendar to CSS Grid Layout
+- [x] Replace flexbox with CSS Grid for week rows - grid grid-cols-7
+- [x] Set grid-template-columns to repeat(7, 1fr) for equal columns
+- [x] Set fixed row heights for uniform vertical spacing - h-9 per day
+- [x] Eliminate all white space with proper grid sizing
