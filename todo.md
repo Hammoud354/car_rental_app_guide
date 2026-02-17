@@ -4626,3 +4626,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix buttons shifting position when Customize dialog opens (still occurring)
 - [x] Remove flex-wrap from button containers to prevent reflow
 - [x] Lock button positions to prevent any movement when dialogs open
+
+## Fix Calendar Date Picker Display
+- [x] Fix calendar cutting off bottom rows (days 22-28 not fully visible)
+- [x] Increase calendar component height to show all weeks
+- [x] Ensure all days of the month are visible and clickable
