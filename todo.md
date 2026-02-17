@@ -4634,8 +4634,7 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure all days of the month are visible and clickable
 
 ## Remove Calendar White Space
-- [x] Remove excessive white space below calendar grid
-- [x] Make calendar layout more compact and professional
-- [x] Reduce minHeight to fit content exactly - removed inline style
-- [x] Reduce calendar padding from p-3 to p-2
-- [x] Reduce month gap from gap-4 to gap-2
+- [x] Fix white space in February (4 weeks) vs compression in March (5-6 weeks)
+- [x] Set consistent calendar height for all months - h-[280px]
+- [x] Adjust week row spacing to be uniform - mt-1 instead of mt-2
+- [x] Remove white space below calendar grid
