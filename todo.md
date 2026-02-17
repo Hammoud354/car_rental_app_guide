@@ -4632,3 +4632,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Investigate Calendar component internal height constraints
 - [x] Remove all overflow/height limits - added wrapper with minHeight 320px
 - [x] Ensure all days of the month are visible and clickable
+
+## Remove Calendar White Space
+- [x] Remove excessive white space below calendar grid
+- [x] Make calendar layout more compact and professional
+- [x] Reduce minHeight to fit content exactly - removed inline style
+- [x] Reduce calendar padding from p-3 to p-2
+- [x] Reduce month gap from gap-4 to gap-2

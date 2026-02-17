@@ -100,7 +100,7 @@ export function DatePickerWithYearNav({
             </SelectContent>
           </Select>
         </div>
-        <div className="overflow-visible" style={{ minHeight: '320px', height: 'auto' }}>
+        <div className="overflow-visible">
           <Calendar
             mode="single"
             selected={date}
