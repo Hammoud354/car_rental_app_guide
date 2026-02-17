@@ -4623,6 +4623,6 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Apply to all insurance-related date fields (start date, expiry date)
 
 ## Fix Dashboard Header Button Layout Shift
-- [x] Fix buttons shifting position when Customize dialog opens
-- [x] Ensure header layout remains stable when dialogs are opened
-- [x] Prevent layout reflow in Dashboard header
+- [x] Fix buttons shifting position when Customize dialog opens (still occurring)
+- [x] Remove flex-wrap from button containers to prevent reflow
+- [x] Lock button positions to prevent any movement when dialogs open

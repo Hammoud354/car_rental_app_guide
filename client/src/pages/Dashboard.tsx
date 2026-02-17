@@ -488,7 +488,7 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               {/* Settings and Admin Controls Group */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" className="whitespace-nowrap">
@@ -630,7 +630,7 @@ export default function Dashboard() {
               </div>
               
               {/* Action Buttons Group */}
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <ExportToExcelButton />
                 {user?.role === "super_admin" && (
                   <Link href="/admin/users" className="w-full sm:w-auto">
