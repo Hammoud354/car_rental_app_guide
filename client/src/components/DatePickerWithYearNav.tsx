@@ -100,14 +100,16 @@ export function DatePickerWithYearNav({
             </SelectContent>
           </Select>
         </div>
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={onDateChange}
-          month={month}
-          onMonthChange={setMonth}
-          initialFocus
-        />
+        <div className="overflow-visible" style={{ minHeight: '320px', height: 'auto' }}>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={onDateChange}
+            month={month}
+            onMonthChange={setMonth}
+            initialFocus
+          />
+        </div>
       </PopoverContent>
     </Popover>
   );
