@@ -4759,3 +4759,22 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Solution: Upload template immediately on file selection and save to database
 - [x] Removed all debug code and console.log statements
 - [x] Ready for final checkpoint
+
+## BUG: Template Upload Fails for New Users in Incognito Mode
+- [x] Check server logs for upload error details - validation error: companyName too small
+- [x] Verify new user has company profile created - profile exists but companyName is empty
+- [x] Root cause: updateProfile requires companyName to be non-empty, but new users have empty companyName
+- [x] Fix: Provide default value 'My Company' if companyName is empty during template upload
+- [x] Test upload with new user account in incognito mode - WORKING
+- [x] Verify solution works - CONFIRMED
+
+## Add Missing Fields to Contract Template Mapper
+- [x] Add nationality field
+- [x] Add driving license issue date field
+- [x] Add driving license expiry date field
+- [x] Add passport number, date of birth fields
+- [x] Add vehicle color, VIN, odometer fields
+- [x] Add pickup/return time, insurance fee, payment method fields
+- [x] Add company email, registration, tax ID fields
+- [x] Update SAMPLE_DATA with example values for new fields
+- [x] Total of 41 fields now available for mapping

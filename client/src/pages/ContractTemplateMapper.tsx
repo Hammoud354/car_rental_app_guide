@@ -11,50 +11,100 @@ import { Loader2, Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 
 // Sample contract data for preview
 const SAMPLE_DATA: Record<string, string> = {
+  // Client Information
   clientName: "John Doe",
   clientAddress: "123 Main Street, Beirut",
   clientPhone: "+961 1 234567",
   clientEmail: "john.doe@example.com",
+  clientNationality: "Lebanese",
   clientLicenseNumber: "DL123456",
+  clientLicenseIssueDate: "2020-01-15",
+  clientLicenseExpiryDate: "2030-01-15",
+  clientDateOfBirth: "1990-05-20",
+  clientPassportNumber: "P1234567",
+  
+  // Vehicle Information
   vehiclePlate: "ABC-1234",
   vehicleMake: "Toyota",
   vehicleModel: "Camry",
   vehicleYear: "2023",
+  vehicleColor: "Silver",
+  vehicleVIN: "1HGBH41JXMN109186",
+  vehicleOdometer: "15,000 km",
+  
+  // Contract Details
+  contractNumber: "CNT-2026-001",
   startDate: "2026-02-18",
   endDate: "2026-02-25",
   pickupLocation: "Beirut Airport",
   returnLocation: "Beirut Airport",
+  pickupTime: "10:00 AM",
+  returnTime: "10:00 AM",
+  
+  // Financial Information
   dailyRate: "$50.00",
   totalAmount: "$350.00",
   deposit: "$100.00",
-  contractNumber: "CNT-2026-001",
+  insuranceFee: "$25.00",
+  additionalFees: "$10.00",
+  paymentMethod: "Credit Card",
+  
+  // Company Information
   companyName: "Car Rental Co.",
   companyAddress: "456 Business St, Beirut",
   companyPhone: "+961 1 987654",
+  companyEmail: "info@carrentalco.com",
+  companyRegistration: "REG123456",
+  companyTaxId: "TAX789012",
 };
 
 // Define available contract fields
 const CONTRACT_FIELDS = [
+  // Client Information
   { id: "clientName", label: "Client Name" },
   { id: "clientAddress", label: "Client Address" },
   { id: "clientPhone", label: "Client Phone" },
   { id: "clientEmail", label: "Client Email" },
+  { id: "clientNationality", label: "Client Nationality" },
   { id: "clientLicenseNumber", label: "License Number" },
+  { id: "clientLicenseIssueDate", label: "License Issue Date" },
+  { id: "clientLicenseExpiryDate", label: "License Expiry Date" },
+  { id: "clientDateOfBirth", label: "Client Date of Birth" },
+  { id: "clientPassportNumber", label: "Passport Number" },
+  
+  // Vehicle Information
   { id: "vehiclePlate", label: "Vehicle Plate" },
   { id: "vehicleMake", label: "Vehicle Make" },
   { id: "vehicleModel", label: "Vehicle Model" },
   { id: "vehicleYear", label: "Vehicle Year" },
+  { id: "vehicleColor", label: "Vehicle Color" },
+  { id: "vehicleVIN", label: "Vehicle VIN" },
+  { id: "vehicleOdometer", label: "Odometer Reading" },
+  
+  // Contract Details
+  { id: "contractNumber", label: "Contract Number" },
   { id: "startDate", label: "Start Date" },
   { id: "endDate", label: "End Date" },
   { id: "pickupLocation", label: "Pickup Location" },
   { id: "returnLocation", label: "Return Location" },
+  { id: "pickupTime", label: "Pickup Time" },
+  { id: "returnTime", label: "Return Time" },
+  
+  // Financial Information
   { id: "dailyRate", label: "Daily Rate" },
   { id: "totalAmount", label: "Total Amount" },
   { id: "deposit", label: "Deposit" },
-  { id: "contractNumber", label: "Contract Number" },
+  { id: "insuranceFee", label: "Insurance Fee" },
+  { id: "additionalFees", label: "Additional Fees" },
+  { id: "paymentMethod", label: "Payment Method" },
+  
+  // Company Information
   { id: "companyName", label: "Company Name" },
   { id: "companyAddress", label: "Company Address" },
   { id: "companyPhone", label: "Company Phone" },
+  { id: "companyEmail", label: "Company Email" },
+  { id: "companyRegistration", label: "Company Registration" },
+  { id: "companyTaxId", label: "Company Tax ID" },
 ];
 
 type FieldPosition = {

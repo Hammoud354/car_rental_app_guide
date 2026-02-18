@@ -100,8 +100,11 @@ export default function CompanySettings() {
       });
 
       // Save to database immediately
+      // Ensure companyName is not empty (required field)
+      const companyName = formData.companyName?.trim() || 'My Company';
       await updateProfile.mutateAsync({
         ...formData,
+        companyName,
         contractTemplateUrl: url,
       });
 
