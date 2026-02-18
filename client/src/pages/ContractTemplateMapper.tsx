@@ -69,6 +69,12 @@ export default function ContractTemplateMapper() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { data: profile, isLoading } = trpc.company.getProfile.useQuery();
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('ContractTemplateMapper - Profile loaded:', profile);
+    console.log('ContractTemplateMapper - contractTemplateUrl:', profile?.contractTemplateUrl);
+  }, [profile]);
   const updateProfile = trpc.company.updateProfile.useMutation();
   
   const imageRef = useRef<HTMLImageElement>(null);

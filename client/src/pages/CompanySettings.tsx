@@ -72,62 +72,13 @@ export default function CompanySettings() {
     }
   };
 
-  const handleTemplateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setTemplateFile(file);
       const reader = new FileReader();
-      reader.onloadend = async () => {
+      reader.onloadend = () => {
         setTemplatePreview(reader.result as string);
-        
-        // Auto-save template immediately
-        try {
-          setUploading(true);
-          const arrayBuffer = await file.arrayBuffer();
-          const buffer = new Uint8Array(arrayBuffer);
-          
-          // Generate unique filename
-          const timestamp = Date.now();
-          const filename = `contract-template-${timestamp}.${file.name.split('.').pop()}`;
-          
-          const result = await uploadLogoMutation.mutateAsync({
-            fileName: filename,
-            fileData: Array.from(buffer),
-            contentType: file.type,
-          });
-          
-          // Save to database immediately - use existing profile data
-          await updateProfile.mutateAsync({
-            companyName: profile?.companyName || "My Company",
-            registrationNumber: profile?.registrationNumber || undefined,
-            taxId: profile?.taxId || undefined,
-            address: profile?.address || undefined,
-            city: profile?.city || undefined,
-            country: profile?.country || undefined,
-            phone: profile?.phone || undefined,
-            email: profile?.email || undefined,
-            website: profile?.website || undefined,
-            logoUrl: profile?.logoUrl || undefined,
-            contractTemplateUrl: result.url,
-          });
-          
-          setFormData(prev => ({ ...prev, contractTemplateUrl: result.url }));
-          
-          toast({
-            title: "Success",
-            description: "Contract template uploaded successfully!",
-          });
-          
-          refetch();
-        } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to upload template. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setUploading(false);
-        }
       };
       reader.readAsDataURL(file);
     }
@@ -229,12 +180,12 @@ export default function CompanySettings() {
         contractTemplateUrl,
       });
 
+      await refetch();
+      
       toast({
         title: "Success",
         description: "Company profile updated successfully!",
       });
-
-      refetch();
     } catch (error) {
       toast({
         title: "Error",
@@ -445,38 +396,30 @@ export default function CompanySettings() {
               )}
               <div className="flex-1 space-y-4 input-client">
                 <div>
-                  <Label htmlFor="contractTemplate" className="cursor-pointer input-client">
-                    <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit input-client">
-                      <Upload className="h-4 w-4 input-client" />
+                  <Label htmlFor="contractTemplate" className="cursor-pointer">
+                    <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit">
+                      <Upload className="h-4 w-4" />
                       Choose Template
                     </div>
-                    <Input
-                      id="contractTemplate"
-                      type="file"
-                      accept="image/*"
-                      className="hidden input-client"
-                      onChange={handleTemplateChange}
-                    />
                   </Label>
-                  <p className="text-sm text-muted-foreground mt-2 input-client">
+                  <Input
+                    id="contractTemplate"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleTemplateChange}
+                  />
+                  <p className="text-sm text-muted-foreground mt-2">
                     Upload a high-resolution image of your contract template (PNG, JPG)
                   </p>
                 </div>
-                {templatePreview && (
+                {(templatePreview || profile?.contractTemplateUrl) && (
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setLocation('/contract-template-mapper')}
-                    disabled={uploading}
                   >
-                    {uploading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Uploading...
-                      </>
-                    ) : (
-                      "Configure Field Positions"
-                    )}
+                    Configure Field Positions
                   </Button>
                 )}
               </div>

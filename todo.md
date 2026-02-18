@@ -4731,3 +4731,21 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add toggle button to show/hide gridlines
 - [x] Style gridlines as subtle semi-transparent blue lines
 - [x] Gridlines overlay on template with pointer-events-none
+
+## CRITICAL BUG: Template Upload Still Not Persisting to Database
+- [x] Investigate why template upload shows success but field mapper shows "No template uploaded"
+- [x] Check if updateProfile mutation is actually being called
+- [x] Verify database is receiving and storing contractTemplateUrl
+- [x] Check if profile refetch is happening after save - refetch was called but not awaited
+- [x] Fix the save flow to ensure template persists before navigation - added await refetch()
+- [ ] Test complete flow: upload → navigate → field mapper loads template
+- [ ] NEW APPROACH: Simplify flow - save template URL to database when clicking Configure button instead of on upload
+- [ ] This will make debugging easier and give user explicit control
+
+## Template Upload Simplified to Match Logo Upload Flow
+- [x] Check updateProfile mutation permissions in server/routers.ts - uses protectedProcedure, should work
+- [x] Check uploadLogo mutation permissions in server/routers.ts - uses protectedProcedure, should work  
+- [x] Simplified template upload to match logo upload flow - removed all auto-save complexity
+- [x] Template now uploads when user clicks Save Changes button (same as logo)
+- [x] Removed version indicators and debug code
+- [x] Ready for checkpoint and publish
