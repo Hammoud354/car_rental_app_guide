@@ -4705,3 +4705,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Call updateProfile mutation with contractTemplateUrl after S3 upload
 - [x] Show success toast when template is saved
 - [x] Ensure field mapper can load the saved template
+
+## Fix Field Mapper Navigation Timing
+- [x] Disable "Configure Field Positions" button during upload
+- [x] Wait for refetch to complete before enabling navigation
+- [x] Show loading spinner on button during upload
+- [x] Only navigate after template is confirmed saved

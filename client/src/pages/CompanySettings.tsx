@@ -458,8 +458,16 @@ export default function CompanySettings() {
                     type="button"
                     variant="outline"
                     onClick={() => setLocation('/contract-template-mapper')}
+                    disabled={uploading}
                   >
-                    Configure Field Positions
+                    {uploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      "Configure Field Positions"
+                    )}
                   </Button>
                 )}
               </div>
