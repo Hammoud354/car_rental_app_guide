@@ -4694,3 +4694,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add tRPC procedure for PDF generation
 - [x] Add download button in contract UI (Export with Custom Template)
 - [ ] Test full workflow (upload template → map fields → generate PDF)
+
+## Add Configure Field Mapping Button
+- [x] Add "Configure Field Mapping" button in Company Settings after template upload
+- [x] Button should navigate to /contract-template-mapper route
+- [x] Show button when templatePreview exists (immediately after upload)

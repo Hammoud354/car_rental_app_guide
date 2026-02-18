@@ -413,7 +413,7 @@ export default function CompanySettings() {
                     Upload a high-resolution image of your contract template (PNG, JPG)
                   </p>
                 </div>
-                {formData.contractTemplateUrl && (
+                {templatePreview && (
                   <Button
                     type="button"
                     variant="outline"
