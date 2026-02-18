@@ -4711,3 +4711,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Wait for refetch to complete before enabling navigation
 - [x] Show loading spinner on button during upload
 - [x] Only navigate after template is confirmed saved
+
+## Add Field Preview in Template Mapper
+- [x] Create sample contract data object with realistic values
+- [x] Add toggle button to show/hide preview overlays
+- [x] Render text overlays at each field position with sample data
+- [x] Style preview text to match configured font size and alignment
+- [x] Add semi-transparent background to preview text for visibility

@@ -9,6 +9,30 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Save, ArrowLeft, Plus, Trash2 } from "lucide-react";
 
+// Sample contract data for preview
+const SAMPLE_DATA: Record<string, string> = {
+  clientName: "John Doe",
+  clientAddress: "123 Main Street, Beirut",
+  clientPhone: "+961 1 234567",
+  clientEmail: "john.doe@example.com",
+  clientLicenseNumber: "DL123456",
+  vehiclePlate: "ABC-1234",
+  vehicleMake: "Toyota",
+  vehicleModel: "Camry",
+  vehicleYear: "2023",
+  startDate: "2026-02-18",
+  endDate: "2026-02-25",
+  pickupLocation: "Beirut Airport",
+  returnLocation: "Beirut Airport",
+  dailyRate: "$50.00",
+  totalAmount: "$350.00",
+  deposit: "$100.00",
+  contractNumber: "CNT-2026-001",
+  companyName: "Car Rental Co.",
+  companyAddress: "456 Business St, Beirut",
+  companyPhone: "+961 1 987654",
+};
+
 // Define available contract fields
 const CONTRACT_FIELDS = [
   { id: "clientName", label: "Client Name" },
@@ -53,6 +77,7 @@ export default function ContractTemplateMapper() {
   const [fieldPositions, setFieldPositions] = useState<FieldPosition[]>([]);
   const [selectedField, setSelectedField] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [showPreview, setShowPreview] = useState(true);
 
   useEffect(() => {
     if (profile?.contractTemplateFieldMap) {
@@ -190,6 +215,12 @@ export default function ContractTemplateMapper() {
               Back
             </Button>
             <Button
+              variant={showPreview ? "default" : "outline"}
+              onClick={() => setShowPreview(!showPreview)}
+            >
+              {showPreview ? "Hide Preview" : "Show Preview"}
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={updateProfile.isPending}
             >
@@ -226,18 +257,36 @@ export default function ContractTemplateMapper() {
                   onLoad={() => setImageLoaded(true)}
                 />
                 
-                {/* Show positioned fields as markers */}
+                {/* Show positioned fields as markers or preview text */}
                 {imageLoaded && fieldPositions.map(fp => (
                   <div
                     key={fp.fieldId}
-                    className="absolute w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg cursor-pointer hover:scale-125 transition-transform"
+                    className="absolute"
                     style={{
                       left: `${fp.x}%`,
                       top: `${fp.y}%`,
-                      transform: 'translate(-50%, -50%)',
+                      transform: showPreview ? 'translate(0, -50%)' : 'translate(-50%, -50%)',
+                      textAlign: fp.alignment,
                     }}
                     title={CONTRACT_FIELDS.find(f => f.id === fp.fieldId)?.label}
-                  />
+                  >
+                    {showPreview ? (
+                      <div
+                        style={{
+                          fontSize: `${fp.fontSize}px`,
+                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                          color: 'white',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {SAMPLE_DATA[fp.fieldId] || fp.fieldId}
+                      </div>
+                    ) : (
+                      <div className="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg cursor-pointer hover:scale-125 transition-transform" />
+                    )}
+                  </div>
                 ))}
               </div>
             </CardContent>
