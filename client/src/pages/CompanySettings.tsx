@@ -72,13 +72,53 @@ export default function CompanySettings() {
     }
   };
 
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTemplateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       setTemplateFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         setTemplatePreview(reader.result as string);
+        
+        // Auto-save template immediately
+        try {
+          setUploading(true);
+          const arrayBuffer = await file.arrayBuffer();
+          const buffer = new Uint8Array(arrayBuffer);
+          
+          // Generate unique filename
+          const timestamp = Date.now();
+          const filename = `contract-template-${timestamp}.${file.name.split('.').pop()}`;
+          
+          const result = await uploadLogoMutation.mutateAsync({
+            fileName: filename,
+            fileData: Array.from(buffer),
+            contentType: file.type,
+          });
+          
+          // Save to database immediately
+          await updateProfile.mutateAsync({
+            ...formData,
+            contractTemplateUrl: result.url,
+          });
+          
+          setFormData(prev => ({ ...prev, contractTemplateUrl: result.url }));
+          
+          toast({
+            title: "Success",
+            description: "Contract template uploaded successfully!",
+          });
+          
+          refetch();
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Failed to upload template. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setUploading(false);
+        }
       };
       reader.readAsDataURL(file);
     }

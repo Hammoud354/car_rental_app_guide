@@ -4699,3 +4699,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add "Configure Field Mapping" button in Company Settings after template upload
 - [x] Button should navigate to /contract-template-mapper route
 - [x] Show button when templatePreview exists (immediately after upload)
+
+## Auto-save Contract Template on Upload
+- [x] Modify handleTemplateChange to auto-save template immediately after upload
+- [x] Call updateProfile mutation with contractTemplateUrl after S3 upload
+- [x] Show success toast when template is saved
+- [x] Ensure field mapper can load the saved template
