@@ -4718,3 +4718,16 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Render text overlays at each field position with sample data
 - [x] Style preview text to match configured font size and alignment
 - [x] Add semi-transparent background to preview text for visibility
+
+## Fix Template Upload Database Save
+- [x] Debug why template upload isn't persisting to database - formData had empty companyName
+- [x] Check updateProfile mutation parameters - companyName is required
+- [x] Verify S3 upload completes before database save - using await
+- [x] Use existing profile data instead of formData to preserve all fields
+
+## Add Alignment Guides to Template Mapper
+- [x] Add horizontal gridlines at 5% intervals (20 lines total)
+- [x] Add vertical gridlines at 5% intervals (20 lines total)
+- [x] Add toggle button to show/hide gridlines
+- [x] Style gridlines as subtle semi-transparent blue lines
+- [x] Gridlines overlay on template with pointer-events-none

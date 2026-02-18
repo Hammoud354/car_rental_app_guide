@@ -96,9 +96,18 @@ export default function CompanySettings() {
             contentType: file.type,
           });
           
-          // Save to database immediately
+          // Save to database immediately - use existing profile data
           await updateProfile.mutateAsync({
-            ...formData,
+            companyName: profile?.companyName || "My Company",
+            registrationNumber: profile?.registrationNumber || undefined,
+            taxId: profile?.taxId || undefined,
+            address: profile?.address || undefined,
+            city: profile?.city || undefined,
+            country: profile?.country || undefined,
+            phone: profile?.phone || undefined,
+            email: profile?.email || undefined,
+            website: profile?.website || undefined,
+            logoUrl: profile?.logoUrl || undefined,
             contractTemplateUrl: result.url,
           });
           

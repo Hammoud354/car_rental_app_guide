@@ -78,6 +78,7 @@ export default function ContractTemplateMapper() {
   const [selectedField, setSelectedField] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
+  const [showGridlines, setShowGridlines] = useState(true);
 
   useEffect(() => {
     if (profile?.contractTemplateFieldMap) {
@@ -221,6 +222,12 @@ export default function ContractTemplateMapper() {
               {showPreview ? "Hide Preview" : "Show Preview"}
             </Button>
             <Button
+              variant={showGridlines ? "default" : "outline"}
+              onClick={() => setShowGridlines(!showGridlines)}
+            >
+              {showGridlines ? "Hide Gridlines" : "Show Gridlines"}
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={updateProfile.isPending}
             >
@@ -256,6 +263,28 @@ export default function ContractTemplateMapper() {
                   onClick={handleImageClick}
                   onLoad={() => setImageLoaded(true)}
                 />
+                
+                {/* Gridlines overlay */}
+                {imageLoaded && showGridlines && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Vertical gridlines */}
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <div
+                        key={`v-${i}`}
+                        className="absolute top-0 bottom-0 border-l border-blue-400/30"
+                        style={{ left: `${(i + 1) * 5}%` }}
+                      />
+                    ))}
+                    {/* Horizontal gridlines */}
+                    {Array.from({ length: 20 }).map((_, i) => (
+                      <div
+                        key={`h-${i}`}
+                        className="absolute left-0 right-0 border-t border-blue-400/30"
+                        style={{ top: `${(i + 1) * 5}%` }}
+                      />
+                    ))}
+                  </div>
+                )}
                 
                 {/* Show positioned fields as markers or preview text */}
                 {imageLoaded && fieldPositions.map(fp => (
