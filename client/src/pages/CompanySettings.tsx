@@ -72,15 +72,54 @@ export default function CompanySettings() {
     }
   };
 
-  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTemplateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setTemplateFile(file);
+    if (!file) return;
+
+    try {
+      setUploading(true);
+      
+      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setTemplatePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to S3 immediately
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const timestamp = Date.now();
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `contract-template-${timestamp}.${fileExtension}`;
+      
+      const { url } = await uploadLogoMutation.mutateAsync({
+        fileName,
+        fileData: Array.from(buffer),
+        contentType: file.type,
+      });
+
+      // Save to database immediately
+      await updateProfile.mutateAsync({
+        ...formData,
+        contractTemplateUrl: url,
+      });
+
+      await refetch();
+
+      toast({
+        title: "Success",
+        description: "Contract template uploaded successfully!",
+      });
+    } catch (error) {
+      console.error('Template upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload template. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -119,7 +158,9 @@ export default function CompanySettings() {
   };
 
   const uploadTemplate = async (): Promise<string | null> => {
-    if (!templateFile) return formData.contractTemplateUrl || null;
+    if (!templateFile) {
+      return formData.contractTemplateUrl || null;
+    }
 
     try {
       setUploading(true);
@@ -143,7 +184,7 @@ export default function CompanySettings() {
       console.error('Template upload error:', error);
       toast({
         title: "Upload Failed",
-        description: "Failed to upload contract template. Please try again.",
+        description: "Failed to upload template. Please try again.",
         variant: "destructive",
       });
       return null;
