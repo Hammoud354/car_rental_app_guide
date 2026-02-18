@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, decimal, boolean, date, json } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -63,6 +63,8 @@ export const companyProfiles = mysqlTable("companyProfiles", {
   logoUrl: text("logoUrl"), // S3 URL for company logo
   primaryColor: varchar("primaryColor", { length: 7 }), // Hex color code
   secondaryColor: varchar("secondaryColor", { length: 7 }), // Hex color code
+  contractTemplateUrl: text("contractTemplateUrl"), // S3 URL for contract template image
+  contractTemplateFieldMap: json("contractTemplateFieldMap"), // JSON mapping of field positions {fieldName: {x, y, fontSize, alignment}}
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

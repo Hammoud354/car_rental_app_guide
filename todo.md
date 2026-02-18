@@ -4680,3 +4680,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update create procedure input schema
 - [x] Update edit procedure input schema
 - [x] Add date conversion logic in mutations
+
+## Contract Template Upload with Coordinate Mapping
+- [x] Add contractTemplateUrl field to companyProfiles schema
+- [x] Add contractTemplateFieldMap JSON field to store field coordinates
+- [x] Run db:push to update database
+- [x] Create template upload component in Company Settings
+- [x] Implement S3 upload for template images
+- [x] Build visual field mapper interface with click-to-position
+- [x] Define contract field types (clientName, vehiclePlate, startDate, etc.)
+- [x] Store field positions as JSON (x, y, fontSize, alignment)
+- [x] Create PDF generation service with template overlay
+- [x] Add tRPC procedure for PDF generation
+- [x] Add download button in contract UI (Export with Custom Template)
+- [ ] Test full workflow (upload template → map fields → generate PDF)

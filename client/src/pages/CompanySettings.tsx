@@ -26,11 +26,15 @@ export default function CompanySettings() {
     email: "",
     website: "",
     logoUrl: "",
+    contractTemplateUrl: "",
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  
+  const [templateFile, setTemplateFile] = useState<File | null>(null);
+  const [templatePreview, setTemplatePreview] = useState<string>("");
 
   useEffect(() => {
     if (profile) {
@@ -45,9 +49,13 @@ export default function CompanySettings() {
         email: profile.email || "",
         website: profile.website || "",
         logoUrl: profile.logoUrl || "",
+        contractTemplateUrl: profile.contractTemplateUrl || "",
       });
       if (profile.logoUrl) {
         setLogoPreview(profile.logoUrl);
+      }
+      if (profile.contractTemplateUrl) {
+        setTemplatePreview(profile.contractTemplateUrl);
       }
     }
   }, [profile]);
@@ -59,6 +67,18 @@ export default function CompanySettings() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setTemplateFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setTemplatePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -98,6 +118,40 @@ export default function CompanySettings() {
     }
   };
 
+  const uploadTemplate = async (): Promise<string | null> => {
+    if (!templateFile) return formData.contractTemplateUrl || null;
+
+    try {
+      setUploading(true);
+      const arrayBuffer = await templateFile.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileExtension = templateFile.name.split('.').pop();
+      const fileName = `contract-template-${timestamp}.${fileExtension}`;
+      
+      // Upload to S3 using tRPC mutation (reuse uploadLogo mutation)
+      const { url } = await uploadLogoMutation.mutateAsync({
+        fileName,
+        fileData: Array.from(buffer),
+        contentType: templateFile.type,
+      });
+      
+      return url;
+    } catch (error) {
+      console.error('Template upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: "Failed to upload contract template. Please try again.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,9 +165,19 @@ export default function CompanySettings() {
         }
       }
 
+      // Upload contract template if changed
+      let contractTemplateUrl = formData.contractTemplateUrl;
+      if (templateFile) {
+        const uploadedUrl = await uploadTemplate();
+        if (uploadedUrl) {
+          contractTemplateUrl = uploadedUrl;
+        }
+      }
+
       await updateProfile.mutateAsync({
         ...formData,
         logoUrl,
+        contractTemplateUrl,
       });
 
       toast({
@@ -303,6 +367,61 @@ export default function CompanySettings() {
                   onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   placeholder="https://example.com"
                 />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Contract Template */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Contract Template</CardTitle>
+            <CardDescription>
+              Upload your custom contract template and configure field positions.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 input-client">
+            <div className="flex items-center gap-6 input-client">
+              {templatePreview ? (
+                <div className="w-48 h-64 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center input-client">
+                  <img src={templatePreview} alt="Contract Template" className="max-w-full max-h-full object-contain input-client" />
+                </div>
+              ) : (
+                <div className="w-48 h-64 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted input-client">
+                  <div className="text-center p-4">
+                    <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-2 input-client" />
+                    <p className="text-sm text-muted-foreground">No template uploaded</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex-1 space-y-4 input-client">
+                <div>
+                  <Label htmlFor="contractTemplate" className="cursor-pointer input-client">
+                    <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit input-client">
+                      <Upload className="h-4 w-4 input-client" />
+                      Choose Template
+                    </div>
+                    <Input
+                      id="contractTemplate"
+                      type="file"
+                      accept="image/*"
+                      className="hidden input-client"
+                      onChange={handleTemplateChange}
+                    />
+                  </Label>
+                  <p className="text-sm text-muted-foreground mt-2 input-client">
+                    Upload a high-resolution image of your contract template (PNG, JPG)
+                  </p>
+                </div>
+                {formData.contractTemplateUrl && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setLocation('/contract-template-mapper')}
+                  >
+                    Configure Field Positions
+                  </Button>
+                )}
               </div>
             </div>
           </CardContent>

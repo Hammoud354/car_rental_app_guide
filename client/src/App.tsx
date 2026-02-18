@@ -28,6 +28,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Analysis from "./pages/Analysis";
 import Reservations from "./pages/Reservations";
 import CompanySettings from "./pages/CompanySettings";
+import ContractTemplateMapper from "./pages/ContractTemplateMapper";
 import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
@@ -71,6 +72,7 @@ function Router() {
       <Route path="/analysis" component={Analysis} />
       <Route path="/reservations" component={Reservations} />
       <Route path="/company-settings" component={CompanySettings} />
+      <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
       <Route path="/invoices" component={Invoices} />
       {/* Final fallback route */}
       <Route component={NotFound} />

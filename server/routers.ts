@@ -927,6 +927,45 @@ export const appRouter = router({
         );
       }),
 
+    // Generate PDF with custom template
+    generatePDF: protectedProcedure
+      .input(z.object({ contractId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const { generateContractPDF, formatContractDataForPDF } = await import("./contractPdfGenerator");
+        
+        // Get contract data
+        const contract = await db.getRentalContractById(input.contractId, ctx.user.id);
+        if (!contract) {
+          throw new Error('Contract not found');
+        }
+        
+        // Get related data
+        const client = contract.clientId ? await db.getClientById(contract.clientId, ctx.user.id) : null;
+        const vehicle = await db.getVehicleById(contract.vehicleId, ctx.user.id);
+        const company = await db.getCompanyProfile(ctx.user.id);
+        
+        // Check if custom template is configured
+        if (!company?.contractTemplateUrl || !company?.contractTemplateFieldMap) {
+          throw new Error('Contract template not configured. Please upload a template and configure field mappings in Company Settings.');
+        }
+        
+        // Format contract data
+        const contractData = formatContractDataForPDF(contract, client, vehicle, company);
+        
+        // Generate PDF
+        const pdfBytes = await generateContractPDF(
+          company.contractTemplateUrl,
+          company.contractTemplateFieldMap as Record<string, any>,
+          contractData
+        );
+        
+        // Convert Uint8Array to number array for transmission
+        return {
+          pdfData: Array.from(pdfBytes),
+          fileName: `Contract_${contract.contractNumber || contract.id}.pdf`,
+        };
+      }),
+
   }),
 
   // Client Management Router
@@ -1281,6 +1320,8 @@ export const appRouter = router({
         logoUrl: z.string().optional(),
         primaryColor: z.string().optional(),
         secondaryColor: z.string().optional(),
+        contractTemplateUrl: z.string().optional(),
+        contractTemplateFieldMap: z.any().optional(), // JSON field mapping
       }))
       .mutation(async ({ input, ctx }) => {
         const profile = await db.upsertCompanyProfile({
