@@ -2861,3 +2861,36 @@ export async function getInsuranceCostForPeriod(
   
   return totalCost;
 }
+
+
+export async function getAllInvoices(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db
+      .select()
+      .from(invoices)
+      .where(eq(invoices.userId, userId));
+    return result;
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    return [];
+  }
+}
+
+export async function getAllInsurancePolicies(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const result = await db
+      .select()
+      .from(insurancePolicies)
+      .where(eq(insurancePolicies.userId, userId));
+    return result;
+  } catch (error) {
+    console.error("Error fetching insurance policies:", error);
+    return [];
+  }
+}

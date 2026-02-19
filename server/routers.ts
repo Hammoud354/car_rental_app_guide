@@ -1663,6 +1663,88 @@ export const appRouter = router({
         return vehicleProfitability.sort((a, b) => b.netProfit - a.netProfit);
       }),
 
+    calculatePnL: protectedProcedure
+      .input(z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+      }))
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        const startDate = new Date(input.startDate);
+        const endDate = new Date(input.endDate);
+
+        // Get all invoices in date range
+        const invoices = await db.getAllInvoices(userId);
+        const filteredInvoices = invoices.filter(inv => {
+          const invDate = new Date(inv.invoiceDate);
+          return invDate >= startDate && invDate <= endDate;
+        });
+
+        // Get contracts to map client names
+        const allContracts = await db.getAllRentalContracts(userId);
+        const contractMap = new Map(allContracts.map((c: any) => [c.id, c]));
+
+        // Calculate revenue from invoices
+        const revenueBreakdown = filteredInvoices.map(inv => {
+          const contract = contractMap.get(inv.contractId);
+          return {
+            invoiceNumber: inv.invoiceNumber,
+            clientName: contract?.clientName || 'Unknown Client',
+            invoiceDate: inv.invoiceDate,
+            amount: parseFloat(inv.totalAmount?.toString() || '0'),
+          };
+        });
+        const totalRevenue = revenueBreakdown.reduce((sum, item) => sum + item.amount, 0);
+
+        // Get all maintenance records in date range
+        const maintenanceRecords = await db.getMaintenanceRecords(userId, startDate, endDate);
+        const expenseBreakdown: any[] = maintenanceRecords.map(record => ({
+          category: 'Maintenance',
+          description: record.description || 'Maintenance work',
+          date: record.performedAt,
+          amount: parseFloat(record.cost?.toString() || '0'),
+        }));
+
+        // Get all insurance policies in date range
+        const insurancePolicies = await db.getAllInsurancePolicies(userId);
+        const filteredPolicies = insurancePolicies.filter(policy => {
+          const policyDate = new Date(policy.policyStartDate);
+          return policyDate >= startDate && policyDate <= endDate;
+        });
+
+        filteredPolicies.forEach(policy => {
+          expenseBreakdown.push({
+            category: 'Insurance',
+            description: `${policy.policyNumber || 'Insurance Policy'}`,
+            date: policy.policyStartDate,
+            amount: parseFloat(policy.annualPremium?.toString() || '0'),
+          });
+        });
+
+        const totalExpenses = expenseBreakdown.reduce((sum, item) => sum + item.amount, 0);
+
+        // Calculate vehicle utilization
+        const contracts = await db.getCompletedContracts(userId, startDate, endDate);
+        const vehicles = await db.getAllVehicles(userId);
+        const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const totalVehicleDays = vehicles.length * totalDays;
+        const rentedDays = contracts.reduce((sum, contract) => {
+          const start = new Date(contract.rentalStartDate);
+          const end = new Date(contract.rentalEndDate);
+          return sum + Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+        }, 0);
+        const vehicleUtilization = totalVehicleDays > 0 ? (rentedDays / totalVehicleDays) * 100 : 0;
+
+        return {
+          totalRevenue,
+          totalExpenses,
+          netProfit: totalRevenue - totalExpenses,
+          revenueBreakdown,
+          expenseBreakdown,
+          vehicleUtilization,
+        };
+      }),
+
     getRevenueByMonth: protectedProcedure
       .input(z.object({
         year: z.number().optional(),

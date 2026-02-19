@@ -4863,3 +4863,46 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Keep margins and tables fully visible
 - [x] Prevent overflow beyond screen boundaries
 - [x] Test on mobile, tablet, and desktop viewports
+
+
+## P&L Dashboard Implementation
+
+### P&L Summary Cards
+- [x] Create P&L dashboard page with summary cards
+- [x] Display Total Revenue card
+- [x] Display Total Expenses card
+- [x] Display Net Profit/Loss card
+- [x] Display Vehicle Utilization Rate card
+- [x] Make cards clickable to show detailed breakdowns
+
+### Detailed Calculation Breakdowns
+- [x] Create modal showing revenue calculation details
+- [x] Show all invoices contributing to revenue
+- [x] Display invoice dates, amounts, and vehicle info
+- [x] Create modal showing expense calculation details
+- [x] Break down expenses by category (maintenance, insurance, fuel, etc.)
+- [x] Show individual expense line items with dates and descriptions
+- [x] Create modal showing profit calculation
+- [x] Display revenue minus expenses formula
+
+### Date Range Filtering
+- [x] Add date range picker to P&L page
+- [x] Default to current month
+- [x] Allow custom date range selection
+- [x] Update all calculations based on selected date range
+- [x] Show selected date range in summary cards
+
+### Backend P&L Procedures
+- [x] Create calculatePnL tRPC procedure
+- [x] Calculate total revenue from invoices
+- [x] Calculate total expenses from maintenance and insurance records
+- [x] Calculate net profit/loss
+- [x] Calculate vehicle utilization rates
+- [x] Support date range filtering in backend
+
+### Testing and Deployment
+- [x] Test P&L calculations accuracy
+- [x] Test modal detail views
+- [x] Test date range filtering
+- [x] Test on mobile and desktop viewports
+- [x] Save checkpoint
