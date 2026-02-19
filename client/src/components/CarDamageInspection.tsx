@@ -34,6 +34,12 @@ interface ContractData {
   totalAmount: number;
   discount: number;
   finalAmount: number;
+  insurancePackage?: "None" | "Basic" | "Premium" | "Full Coverage";
+  insuranceCost?: number;
+  insuranceDailyRate?: number;
+  depositAmount?: number;
+  depositStatus?: "None" | "Held" | "Refunded" | "Forfeited";
+  fuelPolicy?: "Full-to-Full" | "Same-to-Same" | "Pre-purchase";
 }
 
 interface CarDamageInspectionProps {
@@ -184,6 +190,42 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
                 </div>
               </div>
             </div>
+
+            {/* Additional Options */}
+            {(contractData.insurancePackage || contractData.depositAmount || contractData.fuelPolicy) && (
+              <div>
+                <h3 className="font-semibold text-lg mb-3 border-b pb-2">Additional Options</h3>
+                <div className="space-y-3">
+                  {contractData.insurancePackage && contractData.insurancePackage !== "None" && (
+                    <div>
+                      <Label className="text-sm text-gray-600">Insurance Package</Label>
+                      <p className="font-medium">{contractData.insurancePackage}</p>
+                      {contractData.insuranceDailyRate && (
+                        <p className="text-sm text-gray-500">Daily Rate: ${contractData.insuranceDailyRate.toFixed(2)}</p>
+                      )}
+                      {contractData.insuranceCost && (
+                        <p className="text-sm text-gray-500">Total Cost: ${contractData.insuranceCost.toFixed(2)}</p>
+                      )}
+                    </div>
+                  )}
+                  {contractData.depositAmount && contractData.depositAmount > 0 && (
+                    <div>
+                      <Label className="text-sm text-gray-600">Security Deposit</Label>
+                      <p className="font-medium">${contractData.depositAmount.toFixed(2)}</p>
+                      {contractData.depositStatus && (
+                        <p className="text-sm text-gray-500">Status: {contractData.depositStatus}</p>
+                      )}
+                    </div>
+                  )}
+                  {contractData.fuelPolicy && (
+                    <div>
+                      <Label className="text-sm text-gray-600">Fuel Policy</Label>
+                      <p className="font-medium">{contractData.fuelPolicy}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Pricing Details */}
             <div>

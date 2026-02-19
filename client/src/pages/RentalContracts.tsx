@@ -411,6 +411,10 @@ export default function RentalContracts() {
                   setContractData(null);
                   setIsCreateDialogOpen(true);
                 }}
+                onBack={() => {
+                  setShowInspection(false);
+                  setIsCreateDialogOpen(true);
+                }}
                 contractData={contractData ? {
                   clientName: `${contractData.clientFirstName} ${contractData.clientLastName}`,
                   clientLicense: contractData.drivingLicenseNumber,
@@ -428,6 +432,12 @@ export default function RentalContracts() {
                   totalAmount: parseFloat(contractData.totalAmount),
                   discount: parseFloat(contractData.discount),
                   finalAmount: parseFloat(contractData.finalAmount),
+                  insurancePackage: insurancePackage,
+                  insuranceCost: insuranceCost,
+                  insuranceDailyRate: insuranceDailyRate,
+                  depositAmount: depositAmount,
+                  depositStatus: depositStatus,
+                  fuelPolicy: fuelPolicy,
                 } : undefined}
               />
             </div>

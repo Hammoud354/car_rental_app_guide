@@ -111,67 +111,73 @@ export default function ProfitAndLoss() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Revenue Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow"
+        <button
           onClick={handleViewRevenue}
+          className="text-left"
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold text-green-600">
-                  ${metrics.totalRevenue.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-green-600">
+                    ${metrics.totalRevenue.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-green-600 opacity-20" />
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </button>
 
         {/* Total Expenses Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow"
+        <button
           onClick={handleViewExpenses}
+          className="text-left"
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Expenses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold text-red-600">
-                  ${metrics.totalExpenses.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Expenses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-red-600">
+                    ${metrics.totalExpenses.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
+                <TrendingDown className="h-8 w-8 text-red-600 opacity-20" />
               </div>
-              <TrendingDown className="h-8 w-8 text-red-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </button>
 
         {/* Net Profit Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow"
+        <button
           onClick={handleViewProfit}
+          className="text-left"
         >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Net Profit/Loss</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-2xl font-bold ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${metrics.netProfit.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
-              </div>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow h-full">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Net Profit/Loss</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-2xl font-bold ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ${metrics.netProfit.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
               <DollarSign className={`h-8 w-8 ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'} opacity-20`} />
             </div>
           </CardContent>
         </Card>
+        </button>
 
         {/* Profit Margin Card */}
         <Card>

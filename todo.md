@@ -4915,3 +4915,38 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test date range filtering
 - [x] Test on mobile and desktop viewports
 - [x] Save checkpoint
+
+
+## Critical Bug Fixes
+
+### Vehicle Inspection Back Navigation
+- [ ] Verify Back button exists in CarDamageInspection component
+- [ ] Ensure onBack callback is properly passed from RentalContracts page
+- [ ] Test Back button returns to contract form without data loss
+- [ ] Verify all previously entered contract data remains intact
+
+### Currency Settings Not Saving
+- [ ] Check CompanySettings form submission handler
+- [ ] Verify currency fields are included in updateProfile mutation
+- [ ] Test Save button properly sends currency data to backend
+- [ ] Verify currency values persist after page reload
+
+### P&L Card Click Handlers Not Working
+- [ ] Check ProfitAndLoss component for onClick handlers on cards
+- [ ] Verify card click opens detail modal
+- [ ] Test all three cards (Revenue, Expenses, Profit) are clickable
+- [ ] Verify detail breakdown displays correctly in modal
+
+
+## Additional Bug Fixes
+
+### Back to Contract Navigation
+- [x] Fix Back button to return to Create Rental Contract form instead of Contract list page
+- [x] Preserve all contract data when navigating back
+- [x] Allow user to make amendments before completing inspection
+
+### Additional Options Display in Inspection
+- [x] Display Additional Options in Vehicle Inspection page details
+- [x] Show options that were added during contract creation
+- [x] Include options in inspection form for reference
+- [x] Ensure options are visible before completing contract

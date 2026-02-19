@@ -1653,6 +1653,11 @@ export async function upsertCompanyProfile(data: {
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  contractTemplateUrl?: string;
+  contractTemplateFieldMap?: any;
+  defaultCurrency?: "USD" | "LOCAL";
+  exchangeRate?: number;
+  localCurrencyCode?: string;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -1679,15 +1684,24 @@ export async function upsertCompanyProfile(data: {
         logoUrl: data.logoUrl,
         primaryColor: data.primaryColor,
         secondaryColor: data.secondaryColor,
+        contractTemplateUrl: data.contractTemplateUrl,
+        contractTemplateFieldMap: data.contractTemplateFieldMap,
+        defaultCurrency: data.defaultCurrency,
+        exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : undefined,
+        localCurrencyCode: data.localCurrencyCode,
       })
       .where(eq(companyProfiles.userId, data.userId));
     
     return await getCompanyProfile(data.userId);
   } else {
     // Create new profile
+    const createData = {
+      ...data,
+      exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : "1.0000",
+    };
     const [result] = await db
       .insert(companyProfiles)
-      .values(data)
+      .values([createData])
       .$returningId();
     
     return await getCompanyProfile(data.userId);
