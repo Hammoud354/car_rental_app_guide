@@ -1891,15 +1891,15 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
   });
   
   // 2. Insurance (if any)
-  const insuranceCost = parseFloat(contract.insuranceCost || '0');
-  if (insuranceCost > 0) {
+  const insuranceDailyRate = parseFloat(contract.insuranceDailyRate || '0');
+  if (insuranceDailyRate > 0) {
     const insurancePackage = contract.insurancePackage || 'Insurance';
-    const insuranceDailyRate = parseFloat(contract.insuranceDailyRate || '0');
+    const calculatedInsuranceCost = insuranceDailyRate * rentalDays;
     lineItems.push({
       description: `Insurance - ${insurancePackage} (${rentalDays} days @ $${insuranceDailyRate}/day)`,
       quantity: String(rentalDays),
       unitPrice: insuranceDailyRate.toFixed(2),
-      amount: insuranceCost.toFixed(2),
+      amount: calculatedInsuranceCost.toFixed(2),
     });
   }
   

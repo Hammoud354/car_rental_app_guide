@@ -56,21 +56,32 @@ export default function Reservations() {
     calendarDays.push(day);
   }
 
-  // Get reservations for a specific day (only show on start date)
+  // Get reservations for a specific day (show for all days the reservation spans)
   const getReservationsForDay = (day: number) => {
     if (!reservations) return [];
     
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const checkDate = new Date(dateStr);
+    checkDate.setHours(0, 0, 0, 0);
     
     return reservations.filter(reservation => {
       const startDate = new Date(reservation.rentalStartDate);
       startDate.setHours(0, 0, 0, 0);
-      const checkDate = new Date(dateStr);
-      checkDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(reservation.rentalEndDate);
+      endDate.setHours(0, 0, 0, 0);
       
-      // Only show reservation on its start date
-      return startDate.getTime() === checkDate.getTime();
+      // Show reservation on all days from start to end date (inclusive)
+      return checkDate.getTime() >= startDate.getTime() && checkDate.getTime() <= endDate.getTime();
     });
+  };
+
+  // Check if a reservation is being returned on this specific day
+  const isReturnDay = (reservation: any, day: number) => {
+    const endDate = new Date(reservation.rentalEndDate);
+    endDate.setHours(0, 0, 0, 0);
+    const checkDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+    checkDate.setHours(0, 0, 0, 0);
+    return endDate.getTime() === checkDate.getTime();
   };
 
   const getRandomColor = (index: number) => {
@@ -178,6 +189,8 @@ export default function Reservations() {
                         // Create tooltip text
                         const tooltipText = `Contract #${reservation.id}\nVehicle: ${reservation.vehicleBrand} ${reservation.vehicleModel}\nStart: ${formattedStartDate}\nEnd: ${formattedEndDate}\nDuration: ${durationDays} day${durationDays > 1 ? 's' : ''}\nTotal Cost: $${reservation.totalCost?.toFixed(2) || 'N/A'}\nClient: ${reservation.clientName}\nPhone: ${reservation.clientPhone}`;
                         
+                        const returnDayBadge = isReturnDay(reservation, day);
+                        
                         return (
                             <div
                               key={reservation.id}
@@ -192,6 +205,12 @@ export default function Reservations() {
                                   : `border ${getRandomColor(idx)}`
                               }`}
                             >
+                            {returnDayBadge && (
+                              <div className="absolute top-1 left-1 bg-amber-400 text-amber-900 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                Return Today
+                              </div>
+                            )}
+                            
                             {/* Duration indicator in top-right corner */}
                             <div className="absolute top-1 right-1 flex items-center gap-0.5 bg-white/90 px-1 py-0.5 rounded text-[9px] font-semibold text-gray-700 shadow-sm">
                               <Clock className="h-2.5 w-2.5" />

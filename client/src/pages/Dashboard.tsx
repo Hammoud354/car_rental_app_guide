@@ -436,6 +436,7 @@ export default function Dashboard() {
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery({ filterUserId: selectedUserId || undefined });
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery({ filterUserId: selectedUserId || undefined });
+  const { data: companyProfile } = trpc.company.getProfile.useQuery();
 
   // Invalidate all queries when selectedUserId changes to force refetch with new filter
   useEffect(() => {
@@ -482,9 +483,18 @@ export default function Dashboard() {
       <div className="space-y-8">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
-              <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
+            <div className="flex items-start gap-4">
+              {companyProfile?.logoUrl && (
+                <img
+                  src={companyProfile.logoUrl}
+                  alt={companyProfile.companyName || "Company Logo"}
+                  className="h-16 w-auto object-contain flex-shrink-0"
+                />
+              )}
+              <div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
+                <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
+              </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               {/* Settings and Admin Controls Group */}

@@ -4778,3 +4778,33 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add company email, registration, tax ID fields
 - [x] Update SAMPLE_DATA with example values for new fields
 - [x] Total of 41 fields now available for mapping
+
+
+## Reservation Calendar and Contract Calculation Corrections
+
+### Reservation Calendar Duration Logic
+- [x] Fix calendar to display multi-day reservations spanning exact number of booked days
+- [x] Ensure reservation bar begins on pickup date and ends on return date
+- [x] Test 3-day, 5-day, and 7-day bookings display correctly across calendar grid
+- [x] Verify reservation visual spans do not overlap with other reservations
+
+### Return-Day Status Indicator
+- [x] Add "To be returned today" badge to calendar cells on return date
+- [x] Badge must appear only on exact return date
+- [x] Badge must be small, distinct, and visually tied to vehicle reservation
+- [x] Style badge with appropriate color and icon
+
+### Company Logo Integration
+- [x] Display company logo on main dashboard next to company name
+- [x] Integrate logo in all generated PDFs (contracts, invoices, reports)
+- [x] Ensure logo placement is consistent and proportionally scaled
+- [x] Add logo to printable documents header section
+- [x] Prevent logo distortion through proper aspect ratio handling
+
+### Insurance Per Day Calculation
+- [x] Multiply "Insurance per day" by total number of rental days
+- [x] Include calculated insurance total in invoice subtotal before tax
+- [x] Display insurance line item clearly in invoice breakdown
+- [x] Ensure final invoice total reflects insurance calculation
+- [x] Synchronize backend calculation with frontend display
+- [x] Verify contract, invoice preview, and PDF totals match exactly
