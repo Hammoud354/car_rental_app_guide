@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, userId, companyName, defaultCurrency, exchangeRate, localCurrencyCode FROM companyProfiles LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, companyName, defaultCurrency, exchangeRate, localCurrencyCode FROM companyProfiles LIMIT 5;",
+  "rows": [
+    {
+      "id": "120001",
+      "userId": "870167",
+      "companyName": "Dima Rent a Car",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    },
+    {
+      "id": "150001",
+      "userId": "1470001",
+      "companyName": "Dima Rent a car",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    },
+    {
+      "id": "180001",
+      "userId": "841246",
+      "companyName": "My Company",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    },
+    {
+      "id": "210001",
+      "userId": "1620001",
+      "companyName": "dima rent a car",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    },
+    {
+      "id": "240001",
+      "userId": "870189",
+      "companyName": "Test",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcompanyName\tdefaultCurrency\texchangeRate\tlocalCurrencyCode\n120001\t870167\tDima Rent a Car\tUSD\t1.0000\tLBP\n150001\t1470001\tDima Rent a car\tUSD\t1.0000\tLBP\n180001\t841246\tMy Company\tUSD\t1.0000\tLBP\n210001\t1620001\tdima rent a car\tUSD\t1.0000\tLBP\n240001\t870189\tTest\tUSD\t1.0000\tLBP\n",
+  "stderr": "",
+  "execution_time_ms": 1648
+}

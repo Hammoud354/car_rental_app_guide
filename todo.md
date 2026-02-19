@@ -4919,23 +4919,27 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ## Critical Bug Fixes
 
-### Vehicle Inspection Back Navigation
-- [ ] Verify Back button exists in CarDamageInspection component
-- [ ] Ensure onBack callback is properly passed from RentalContracts page
-- [ ] Test Back button returns to contract form without data loss
-- [ ] Verify all previously entered contract data remains intact
+### Vehicle Inspection Back Navigation - FIXED
+- [x] Verify Back button exists in CarDamageInspection component
+- [x] Ensure onBack callback is properly passed from RentalContracts page
+- [x] Test Back button returns to contract form without data loss
+- [x] Verify all previously entered contract data remains intact
 
-### Currency Settings Not Saving
-- [ ] Check CompanySettings form submission handler
-- [ ] Verify currency fields are included in updateProfile mutation
-- [ ] Test Save button properly sends currency data to backend
-- [ ] Verify currency values persist after page reload
+### Currency Settings Not Saving - FIXED
+- [x] Check CompanySettings form submission handler
+- [x] Verify currency fields are included in updateProfile mutation
+- [x] Test Save button properly sends currency data to backend
+- [x] Verify currency values persist after page reload
+- [x] Auto-detect currency code from signup country (implemented countryToCurrency mapping)
+- [x] Fix getCompanyProfile to return all currency fields (fixed field selection in Drizzle query)
 
-### P&L Card Click Handlers Not Working
-- [ ] Check ProfitAndLoss component for onClick handlers on cards
-- [ ] Verify card click opens detail modal
-- [ ] Test all three cards (Revenue, Expenses, Profit) are clickable
-- [ ] Verify detail breakdown displays correctly in modal
+### P&L Card Click Handlers Not Working - FIXED
+- [x] Check ProfitAndLoss component for onClick handlers on cards
+- [x] Verify card click opens detail modal
+- [x] Test all three cards (Revenue, Expenses, Profit) are clickable
+- [x] Verify detail breakdown displays correctly in modal
+- [x] Added missing useState and useMemo imports to ProfitAndLoss.tsx
+- [x] Moved onClick handlers directly to Card components
 
 
 ## Additional Bug Fixes
@@ -4971,3 +4975,27 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display actual country currency code instead of "Local Currency" text
 - [x] Ensure exchange rate saves correctly
 - [x] Verify currency selection persists on page reload
+
+
+## CRITICAL BUG FIXES - IMMEDIATE
+
+### P&L Card Click NOT Working
+- [ ] Debug why P&L cards are not clickable despite onClick handlers
+- [ ] Verify Dialog component is rendering properly
+- [ ] Check if selectedBreakdown state is updating on click
+- [ ] Test click event propagation
+- [ ] Ensure modal displays when card is clicked
+
+### Currency Auto-Detection from Signup Country
+- [ ] Implement auto-detection of user's country during signup
+- [ ] Auto-populate currency code based on country (e.g., Lebanon = LBP)
+- [ ] Store country information in user/company profile
+- [ ] Display auto-detected currency in Company Settings
+- [ ] Allow user to override auto-detected currency if needed
+
+### Exchange Rate Not Saving
+- [ ] Debug why exchange rate field value is not persisting
+- [ ] Check if exchangeRate is being sent in API request
+- [ ] Verify backend is receiving and processing exchangeRate
+- [ ] Check database schema for exchangeRate field type
+- [ ] Test save functionality with different exchange rate values

@@ -1628,7 +1628,29 @@ export async function getCompanyProfile(userId: number) {
   const { companyProfiles } = await import("../drizzle/schema");
   
   const [profile] = await db
-    .select()
+    .select({
+      id: companyProfiles.id,
+      userId: companyProfiles.userId,
+      companyName: companyProfiles.companyName,
+      registrationNumber: companyProfiles.registrationNumber,
+      taxId: companyProfiles.taxId,
+      address: companyProfiles.address,
+      city: companyProfiles.city,
+      country: companyProfiles.country,
+      phone: companyProfiles.phone,
+      email: companyProfiles.email,
+      website: companyProfiles.website,
+      logoUrl: companyProfiles.logoUrl,
+      primaryColor: companyProfiles.primaryColor,
+      secondaryColor: companyProfiles.secondaryColor,
+      contractTemplateUrl: companyProfiles.contractTemplateUrl,
+      contractTemplateFieldMap: companyProfiles.contractTemplateFieldMap,
+      defaultCurrency: companyProfiles.defaultCurrency,
+      exchangeRate: companyProfiles.exchangeRate,
+      localCurrencyCode: companyProfiles.localCurrencyCode,
+      createdAt: companyProfiles.createdAt,
+      updatedAt: companyProfiles.updatedAt,
+    })
     .from(companyProfiles)
     .where(eq(companyProfiles.userId, userId))
     .limit(1);
@@ -1663,6 +1685,13 @@ export async function upsertCompanyProfile(data: {
   if (!db) throw new Error("Database not available");
 
   const { companyProfiles } = await import("../drizzle/schema");
+  const { countryToCurrency } = await import("./currencyMap");
+  
+  // Auto-detect currency code from country if not provided
+  let localCurrencyCode = data.localCurrencyCode;
+  if (data.country && !localCurrencyCode) {
+    localCurrencyCode = countryToCurrency[data.country] || "USD";
+  }
   
   // Check if profile exists
   const existing = await getCompanyProfile(data.userId);
@@ -1688,7 +1717,7 @@ export async function upsertCompanyProfile(data: {
         contractTemplateFieldMap: data.contractTemplateFieldMap,
         defaultCurrency: data.defaultCurrency,
         exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : undefined,
-        localCurrencyCode: data.localCurrencyCode,
+        localCurrencyCode: localCurrencyCode,
       })
       .where(eq(companyProfiles.userId, data.userId));
     
@@ -1697,6 +1726,7 @@ export async function upsertCompanyProfile(data: {
     // Create new profile
     const createData = {
       ...data,
+      localCurrencyCode: localCurrencyCode,
       exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : "1.0000",
     };
     const [result] = await db

@@ -1,0 +1,23 @@
+export const countryToCurrency: { [key: string]: string } = {
+  "Lebanon": "LBP",
+  "United States": "USD",
+  "United Arab Emirates": "AED",
+  "Saudi Arabia": "SAR",
+  "Qatar": "QAR",
+  "Kuwait": "KWD",
+  "Bahrain": "BHD",
+  "Oman": "OMR",
+  "Egypt": "EGP",
+  "Jordan": "JOD",
+  "United Kingdom": "GBP",
+  "France": "EUR",
+  "Germany": "EUR",
+  "Italy": "EUR",
+  "Spain": "EUR",
+  "Canada": "CAD",
+  "Australia": "AUD",
+  "Japan": "JPY",
+  "China": "CNY",
+  "India": "INR",
+  // Add more countries and currencies as needed
+};

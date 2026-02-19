@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, userId, companyName, defaultCurrency, exchangeRate, localCurrencyCode FROM companyProfiles WHERE country = 'Lebanon';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, companyName, defaultCurrency, exchangeRate, localCurrencyCode FROM companyProfiles WHERE country = 'Lebanon';",
+  "rows": [
+    {
+      "id": "240001",
+      "userId": "870189",
+      "companyName": "Test",
+      "defaultCurrency": "USD",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcompanyName\tdefaultCurrency\texchangeRate\tlocalCurrencyCode\n240001\t870189\tTest\tUSD\t1.0000\tLBP\n",
+  "stderr": "",
+  "execution_time_ms": 1584
+}
