@@ -14,6 +14,7 @@ import { VehicleImageUpload, VehicleImageGallery } from "@/components/VehicleIma
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function VehicleDetails() {
   const params = useParams();
@@ -60,7 +61,7 @@ export default function VehicleDetails() {
   const [maintenanceType, setMaintenanceType] = useState("");
   const [description, setDescription] = useState("");
   const [cost, setCost] = useState("");
-  const [serviceDate, setServiceDate] = useState(new Date().toISOString().split("T")[0]);
+  const [serviceDate, setServiceDate] = useState<Date | undefined>(new Date());
   const [performedBy, setPerformedBy] = useState("");
   const [garageLocation, setGarageLocation] = useState("");
   const [mileageAtService, setMileageAtService] = useState("");
@@ -71,7 +72,7 @@ export default function VehicleDetails() {
     setMaintenanceType("");
     setDescription("");
     setCost("");
-    setServiceDate(new Date().toISOString().split("T")[0]);
+    setServiceDate(new Date());
     setPerformedBy("");
     setGarageLocation("");
     setMileageAtService("");
@@ -83,7 +84,7 @@ export default function VehicleDetails() {
     setMaintenanceType(record.maintenanceType);
     setDescription(record.description || "");
     setCost(record.cost || "");
-    setServiceDate(new Date(record.performedAt).toISOString().split("T")[0]);
+    setServiceDate(new Date(record.performedAt));
     setPerformedBy(record.performedBy || "");
     setGarageLocation(record.garageLocation || "");
     setMileageAtService(record.mileageAtService?.toString() || "");
@@ -372,12 +373,11 @@ export default function VehicleDetails() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="serviceDate">Service Date *</Label>
-                        <Input
-                          id="serviceDate"
-                          type="date"
-                          value={serviceDate}
-                          onChange={(e) => setServiceDate(e.target.value)}
+                        <Label>Service Date *</Label>
+                        <DatePickerWithYearNav
+                          date={serviceDate}
+                          onDateChange={setServiceDate}
+                          placeholder="Select service date"
                         />
                       </div>
 

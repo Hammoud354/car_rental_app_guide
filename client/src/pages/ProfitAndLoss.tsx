@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 interface DetailedBreakdown {
   type: "revenue" | "expenses" | "profit";
@@ -15,14 +16,14 @@ interface DetailedBreakdown {
 }
 
 export default function ProfitAndLoss() {
-  const [startDate, setStartDate] = useState<Date>(startOfMonth(new Date()));
-  const [endDate, setEndDate] = useState<Date>(endOfMonth(new Date()));
+  const [startDate, setStartDate] = useState<Date | undefined>(startOfMonth(new Date()));
+  const [endDate, setEndDate] = useState<Date | undefined>(endOfMonth(new Date()));
   const [selectedBreakdown, setSelectedBreakdown] = useState<DetailedBreakdown | null>(null);
 
   // Fetch P&L data
   const { data: pnlData, isLoading } = trpc.profitLoss.calculatePnL.useQuery({
-    startDate: startDate.toISOString(),
-    endDate: endDate.toISOString(),
+    startDate: (startDate || startOfMonth(new Date())).toISOString(),
+    endDate: (endDate || endOfMonth(new Date())).toISOString(),
   });
 
   const metrics = useMemo(() => {
@@ -89,23 +90,19 @@ export default function ProfitAndLoss() {
         <h1 className="text-3xl font-bold">Profit & Loss</h1>
         <div className="flex gap-4">
           <div>
-            <Label htmlFor="startDate" className="text-sm">Start Date</Label>
-            <Input
-              id="startDate"
-              type="date"
-              value={format(startDate, "yyyy-MM-dd")}
-              onChange={(e) => setStartDate(new Date(e.target.value))}
-              className="w-40"
+            <Label className="text-sm">Start Date</Label>
+            <DatePickerWithYearNav
+              date={startDate}
+              onDateChange={setStartDate}
+              placeholder="Select start date"
             />
           </div>
           <div>
-            <Label htmlFor="endDate" className="text-sm">End Date</Label>
-            <Input
-              id="endDate"
-              type="date"
-              value={format(endDate, "yyyy-MM-dd")}
-              onChange={(e) => setEndDate(new Date(e.target.value))}
-              className="w-40"
+            <Label className="text-sm">End Date</Label>
+            <DatePickerWithYearNav
+              date={endDate}
+              onDateChange={setEndDate}
+              placeholder="Select end date"
             />
           </div>
         </div>

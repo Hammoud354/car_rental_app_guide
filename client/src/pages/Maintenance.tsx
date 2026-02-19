@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import SidebarLayout from "@/components/SidebarLayout";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function Maintenance() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -20,6 +21,12 @@ export default function Maintenance() {
   const [autoFilledKm, setAutoFilledKm] = useState<number | null>(null);
   const [editingRecordId, setEditingRecordId] = useState<number | null>(null);
   const [editFormData, setEditFormData] = useState<any>({});
+  const [performedAtDate, setPerformedAtDate] = useState<Date>();
+  const [garageEntryDate, setGarageEntryDate] = useState<Date>();
+  const [garageExitDate, setGarageExitDate] = useState<Date>();
+  const [editPerformedAtDate, setEditPerformedAtDate] = useState<Date>();
+  const [editGarageEntryDate, setEditGarageEntryDate] = useState<Date>();
+  const [editGarageExitDate, setEditGarageExitDate] = useState<Date>();
 
   const { data: vehicles } = trpc.fleet.listAvailableForMaintenance.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
@@ -226,8 +233,12 @@ export default function Maintenance() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="performedAt">Date Performed *</Label>
-                      <Input id="performedAt" name="performedAt" type="date" required className="input-client" />
+                      <Label>Date Performed *</Label>
+                      <DatePickerWithYearNav
+                        date={performedAtDate}
+                        onDateChange={setPerformedAtDate}
+                        placeholder="Select date performed"
+                      />
                     </div>
                   </div>
 
@@ -247,14 +258,22 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
+                  <div className="input-client">
                     <div>
-                      <Label htmlFor="garageEntryDate">Garage Entry Date</Label>
-                      <Input id="garageEntryDate" name="garageEntryDate" type="date" className="input-client" />
+                      <Label>Garage Entry Date</Label>
+                      <DatePickerWithYearNav
+                        date={garageEntryDate}
+                        onDateChange={setGarageEntryDate}
+                        placeholder="Select entry date"
+                      />
                     </div>
                     <div>
-                      <Label htmlFor="garageExitDate">Garage Exit Date</Label>
-                      <Input id="garageExitDate" name="garageExitDate" type="date" className="input-client" />
+                      <Label>Garage Exit Date</Label>
+                      <DatePickerWithYearNav
+                        date={garageExitDate}
+                        onDateChange={setGarageExitDate}
+                        placeholder="Select exit date"
+                      />
                     </div>
                   </div>
 
@@ -376,13 +395,11 @@ export default function Maintenance() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="edit-performedAt">Date Performed *</Label>
-                      <Input 
-                        id="edit-performedAt" 
-                        type="date" 
-                        value={editFormData.performedAt} 
-                        onChange={(e) => setEditFormData({...editFormData, performedAt: e.target.value})}
-                        className="input-client" 
+                      <Label>Date Performed *</Label>
+                      <DatePickerWithYearNav
+                        date={editPerformedAtDate}
+                        onDateChange={setEditPerformedAtDate}
+                        placeholder="Select date performed"
                       />
                     </div>
                   </div>
@@ -421,25 +438,21 @@ export default function Maintenance() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
+                  <div className="input-client">
                     <div>
-                      <Label htmlFor="edit-garageEntryDate">Garage Entry Date</Label>
-                      <Input 
-                        id="edit-garageEntryDate" 
-                        type="date" 
-                        value={editFormData.garageEntryDate} 
-                        onChange={(e) => setEditFormData({...editFormData, garageEntryDate: e.target.value})}
-                        className="input-client" 
+                      <Label>Garage Entry Date</Label>
+                      <DatePickerWithYearNav
+                        date={editGarageEntryDate}
+                        onDateChange={setEditGarageEntryDate}
+                        placeholder="Select entry date"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-garageExitDate">Garage Exit Date</Label>
-                      <Input 
-                        id="edit-garageExitDate" 
-                        type="date" 
-                        value={editFormData.garageExitDate} 
-                        onChange={(e) => setEditFormData({...editFormData, garageExitDate: e.target.value})}
-                        className="input-client" 
+                      <Label>Garage Exit Date</Label>
+                      <DatePickerWithYearNav
+                        date={editGarageExitDate}
+                        onDateChange={setEditGarageExitDate}
+                        placeholder="Select exit date"
                       />
                     </div>
                   </div>

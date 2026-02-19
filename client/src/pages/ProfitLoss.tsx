@@ -19,6 +19,7 @@ import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function ProfitLoss() {
   const [dateRange, setDateRange] = useState<{
@@ -28,6 +29,8 @@ export default function ProfitLoss() {
     startDate: "",
     endDate: "",
   });
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
 
   // Fetch financial overview
   const { data: financialData, isLoading: isLoadingFinancial } = trpc.profitLoss.getFinancialOverview.useQuery({
@@ -272,23 +275,25 @@ export default function ProfitLoss() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <Label htmlFor="startDate">Start Date</Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={dateRange.startDate}
-                onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                className="input-client"
+              <Label>Start Date</Label>
+              <DatePickerWithYearNav
+                date={startDate}
+                onDateChange={(date) => {
+                  setStartDate(date);
+                  setDateRange({ ...dateRange, startDate: date?.toISOString().split('T')[0] || '' });
+                }}
+                placeholder="Select start date"
               />
             </div>
             <div>
-              <Label htmlFor="endDate">End Date</Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={dateRange.endDate}
-                onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                className="input-client"
+              <Label>End Date</Label>
+              <DatePickerWithYearNav
+                date={endDate}
+                onDateChange={(date) => {
+                  setEndDate(date);
+                  setDateRange({ ...dateRange, endDate: date?.toISOString().split('T')[0] || '' });
+                }}
+                placeholder="Select end date"
               />
             </div>
             <div className="flex items-end gap-2">

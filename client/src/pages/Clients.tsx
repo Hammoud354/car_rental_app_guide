@@ -13,6 +13,7 @@ import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
@@ -49,12 +50,14 @@ export default function Clients() {
   // Form state for create
   const [createLicenseIssueDate, setCreateLicenseIssueDate] = useState<Date>();
   const [createLicenseExpiryDate, setCreateLicenseExpiryDate] = useState<Date>();
+  const [createDateOfBirth, setCreateDateOfBirth] = useState<Date>();
   const [createNationalityOpen, setCreateNationalityOpen] = useState(false);
   const [createSelectedNationality, setCreateSelectedNationality] = useState<string>("");
   
   // Form state for edit
   const [editLicenseIssueDate, setEditLicenseIssueDate] = useState<Date>();
   const [editLicenseExpiryDate, setEditLicenseExpiryDate] = useState<Date>();
+  const [editDateOfBirth, setEditDateOfBirth] = useState<Date>();
   const [editNationalityOpen, setEditNationalityOpen] = useState(false);
   const [editSelectedNationality, setEditSelectedNationality] = useState<string>("");
 
@@ -311,8 +314,12 @@ export default function Clients() {
                       <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                     </div>
                     <div>
-                      <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                      <Input id="dateOfBirth" name="dateOfBirth" type="date" className="input-client" />
+                      <Label>Date of Birth</Label>
+                      <DatePickerWithYearNav
+                        date={createDateOfBirth}
+                        onDateChange={setCreateDateOfBirth}
+                        placeholder="Select date of birth"
+                      />
                     </div>
                     <div>
                       <Label htmlFor="placeOfBirth">Place of Birth</Label>
@@ -644,13 +651,11 @@ export default function Clients() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-dateOfBirth">Date of Birth</Label>
-                    <Input 
-                      id="edit-dateOfBirth" 
-                      name="dateOfBirth" 
-                      type="date" 
-                      defaultValue={selectedClient.dateOfBirth || ""}
-                      className="input-client" 
+                    <Label>Date of Birth</Label>
+                    <DatePickerWithYearNav
+                      date={editDateOfBirth}
+                      onDateChange={setEditDateOfBirth}
+                      placeholder="Select date of birth"
                     />
                   </div>
                   <div>

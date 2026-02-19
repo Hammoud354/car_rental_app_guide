@@ -4819,13 +4819,22 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure S3 URL is accessible and valid
 - [x] Test logo display with uploaded image (works when logo is uploaded)
 
-### Unified Calendar Format
-- [x] Standardize all date pickers to use same calendar component
+### Unified Calendar Format - COMPLETE
+- [x] Standardize all date pickers to use same calendar component (DatePickerWithYearNav)
 - [x] Apply consistent format to Insurance Start Date
 - [x] Apply consistent format to Insurance Expiry Date
 - [x] Apply consistent format to Registration Expiry Date
 - [x] Ensure no variation in layout, interaction, or display format
 - [x] Test date picker consistency across all forms
+- [x] Replace all HTML date inputs with DatePickerWithYearNav across entire app
+- [x] Standardize Clients page date of birth picker
+- [x] Standardize Maintenance page date pickers (performedAt, garageEntry, garageExit)
+- [x] Standardize MaintenanceTracking page date picker
+- [x] Standardize ProfitAndLoss page date range pickers
+- [x] Standardize ProfitLoss page date range pickers
+- [x] Standardize VehicleDetails page service date picker
+- [x] Verify all date pickers use identical component and styling
+- [x] Zero variations in layout, interaction, or display format across all pages
 
 ### Prevent Duplicate Contract Completion
 - [x] Add button disable state after first click

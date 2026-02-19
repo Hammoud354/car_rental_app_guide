@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function MaintenanceTracking() {
   const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
+  const [nextMaintenanceDate, setNextMaintenanceDate] = useState<Date>();
 
   const { data: vehicles, refetch } = trpc.fleet.list.useQuery();
 
@@ -238,16 +240,11 @@ export default function MaintenanceTracking() {
             {selectedVehicle && (
               <>
                 <div className="space-y-2 input-client">
-                  <Label htmlFor="nextMaintenanceDate">Next Maintenance Date</Label>
-                  <Input
-                    id="nextMaintenanceDate"
-                    name="nextMaintenanceDate"
-                    type="date"
-                    defaultValue={
-                      vehicles?.find(v => v.id === selectedVehicle)?.nextMaintenanceDate
-                        ? new Date(vehicles.find(v => v.id === selectedVehicle)!.nextMaintenanceDate!).toISOString().split('T')[0]
-                        : ""
-                    }
+                  <Label>Next Maintenance Date</Label>
+                  <DatePickerWithYearNav
+                    date={nextMaintenanceDate}
+                    onDateChange={setNextMaintenanceDate}
+                    placeholder="Select maintenance date"
                   />
                 </div>
 

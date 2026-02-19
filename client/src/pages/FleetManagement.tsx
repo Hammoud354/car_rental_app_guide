@@ -64,6 +64,14 @@ export default function FleetManagement() {
   const [registrationExpiryDate, setRegistrationExpiryDate] = useState<Date | undefined>();
   const [editRegistrationExpiryDate, setEditRegistrationExpiryDate] = useState<Date | undefined>();
 
+  // Additional date states
+  const [nextMaintenanceDate, setNextMaintenanceDate] = useState<Date | undefined>();
+  const [editNextMaintenanceDate, setEditNextMaintenanceDate] = useState<Date | undefined>();
+  const [purchaseDate, setPurchaseDate] = useState<Date | undefined>();
+  const [editPurchaseDate, setEditPurchaseDate] = useState<Date | undefined>();
+  const [lastServiceDate, setLastServiceDate] = useState<Date | undefined>();
+  const [editLastServiceDate, setEditLastServiceDate] = useState<Date | undefined>();
+
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
@@ -599,8 +607,12 @@ export default function FleetManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="nextMaintenanceDate">Next Maintenance Date</Label>
-                  <Input id="nextMaintenanceDate" name="nextMaintenanceDate" type="date" />
+                  <Label>Next Maintenance Date</Label>
+                  <DatePickerWithYearNav
+                    date={nextMaintenanceDate}
+                    onDateChange={setNextMaintenanceDate}
+                    placeholder="Select maintenance date"
+                  />
                 </div>
 
                 <div>
@@ -671,8 +683,12 @@ export default function FleetManagement() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="purchaseDate">Purchase Date</Label>
-                      <Input id="purchaseDate" name="purchaseDate" type="date" />
+                      <Label>Purchase Date</Label>
+                      <DatePickerWithYearNav
+                        date={editPurchaseDate}
+                        onDateChange={setEditPurchaseDate}
+                        placeholder="Select purchase date"
+                      />
                     </div>
                   </div>
 
@@ -716,8 +732,12 @@ export default function FleetManagement() {
                     </div>
                     
                     <div>
-                      <Label htmlFor="lastServiceDate">Last Service Date</Label>
-                      <Input id="lastServiceDate" name="lastServiceDate" type="date" />
+                      <Label>Last Service Date</Label>
+                      <DatePickerWithYearNav
+                        date={editLastServiceDate}
+                        onDateChange={setEditLastServiceDate}
+                        placeholder="Select last service date"
+                      />
                     </div>
                   </div>
 
