@@ -1328,10 +1328,12 @@ export const appRouter = router({
         localCurrencyCode: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        console.log('[updateProfile mutation] Called with input:', { exchangeRate: input.exchangeRate, localCurrencyCode: input.localCurrencyCode });
         const profile = await db.upsertCompanyProfile({
           userId: ctx.user.id,
           ...input,
         });
+        console.log('[updateProfile mutation] Result:', { exchangeRate: profile?.exchangeRate, localCurrencyCode: profile?.localCurrencyCode });
         return profile;
       }),
 

@@ -1698,6 +1698,9 @@ export async function upsertCompanyProfile(data: {
   
   if (existing) {
     // Update existing profile
+    console.log('[upsertCompanyProfile] Updating with exchangeRate:', data.exchangeRate, 'localCurrencyCode:', localCurrencyCode);
+    const finalExchangeRate = data.exchangeRate !== undefined && data.exchangeRate !== null ? String(data.exchangeRate) : existing.exchangeRate;
+    console.log('[upsertCompanyProfile] Final exchangeRate to save:', finalExchangeRate);
     await db
       .update(companyProfiles)
       .set({
@@ -1716,12 +1719,14 @@ export async function upsertCompanyProfile(data: {
         contractTemplateUrl: data.contractTemplateUrl,
         contractTemplateFieldMap: data.contractTemplateFieldMap,
         defaultCurrency: data.defaultCurrency,
-        exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : undefined,
+        exchangeRate: data.exchangeRate !== undefined && data.exchangeRate !== null ? String(data.exchangeRate) : existing.exchangeRate,
         localCurrencyCode: localCurrencyCode,
       })
       .where(eq(companyProfiles.userId, data.userId));
     
-    return await getCompanyProfile(data.userId);
+    const updated = await getCompanyProfile(data.userId);
+    console.log('[upsertCompanyProfile] After update - exchangeRate:', updated?.exchangeRate, 'localCurrencyCode:', updated?.localCurrencyCode);
+    return updated;
   } else {
     // Create new profile
     const createData = {

@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, userId, exchangeRate, localCurrencyCode, defaultCurrency FROM companyProfiles WHERE userId IN (SELECT id FROM users WHERE username = 'testuser2') LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, exchangeRate, localCurrencyCode, defaultCurrency FROM companyProfiles WHERE userId IN (SELECT id FROM users WHERE username = 'testuser2') LIMIT 1;",
+  "rows": [
+    {
+      "id": "270001",
+      "userId": "1740020",
+      "exchangeRate": "1.0000",
+      "localCurrencyCode": "LBP",
+      "defaultCurrency": "USD"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\texchangeRate\tlocalCurrencyCode\tdefaultCurrency\n270001\t1740020\t1.0000\tLBP\tUSD\n",
+  "stderr": "",
+  "execution_time_ms": 1638
+}

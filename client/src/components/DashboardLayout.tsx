@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
+import { trpc } from "@/lib/trpc";
 import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
@@ -110,6 +111,7 @@ function DashboardLayoutContent({
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
+  const { data: profile } = trpc.company.getProfile.useQuery();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -171,9 +173,21 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
-                  </span>
+                  {profile?.logoUrl && (
+                    <img
+                      src={profile.logoUrl}
+                      alt="Company Logo"
+                      className="h-8 w-8 rounded object-cover shrink-0"
+                    />
+                  )}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-semibold tracking-tight truncate">
+                      {profile?.companyName || "Company"}
+                    </span>
+                    <span className="text-xs text-muted-foreground truncate">
+                      Management System
+                    </span>
+                  </div>
                 </div>
               ) : null}
             </div>

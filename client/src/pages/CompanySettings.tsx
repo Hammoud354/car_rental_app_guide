@@ -205,6 +205,7 @@ export default function CompanySettings() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    alert('handleSubmit called!');
     e.preventDefault();
 
     try {
@@ -226,12 +227,14 @@ export default function CompanySettings() {
         }
       }
 
+      console.log('[handleSubmit] exchangeRate formData:', formData.exchangeRate);
       const updateData: any = {
         ...formData,
         logoUrl,
         contractTemplateUrl,
         exchangeRate: parseFloat(formData.exchangeRate) || 1,
       };
+      console.log('[handleSubmit] final exchangeRate:', updateData.exchangeRate);
       await updateProfile.mutateAsync(updateData);
 
       await refetch();
@@ -279,7 +282,7 @@ export default function CompanySettings() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 input-client">
+      <div className="space-y-6 input-client">
         {/* Company Logo */}
         <Card>
           <CardHeader>
@@ -520,7 +523,10 @@ export default function CompanySettings() {
                   type="number"
                   step="0.0001"
                   value={formData.exchangeRate}
-                  onChange={(e) => setFormData({ ...formData, exchangeRate: e.target.value })}
+                  onChange={(e) => {
+                    console.log('[ExchangeRate Input] Raw value:', e.target.value, 'Type:', typeof e.target.value);
+                    setFormData({ ...formData, exchangeRate: e.target.value });
+                  }}
                   placeholder="1.0000"
                 />
                 <p className="text-xs text-muted-foreground mt-1">Local currency to USD conversion rate</p>
@@ -531,7 +537,29 @@ export default function CompanySettings() {
 
         <div className="flex justify-end items-center input-client">
           <Button
-            type="submit"
+            onClick={async () => {
+              try {
+                const testData = {
+                  ...formData,
+                  exchangeRate: parseFloat(formData.exchangeRate) || 1,
+                };
+                console.log('Sending mutation with:', testData);
+                const result = await updateProfile.mutateAsync(testData);
+                console.log('Mutation result:', result);
+                await refetch();
+                toast({
+                  title: "Success",
+                  description: "Company profile updated successfully!",
+                });
+              } catch (error) {
+                console.error('Mutation error:', error);
+                toast({
+                  title: "Error",
+                  description: "Failed to update company profile. Please try again.",
+                  variant: "destructive",
+                });
+              }
+            }}
             disabled={updateProfile.isPending || uploading}
           >
             {(updateProfile.isPending || uploading) && (
@@ -540,7 +568,7 @@ export default function CompanySettings() {
             Save Changes
           </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
