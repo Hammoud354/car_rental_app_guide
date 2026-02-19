@@ -4950,3 +4950,16 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Show options that were added during contract creation
 - [x] Include options in inspection form for reference
 - [x] Ensure options are visible before completing contract
+
+
+### P&L Card Click Issue
+- [x] Fix P&L Revenue card click handler
+- [x] Fix P&L Expenses card click handler
+- [x] Fix P&L Net Profit card click handler
+- [x] Verify modals open with correct data
+
+### Currency Settings Issues
+- [x] Fix currency settings not persisting to database
+- [x] Display actual country currency code instead of "Local Currency" text
+- [x] Ensure exchange rate saves correctly
+- [x] Verify currency selection persists on page reload

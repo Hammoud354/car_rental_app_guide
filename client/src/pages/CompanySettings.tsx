@@ -500,7 +500,7 @@ export default function CompanySettings() {
                   className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 >
                   <option value="USD">USD</option>
-                  <option value="LOCAL">Local Currency</option>
+                  <option value="LOCAL">{formData.localCurrencyCode || 'Local Currency'}</option>
                 </select>
               </div>
               <div>
