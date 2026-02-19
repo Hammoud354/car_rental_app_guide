@@ -320,7 +320,7 @@ export default function Invoices() {
 
         {/* Invoice Details Dialog */}
         <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
-          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
               <DialogTitle>Invoice Details</DialogTitle>
             </DialogHeader>
@@ -340,9 +340,9 @@ export default function Invoices() {
             ) : (
               <div className="space-y-6">
                 {/* Invoice Content for PDF Export */}
-                <div id="invoice-content" className="bg-white text-black p-8 space-y-6 print:block">
+                <div id="invoice-content" className="bg-white text-black p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 print:block">
                   {/* Company Header */}
-                  <div className="flex justify-between items-start border-b pb-6">
+                  <div className="flex flex-col sm:flex-row justify-between items-start border-b pb-4 sm:pb-6 gap-4">
                     <div className="space-y-2">
                       {companyProfile?.logoUrl && (
                         <img

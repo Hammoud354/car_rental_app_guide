@@ -27,6 +27,9 @@ export default function CompanySettings() {
     website: "",
     logoUrl: "",
     contractTemplateUrl: "",
+    defaultCurrency: "USD" as "USD" | "LOCAL",
+    exchangeRate: "1.0000",
+    localCurrencyCode: "LBP",
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -50,6 +53,9 @@ export default function CompanySettings() {
         website: profile.website || "",
         logoUrl: profile.logoUrl || "",
         contractTemplateUrl: profile.contractTemplateUrl || "",
+        defaultCurrency: (profile.defaultCurrency as "USD" | "LOCAL") || "USD",
+        exchangeRate: profile.exchangeRate?.toString() || "1.0000",
+        localCurrencyCode: profile.localCurrencyCode || "LBP",
       });
       if (profile.logoUrl) {
         setLogoPreview(profile.logoUrl);
@@ -102,11 +108,13 @@ export default function CompanySettings() {
       // Save to database immediately
       // Ensure companyName is not empty (required field)
       const companyName = formData.companyName?.trim() || 'My Company';
-      await updateProfile.mutateAsync({
+      const updateData: any = {
         ...formData,
         companyName,
         contractTemplateUrl: url,
-      });
+        exchangeRate: parseFloat(formData.exchangeRate) || 1,
+      };
+      await updateProfile.mutateAsync(updateData);
 
       await refetch();
 
@@ -218,11 +226,13 @@ export default function CompanySettings() {
         }
       }
 
-      await updateProfile.mutateAsync({
+      const updateData: any = {
         ...formData,
         logoUrl,
         contractTemplateUrl,
-      });
+        exchangeRate: parseFloat(formData.exchangeRate) || 1,
+      };
+      await updateProfile.mutateAsync(updateData);
 
       await refetch();
       
@@ -466,6 +476,54 @@ export default function CompanySettings() {
                     Configure Field Positions
                   </Button>
                 )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Currency Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Currency Settings</CardTitle>
+            <CardDescription>
+              Configure your default operating currency and exchange rates.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 input-client">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
+              <div>
+                <Label htmlFor="defaultCurrency">Default Operating Currency</Label>
+                <select
+                  id="defaultCurrency"
+                  value={formData.defaultCurrency}
+                  onChange={(e) => setFormData({ ...formData, defaultCurrency: e.target.value as any })}
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background"
+                >
+                  <option value="USD">USD</option>
+                  <option value="LOCAL">Local Currency</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="localCurrencyCode">Local Currency Code</Label>
+                <Input
+                  id="localCurrencyCode"
+                  value={formData.localCurrencyCode}
+                  onChange={(e) => setFormData({ ...formData, localCurrencyCode: e.target.value })}
+                  placeholder="e.g., LBP"
+                  maxLength={3}
+                />
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="exchangeRate">Exchange Rate</Label>
+                <Input
+                  id="exchangeRate"
+                  type="number"
+                  step="0.0001"
+                  value={formData.exchangeRate}
+                  onChange={(e) => setFormData({ ...formData, exchangeRate: e.target.value })}
+                  placeholder="1.0000"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Local currency to USD conversion rate</p>
               </div>
             </div>
           </CardContent>

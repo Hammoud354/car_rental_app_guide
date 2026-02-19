@@ -337,6 +337,7 @@ export const appRouter = router({
           insuranceProvider: z.string().max(200).optional(),
           insurancePolicyStartDate: z.date().optional(),
           insuranceExpiryDate: z.date().optional(),
+          registrationExpiryDate: z.date().optional(),
           insuranceAnnualPremium: z.string().optional(),
           insuranceCost: z.string().optional(),
           purchaseCost: z.string().optional(),
@@ -1322,6 +1323,9 @@ export const appRouter = router({
         secondaryColor: z.string().optional(),
         contractTemplateUrl: z.string().optional(),
         contractTemplateFieldMap: z.any().optional(), // JSON field mapping
+        defaultCurrency: z.enum(["USD", "LOCAL"]).optional(),
+        exchangeRate: z.number().optional(),
+        localCurrencyCode: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const profile = await db.upsertCompanyProfile({

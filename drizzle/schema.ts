@@ -65,6 +65,9 @@ export const companyProfiles = mysqlTable("companyProfiles", {
   secondaryColor: varchar("secondaryColor", { length: 7 }), // Hex color code
   contractTemplateUrl: text("contractTemplateUrl"), // S3 URL for contract template image
   contractTemplateFieldMap: json("contractTemplateFieldMap"), // JSON mapping of field positions {fieldName: {x, y, fontSize, alignment}}
+  defaultCurrency: mysqlEnum("defaultCurrency", ["USD", "LOCAL"]).default("USD").notNull(), // Default operating currency
+  exchangeRate: decimal("exchangeRate", { precision: 10, scale: 4 }).default("1.0000").notNull(), // Exchange rate for local currency to USD
+  localCurrencyCode: varchar("localCurrencyCode", { length: 3 }).default("LBP"), // Local currency code (e.g., LBP, EUR)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

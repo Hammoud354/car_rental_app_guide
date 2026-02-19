@@ -251,28 +251,7 @@ export default function Reservations() {
           </CardContent>
         </Card>
 
-        {/* Legend */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Calendar Legend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-blue-50 border border-blue-300 rounded"></div>
-                <span>Today</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-50 border border-gray-200 rounded"></div>
-                <span>Past Date</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-white border border-gray-200 rounded"></div>
-                <span>Future Date</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+
 
         {isLoading && (
           <div className="text-center py-8 text-gray-500">Loading reservations...</div>

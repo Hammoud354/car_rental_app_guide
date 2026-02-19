@@ -4808,3 +4808,58 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure final invoice total reflects insurance calculation
 - [x] Synchronize backend calculation with frontend display
 - [x] Verify contract, invoice preview, and PDF totals match exactly
+
+
+## System Corrections and Functional Adjustments
+
+### Logo Display Fix
+- [x] Debug why company logo is not appearing on dashboard
+- [x] Verify company profile query is returning logoUrl
+- [x] Check image rendering in Dashboard component
+- [x] Ensure S3 URL is accessible and valid
+- [x] Test logo display with uploaded image (works when logo is uploaded)
+
+### Unified Calendar Format
+- [x] Standardize all date pickers to use same calendar component
+- [x] Apply consistent format to Insurance Start Date
+- [x] Apply consistent format to Insurance Expiry Date
+- [x] Apply consistent format to Registration Expiry Date
+- [x] Ensure no variation in layout, interaction, or display format
+- [x] Test date picker consistency across all forms
+
+### Prevent Duplicate Contract Completion
+- [x] Add button disable state after first click
+- [x] Implement backend idempotency check
+- [x] Redirect to main contract page after completion
+- [x] Lock button instantly to prevent multiple submissions
+- [x] Test duplicate submission prevention
+
+### Vehicle Inspection Back Navigation
+- [x] Add visible "Back" button to Vehicle Inspection page
+- [x] Preserve all previously entered contract data
+- [x] Return to main contract form without data loss
+- [x] Test back navigation flow
+
+### Remove Reservation Legend
+- [x] Remove legend section from Reservation page
+- [x] Remove any placeholder containers
+- [x] Remove spacing remnants
+- [x] Verify clean removal with no visual artifacts
+
+### Exchange Rate and Currency Logic
+- [x] Add Exchange Rate field in Company Settings
+- [x] Allow manual update of exchange rate value
+- [x] Auto-detect country on signup and set local currency
+- [x] Add default currency selection (USD or Local)
+- [x] Apply exchange rate dynamically in conversions
+- [x] Ensure all invoices follow selected default currency
+- [x] Verify totals consistency across UI and PDFs
+- [x] Test currency conversion logic
+
+### Invoice Details Screen Fit
+- [x] Make invoice view automatically fit to screen
+- [x] Implement responsive scaling for all device resolutions
+- [x] Ensure no horizontal scrolling
+- [x] Keep margins and tables fully visible
+- [x] Prevent overflow beyond screen boundaries
+- [x] Test on mobile, tablet, and desktop viewports

@@ -39,14 +39,16 @@ interface ContractData {
 interface CarDamageInspectionProps {
   onComplete: (damageMarks: DamageMark[], signatureData: string, fuelLevel: string) => void;
   onCancel: () => void;
+  onBack?: () => void;
   contractData?: ContractData;
 }
 
-export default function CarDamageInspection({ onComplete, onCancel, contractData }: CarDamageInspectionProps) {
+export default function CarDamageInspection({ onComplete, onCancel, onBack, contractData }: CarDamageInspectionProps) {
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
   const [fuelLevel, setFuelLevel] = useState<string>("Full");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const carDiagramRef = useRef<HTMLDivElement>(null);
 
   const handleCarClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -90,9 +92,9 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
 
 
 
-  const handleSubmit = () => {
-    // No signature validation needed since it's now a printable field
-    // Pass empty string for signatureData since signature will be added when printed
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     onComplete(damageMarks, "", fuelLevel);
   };
 
@@ -495,22 +497,36 @@ export default function CarDamageInspection({ onComplete, onCancel, contractData
 
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-4 print:hidden">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={() => window.print()}
-          className="flex items-center gap-2"
-        >
-          <Printer className="h-4 w-4" />
-          Print Inspection
-        </Button>
-        <Button type="button" onClick={handleSubmit} className="bg-black hover:bg-gray-800 text-white">
-          Complete Contract
-        </Button>
+      <div className="flex justify-between gap-4 print:hidden">
+        <div className="flex gap-2">
+          {onBack && (
+            <Button type="button" variant="outline" onClick={onBack}>
+              Back to Contract
+            </Button>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => window.print()}
+            className="flex items-center gap-2"
+          >
+            <Printer className="h-4 w-4" />
+            Print Inspection
+          </Button>
+          <Button 
+            type="button" 
+            onClick={handleSubmit} 
+            className="bg-black hover:bg-gray-800 text-white"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Completing..." : "Complete Contract"}
+          </Button>
+        </div>
       </div>
     </div>
   );

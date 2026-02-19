@@ -59,6 +59,10 @@ export default function FleetManagement() {
   const [insuranceExpiryDate, setInsuranceExpiryDate] = useState<Date | undefined>();
   const [editInsuranceStartDate, setEditInsuranceStartDate] = useState<Date | undefined>();
   const [editInsuranceExpiryDate, setEditInsuranceExpiryDate] = useState<Date | undefined>();
+  
+  // Registration expiry date states
+  const [registrationExpiryDate, setRegistrationExpiryDate] = useState<Date | undefined>();
+  const [editRegistrationExpiryDate, setEditRegistrationExpiryDate] = useState<Date | undefined>();
 
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
@@ -104,19 +108,21 @@ export default function FleetManagement() {
     }
   }, [selectedVehicle, editCarModels, editSelectedMakerId]);
   
-  // Initialize insurance dates when vehicle is selected for editing
+  // Initialize insurance and registration dates when vehicle is selected for editing
   useEffect(() => {
     if (selectedVehicle) {
       setEditInsuranceStartDate(selectedVehicle.insurancePolicyStartDate ? new Date(selectedVehicle.insurancePolicyStartDate) : undefined);
       setEditInsuranceExpiryDate(selectedVehicle.insuranceExpiryDate ? new Date(selectedVehicle.insuranceExpiryDate) : undefined);
+      setEditRegistrationExpiryDate(selectedVehicle.registrationExpiryDate ? new Date(selectedVehicle.registrationExpiryDate) : undefined);
     }
   }, [selectedVehicle]);
   
-  // Reset insurance dates when Add dialog closes
+  // Reset insurance and registration dates when Add dialog closes
   useEffect(() => {
     if (!isAddDialogOpen) {
       setInsuranceStartDate(undefined);
       setInsuranceExpiryDate(undefined);
+      setRegistrationExpiryDate(undefined);
     }
   }, [isAddDialogOpen]);
   
@@ -234,7 +240,7 @@ export default function FleetManagement() {
       insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
-      registrationExpiryDate: formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined,
+      registrationExpiryDate: registrationExpiryDate || (formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined),
       nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
       notes: formData.get("notes") as string || undefined,
       targetUserId: selectedTargetUserId || undefined, // For Super Admin to assign to specific user
@@ -282,6 +288,7 @@ export default function FleetManagement() {
         insuranceProvider: formData.get("insuranceProvider") as string || undefined,
         insurancePolicyStartDate: editInsuranceStartDate,
         insuranceExpiryDate: editInsuranceExpiryDate,
+      registrationExpiryDate: editRegistrationExpiryDate,
         insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
@@ -584,8 +591,12 @@ export default function FleetManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="registrationExpiryDate">Registration Expiry Date</Label>
-                  <Input id="registrationExpiryDate" name="registrationExpiryDate" type="date" />
+                  <Label>Registration Expiry Date</Label>
+                  <DatePickerWithYearNav
+                    date={registrationExpiryDate}
+                    onDateChange={setRegistrationExpiryDate}
+                    placeholder="Select expiry date"
+                  />
                 </div>
 
                 <div>
@@ -1122,6 +1133,15 @@ export default function FleetManagement() {
                       defaultValue={selectedVehicle.insuranceAnnualPremium || ""}
                     />
                   </div>
+                </div>
+
+                <div>
+                  <Label>Registration Expiry Date</Label>
+                  <DatePickerWithYearNav
+                    date={editRegistrationExpiryDate}
+                    onDateChange={setEditRegistrationExpiryDate}
+                    placeholder="Select expiry date"
+                  />
                 </div>
 
                 <div>

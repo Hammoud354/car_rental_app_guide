@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, userId, companyName, logoUrl FROM companyProfiles LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, companyName, logoUrl FROM companyProfiles LIMIT 5;",
+  "rows": [
+    {
+      "id": "120001",
+      "userId": "870167",
+      "companyName": "Dima Rent a Car",
+      "logoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771412335146.png"
+    },
+    {
+      "id": "150001",
+      "userId": "1470001",
+      "companyName": "Dima Rent a car",
+      "logoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771413526567.png"
+    },
+    {
+      "id": "180001",
+      "userId": "841246",
+      "companyName": "My Company",
+      "logoUrl": "NULL"
+    },
+    {
+      "id": "210001",
+      "userId": "1620001",
+      "companyName": "dima rent a car",
+      "logoUrl": ""
+    },
+    {
+      "id": "240001",
+      "userId": "870189",
+      "companyName": "Test",
+      "logoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771481761958.png"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcompanyName\tlogoUrl\n120001\t870167\tDima Rent a Car\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771412335146.png\n150001\t1470001\tDima Rent a car\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771413526567.png\n180001\t841246\tMy Company\tNULL\n210001\t1620001\tdima rent a car\t\n240001\t870189\tTest\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771481761958.png\n",
+  "stderr": "",
+  "execution_time_ms": 1548
+}
