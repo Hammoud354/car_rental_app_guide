@@ -173,13 +173,17 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  {profile?.logoUrl && (
+                  {profile?.logoUrl ? (
                     <img
                       src={profile.logoUrl}
                       alt="Company Logo"
                       className="h-10 w-auto object-contain shrink-0"
+                      onError={(e) => {
+                        console.log("Logo failed to load from:", profile.logoUrl);
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
                     />
-                  )}
+                  ) : null}
                   <div className="flex flex-col min-w-0">
                     <span className="text-sm font-semibold tracking-tight truncate">
                       {profile?.companyName || "Company"}
