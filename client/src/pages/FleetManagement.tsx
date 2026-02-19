@@ -564,23 +564,22 @@ export default function FleetManagement() {
                     <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Policy Start Date</Label>
-                      <DatePickerWithYearNav
-                        date={insuranceStartDate}
-                        onDateChange={setInsuranceStartDate}
-                        placeholder="Select start date"
-                      />
-                    </div>
-                    <div>
-                      <Label>Policy Expiry Date</Label>
-                      <DatePickerWithYearNav
-                        date={insuranceExpiryDate}
-                        onDateChange={setInsuranceExpiryDate}
-                        placeholder="Select expiry date"
-                      />
-                    </div>
+                  <div>
+                    <Label>Policy Start Date</Label>
+                    <DatePickerWithYearNav
+                      date={insuranceStartDate}
+                      onDateChange={setInsuranceStartDate}
+                      placeholder="Select start date"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Policy Expiry Date</Label>
+                    <DatePickerWithYearNav
+                      date={insuranceExpiryDate}
+                      onDateChange={setInsuranceExpiryDate}
+                      placeholder="Select expiry date"
+                    />
                   </div>
 
                   <div>
@@ -1102,23 +1101,22 @@ export default function FleetManagement() {
                     <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Policy Start Date</Label>
-                      <DatePickerWithYearNav
-                        date={editInsuranceStartDate}
-                        onDateChange={setEditInsuranceStartDate}
-                        placeholder="Select start date"
-                      />
-                    </div>
-                    <div>
-                      <Label>Policy Expiry Date</Label>
-                      <DatePickerWithYearNav
-                        date={editInsuranceExpiryDate}
-                        onDateChange={setEditInsuranceExpiryDate}
-                        placeholder="Select expiry date"
-                      />
-                    </div>
+                  <div>
+                    <Label>Policy Start Date</Label>
+                    <DatePickerWithYearNav
+                      date={editInsuranceStartDate}
+                      onDateChange={setEditInsuranceStartDate}
+                      placeholder="Select start date"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Policy Expiry Date</Label>
+                    <DatePickerWithYearNav
+                      date={editInsuranceExpiryDate}
+                      onDateChange={setEditInsuranceExpiryDate}
+                      placeholder="Select expiry date"
+                    />
                   </div>
 
                   <div>
