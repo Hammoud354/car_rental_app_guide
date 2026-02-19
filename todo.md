@@ -4958,6 +4958,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix P&L Net Profit card click handler
 - [x] Verify modals open with correct data
 
+### P&L Modal Redesign for Non-Financial Users
+- [x] Redesign modal with simplified language (Money In/Out instead of Revenue/Expenses)
+- [x] Add visual emojis and color-coded sections
+- [x] Provide plain English explanations for each metric
+- [x] Show profit calculation as step-by-step equation
+- [x] Add friendly messaging for profits and losses
+- [x] Test modal display and interactions
+
 ### Currency Settings Issues
 - [x] Fix currency settings not persisting to database
 - [x] Display actual country currency code instead of "Local Currency" text

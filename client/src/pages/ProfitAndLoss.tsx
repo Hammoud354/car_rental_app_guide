@@ -220,81 +220,154 @@ export default function ProfitAndLoss() {
 
       {/* Detailed Breakdown Modal */}
       <Dialog open={!!selectedBreakdown} onOpenChange={() => setSelectedBreakdown(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>
-              {selectedBreakdown?.type === "revenue" && "Revenue Breakdown"}
-              {selectedBreakdown?.type === "expenses" && "Expense Breakdown"}
-              {selectedBreakdown?.type === "profit" && "Profit Calculation"}
+            <DialogTitle className="text-2xl">
+              {selectedBreakdown?.type === "revenue" && "Money Coming In"}
+              {selectedBreakdown?.type === "expenses" && "Money Going Out"}
+              {selectedBreakdown?.type === "profit" && "Your Financial Summary"}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             {selectedBreakdown?.type === "revenue" && (
               <div>
-                <p className="text-sm text-gray-600 mb-4">
-                  All invoices and payments collected during the selected period
-                </p>
+                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded mb-4">
+                  <p className="font-semibold text-green-900 text-lg">💰 Money You Received</p>
+                  <p className="text-sm text-green-700 mt-1">
+                    These are all the payments from customers who rented your vehicles
+                  </p>
+                </div>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {selectedBreakdown.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <div>
-                        <p className="font-medium">{item.invoiceNumber}</p>
-                        <p className="text-sm text-gray-600">
-                          {item.clientName} • {new Date(item.invoiceDate).toLocaleDateString()}
-                        </p>
+                  {selectedBreakdown.items.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">No revenue in this period</p>
+                  ) : (
+                    selectedBreakdown.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-4 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{item.clientName}</p>
+                          <p className="text-xs text-gray-600">
+                            Invoice #{item.invoiceNumber} • {new Date(item.invoiceDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <p className="font-bold text-green-600 text-lg">${item.amount.toFixed(2)}</p>
                       </div>
-                      <p className="font-semibold text-green-600">${item.amount.toFixed(2)}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
+                </div>
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between items-center p-4 bg-green-100 rounded font-bold">
+                    <span className="text-green-900">Total Received</span>
+                    <span className="text-green-600 text-xl">${selectedBreakdown.total?.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             )}
 
             {selectedBreakdown?.type === "expenses" && (
               <div>
-                <p className="text-sm text-gray-600 mb-4">
-                  All expenses including maintenance, insurance, and other costs
-                </p>
+                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-4">
+                  <p className="font-semibold text-red-900 text-lg">💸 Money You Spent</p>
+                  <p className="text-sm text-red-700 mt-1">
+                    These are all the costs to keep your vehicles running and maintained
+                  </p>
+                </div>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
-                  {selectedBreakdown.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 rounded">
-                      <div>
-                        <p className="font-medium">{item.category}</p>
-                        <p className="text-sm text-gray-600">
-                          {item.description} • {new Date(item.date).toLocaleDateString()}
-                        </p>
+                  {selectedBreakdown.items.length === 0 ? (
+                    <p className="text-gray-500 text-center py-8">No expenses in this period</p>
+                  ) : (
+                    selectedBreakdown.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-center p-4 bg-red-50 border border-red-200 rounded hover:bg-red-100 transition">
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-800">{item.category}</p>
+                          <p className="text-xs text-gray-600">
+                            {item.description} • {new Date(item.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <p className="font-bold text-red-600 text-lg">${item.amount.toFixed(2)}</p>
                       </div>
-                      <p className="font-semibold text-red-600">${item.amount.toFixed(2)}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
+                </div>
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between items-center p-4 bg-red-100 rounded font-bold">
+                    <span className="text-red-900">Total Spent</span>
+                    <span className="text-red-600 text-xl">${selectedBreakdown.total?.toFixed(2)}</span>
+                  </div>
                 </div>
               </div>
             )}
 
             {selectedBreakdown?.type === "profit" && (
-              <div className="space-y-3">
-                {selectedBreakdown.items.map((item, idx) => (
-                  <div key={idx} className={`flex justify-between items-center p-4 rounded ${item.isBold ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'}`}>
-                    <p className={item.isBold ? 'font-bold text-lg' : 'font-medium'}>
-                      {item.label}
-                    </p>
-                    <p className={`${item.isBold ? 'font-bold text-lg' : 'font-semibold'} ${item.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {item.amount >= 0 ? '+' : ''} ${item.amount.toFixed(2)}
-                    </p>
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                  <p className="font-semibold text-blue-900 text-lg">📊 How We Calculate Your Profit</p>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Simple equation: Money In - Money Out = Your Profit
+                  </p>
+                </div>
+                
+                <div className="space-y-3">
+                  {/* Money In */}
+                  <div className="flex items-center gap-4 p-4 bg-green-50 border-2 border-green-200 rounded">
+                    <div className="text-4xl">💰</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800 text-lg">Money You Received</p>
+                      <p className="text-sm text-gray-600">From all rental invoices</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600 text-2xl">${metrics.totalRevenue.toFixed(2)}</p>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Minus */}
+                  <div className="flex justify-center py-2">
+                    <div className="text-3xl font-bold text-gray-400">−</div>
+                  </div>
+
+                  {/* Money Out */}
+                  <div className="flex items-center gap-4 p-4 bg-red-50 border-2 border-red-200 rounded">
+                    <div className="text-4xl">💸</div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-800 text-lg">Money You Spent</p>
+                      <p className="text-sm text-gray-600">On maintenance, insurance, operations</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-red-600 text-2xl">${metrics.totalExpenses.toFixed(2)}</p>
+                    </div>
+                  </div>
+
+                  {/* Equals */}
+                  <div className="flex justify-center py-2">
+                    <div className="text-3xl font-bold text-gray-400">=</div>
+                  </div>
+
+                  {/* Result */}
+                  <div className={`flex items-center gap-4 p-5 rounded-lg border-3 ${
+                    metrics.netProfit >= 0 
+                      ? 'bg-green-50 border-green-500' 
+                      : 'bg-red-50 border-red-500'
+                  }`}>
+                    <div className="text-5xl">{metrics.netProfit >= 0 ? '✅' : '⚠️'}</div>
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-800 text-lg">Your Bottom Line</p>
+                      <p className="text-sm text-gray-600">
+                        {metrics.netProfit >= 0 
+                          ? 'Great! You made a profit this period' 
+                          : 'You had a loss this period - review your expenses'}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className={`font-bold text-3xl ${
+                        metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'
+                      }`}>
+                        {metrics.netProfit >= 0 ? '+' : ''} ${metrics.netProfit.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-
-            <div className="border-t pt-4 mt-4">
-              <div className="flex justify-between items-center p-4 bg-blue-50 rounded font-bold">
-                <span>Total</span>
-                <span className={selectedBreakdown?.total! >= 0 ? 'text-green-600' : 'text-red-600'}>
-                  ${selectedBreakdown?.total?.toFixed(2)}
-                </span>
-              </div>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
