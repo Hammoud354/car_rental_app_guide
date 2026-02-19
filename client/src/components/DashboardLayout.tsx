@@ -172,16 +172,16 @@ function DashboardLayoutContent({
                 <PanelLeft className="h-4 w-4 text-muted-foreground" />
               </button>
               {!isCollapsed ? (
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
                   {profile?.logoUrl && (
                     <img
                       src={profile.logoUrl}
                       alt="Company Logo"
-                      className="h-8 w-8 rounded object-cover shrink-0"
+                      className="h-10 w-auto object-contain shrink-0"
                     />
                   )}
                   <div className="flex flex-col min-w-0">
-                    <span className="text-xs font-semibold tracking-tight truncate">
+                    <span className="text-sm font-semibold tracking-tight truncate">
                       {profile?.companyName || "Company"}
                     </span>
                     <span className="text-xs text-muted-foreground truncate">
