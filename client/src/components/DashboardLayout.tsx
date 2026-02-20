@@ -120,7 +120,9 @@ function DashboardLayoutContent({
 
   useEffect(() => {
     refetchProfile();
-  }, []);
+  }, [refetchProfile]);
+
+
 
   useEffect(() => {
     if (isCollapsed) {
@@ -183,8 +185,8 @@ function DashboardLayoutContent({
                         src={profile.logoUrl}
                         alt="Company Logo"
                         className="h-10 w-10 object-contain rounded-lg"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                        onError={() => {
+                          // Logo failed to load, let the Building2 icon show via CSS
                         }}
                       />
                     ) : (

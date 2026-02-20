@@ -5049,3 +5049,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix the logo display to show uploaded company logo instead of blue icon - Added logo container and fallback
 - [x] Add fallback to blue icon if no logo is uploaded - Building2 icon added as fallback
 - [x] Add profile refetch on component mount to ensure latest logo is loaded
+
+
+## Sidebar Logo Not Displaying (Debugging)
+- [x] Verify logo URL is being fetched in sidebar component - Query is set up correctly
+- [ ] Check if logo image is loading correctly from S3 - Logo URL exists in database
+- [ ] Test logo display with different image formats - PNG format confirmed
+- [ ] Ensure CORS headers are correct for S3 images - Need to verify
+- [ ] Fix logo rendering in sidebar header - Code is in place, need to debug why logoUrl is undefined
