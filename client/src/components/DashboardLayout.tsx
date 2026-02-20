@@ -111,16 +111,20 @@ function DashboardLayoutContent({
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
-  const { data: profile, refetch: refetchProfile } = trpc.company.getProfile.useQuery();
+  const { data: profile, refetch: refetchProfile } = trpc.company.getProfile.useQuery(undefined, {
+    refetchInterval: 5000,
+    staleTime: 0,
+  });
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
 
   useEffect(() => {
     refetchProfile();
-  }, [refetchProfile]);
+  }, []);
 
 
 
@@ -180,18 +184,20 @@ function DashboardLayoutContent({
               {!isCollapsed ? (
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="h-10 w-10 flex items-center justify-center shrink-0 rounded-lg bg-primary/10">
-                    {profile?.logoUrl ? (
-                      <>
-                        <img
-                          src={profile.logoUrl}
-                          alt="Company Logo"
-                          className="h-10 w-10 object-contain rounded-lg"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                        <Building2 className="h-6 w-6 text-primary hidden" id="logo-fallback" />
-                      </>
+                    {profile?.logoUrl && !logoFailed ? (
+                      <img
+                        key={profile.logoUrl}
+                        src={profile.logoUrl}
+                        alt="Company Logo"
+                        className="h-10 w-10 object-contain rounded-lg"
+                        onError={() => {
+                          console.error('[Logo] Failed to load image from URL:', profile.logoUrl);
+                          setLogoFailed(true);
+                        }}
+                        onLoad={() => {
+                          setLogoFailed(false);
+                        }}
+                      />
                     ) : (
                       <Building2 className="h-6 w-6 text-primary" />
                     )}

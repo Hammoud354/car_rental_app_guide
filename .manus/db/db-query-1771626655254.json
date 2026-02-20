@@ -1,0 +1,17 @@
+{
+  "query": "SELECT u.id, u.name, u.email, cp.companyName, cp.logoUrl FROM users u LEFT JOIN companyProfiles cp ON u.id = cp.userId WHERE u.name LIKE '%dima%' OR u.name LIKE '%Dima%' OR cp.companyName LIKE '%dima%' LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT u.id, u.name, u.email, cp.companyName, cp.logoUrl FROM users u LEFT JOIN companyProfiles cp ON u.id = cp.userId WHERE u.name LIKE '%dima%' OR u.name LIKE '%Dima%' OR cp.companyName LIKE '%dima%' LIMIT 5;",
+  "rows": [
+    {
+      "id": "1620001",
+      "name": "mohammad",
+      "email": "test@test.com",
+      "companyName": "dima rent a car",
+      "logoUrl": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\temail\tcompanyName\tlogoUrl\n1620001\tmohammad\ttest@test.com\tdima rent a car\t\n",
+  "stderr": "",
+  "execution_time_ms": 1593
+}
