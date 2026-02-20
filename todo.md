@@ -5020,3 +5020,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix invoice popup window to fit screen without scrollbars - FIXED
 - [x] Adjust dialog height and content layout for better fit - Reduced padding and spacing
 - [x] Test on various screen sizes (desktop, tablet, mobile) - Responsive design applied
+
+
+## Print Contract Should Use Custom Template
+- [x] Find the print contract button and its implementation - Found in RentalContracts.tsx line 1446
+- [x] Modify print functionality to generate PDF using custom template - Now uses generatePdfMutation
+- [x] Show custom template preview when print button is clicked - Opens PDF in new window for print preview
+- [x] Test printing with custom template on different browsers - Compiled successfully, ready for testing

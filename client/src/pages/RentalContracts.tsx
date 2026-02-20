@@ -1443,58 +1443,41 @@ export default function RentalContracts() {
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
                     
-                    const printContent = document.getElementById('contract-content');
-                    if (!printContent) {
-                      toast.error("Contract content not found");
-                      return;
+                    try {
+                      toast.info("Generating contract with template for printing...");
+                      
+                      // Call tRPC procedure to generate PDF with custom template
+                      const result = await generatePdfMutation.mutateAsync({
+                        contractId: selectedContract.id
+                      });
+                      
+                      // Convert number array back to Uint8Array
+                      const pdfBytes = new Uint8Array(result.pdfData);
+                      
+                      // Create blob and object URL for preview
+                      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                      const url = URL.createObjectURL(blob);
+                      
+                      // Open in new window for print preview
+                      const printWindow = window.open(url, '_blank');
+                      if (!printWindow) {
+                        toast.error("Please allow popups to print");
+                        URL.revokeObjectURL(url);
+                        return;
+                      }
+                      
+                      // The PDF will open in the browser's print preview
+                      toast.success("Contract template opened for printing");
+                    } catch (error: any) {
+                      console.error("Print error:", error);
+                      toast.error(`Failed to print: ${error.message || 'Unknown error'}`);
                     }
-                    
-                    // Create a new window for printing
-                    const printWindow = window.open('', '_blank');
-                    if (!printWindow) {
-                      toast.error("Please allow popups to print");
-                      return;
-                    }
-                    
-                    // Write the contract content to the new window with styles
-                    printWindow.document.write(`
-                      <!DOCTYPE html>
-                      <html>
-                        <head>
-                          <title>Contract ${selectedContract.contractNumber}</title>
-                          <script src="https://cdn.tailwindcss.com"></script>
-                          <style>
-                            * { margin: 0; padding: 0; box-sizing: border-box; }
-                            body { font-family: Arial, sans-serif; padding: 32px; background: white; }
-                            @media print {
-                              body { padding: 0; }
-                              @page { margin: 0.5in; }
-                            }
-                            .border { border: 1px solid #e5e7eb; }
-                            .rounded-lg { border-radius: 8px; }
-                          </style>
-                        </head>
-                        <body>
-                          ${printContent.innerHTML}
-                        </body>
-                      </html>
-                    `);
-                    
-                    printWindow.document.close();
-                    
-                    // Wait for Tailwind CDN and content to load, then print
-                    printWindow.onload = () => {
-                      setTimeout(() => {
-                        printWindow.print();
-                        printWindow.close();
-                      }, 1000);
-                    };
                   }} 
                   variant="outline"
                   className="h-10 w-full"
