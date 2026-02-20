@@ -5027,3 +5027,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Modify print functionality to generate PDF using custom template - Now uses generatePdfMutation
 - [x] Show custom template preview when print button is clicked - Opens PDF in new window for print preview
 - [x] Test printing with custom template on different browsers - Compiled successfully, ready for testing
+
+
+## Missing Fields in Contract Template Export
+- [x] Identify which fields are not appearing in the exported contract PDF - Found missing client fields
+- [x] Check if field mapping data is being passed correctly to PDF generator - Data was not being extracted
+- [x] Verify template placeholder replacement logic - Added all missing fields to ContractData type
+- [x] Ensure all mapped fields are rendered in the final PDF output - All 14 tests passing

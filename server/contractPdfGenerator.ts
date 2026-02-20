@@ -13,6 +13,13 @@ type ContractData = {
   clientPhone?: string;
   clientEmail?: string;
   clientLicenseNumber?: string;
+  clientNationality?: string;
+  clientDateOfBirth?: string;
+  clientPlaceOfBirth?: string;
+  clientPassportNumber?: string;
+  clientRegistrationNumber?: string;
+  clientLicenseIssueDate?: string;
+  clientLicenseExpiryDate?: string;
   vehiclePlate?: string;
   vehicleMake?: string;
   vehicleModel?: string;
@@ -124,18 +131,35 @@ export function formatContractDataForPDF(contract: any, client: any, vehicle: an
     return 0;
   };
 
+  // Helper function to format dates
+  const formatDate = (date: any): string => {
+    if (!date) return '';
+    try {
+      return new Date(date).toLocaleDateString();
+    } catch {
+      return '';
+    }
+  };
+
   return {
     clientName: client && client.firstName && client.lastName ? `${client.firstName} ${client.lastName}` : '',
     clientAddress: client?.address ? client.address : '',
     clientPhone: client?.phone ? client.phone : '',
     clientEmail: client?.email ? client.email : '',
     clientLicenseNumber: client?.drivingLicenseNumber ? client.drivingLicenseNumber : '',
+    clientNationality: client?.nationality ? client.nationality : '',
+    clientDateOfBirth: client?.dateOfBirth ? formatDate(client.dateOfBirth) : '',
+    clientPlaceOfBirth: client?.placeOfBirth ? client.placeOfBirth : '',
+    clientPassportNumber: client?.passportIdNumber ? client.passportIdNumber : '',
+    clientRegistrationNumber: client?.registrationNumber ? client.registrationNumber : '',
+    clientLicenseIssueDate: client?.licenseIssueDate ? formatDate(client.licenseIssueDate) : '',
+    clientLicenseExpiryDate: client?.licenseExpiryDate ? formatDate(client.licenseExpiryDate) : '',
     vehiclePlate: vehicle?.plateNumber ? vehicle.plateNumber : '',
     vehicleMake: vehicle?.make ? vehicle.make : '',
     vehicleModel: vehicle?.model ? vehicle.model : '',
     vehicleYear: vehicle?.year ? vehicle.year.toString() : '',
-    startDate: contract?.startDate ? new Date(contract.startDate).toLocaleDateString() : '',
-    endDate: contract?.endDate ? new Date(contract.endDate).toLocaleDateString() : '',
+    startDate: contract?.startDate ? formatDate(contract.startDate) : '',
+    endDate: contract?.endDate ? formatDate(contract.endDate) : '',
     pickupLocation: contract?.pickupLocation ? contract.pickupLocation : '',
     returnLocation: contract?.returnLocation ? contract.returnLocation : '',
     dailyRate: contract?.dailyRate ? `$${parseFloat(contract.dailyRate).toFixed(2)}` : '',

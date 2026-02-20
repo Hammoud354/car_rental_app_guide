@@ -31,6 +31,10 @@ describe("Contract PDF Generator", () => {
       drivingLicenseNumber: "6789",
       licenseIssueDate: new Date("2020-01-01T00:00:00Z"),
       licenseExpiryDate: new Date("2030-01-01T00:00:00Z"),
+      dateOfBirth: new Date("1990-05-15T00:00:00Z"),
+      placeOfBirth: "Beirut",
+      passportIdNumber: "P123456789",
+      registrationNumber: "REG123",
       email: "john@example.com",
       userId: 1,
     };
@@ -185,6 +189,18 @@ describe("Contract PDF Generator", () => {
       const result = formatContractDataForPDF(contractWithoutNumber, mockClient, mockVehicle, mockCompany);
 
       expect(result.contractNumber).toBe("1");
+    });
+
+    it("should include all new client fields in contract data", () => {
+      const result = formatContractDataForPDF(mockContract, mockClient, mockVehicle, mockCompany);
+
+      expect(result.clientNationality).toBe("Lebanese");
+      expect(result.clientPassportNumber).toBe("P123456789");
+      expect(result.clientRegistrationNumber).toBe("REG123");
+      expect(result.clientPlaceOfBirth).toBe("Beirut");
+      expect(result.clientDateOfBirth).toBeTruthy();
+      expect(result.clientLicenseIssueDate).toBeTruthy();
+      expect(result.clientLicenseExpiryDate).toBeTruthy();
     });
   });
 });
