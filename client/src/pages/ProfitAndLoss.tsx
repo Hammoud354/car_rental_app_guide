@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Percent, X } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
@@ -15,15 +15,29 @@ interface DetailedBreakdown {
   total: number;
 }
 
+interface MonthlyDetail {
+  month: number;
+  monthName: string;
+  revenue: number;
+  expenses: number;
+}
+
 export default function ProfitAndLoss() {
   const [startDate, setStartDate] = useState<Date | undefined>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date | undefined>(endOfMonth(new Date()));
   const [selectedBreakdown, setSelectedBreakdown] = useState<DetailedBreakdown | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<MonthlyDetail | null>(null);
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   // Fetch P&L data
   const { data: pnlData, isLoading } = trpc.profitLoss.calculatePnL.useQuery({
     startDate: (startDate || startOfMonth(new Date())).toISOString(),
     endDate: (endDate || endOfMonth(new Date())).toISOString(),
+  });
+
+  // Fetch monthly revenue data
+  const { data: monthlyData } = trpc.profitLoss.getRevenueByMonth.useQuery({
+    year: currentYear,
   });
 
   const metrics = useMemo(() => {
@@ -81,6 +95,18 @@ export default function ProfitAndLoss() {
       ],
       total: metrics.netProfit,
     });
+  };
+
+  const handleMonthClick = (month: any) => {
+    setSelectedMonth(month);
+  };
+
+  const handlePreviousYear = () => {
+    setCurrentYear(currentYear - 1);
+  };
+
+  const handleNextYear = () => {
+    setCurrentYear(currentYear + 1);
   };
 
   return (
@@ -214,6 +240,72 @@ export default function ProfitAndLoss() {
             <p className="text-sm text-gray-500">
               Percentage of time vehicles are rented vs idle
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Monthly Breakdown Section */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Monthly Breakdown - {currentYear}</CardTitle>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handlePreviousYear}
+            >
+              ← Previous Year
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleNextYear}
+            >
+              Next Year →
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {monthlyData?.map((month) => {
+              const profit = month.revenue - month.expenses;
+              const profitMargin = month.revenue > 0 ? (profit / month.revenue) * 100 : 0;
+              
+              return (
+                <div
+                  key={month.month}
+                  onClick={() => handleMonthClick(month)}
+                  className="p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-primary transition-all cursor-pointer bg-white"
+                >
+                  <div className="space-y-3">
+                    <h3 className="font-semibold text-lg text-gray-800">{month.monthName}</h3>
+                    
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Revenue</span>
+                        <span className="font-semibold text-green-600">${month.revenue.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Expenses</span>
+                        <span className="font-semibold text-red-600">${month.expenses.toFixed(2)}</span>
+                      </div>
+                      <div className="border-t pt-2 flex justify-between items-center">
+                        <span className="text-sm font-semibold text-gray-800">Profit/Loss</span>
+                        <span className={`font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {profit >= 0 ? '+' : ''} ${profit.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t">
+                      <p className="text-xs text-gray-500 text-center">
+                        Margin: {profitMargin.toFixed(1)}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -369,6 +461,105 @@ export default function ProfitAndLoss() {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Monthly Detail Modal */}
+      <Dialog open={!!selectedMonth} onOpenChange={() => setSelectedMonth(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle className="text-2xl">
+              {selectedMonth?.monthName} {currentYear} - Detailed Breakdown
+            </DialogTitle>
+            <button
+              onClick={() => setSelectedMonth(null)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </DialogHeader>
+
+          {selectedMonth && (
+            <div className="space-y-6">
+              {/* Summary Cards */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 bg-green-50 border border-green-200 rounded">
+                  <p className="text-sm text-gray-600 mb-1">Revenue</p>
+                  <p className="text-2xl font-bold text-green-600">${selectedMonth.revenue.toFixed(2)}</p>
+                </div>
+                <div className="p-4 bg-red-50 border border-red-200 rounded">
+                  <p className="text-sm text-gray-600 mb-1">Expenses</p>
+                  <p className="text-2xl font-bold text-red-600">${selectedMonth.expenses.toFixed(2)}</p>
+                </div>
+                <div className={`p-4 rounded border ${
+                  (selectedMonth.revenue - selectedMonth.expenses) >= 0
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <p className="text-sm text-gray-600 mb-1">Profit/Loss</p>
+                  <p className={`text-2xl font-bold ${
+                    (selectedMonth.revenue - selectedMonth.expenses) >= 0
+                      ? 'text-green-600'
+                      : 'text-red-600'
+                  }`}>
+                    ${(selectedMonth.revenue - selectedMonth.expenses).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Detailed Breakdown */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Revenue Breakdown</h3>
+                  <div className="bg-green-50 border border-green-200 rounded p-4">
+                    <p className="text-sm text-gray-600 mb-2">Total Revenue for {selectedMonth.monthName}</p>
+                    <p className="text-3xl font-bold text-green-600">${selectedMonth.revenue.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500 mt-2">From rental invoices and contracts completed in this month</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Expense Breakdown</h3>
+                  <div className="bg-red-50 border border-red-200 rounded p-4">
+                    <p className="text-sm text-gray-600 mb-2">Total Expenses for {selectedMonth.monthName}</p>
+                    <p className="text-3xl font-bold text-red-600">${selectedMonth.expenses.toFixed(2)}</p>
+                    <p className="text-xs text-gray-500 mt-2">Maintenance, insurance, and other operational costs</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Profit Analysis</h3>
+                  <div className={`rounded p-4 border ${
+                    (selectedMonth.revenue - selectedMonth.expenses) >= 0
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}>
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-gray-700">Revenue</span>
+                      <span className="font-semibold text-green-600">${selectedMonth.revenue.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-3 pb-3 border-b">
+                      <span className="text-gray-700">Expenses</span>
+                      <span className="font-semibold text-red-600">-${selectedMonth.expenses.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-800">Net Profit/Loss</span>
+                      <span className={`text-2xl font-bold ${
+                        (selectedMonth.revenue - selectedMonth.expenses) >= 0
+                          ? 'text-green-600'
+                          : 'text-red-600'
+                      }`}>
+                        ${(selectedMonth.revenue - selectedMonth.expenses).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-3">
+                      Profit Margin: {selectedMonth.revenue > 0 ? (((selectedMonth.revenue - selectedMonth.expenses) / selectedMonth.revenue) * 100).toFixed(1) : 0}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

@@ -111,6 +111,7 @@ function DashboardLayoutContent({
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
+  const utils = trpc.useUtils();
   const { data: profile, refetch: refetchProfile } = trpc.company.getProfile.useQuery(undefined, {
     refetchInterval: 5000,
     staleTime: 0,
@@ -123,8 +124,10 @@ function DashboardLayoutContent({
   const isMobile = useIsMobile();
 
   useEffect(() => {
+    // Invalidate the profile query cache to force a fresh fetch
+    utils.company.getProfile.invalidate();
     refetchProfile();
-  }, []);
+  }, [utils, refetchProfile]);
 
 
 

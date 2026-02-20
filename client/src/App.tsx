@@ -33,7 +33,7 @@ import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
 import UserManagement from "./pages/UserManagement";
-import ProfitLoss from "./pages/ProfitLoss";
+import ProfitAndLoss from "./pages/ProfitAndLoss";
 import Demo from "./pages/Demo";
 import Home from "./pages/Home";
 import AIMaintenance from "./pages/AIMaintenance";
@@ -54,7 +54,7 @@ function Router() {
       <Route path="/404" component={NotFound} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/profitability" component={ProfitabilityDashboard} />
-      <Route path="/profit-loss" component={ProfitLoss} />
+      <Route path="/profit-loss" component={ProfitAndLoss} />
       <Route path="/maintenance" component={Maintenance} />
       <Route path="/maintenance-tracking" component={MaintenanceTracking} />
       <Route path="/ai-maintenance" component={AIMaintenance} />

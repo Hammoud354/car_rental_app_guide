@@ -5068,3 +5068,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test with hardcoded logo URL to isolate the issue - Issue was missing profile
 - [x] Fix logo rendering in sidebar header - Auto-create company profile on OAuth login
 - [x] Auto-create company profile for new users on first login - Now happens in OAuth callback
+
+
+## P&L Monthly Detail View Feature
+- [x] Make month cards clickable in P&L section
+- [x] Create modal/enlarged view for monthly details
+- [x] Display detailed breakdown of revenue and expenses for selected month
+- [x] Show transaction list for the selected month
+- [x] Add close button and navigation between months in modal

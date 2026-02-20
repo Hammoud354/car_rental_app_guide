@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO companyProfiles (userId, companyName, logoUrl, createdAt, updatedAt) \nSELECT u.id, 'Dima Rent a car', 'https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771625768613.png', NOW(), NOW()\nFROM users u \nWHERE u.name LIKE '%Dima%' OR u.email LIKE '%dima%'\nLIMIT 1\nON DUPLICATE KEY UPDATE \n  companyName = 'Dima Rent a car',\n  logoUrl = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771625768613.png',\n  updatedAt = NOW()",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO companyProfiles (userId, companyName, logoUrl, createdAt, updatedAt) \nSELECT u.id, 'Dima Rent a car', 'https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771625768613.png', NOW(), NOW()\nFROM users u \nWHERE u.name LIKE '%Dima%' OR u.email LIKE '%dima%'\nLIMIT 1\nON DUPLICATE KEY UPDATE \n  companyName = 'Dima Rent a car',\n  logoUrl = 'https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771625768613.png',\n  updatedAt = NOW()",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1549
+}
