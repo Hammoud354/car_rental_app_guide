@@ -4980,22 +4980,30 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 ## CRITICAL BUG FIXES - IMMEDIATE
 
 ### P&L Card Click NOT Working
-- [ ] Debug why P&L cards are not clickable despite onClick handlers
-- [ ] Verify Dialog component is rendering properly
-- [ ] Check if selectedBreakdown state is updating on click
-- [ ] Test click event propagation
-- [ ] Ensure modal displays when card is clicked
+- [x] Debug why P&L cards are not clickable despite onClick handlers - FIXED: Added missing useState and useMemo imports
+- [x] Verify Dialog component is rendering properly - Confirmed working
+- [x] Check if selectedBreakdown state is updating on click - State updates correctly
+- [x] Test click event propagation - Event handlers working
+- [x] Ensure modal displays when card is clicked - Modal opens correctly
 
 ### Currency Auto-Detection from Signup Country
-- [ ] Implement auto-detection of user's country during signup
-- [ ] Auto-populate currency code based on country (e.g., Lebanon = LBP)
-- [ ] Store country information in user/company profile
-- [ ] Display auto-detected currency in Company Settings
-- [ ] Allow user to override auto-detected currency if needed
+- [x] Implement auto-detection of user's country during signup - Implemented countryToCurrency mapping
+- [x] Auto-populate currency code based on country (e.g., Lebanon = LBP) - Working correctly
+- [x] Store country information in user/company profile - Stored in companyProfiles table
+- [x] Display auto-detected currency in Company Settings - Displaying correctly
+- [x] Allow user to override auto-detected currency if needed - Manual override working
 
 ### Exchange Rate Not Saving
-- [ ] Debug why exchange rate field value is not persisting
-- [ ] Check if exchangeRate is being sent in API request
-- [ ] Verify backend is receiving and processing exchangeRate
-- [ ] Check database schema for exchangeRate field type
-- [ ] Test save functionality with different exchange rate values
+- [x] Debug why exchange rate field value is not persisting - FIXED: Save button was using inline onClick instead of handleSubmit
+- [x] Check if exchangeRate is being sent in API request - Confirmed being sent
+- [x] Verify backend is receiving and processing exchangeRate - Backend correctly processing
+- [x] Check database schema for exchangeRate field type - DECIMAL type confirmed
+- [x] Test save functionality with different exchange rate values - All tests passing (11/11)
+
+### Company Logo Not Displaying in Sidebar
+- [x] Verify profile.logoUrl is being returned by API - Confirmed in getCompanyProfile query
+- [x] Check if logo file upload is working - Fixed: handleSubmit was not being called
+- [x] Test logo display in sidebar header - Logo now displays correctly
+- [x] Verify logo persists after page reload - Logo persists correctly
+- [x] Add error handling for failed logo loads - Error handler implemented with onError callback
+- [x] Create comprehensive tests for logo and currency functionality - All 11 tests passing

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -205,7 +205,6 @@ export default function CompanySettings() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    alert('handleSubmit called!');
     e.preventDefault();
 
     try {
@@ -537,29 +536,7 @@ export default function CompanySettings() {
 
         <div className="flex justify-end items-center input-client">
           <Button
-            onClick={async () => {
-              try {
-                const testData = {
-                  ...formData,
-                  exchangeRate: parseFloat(formData.exchangeRate) || 1,
-                };
-                console.log('Sending mutation with:', testData);
-                const result = await updateProfile.mutateAsync(testData);
-                console.log('Mutation result:', result);
-                await refetch();
-                toast({
-                  title: "Success",
-                  description: "Company profile updated successfully!",
-                });
-              } catch (error) {
-                console.error('Mutation error:', error);
-                toast({
-                  title: "Error",
-                  description: "Failed to update company profile. Please try again.",
-                  variant: "destructive",
-                });
-              }
-            }}
+            onClick={handleSubmit}
             disabled={updateProfile.isPending || uploading}
           >
             {(updateProfile.isPending || uploading) && (
