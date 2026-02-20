@@ -5,9 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Percent, ChevronRight, Home } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { Link } from "wouter";
 
 interface DetailedBreakdown {
   type: "revenue" | "expenses" | "profit";
@@ -112,6 +113,17 @@ export default function ProfitAndLoss() {
   return (
     <div className="w-full bg-background">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* Breadcrumb Navigation */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Link href="/dashboard">
+            <a className="flex items-center gap-1 hover:text-primary transition-colors">
+              <Home className="h-4 w-4" />
+              <span>Dashboard</span>
+            </a>
+          </Link>
+          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <span className="text-foreground font-medium">Profit & Loss</span>
+        </div>
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-4xl font-bold text-foreground">Profit & Loss</h1>
