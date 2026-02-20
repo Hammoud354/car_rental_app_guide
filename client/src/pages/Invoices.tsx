@@ -320,7 +320,7 @@ export default function Invoices() {
 
         {/* Invoice Details Dialog */}
         <Dialog open={!!selectedInvoice} onOpenChange={() => setSelectedInvoice(null)}>
-          <DialogContent className="w-[95vw] max-w-6xl max-h-[95vh] overflow-y-auto p-4 sm:p-6">
+          <DialogContent className="w-[95vw] max-w-6xl max-h-[90vh] overflow-hidden flex flex-col p-4 sm:p-6">
             <DialogHeader>
               <DialogTitle>Invoice Details</DialogTitle>
             </DialogHeader>
@@ -338,11 +338,11 @@ export default function Invoices() {
                 <p className="text-gray-600">Invoice not found</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4 overflow-y-auto flex-1">
                 {/* Invoice Content for PDF Export */}
-                <div id="invoice-content" className="bg-white text-black p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6 print:block">
+                <div id="invoice-content" className="bg-white text-black p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 print:block text-sm sm:text-base">
                   {/* Company Header */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start border-b pb-4 sm:pb-6 gap-4">
+                  <div className="flex flex-col sm:flex-row justify-between items-start border-b pb-2 sm:pb-3 gap-2">
                     <div className="space-y-2">
                       {companyProfile?.logoUrl && (
                         <img
@@ -351,7 +351,7 @@ export default function Invoices() {
                           className="h-16 object-contain"
                         />
                       )}
-                      <h2 className="text-2xl font-bold">
+                      <h2 className="text-lg sm:text-2xl font-bold">
                         {companyProfile?.companyName || settings?.companyName || "Company Name"}
                       </h2>
                       {companyProfile && (
@@ -369,7 +369,7 @@ export default function Invoices() {
                       )}
                     </div>
                     <div className="text-right space-y-2">
-                      <h1 className="text-3xl font-bold">INVOICE</h1>
+                      <h1 className="text-2xl sm:text-3xl font-bold">INVOICE</h1>
                       <p className="text-lg font-semibold">{invoiceDetails.invoiceNumber}</p>
                       <div className="text-sm text-gray-600 space-y-1">
                         <p>
@@ -384,7 +384,7 @@ export default function Invoices() {
                   </div>
 
                   {/* Bill To Section */}
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <p className="text-sm font-semibold text-gray-600">BILL TO:</p>
                     <div className="text-base">
                       <p className="font-semibold">{invoiceDetails.clientName}</p>
@@ -409,8 +409,8 @@ export default function Invoices() {
                   </div>
 
                   {/* Line Items */}
-                  <div className="space-y-4">
-                    <h3 className="font-semibold text-lg mb-4">Itemized Charges</h3>
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-base sm:text-lg mb-2">Itemized Charges</h3>
                     <div className="overflow-x-auto -mx-4 sm:mx-0">
                       <div className="inline-block min-w-full align-middle px-4 sm:px-0">
                         <table className="w-full min-w-[600px]">
@@ -444,9 +444,9 @@ export default function Invoices() {
                   </div>
 
                   {/* Totals */}
-                  <div className="border-t-2 pt-6 space-y-4 mt-6">
+                  <div className="border-t-2 pt-3 space-y-2 mt-3">
                     {/* USD Amounts */}
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                       <div className="flex justify-between text-base">
                         <span className="text-gray-600">Subtotal (USD):</span>
                         <span className="font-medium tracking-wider">
@@ -466,7 +466,7 @@ export default function Invoices() {
                     </div>
 
                     {/* LBP Amounts */}
-                    <div className="bg-gray-50 p-5 rounded-lg space-y-3 border-2 border-primary mt-4">
+                    <div className="bg-gray-50 p-3 rounded-lg space-y-1 border-2 border-primary mt-2">
                       <p className="text-xs text-gray-500 mb-3">Lebanese Pounds (LBP) at rate {exchangeRate.toLocaleString()} LBP/USD</p>
                       <div className="flex justify-between text-base">
                         <span className="text-gray-600">Subtotal (LBP):</span>
@@ -497,7 +497,7 @@ export default function Invoices() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3 border-t pt-4">
+                <div className="flex gap-2 border-t pt-3 mt-3 flex-wrap">
                   <Button 
                     onClick={() => {
                       if (!invoiceDetails) {
@@ -522,16 +522,16 @@ export default function Invoices() {
                       
                       // Open WhatsApp with pre-filled message
                       window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-                    }} 
+                    }}
                     variant="outline" 
-                    className="flex-1 print:hidden"
+                    className="flex-1 min-w-[150px] print:hidden text-sm"
                   >
                     💬 Send via WhatsApp
                   </Button>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 justify-end print:hidden">
+                {/* Export Buttons */}
+                <div className="flex gap-2 justify-end print:hidden flex-wrap">
                   <Button 
                     onClick={() => {
                       const printContent = document.getElementById('invoice-content');

@@ -5014,3 +5014,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify dailyRate is properly converted to number before calling toFixed() - Using parseFloat() for all numeric fields
 - [x] Check custom template code for type assumptions - Fixed in contractPdfGenerator.ts
 - [x] Test PDF export with various contract data - All 13 tests passing
+
+
+## Invoice Popup Scrollbar Issue
+- [x] Fix invoice popup window to fit screen without scrollbars - FIXED
+- [x] Adjust dialog height and content layout for better fit - Reduced padding and spacing
+- [x] Test on various screen sizes (desktop, tablet, mobile) - Responsive design applied
