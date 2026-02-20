@@ -5076,3 +5076,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display detailed breakdown of revenue and expenses for selected month
 - [x] Show transaction list for the selected month
 - [x] Add close button and navigation between months in modal
+
+
+## P&L Design Improvements
+- [x] Remove duplicate close button from modal header
+- [x] Add professional padding to page sides
+- [x] Add proper margins between sections
+- [x] Improve overall spacing and visual hierarchy

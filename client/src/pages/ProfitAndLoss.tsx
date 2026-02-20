@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, TrendingDown, DollarSign, Percent, X } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Percent } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
@@ -110,205 +110,209 @@ export default function ProfitAndLoss() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Profit & Loss</h1>
-        <div className="flex gap-4">
-          <div>
-            <Label className="text-sm">Start Date</Label>
-            <DatePickerWithYearNav
-              date={startDate}
-              onDateChange={setStartDate}
-              placeholder="Select start date"
-            />
-          </div>
-          <div>
-            <Label className="text-sm">End Date</Label>
-            <DatePickerWithYearNav
-              date={endDate}
-              onDateChange={setEndDate}
-              placeholder="Select end date"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Revenue Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow h-full"
-          onClick={handleViewRevenue}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold text-green-600">
-                  ${metrics.totalRevenue.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-green-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Total Expenses Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow h-full"
-          onClick={handleViewExpenses}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Expenses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold text-red-600">
-                  ${metrics.totalExpenses.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
-              </div>
-              <TrendingDown className="h-8 w-8 text-red-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Net Profit Card */}
-        <Card 
-          className="cursor-pointer hover:shadow-lg transition-shadow h-full"
-          onClick={handleViewProfit}
-        >
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Net Profit/Loss</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-2xl font-bold ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  ${metrics.netProfit.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">Click for details</p>
-              </div>
-            <DollarSign className={`h-8 w-8 ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'} opacity-20`} />
-          </div>
-        </CardContent>
-        </Card>
-
-        {/* Profit Margin Card */}
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-gray-600">Profit Margin</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-2xl font-bold ${metrics.profitMargin >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
-                  {metrics.profitMargin.toFixed(1)}%
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {metrics.profitMargin >= 0 ? 'Healthy' : 'Needs attention'}
-                </p>
-              </div>
-              <Percent className="h-8 w-8 text-blue-600 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Vehicle Utilization */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Vehicle Utilization Rate</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-600">Fleet Utilization</span>
-              <span className="text-2xl font-bold">{metrics.vehicleUtilization.toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className="bg-blue-600 h-3 rounded-full transition-all"
-                style={{ width: `${Math.min(metrics.vehicleUtilization, 100)}%` }}
+    <div className="w-full bg-background">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <h1 className="text-4xl font-bold text-foreground">Profit & Loss</h1>
+          <div className="flex gap-4">
+            <div>
+              <Label className="text-sm font-medium">Start Date</Label>
+              <DatePickerWithYearNav
+                date={startDate}
+                onDateChange={setStartDate}
+                placeholder="Select start date"
               />
             </div>
-            <p className="text-sm text-gray-500">
-              Percentage of time vehicles are rented vs idle
-            </p>
+            <div>
+              <Label className="text-sm font-medium">End Date</Label>
+              <DatePickerWithYearNav
+                date={endDate}
+                onDateChange={setEndDate}
+                placeholder="Select end date"
+              />
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Monthly Breakdown Section */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Monthly Breakdown - {currentYear}</CardTitle>
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handlePreviousYear}
-            >
-              ← Previous Year
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleNextYear}
-            >
-              Next Year →
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {monthlyData?.map((month) => {
-              const profit = month.revenue - month.expenses;
-              const profitMargin = month.revenue > 0 ? (profit / month.revenue) * 100 : 0;
-              
-              return (
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Revenue Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow h-full"
+            onClick={handleViewRevenue}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-green-600">
+                    ${metrics.totalRevenue.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-green-600 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Total Expenses Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow h-full"
+            onClick={handleViewExpenses}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Total Expenses</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-red-600">
+                    ${metrics.totalExpenses.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
+                <TrendingDown className="h-8 w-8 text-red-600 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Net Profit Card */}
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow h-full"
+            onClick={handleViewProfit}
+          >
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Net Profit/Loss</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-2xl font-bold ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    ${metrics.netProfit.toFixed(2)}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Click for details</p>
+                </div>
+              <DollarSign className={`h-8 w-8 ${metrics.netProfit >= 0 ? 'text-green-600' : 'text-red-600'} opacity-20`} />
+            </div>
+          </CardContent>
+          </Card>
+
+          {/* Profit Margin Card */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium text-gray-600">Profit Margin</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-2xl font-bold ${metrics.profitMargin >= 0 ? 'text-blue-600' : 'text-red-600'}`}>
+                    {metrics.profitMargin.toFixed(1)}%
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {metrics.profitMargin >= 0 ? 'Healthy' : 'Needs attention'}
+                  </p>
+                </div>
+                <Percent className="h-8 w-8 text-blue-600 opacity-20" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Vehicle Utilization */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Vehicle Utilization Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Fleet Utilization</span>
+                <span className="text-2xl font-bold">{metrics.vehicleUtilization.toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
                 <div
-                  key={month.month}
-                  onClick={() => handleMonthClick(month)}
-                  className="p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-primary transition-all cursor-pointer bg-white"
-                >
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-lg text-gray-800">{month.monthName}</h3>
-                    
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Revenue</span>
-                        <span className="font-semibold text-green-600">${month.revenue.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Expenses</span>
-                        <span className="font-semibold text-red-600">${month.expenses.toFixed(2)}</span>
-                      </div>
-                      <div className="border-t pt-2 flex justify-between items-center">
-                        <span className="text-sm font-semibold text-gray-800">Profit/Loss</span>
-                        <span className={`font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {profit >= 0 ? '+' : ''} ${profit.toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
+                  className="bg-blue-600 h-3 rounded-full transition-all"
+                  style={{ width: `${Math.min(metrics.vehicleUtilization, 100)}%` }}
+                />
+              </div>
+              <p className="text-sm text-gray-500">
+                Percentage of time vehicles are rented vs idle
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-                    <div className="pt-2 border-t">
-                      <p className="text-xs text-gray-500 text-center">
-                        Margin: {profitMargin.toFixed(1)}%
-                      </p>
+        {/* Monthly Breakdown Section */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-6">
+            <CardTitle className="text-2xl">Monthly Breakdown - {currentYear}</CardTitle>
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handlePreviousYear}
+                className="text-sm"
+              >
+                ← Previous Year
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleNextYear}
+                className="text-sm"
+              >
+                Next Year →
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monthlyData?.map((month) => {
+                const profit = month.revenue - month.expenses;
+                const profitMargin = month.revenue > 0 ? (profit / month.revenue) * 100 : 0;
+                
+                return (
+                  <div
+                    key={month.month}
+                    onClick={() => handleMonthClick(month)}
+                    className="p-5 border border-gray-200 rounded-lg hover:shadow-md hover:border-primary transition-all cursor-pointer bg-white hover:bg-gray-50"
+                  >
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-lg text-gray-900">{month.monthName}</h3>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 font-medium">Revenue</span>
+                          <span className="font-semibold text-green-600">${month.revenue.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600 font-medium">Expenses</span>
+                          <span className="font-semibold text-red-600">${month.expenses.toFixed(2)}</span>
+                        </div>
+                        <div className="border-t pt-3 flex justify-between items-center">
+                          <span className="text-sm font-semibold text-gray-900">Profit/Loss</span>
+                          <span className={`font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {profit >= 0 ? '+' : ''} ${profit.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t">
+                        <p className="text-xs text-gray-500 text-center font-medium">
+                          Margin: {profitMargin.toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Detailed Breakdown Modal */}
       <Dialog open={!!selectedBreakdown} onOpenChange={() => setSelectedBreakdown(null)}>
@@ -467,16 +471,10 @@ export default function ProfitAndLoss() {
       {/* Monthly Detail Modal */}
       <Dialog open={!!selectedMonth} onOpenChange={() => setSelectedMonth(null)}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="flex flex-row items-center justify-between">
+          <DialogHeader>
             <DialogTitle className="text-2xl">
               {selectedMonth?.monthName} {currentYear} - Detailed Breakdown
             </DialogTitle>
-            <button
-              onClick={() => setSelectedMonth(null)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </DialogHeader>
 
           {selectedMonth && (
@@ -510,40 +508,40 @@ export default function ProfitAndLoss() {
               {/* Detailed Breakdown */}
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Revenue Breakdown</h3>
-                  <div className="bg-green-50 border border-green-200 rounded p-4">
+                  <h3 className="font-semibold text-lg mb-3 text-gray-900">Revenue Breakdown</h3>
+                  <div className="bg-green-50 border border-green-200 rounded p-5">
                     <p className="text-sm text-gray-600 mb-2">Total Revenue for {selectedMonth.monthName}</p>
                     <p className="text-3xl font-bold text-green-600">${selectedMonth.revenue.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500 mt-2">From rental invoices and contracts completed in this month</p>
+                    <p className="text-xs text-gray-500 mt-3">From rental invoices and contracts completed in this month</p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Expense Breakdown</h3>
-                  <div className="bg-red-50 border border-red-200 rounded p-4">
+                  <h3 className="font-semibold text-lg mb-3 text-gray-900">Expense Breakdown</h3>
+                  <div className="bg-red-50 border border-red-200 rounded p-5">
                     <p className="text-sm text-gray-600 mb-2">Total Expenses for {selectedMonth.monthName}</p>
                     <p className="text-3xl font-bold text-red-600">${selectedMonth.expenses.toFixed(2)}</p>
-                    <p className="text-xs text-gray-500 mt-2">Maintenance, insurance, and other operational costs</p>
+                    <p className="text-xs text-gray-500 mt-3">Maintenance, insurance, and other operational costs</p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 text-gray-800">Profit Analysis</h3>
-                  <div className={`rounded p-4 border ${
+                  <h3 className="font-semibold text-lg mb-3 text-gray-900">Profit Analysis</h3>
+                  <div className={`rounded p-5 border ${
                     (selectedMonth.revenue - selectedMonth.expenses) >= 0
                       ? 'bg-green-50 border-green-200'
                       : 'bg-red-50 border-red-200'
                   }`}>
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-gray-700">Revenue</span>
+                      <span className="text-gray-700 font-medium">Revenue</span>
                       <span className="font-semibold text-green-600">${selectedMonth.revenue.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center mb-3 pb-3 border-b">
-                      <span className="text-gray-700">Expenses</span>
+                      <span className="text-gray-700 font-medium">Expenses</span>
                       <span className="font-semibold text-red-600">-${selectedMonth.expenses.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-800">Net Profit/Loss</span>
+                      <span className="font-bold text-gray-900">Net Profit/Loss</span>
                       <span className={`text-2xl font-bold ${
                         (selectedMonth.revenue - selectedMonth.expenses) >= 0
                           ? 'text-green-600'
@@ -552,7 +550,7 @@ export default function ProfitAndLoss() {
                         ${(selectedMonth.revenue - selectedMonth.expenses).toFixed(2)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-3">
+                    <p className="text-xs text-gray-500 mt-3 font-medium">
                       Profit Margin: {selectedMonth.revenue > 0 ? (((selectedMonth.revenue - selectedMonth.expenses) / selectedMonth.revenue) * 100).toFixed(1) : 0}%
                     </p>
                   </div>
