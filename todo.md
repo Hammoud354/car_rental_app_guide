@@ -5007,3 +5007,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify logo persists after page reload - Logo persists correctly
 - [x] Add error handling for failed logo loads - Error handler implemented with onError callback
 - [x] Create comprehensive tests for logo and currency functionality - All 11 tests passing
+
+
+## PDF Export Error - Custom Template
+- [x] Fix "contract.dailyRate.toFixed is not a function" error when exporting to custom template - FIXED
+- [x] Verify dailyRate is properly converted to number before calling toFixed() - Using parseFloat() for all numeric fields
+- [x] Check custom template code for type assumptions - Fixed in contractPdfGenerator.ts
+- [x] Test PDF export with various contract data - All 13 tests passing

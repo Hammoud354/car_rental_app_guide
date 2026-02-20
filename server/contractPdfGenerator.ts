@@ -117,24 +117,31 @@ export async function generateContractPDF(
  * Helper function to format contract data for PDF generation
  */
 export function formatContractDataForPDF(contract: any, client: any, vehicle: any, company: any): ContractData {
+  // Helper function to safely convert values to numbers
+  const toNumber = (value: any): number => {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') return parseFloat(value) || 0;
+    return 0;
+  };
+
   return {
-    clientName: client ? `${client.firstName} ${client.lastName}` : '',
-    clientAddress: client?.address || '',
-    clientPhone: client?.phone || '',
-    clientEmail: client?.email || '',
-    clientLicenseNumber: client?.drivingLicenseNumber || '',
-    vehiclePlate: vehicle?.plateNumber || '',
-    vehicleMake: vehicle?.make || '',
-    vehicleModel: vehicle?.model || '',
-    vehicleYear: vehicle?.year?.toString() || '',
+    clientName: client && client.firstName && client.lastName ? `${client.firstName} ${client.lastName}` : '',
+    clientAddress: client?.address ? client.address : '',
+    clientPhone: client?.phone ? client.phone : '',
+    clientEmail: client?.email ? client.email : '',
+    clientLicenseNumber: client?.drivingLicenseNumber ? client.drivingLicenseNumber : '',
+    vehiclePlate: vehicle?.plateNumber ? vehicle.plateNumber : '',
+    vehicleMake: vehicle?.make ? vehicle.make : '',
+    vehicleModel: vehicle?.model ? vehicle.model : '',
+    vehicleYear: vehicle?.year ? vehicle.year.toString() : '',
     startDate: contract?.startDate ? new Date(contract.startDate).toLocaleDateString() : '',
     endDate: contract?.endDate ? new Date(contract.endDate).toLocaleDateString() : '',
-    pickupLocation: contract?.pickupLocation || '',
-    returnLocation: contract?.returnLocation || '',
-    dailyRate: contract?.dailyRate ? `$${contract.dailyRate.toFixed(2)}` : '',
-    totalAmount: contract?.totalAmount ? `$${contract.totalAmount.toFixed(2)}` : '',
-    deposit: contract?.depositAmount ? `$${contract.depositAmount.toFixed(2)}` : '',
-    contractNumber: contract?.contractNumber || contract?.id?.toString() || '',
+    pickupLocation: contract?.pickupLocation ? contract.pickupLocation : '',
+    returnLocation: contract?.returnLocation ? contract.returnLocation : '',
+    dailyRate: contract?.dailyRate ? `$${parseFloat(contract.dailyRate).toFixed(2)}` : '',
+    totalAmount: contract?.totalAmount ? `$${parseFloat(contract.totalAmount).toFixed(2)}` : '',
+    deposit: contract?.depositAmount ? `$${parseFloat(contract.depositAmount).toFixed(2)}` : '',
+    contractNumber: contract?.contractNumber || (contract?.id ? contract.id.toString() : ''),
     companyName: company?.companyName || '',
     companyAddress: company?.address || '',
     companyPhone: company?.phone || '',
