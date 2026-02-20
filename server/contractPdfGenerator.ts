@@ -85,26 +85,37 @@ export async function generateContractPDF(
       const text = contractData[fieldId as keyof ContractData] || '';
       if (!text) continue;
       
+      // Ensure alignment has a default value
+      const alignment = mapping.alignment || 'left';
+      const fontSize = mapping.fontSize || 12;
+      
       // Convert percentage coordinates to absolute positions
       // Note: PDF coordinates start from bottom-left, so we need to invert Y
       const x = (mapping.x / 100) * imageDims.width;
       const y = imageDims.height - ((mapping.y / 100) * imageDims.height);
       
       // Calculate text width for alignment
-      const textWidth = font.widthOfTextAtSize(text, mapping.fontSize);
+      const textWidth = font.widthOfTextAtSize(text, fontSize);
       
+      // For alignment: x coordinate represents the reference point
+      // Left: text starts at x
+      // Center: center of text is at x
+      // Right: text ends at x
       let finalX = x;
-      if (mapping.alignment === 'center') {
+      if (alignment === 'center') {
+        // Center the text around the x position
         finalX = x - (textWidth / 2);
-      } else if (mapping.alignment === 'right') {
+      } else if (alignment === 'right') {
+        // Right-align: text ends at x
         finalX = x - textWidth;
       }
+      // For 'left', finalX stays as x (text starts at x)
       
       // Draw text
       page.drawText(text, {
         x: finalX,
         y: y,
-        size: mapping.fontSize,
+        size: fontSize,
         font: font,
         color: rgb(0, 0, 0),
       });

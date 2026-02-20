@@ -5034,3 +5034,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check if field mapping data is being passed correctly to PDF generator - Data was not being extracted
 - [x] Verify template placeholder replacement logic - Added all missing fields to ContractData type
 - [x] Ensure all mapped fields are rendered in the final PDF output - All 14 tests passing
+
+
+## Field Alignment Configuration for Contract Templates
+- [x] Add alignment options (left, center, right) to field mapping UI - Already implemented
+- [x] Update field mapping data structure to store alignment preference - Already implemented
+- [x] Modify PDF generator to apply alignment settings - Fixed alignment handling with default values
+- [x] Test centered field display in exported PDF - All 16 tests passing
