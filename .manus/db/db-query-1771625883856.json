@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, username, name FROM users ORDER BY lastSignedIn DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, name FROM users ORDER BY lastSignedIn DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "1800044",
+      "username": "oauth_eaoa7aHG4W4zHjNjYNHFcY",
+      "name": "Test Owner Updated"
+    },
+    {
+      "id": "1800043",
+      "username": "testuser_1771585448148",
+      "name": "Test Company Registration"
+    },
+    {
+      "id": "1800042",
+      "username": "resettest_1771585445517",
+      "name": "Reset Test User"
+    },
+    {
+      "id": "1800040",
+      "username": "test_user_1771585437798",
+      "name": "Test User"
+    },
+    {
+      "id": "1800039",
+      "username": "test_admin_1771585436295",
+      "name": "Test Admin"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\tname\n1800044\toauth_eaoa7aHG4W4zHjNjYNHFcY\tTest Owner Updated\n1800043\ttestuser_1771585448148\tTest Company Registration\n1800042\tresettest_1771585445517\tReset Test User\n1800040\ttest_user_1771585437798\tTest User\n1800039\ttest_admin_1771585436295\tTest Admin\n",
+  "stderr": "",
+  "execution_time_ms": 1498
+}

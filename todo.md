@@ -5053,7 +5053,18 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ## Sidebar Logo Not Displaying (Debugging)
 - [x] Verify logo URL is being fetched in sidebar component - Query is set up correctly
-- [ ] Check if logo image is loading correctly from S3 - Logo URL exists in database
-- [ ] Test logo display with different image formats - PNG format confirmed
-- [ ] Ensure CORS headers are correct for S3 images - Need to verify
+- [ ] Add server-side logging to getProfile query to see what data is returned
+- [ ] Check if profile data is being fetched at all in the sidebar component
+- [ ] Verify the logo URL format and ensure it's a valid S3 URL
+- [ ] Test with hardcoded logo URL to isolate the issue
 - [ ] Fix logo rendering in sidebar header - Code is in place, need to debug why logoUrl is undefined
+
+
+## Sidebar Logo Not Displaying (FIXED)
+- [x] Verify logo URL is being fetched in sidebar component - Query is set up correctly
+- [x] Add server-side logging to getProfile query to see what data is returned - Found root cause
+- [x] Check if profile data is being fetched at all in the sidebar component - Profile was null
+- [x] Verify the logo URL format and ensure it's a valid S3 URL - URL is valid
+- [x] Test with hardcoded logo URL to isolate the issue - Issue was missing profile
+- [x] Fix logo rendering in sidebar header - Auto-create company profile on OAuth login
+- [x] Auto-create company profile for new users on first login - Now happens in OAuth callback

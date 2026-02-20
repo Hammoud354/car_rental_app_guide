@@ -181,14 +181,17 @@ function DashboardLayoutContent({
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <div className="h-10 w-10 flex items-center justify-center shrink-0 rounded-lg bg-primary/10">
                     {profile?.logoUrl ? (
-                      <img
-                        src={profile.logoUrl}
-                        alt="Company Logo"
-                        className="h-10 w-10 object-contain rounded-lg"
-                        onError={() => {
-                          // Logo failed to load, let the Building2 icon show via CSS
-                        }}
-                      />
+                      <>
+                        <img
+                          src={profile.logoUrl}
+                          alt="Company Logo"
+                          className="h-10 w-10 object-contain rounded-lg"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                        <Building2 className="h-6 w-6 text-primary hidden" id="logo-fallback" />
+                      </>
                     ) : (
                       <Building2 className="h-6 w-6 text-primary" />
                     )}

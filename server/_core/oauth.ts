@@ -37,6 +37,18 @@ export function registerOAuthRoutes(app: Express) {
         lastSignedIn: new Date(),
       });
 
+      // Get the user ID to auto-create company profile
+      const user = await db.getUserByOpenId(userInfo.openId);
+      if (user) {
+        const existingProfile = await db.getCompanyProfile(user.id);
+        if (!existingProfile) {
+          await db.upsertCompanyProfile({
+            userId: user.id,
+            companyName: userInfo.name || "My Company",
+          });
+        }
+      }
+
       const sessionToken = await sdk.createSessionToken(userInfo.openId, {
         name: userInfo.name || "",
         expiresInMs: ONE_YEAR_MS,

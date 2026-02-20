@@ -1,0 +1,31 @@
+{
+  "query": "SELECT DISTINCT userId FROM companyProfiles;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT DISTINCT userId FROM companyProfiles;",
+  "rows": [
+    {
+      "userId": "1470001"
+    },
+    {
+      "userId": "1740020"
+    },
+    {
+      "userId": "9999"
+    },
+    {
+      "userId": "870167"
+    },
+    {
+      "userId": "870189"
+    },
+    {
+      "userId": "841246"
+    },
+    {
+      "userId": "1620001"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\n1470001\n1740020\n9999\n870167\n870189\n841246\n1620001\n",
+  "stderr": "",
+  "execution_time_ms": 1493
+}
