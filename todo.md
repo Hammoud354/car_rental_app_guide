@@ -5041,3 +5041,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update field mapping data structure to store alignment preference - Already implemented
 - [x] Modify PDF generator to apply alignment settings - Fixed alignment handling with default values
 - [x] Test centered field display in exported PDF - All 16 tests passing
+
+
+## Sidebar Logo Not Displaying
+- [x] Find the DashboardLayout sidebar component where logo is displayed - Found in DashboardLayout.tsx
+- [x] Check if company logo URL is being fetched from profile - Confirmed in database
+- [x] Fix the logo display to show uploaded company logo instead of blue icon - Added logo container and fallback
+- [x] Add fallback to blue icon if no logo is uploaded - Building2 icon added as fallback
+- [x] Add profile refetch on component mount to ensure latest logo is loaded

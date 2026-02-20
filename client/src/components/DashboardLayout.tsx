@@ -22,7 +22,7 @@ import {
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { trpc } from "@/lib/trpc";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Building2 } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -111,12 +111,16 @@ function DashboardLayoutContent({
   const { user, logout } = useAuth();
   const [location, setLocation] = useLocation();
   const { state, toggleSidebar } = useSidebar();
-  const { data: profile } = trpc.company.getProfile.useQuery();
+  const { data: profile, refetch: refetchProfile } = trpc.company.getProfile.useQuery();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
+
+  useEffect(() => {
+    refetchProfile();
+  }, []);
 
   useEffect(() => {
     if (isCollapsed) {
@@ -173,17 +177,20 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  {profile?.logoUrl ? (
-                    <img
-                      src={profile.logoUrl}
-                      alt="Company Logo"
-                      className="h-10 w-auto object-contain shrink-0"
-                      onError={(e) => {
-                        console.log("Logo failed to load from:", profile.logoUrl);
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                  ) : null}
+                  <div className="h-10 w-10 flex items-center justify-center shrink-0 rounded-lg bg-primary/10">
+                    {profile?.logoUrl ? (
+                      <img
+                        src={profile.logoUrl}
+                        alt="Company Logo"
+                        className="h-10 w-10 object-contain rounded-lg"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                    ) : (
+                      <Building2 className="h-6 w-6 text-primary" />
+                    )}
+                  </div>
                   <div className="flex flex-col min-w-0">
                     <span className="text-sm font-semibold tracking-tight truncate">
                       {profile?.companyName || "Company"}

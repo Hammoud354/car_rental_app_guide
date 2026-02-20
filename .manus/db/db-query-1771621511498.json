@@ -1,0 +1,14 @@
+{
+  "query": "SELECT companyName, logoUrl FROM companyProfiles WHERE logoUrl IS NOT NULL LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT companyName, logoUrl FROM companyProfiles WHERE logoUrl IS NOT NULL LIMIT 1;",
+  "rows": [
+    {
+      "companyName": "Dima Rent a Car",
+      "logoUrl": "https://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771412335146.png"
+    }
+  ],
+  "messages": [],
+  "stdout": "companyName\tlogoUrl\nDima Rent a Car\thttps://d2xsxph8kpxj0f.cloudfront.net/310519663036733093/7Q8gdiHiBpSXUrkFz6JMfV/company-logo-1771412335146.png\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}
