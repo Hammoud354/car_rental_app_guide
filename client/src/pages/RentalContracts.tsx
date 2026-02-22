@@ -103,7 +103,6 @@ export default function RentalContracts() {
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
   const exchangeRate = companyProfile?.exchangeRate ? Number(companyProfile.exchangeRate) : 1.0;
-  const { data: companySettings } = trpc.settings.get.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
   const utils = trpc.useUtils();
   
@@ -1695,12 +1694,11 @@ export default function RentalContracts() {
                         });
                         
                         // Use company phone number from settings
-                        if (!companySettings?.phone) {
+                        if (!companyProfile?.phone) {
                           toast.error("Company phone number not set in settings");
                           return;
                         }
-                        const phoneNumber = companySettings.phone.replace(/[\s\-\(\)]/g, '');
-                        
+                        const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, '');                        
                         // Get custom template or use default
                         const template = whatsappTemplate?.messageTemplate || getDefaultTemplate('contract_created');
                         

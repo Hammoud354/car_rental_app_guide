@@ -588,6 +588,17 @@ export default function Clients() {
                     />
                   </div>
                   <div className="col-span-2">
+                    <Label htmlFor="edit-fatherName">Father's Name *</Label>
+                    <Input 
+                      id="edit-fatherName" 
+                      name="fatherName" 
+                      defaultValue={selectedClient.fatherName || ""}
+                      required 
+                      placeholder="Ahmed Hassan" 
+                      className="input-client" 
+                    />
+                  </div>
+                  <div className="col-span-2">
                     <Label htmlFor="edit-nationality">Nationality</Label>
                     <Popover open={editNationalityOpen} onOpenChange={setEditNationalityOpen}>
                       <PopoverTrigger asChild>

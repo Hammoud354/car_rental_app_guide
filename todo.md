@@ -5228,3 +5228,17 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update bulk import functionality
 - [x] Update seed demo data with father's names (6 clients)
 - [x] Test Father's Name field works correctly - verified in form
+
+
+## Fix Father's Name Field in Edit Form (Feb 23, 2026)
+- [ ] Check why Father's Name field is missing in edit form for existing clients
+- [ ] Verify field appears in edit form when fatherName is populated
+- [ ] Test editing existing client to ensure Father's Name field displays
+- [ ] Ensure field can be edited and saved properly
+
+
+## Father's Name Field in Edit Form - COMPLETED (Feb 23, 2026)
+- [x] Add Father's Name field to edit form
+- [x] Ensure field appears for existing clients
+- [x] Test edit form with Father's Name field
+- [x] Verify field is populated correctly - field now visible in edit form with proper defaultValue handling
