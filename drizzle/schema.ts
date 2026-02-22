@@ -236,6 +236,7 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients
   clientFirstName: varchar("clientFirstName", { length: 100 }),
   clientLastName: varchar("clientLastName", { length: 100 }),
+  clientMotherFullName: varchar("clientMotherFullName", { length: 200 }), // Mother's full name for identification purposes
   clientNationality: varchar("clientNationality", { length: 100 }),
   clientPhone: varchar("clientPhone", { length: 20 }),
   clientAddress: text("clientAddress"),
