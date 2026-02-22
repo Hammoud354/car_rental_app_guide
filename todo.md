@@ -5151,3 +5151,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Create country to currency code mapping
 - [x] Update CompanySettings to auto-populate currency code when country is selected
 - [x] Test auto-selection functionality with different countries
+
+
+## Auto-Populate VAT Rate by Country
+- [x] Create country to VAT rate mapping
+- [x] Update CompanySettings to auto-populate VAT rate when country is selected
+- [x] Test auto-population with different countries (tested with UAE and UK)

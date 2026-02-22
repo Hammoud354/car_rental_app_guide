@@ -11,6 +11,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countries } from "@/lib/countries";
 import { getCurrencyCodeForCountry } from "@/lib/countryCurrencyMap";
+import { getVATRateByCountry } from "@/lib/vatRates";
 import { cn } from "@/lib/utils";
 
 export default function CompanySettings() {
@@ -430,10 +431,12 @@ export default function CompanySettings() {
                               onSelect={(currentValue) => {
                                 const newCountry = currentValue === formData.country ? "" : currentValue;
                                 const newCurrencyCode = newCountry ? getCurrencyCodeForCountry(newCountry) : formData.localCurrencyCode;
+                                const newVATRate = newCountry ? getVATRateByCountry(newCountry) : 11;
                                 setFormData({
                                   ...formData,
                                   country: newCountry,
                                   localCurrencyCode: newCurrencyCode || formData.localCurrencyCode,
+                                  vatRate: newVATRate.toString(),
                                 });
                               }}
                               className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"
