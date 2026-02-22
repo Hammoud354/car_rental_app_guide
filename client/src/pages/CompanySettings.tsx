@@ -30,6 +30,7 @@ export default function CompanySettings() {
     defaultCurrency: "USD" as "USD" | "LOCAL",
     exchangeRate: "1.0000",
     localCurrencyCode: "LBP",
+    vatRate: "11",
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -56,6 +57,7 @@ export default function CompanySettings() {
         defaultCurrency: (profile.defaultCurrency as "USD" | "LOCAL") || "USD",
         exchangeRate: profile.exchangeRate?.toString() || "1.0000",
         localCurrencyCode: profile.localCurrencyCode || "LBP",
+        vatRate: profile.vatRate?.toString() || "11",
       });
       if (profile.logoUrl) {
         setLogoPreview(profile.logoUrl);
@@ -113,6 +115,7 @@ export default function CompanySettings() {
         companyName,
         contractTemplateUrl: url,
         exchangeRate: parseFloat(formData.exchangeRate) || 1,
+        vatRate: parseFloat(formData.vatRate) || 11,
       };
       await updateProfile.mutateAsync(updateData);
 
@@ -232,6 +235,7 @@ export default function CompanySettings() {
         logoUrl,
         contractTemplateUrl,
         exchangeRate: parseFloat(formData.exchangeRate) || 1,
+        vatRate: parseFloat(formData.vatRate) || 11,
       };
       console.log('[handleSubmit] final exchangeRate:', updateData.exchangeRate);
       await updateProfile.mutateAsync(updateData);
@@ -529,6 +533,20 @@ export default function CompanySettings() {
                   placeholder="1.0000"
                 />
                 <p className="text-xs text-muted-foreground mt-1">Local currency to USD conversion rate</p>
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="vatRate">VAT Rate (%)</Label>
+                <Input
+                  id="vatRate"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  max="100"
+                  value={formData.vatRate}
+                  onChange={(e) => setFormData({ ...formData, vatRate: e.target.value })}
+                  placeholder="11"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Value Added Tax percentage applied to invoices (e.g., 5 for UAE, 11 for Lebanon, 20 for UK)</p>
               </div>
             </div>
           </CardContent>

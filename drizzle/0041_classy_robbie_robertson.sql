@@ -1,0 +1,1 @@
+ALTER TABLE `companyProfiles` ADD `vatRate` decimal(5,2) DEFAULT '11.00' NOT NULL;

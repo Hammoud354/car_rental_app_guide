@@ -1648,6 +1648,7 @@ export async function getCompanyProfile(userId: number) {
       defaultCurrency: companyProfiles.defaultCurrency,
       exchangeRate: companyProfiles.exchangeRate,
       localCurrencyCode: companyProfiles.localCurrencyCode,
+      vatRate: companyProfiles.vatRate,
       createdAt: companyProfiles.createdAt,
       updatedAt: companyProfiles.updatedAt,
     })
@@ -1680,6 +1681,7 @@ export async function upsertCompanyProfile(data: {
   defaultCurrency?: "USD" | "LOCAL";
   exchangeRate?: number;
   localCurrencyCode?: string;
+  vatRate?: number;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -1721,6 +1723,7 @@ export async function upsertCompanyProfile(data: {
         defaultCurrency: data.defaultCurrency,
         exchangeRate: data.exchangeRate !== undefined && data.exchangeRate !== null ? String(data.exchangeRate) : existing.exchangeRate,
         localCurrencyCode: localCurrencyCode,
+        vatRate: data.vatRate !== undefined && data.vatRate !== null ? data.vatRate.toString() : existing.vatRate,
       })
       .where(eq(companyProfiles.userId, data.userId));
     
@@ -1733,6 +1736,7 @@ export async function upsertCompanyProfile(data: {
       ...data,
       localCurrencyCode: localCurrencyCode,
       exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : "1.0000",
+      vatRate: data.vatRate ? data.vatRate.toString() : "11.00",
     };
     const [result] = await db
       .insert(companyProfiles)

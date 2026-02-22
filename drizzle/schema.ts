@@ -68,6 +68,7 @@ export const companyProfiles = mysqlTable("companyProfiles", {
   defaultCurrency: mysqlEnum("defaultCurrency", ["USD", "LOCAL"]).default("USD").notNull(), // Default operating currency
   exchangeRate: decimal("exchangeRate", { precision: 10, scale: 4 }).default("1.0000").notNull(), // Exchange rate for local currency to USD
   localCurrencyCode: varchar("localCurrencyCode", { length: 3 }).default("LBP"), // Local currency code (e.g., LBP, EUR)
+  vatRate: decimal("vatRate", { precision: 5, scale: 2 }).default("11.00").notNull(), // VAT percentage (e.g., 11 for 11%, 5 for 5%)
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

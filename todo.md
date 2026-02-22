@@ -5102,3 +5102,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Identify nested anchor tags in Invoices component
 - [x] Fix nested anchor tags by removing or restructuring
 - [x] Test and verify the error is resolved
+
+
+## Dynamic VAT System by Country
+- [x] Create VAT rates mapping for different countries (UAE, Lebanon, etc.)
+- [x] Add VAT rate field to company settings database
+- [x] Update invoice calculation to use dynamic VAT from company settings
+- [x] Add manual VAT adjustment capability in invoice form
+- [x] Update invoice display to show VAT rate and allow editing
+- [x] Test VAT calculation with different countries
