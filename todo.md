@@ -5191,3 +5191,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test P&L calculations with exchange rates
 - [x] Verify all currency conversions are accurate
 - [x] Save checkpoint
+
+
+## Dropdown Close Fix (Feb 22, 2026)
+- [x] Add state management to control Popover open/close
+- [x] Close dropdown immediately after country selection
+- [x] Test dropdown closes properly
+- [x] Verify auto-population still works after close fix

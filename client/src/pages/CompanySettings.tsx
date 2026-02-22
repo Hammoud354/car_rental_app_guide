@@ -42,6 +42,7 @@ export default function CompanySettings() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>("");
   const [uploading, setUploading] = useState(false);
+  const [countryPopoverOpen, setCountryPopoverOpen] = useState(false);
   
   const [templateFile, setTemplateFile] = useState<File | null>(null);
   const [templatePreview, setTemplatePreview] = useState<string>("");
@@ -400,7 +401,7 @@ export default function CompanySettings() {
               </div>
               <div>
                 <Label htmlFor="country">Country</Label>
-                <Popover>
+                <Popover open={countryPopoverOpen} onOpenChange={setCountryPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -440,6 +441,8 @@ export default function CompanySettings() {
                                   vatRate: newVATRate.toString(),
                                   exchangeRate: newExchangeRate.toString(),
                                 });
+                                // Close the popover after selection
+                                setCountryPopoverOpen(false);
                               }}
                               className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"
                             >
