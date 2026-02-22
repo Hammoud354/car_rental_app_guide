@@ -5198,3 +5198,15 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Close dropdown immediately after country selection
 - [x] Test dropdown closes properly
 - [x] Verify auto-population still works after close fix
+
+
+## Add Mother's Full Name Field to Client Form (Feb 22, 2026)
+- [x] Rename fullName to motherFullName in database schema
+- [x] Add motherFullName field to client creation form
+- [x] Add motherFullName field to client edit form
+- [x] Update form label to "Mother's Full Name *"
+- [x] Update placeholder to "Fatima Ahmed"
+- [x] Update all server validation schemas
+- [x] Update bulk import functionality
+- [x] Update seed demo data with mother's names
+- [x] Test mother's full name field works correctly

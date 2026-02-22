@@ -196,6 +196,7 @@ export async function seedDemoData(userId: number): Promise<void> {
   const clientData = [
     {
       userId,
+      motherFullName: "John Smith",
       firstName: "John",
       lastName: "Smith",
       nationality: "American",
@@ -208,6 +209,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     },
     {
       userId,
+      motherFullName: "Sarah Johnson",
       firstName: "Sarah",
       lastName: "Johnson",
       nationality: "Canadian",
@@ -220,6 +222,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     },
     {
       userId,
+      motherFullName: "Michael Brown",
       firstName: "Michael",
       lastName: "Brown",
       nationality: "British",
@@ -232,6 +235,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     },
     {
       userId,
+      motherFullName: "Emily Davis",
       firstName: "Emily",
       lastName: "Davis",
       nationality: "Australian",
@@ -244,6 +248,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     },
     {
       userId,
+      motherFullName: "David Wilson",
       firstName: "David",
       lastName: "Wilson",
       nationality: "American",
@@ -256,6 +261,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     },
     {
       userId,
+      motherFullName: "Lisa Martinez",
       firstName: "Lisa",
       lastName: "Martinez",
       nationality: "Spanish",

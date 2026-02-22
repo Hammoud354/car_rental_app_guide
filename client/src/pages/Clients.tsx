@@ -125,9 +125,12 @@ export default function Clients() {
     }
     
     const dateOfBirthStr = formData.get("dateOfBirth") as string;
+    const firstName = formData.get("firstName") as string;
+    const lastName = formData.get("lastName") as string;
     createClient.mutate({
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
+      motherFullName: formData.get("motherFullName") as string,
+      firstName,
+      lastName,
       nationality: createSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
@@ -250,6 +253,10 @@ export default function Clients() {
                 <div>
                   <h3 className="font-semibold mb-4">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                      <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+                      <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
+                    </div>
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input id="firstName" name="firstName" required className="input-client" />
@@ -555,6 +562,16 @@ export default function Clients() {
               <div>
                 <h3 className="font-semibold mb-4">Personal Information</h3>
                 <div className="grid grid-cols-2 gap-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
+                    <Input 
+                      id="edit-motherFullName" 
+                      name="motherFullName" 
+                      defaultValue={selectedClient.motherFullName}
+                      required 
+                      className="input-client" 
+                    />
+                  </div>
                   <div>
                     <Label htmlFor="edit-firstName">First Name *</Label>
                     <Input 

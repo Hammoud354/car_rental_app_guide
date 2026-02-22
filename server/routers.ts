@@ -687,6 +687,7 @@ export const appRouter = router({
         if (!client) {
           client = await db.createClient({
             userId,
+            motherFullName: `${input.clientFirstName} ${input.clientLastName}`,
             firstName: input.clientFirstName,
             lastName: input.clientLastName,
             nationality: input.clientNationality,
@@ -985,6 +986,7 @@ export const appRouter = router({
     
     create: publicProcedure
       .input(z.object({
+        motherFullName: z.string().min(1).max(200),
         firstName: z.string().min(1).max(100),
         lastName: z.string().min(1).max(100),
         nationality: z.string().max(100).optional(),
@@ -1031,6 +1033,7 @@ export const appRouter = router({
     update: publicProcedure
       .input(z.object({
         id: z.number(),
+        motherFullName: z.string().min(1).max(200).optional(),
         firstName: z.string().min(1).max(100).optional(),
         lastName: z.string().min(1).max(100).optional(),
         nationality: z.string().max(100).optional(),
@@ -1961,12 +1964,13 @@ export const appRouter = router({
             
             const created = await db.createClient({
               userId,
+              motherFullName: client.name,
               firstName,
               lastName,
               email: client.email,
               phone: client.phone,
               drivingLicenseNumber: client.drivingLicenseNumber || 'N/A',
-              licenseExpiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
+              licenseExpiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
               nationality: client.nationality,
               address: client.address,
             });

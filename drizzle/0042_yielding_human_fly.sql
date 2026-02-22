@@ -1,0 +1,1 @@
+ALTER TABLE `clients` ADD `fullName` varchar(200) NOT NULL;
