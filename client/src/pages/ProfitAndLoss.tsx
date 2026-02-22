@@ -115,11 +115,9 @@ export default function ProfitAndLoss() {
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Link href="/dashboard">
-            <a className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Home className="h-4 w-4" />
-              <span>Dashboard</span>
-            </a>
+          <Link href="/dashboard" className="flex items-center gap-1 hover:text-primary transition-colors">
+            <Home className="h-4 w-4" />
+            <span>Dashboard</span>
           </Link>
           <ChevronRight className="h-4 w-4 text-gray-400" />
           <span className="text-foreground font-medium">Profit & Loss</span>

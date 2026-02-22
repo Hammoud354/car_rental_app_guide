@@ -5096,3 +5096,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update contract form UI to include mother's full name field
 - [x] Update form submission to capture mother's full name
 - [x] Test and verify the new field is working correctly
+
+
+## Bug Fix - Nested Anchor Tags on Invoices Page
+- [x] Identify nested anchor tags in Invoices component
+- [x] Fix nested anchor tags by removing or restructuring
+- [x] Test and verify the error is resolved
