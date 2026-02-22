@@ -414,11 +414,11 @@ export default function CompanySettings() {
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-full p-0 border-2 border-red-500">
                     <Command>
-                      <CommandInput placeholder="Search countries..." />
-                      <CommandEmpty>No country found.</CommandEmpty>
-                      <CommandList>
+                      <CommandInput placeholder="Search countries..." className="border-b-2 border-red-200" />
+                      <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">No country found.</CommandEmpty>
+                      <CommandList className="max-h-64">
                         <CommandGroup>
                           {countries.map((country) => (
                             <CommandItem
@@ -430,16 +430,17 @@ export default function CompanySettings() {
                                   country: currentValue === formData.country ? "" : currentValue,
                                 });
                               }}
+                              className="cursor-pointer px-4 py-2.5 hover:bg-red-50 data-[selected]:bg-red-100"
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
                                   formData.country === country.name
-                                    ? "opacity-100"
+                                    ? "opacity-100 text-red-600"
                                     : "opacity-0"
                                 )}
                               />
-                              {country.name}
+                              <span className="text-sm">{country.name}</span>
                             </CommandItem>
                           ))}
                         </CommandGroup>

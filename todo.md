@@ -5117,3 +5117,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Create countries list constant with all countries
 - [x] Update Company Settings to use Combobox for country selection
 - [x] Test country dropdown functionality and auto-fill VAT rate
+
+
+## Country Dropdown Styling Improvements
+- [x] Update dropdown search input to use red border matching form style
+- [x] Add hover effects to country options for better UX
+- [x] Improve dropdown spacing and typography consistency
+- [x] Test dropdown styling on different screen sizes
