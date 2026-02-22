@@ -46,9 +46,11 @@ export default function Invoices() {
     }
   }, []);
 
-  // Fetch company settings for exchange rate
+  // Fetch company settings for exchange rate and VAT rate
   const { data: settings } = trpc.settings.get.useQuery();
   const exchangeRate = settings?.exchangeRateLbpToUsd ? Number(settings.exchangeRateLbpToUsd) : 89700;
+  const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
 
   // Fetch all users for Super Admin
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
@@ -70,7 +72,6 @@ export default function Invoices() {
       setPaymentMethod(invoiceDetails.paymentMethod || "");
     }
   }, [invoiceDetails]);
-  const { data: companyProfile } = trpc.company.getProfile.useQuery();
 
   const updatePaymentMutation = trpc.invoices.updatePaymentStatus.useMutation({
     onSuccess: () => {
@@ -454,7 +455,7 @@ export default function Invoices() {
                         </span>
                       </div>
                       <div className="flex justify-between text-base">
-                        <span className="text-gray-600">Tax/VAT 11% (USD):</span>
+                        <span className="text-gray-600">Tax/VAT {vatRate}% (USD):</span>
                         <span className="font-medium tracking-wider">
                           {formatUSD(parseFloat(invoiceDetails.taxAmount))}
                         </span>
@@ -475,7 +476,7 @@ export default function Invoices() {
                         </span>
                       </div>
                       <div className="flex justify-between text-base">
-                        <span className="text-gray-600">Tax/VAT 11% (LBP):</span>
+                        <span className="text-gray-600">Tax/VAT {vatRate}% (LBP):</span>
                         <span className="font-medium tracking-wider">
                           {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount), exchangeRate))}
                         </span>

@@ -11,7 +11,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countries } from "@/lib/countries";
 import { getCurrencyCodeForCountry } from "@/lib/countryCurrencyMap";
-import { getVATRateByCountry } from "@/lib/vatRates";
+import { getVATRateByCountry, getExchangeRateByCountry } from "@/lib/vatRates";
 import { cn } from "@/lib/utils";
 
 export default function CompanySettings() {
@@ -418,25 +418,27 @@ export default function CompanySettings() {
                       <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0">
+                  <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
                     <Command>
                       <CommandInput placeholder="Search countries..." className="border-b border-gray-200 focus:border-gray-300" />
                       <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">No country found.</CommandEmpty>
-                      <CommandList className="max-h-64">
+                      <CommandList className="max-h-[300px] w-full">
                         <CommandGroup>
                           {countries.map((country) => (
                             <CommandItem
                               key={country.code}
                               value={country.name}
                               onSelect={(currentValue) => {
-                                const newCountry = currentValue === formData.country ? "" : currentValue;
-                                const newCurrencyCode = newCountry ? getCurrencyCodeForCountry(newCountry) : formData.localCurrencyCode;
-                                const newVATRate = newCountry ? getVATRateByCountry(newCountry) : 11;
+                                // Always select the country (don't toggle off)
+                                const newCurrencyCode = getCurrencyCodeForCountry(currentValue);
+                                const newVATRate = getVATRateByCountry(currentValue);
+                                const newExchangeRate = getExchangeRateByCountry(currentValue);
                                 setFormData({
                                   ...formData,
-                                  country: newCountry,
+                                  country: currentValue,
                                   localCurrencyCode: newCurrencyCode || formData.localCurrencyCode,
                                   vatRate: newVATRate.toString(),
+                                  exchangeRate: newExchangeRate.toString(),
                                 });
                               }}
                               className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"

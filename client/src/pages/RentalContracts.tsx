@@ -98,7 +98,11 @@ export default function RentalContracts() {
   const { data: clients = [] } = trpc.clients.list.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
+  
+  // Fetch company profile for VAT and exchange rates
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
+  const exchangeRate = companyProfile?.exchangeRate ? Number(companyProfile.exchangeRate) : 1.0;
   const { data: companySettings } = trpc.settings.get.useQuery();
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
   const utils = trpc.useUtils();
@@ -878,7 +882,7 @@ export default function RentalContracts() {
                         />
                       </div>
                       <div>
-                        <Label>Total Amount ($)</Label>
+                        <Label>Total Amount (USD)</Label>
                         <Input
                           type="text"
                           value={totalAmount.toFixed(2)}
@@ -887,7 +891,16 @@ export default function RentalContracts() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="discount">Discount ($)</Label>
+                        <Label>VAT {vatRate}% (USD)</Label>
+                        <Input
+                          type="text"
+                          value={(totalAmount * (vatRate / 100)).toFixed(2)}
+                          readOnly
+                          className="bg-gray-50 input-client"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="discount">Discount (USD)</Label>
                         <Input
                           id="discount"
                           name="discount"
@@ -900,14 +913,30 @@ export default function RentalContracts() {
                         />
                       </div>
                       <div>
-                        <Label>Final Amount ($)</Label>
+                        <Label>Final Amount with VAT (USD)</Label>
                         <Input
                           type="text"
-                          value={finalAmount.toFixed(2)}
+                          value={(finalAmount + (finalAmount * (vatRate / 100))).toFixed(2)}
                           readOnly
                           className="bg-gray-50 font-bold text-lg input-client"
                         />
                       </div>
+                      {exchangeRate !== 1.0 && (
+                        <>
+                          <div>
+                            <Label>Final Amount with VAT (Local)</Label>
+                            <Input
+                              type="text"
+                              value={((finalAmount + (finalAmount * (vatRate / 100))) * exchangeRate).toFixed(2)}
+                              readOnly
+                              className="bg-gray-50 font-bold text-lg input-client"
+                            />
+                          </div>
+                          <div className="col-span-2 text-xs text-gray-500">
+                            Exchange Rate: 1 USD = {exchangeRate.toFixed(4)} {companyProfile?.localCurrencyCode || "Local"}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 

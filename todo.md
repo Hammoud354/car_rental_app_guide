@@ -5157,3 +5157,37 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Create country to VAT rate mapping
 - [x] Update CompanySettings to auto-populate VAT rate when country is selected
 - [x] Test auto-population with different countries (tested with UAE and UK)
+
+
+## Country Dropdown and Exchange Rate Improvements (Feb 22, 2026)
+
+### Phase 1: Fix Country Dropdown Behavior
+- [x] Close dropdown immediately after country selection (single-choice behavior)
+- [x] Fix dropdown styling to have fixed size (not growing/shrinking)
+- [x] Ensure dropdown doesn't stay activated after selection
+- [x] Test dropdown closes properly on all browsers
+
+### Phase 2: Add Official Exchange Rates
+- [x] Create official exchange rates mapping for all countries (USD-based)
+- [x] Update vatRates.ts to include exchangeRate field for each country
+- [x] Set accurate rates for major countries (UAE, Lebanon, UK, etc.)
+- [x] Auto-populate exchange rate when country is selected in Company Settings
+
+### Phase 3: Apply VAT and Exchange Rates to Invoices
+- [x] Audit Invoices.tsx to ensure VAT is applied correctly
+- [x] Audit invoice calculation to use exchange rate from company settings
+- [x] Ensure invoice totals show both USD and local currency
+- [x] Test invoice calculations with different VAT and exchange rates
+
+### Phase 4: Apply VAT and Exchange Rates to Pricing Pages
+- [x] Audit RentalContracts.tsx pricing calculations
+- [x] Audit contract total calculations
+- [x] Audit P&L/Financial reports to use correct exchange rates
+- [x] Ensure all pricing displays use company settings VAT and exchange rate
+
+### Phase 5: Global Testing and Checkpoint
+- [x] Test invoice generation with different countries
+- [x] Test contract pricing with different VAT rates
+- [x] Test P&L calculations with exchange rates
+- [x] Verify all currency conversions are accurate
+- [x] Save checkpoint
