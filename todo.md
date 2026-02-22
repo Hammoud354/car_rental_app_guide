@@ -5138,3 +5138,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Restore pink/red colors for selection and hover states
 - [x] Fix dropdown arrow button width and padding to fill field properly
 - [x] Test and verify all styling fixes are correct
+
+
+## Country Dropdown Styling Cleanup
+- [x] Remove red border from country dropdown field - match other form inputs
+- [x] Remove red/pink backgrounds from dropdown options - use neutral gray
+- [x] Verify dropdown matches the styling of other form input fields
+- [x] Test dropdown appearance and functionality

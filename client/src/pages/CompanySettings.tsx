@@ -404,7 +404,7 @@ export default function CompanySettings() {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-full justify-between border-red-500 border-2 px-3 py-2",
+                        "w-full justify-between px-3 py-2",
                         !formData.country && "text-muted-foreground"
                       )}
                     >
@@ -416,7 +416,7 @@ export default function CompanySettings() {
                       <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-0 border-2 border-red-500">
+                  <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput placeholder="Search countries..." className="border-b border-gray-200 focus:border-gray-300" />
                       <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">No country found.</CommandEmpty>
@@ -432,13 +432,13 @@ export default function CompanySettings() {
                                   country: currentValue === formData.country ? "" : currentValue,
                                 });
                               }}
-                              className="cursor-pointer px-4 py-2.5 hover:bg-red-50 data-[selected]:bg-red-100"
+                              className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
                                   formData.country === country.name
-                                    ? "opacity-100 text-red-600"
+                                    ? "opacity-100 text-gray-700"
                                     : "opacity-0"
                                 )}
                               />
