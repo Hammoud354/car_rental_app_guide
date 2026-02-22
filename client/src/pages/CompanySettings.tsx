@@ -416,7 +416,7 @@ export default function CompanySettings() {
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0 border-2 border-red-500">
                     <Command>
-                      <CommandInput placeholder="Search countries..." className="border-b-2 border-red-200" />
+                      <CommandInput placeholder="Search countries..." className="border-b border-gray-200 focus:border-gray-300" />
                       <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">No country found.</CommandEmpty>
                       <CommandList className="max-h-64">
                         <CommandGroup>
@@ -430,13 +430,13 @@ export default function CompanySettings() {
                                   country: currentValue === formData.country ? "" : currentValue,
                                 });
                               }}
-                              className="cursor-pointer px-4 py-2.5 hover:bg-red-50 data-[selected]:bg-red-100"
+                              className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
                                   formData.country === country.name
-                                    ? "opacity-100 text-red-600"
+                                    ? "opacity-100 text-gray-700"
                                     : "opacity-0"
                                 )}
                               />

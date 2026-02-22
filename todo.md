@@ -5124,3 +5124,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add hover effects to country options for better UX
 - [x] Improve dropdown spacing and typography consistency
 - [x] Test dropdown styling on different screen sizes
+
+
+## Country Dropdown Styling Fix
+- [x] Remove red background from hover and selected states
+- [x] Fix search input border color to match dropdown
+- [x] Improve overall dropdown styling and spacing
+- [x] Test and verify the updated styling
