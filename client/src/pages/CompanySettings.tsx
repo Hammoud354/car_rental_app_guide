@@ -6,7 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, Building2, Home } from "lucide-react";
+import { Loader2, Upload, Building2, Home, Check, ChevronsUpDown } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { countries } from "@/lib/countries";
+import { cn } from "@/lib/utils";
 
 export default function CompanySettings() {
   const [, setLocation] = useLocation();
@@ -394,11 +398,55 @@ export default function CompanySettings() {
               </div>
               <div>
                 <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-full justify-between border-red-500 border-2",
+                        !formData.country && "text-muted-foreground"
+                      )}
+                    >
+                      {formData.country
+                        ? countries.find((c) => c.name === formData.country)?.name
+                        : "Select country..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Search countries..." />
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandList>
+                        <CommandGroup>
+                          {countries.map((country) => (
+                            <CommandItem
+                              key={country.code}
+                              value={country.name}
+                              onSelect={(currentValue) => {
+                                setFormData({
+                                  ...formData,
+                                  country: currentValue === formData.country ? "" : currentValue,
+                                });
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.country === country.name
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {country.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label htmlFor="phone">Phone</Label>

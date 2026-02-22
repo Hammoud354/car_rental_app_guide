@@ -5111,3 +5111,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add manual VAT adjustment capability in invoice form
 - [x] Update invoice display to show VAT rate and allow editing
 - [x] Test VAT calculation with different countries
+
+
+## Company Settings Country Dropdown
+- [x] Create countries list constant with all countries
+- [x] Update Company Settings to use Combobox for country selection
+- [x] Test country dropdown functionality and auto-fill VAT rate
