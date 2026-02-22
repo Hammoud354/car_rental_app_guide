@@ -5145,3 +5145,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Remove red/pink backgrounds from dropdown options - use neutral gray
 - [x] Verify dropdown matches the styling of other form input fields
 - [x] Test dropdown appearance and functionality
+
+
+## Auto-Select Currency Code by Country
+- [x] Create country to currency code mapping
+- [x] Update CompanySettings to auto-populate currency code when country is selected
+- [x] Test auto-selection functionality with different countries

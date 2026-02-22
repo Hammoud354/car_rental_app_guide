@@ -10,6 +10,7 @@ import { Loader2, Upload, Building2, Home, Check, ChevronsUpDown } from "lucide-
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { countries } from "@/lib/countries";
+import { getCurrencyCodeForCountry } from "@/lib/countryCurrencyMap";
 import { cn } from "@/lib/utils";
 
 export default function CompanySettings() {
@@ -427,9 +428,12 @@ export default function CompanySettings() {
                               key={country.code}
                               value={country.name}
                               onSelect={(currentValue) => {
+                                const newCountry = currentValue === formData.country ? "" : currentValue;
+                                const newCurrencyCode = newCountry ? getCurrencyCodeForCountry(newCountry) : formData.localCurrencyCode;
                                 setFormData({
                                   ...formData,
-                                  country: currentValue === formData.country ? "" : currentValue,
+                                  country: newCountry,
+                                  localCurrencyCode: newCurrencyCode || formData.localCurrencyCode,
                                 });
                               }}
                               className="cursor-pointer px-4 py-2.5 hover:bg-gray-100 data-[selected]:bg-gray-50"
