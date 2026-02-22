@@ -1412,7 +1412,7 @@ export async function getVehicleAnalysis(vehicleId: number, userId: number) {
     return sum + amount;
   }, 0);
 
-  const insuranceCost = parseFloat(vehicle.insuranceCost || "0");
+  const insuranceCost = parseFloat(vehicle.insuranceAnnualPremium || "0");
   const netProfit = totalRevenue - totalMaintenanceCost - insuranceCost;
 
   return {

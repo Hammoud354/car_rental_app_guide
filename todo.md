@@ -5242,3 +5242,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Ensure field appears for existing clients
 - [x] Test edit form with Father's Name field
 - [x] Verify field is populated correctly - field now visible in edit form with proper defaultValue handling
+
+
+## Fix Insurance Cost Display on Analysis Page (Feb 23, 2026)
+- [x] Check Analysis page to see how insurance costs are calculated
+- [x] Verify vehicle insurance policy cost is being fetched
+- [x] Fix insurance cost calculation to use insuranceAnnualPremium instead of legacy insuranceCost field
+- [x] Include rental insurance costs from contracts if applicable
+- [x] Test insurance cost displays correctly - fix applied to db.ts line 1415
