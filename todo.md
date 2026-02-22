@@ -5210,3 +5210,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update bulk import functionality
 - [x] Update seed demo data with mother's names
 - [x] Test mother's full name field works correctly
+
+
+## Reorder Client Form Fields (Feb 23, 2026)
+- [x] Move Mother's Full Name field to appear after Nationality field
+- [x] Update create client form layout
+- [x] Update edit client form layout
+- [x] Test new field order - verified correct order in form

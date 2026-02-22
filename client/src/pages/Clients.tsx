@@ -253,10 +253,6 @@ export default function Clients() {
                 <div>
                   <h3 className="font-semibold mb-4">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="col-span-2">
-                      <Label htmlFor="motherFullName">Mother's Full Name *</Label>
-                      <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
-                    </div>
                     <div>
                       <Label htmlFor="firstName">First Name *</Label>
                       <Input id="firstName" name="firstName" required className="input-client" />
@@ -307,6 +303,10 @@ export default function Clients() {
                           </Command>
                         </PopoverContent>
                       </Popover>
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+                      <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="phone">Phone Number</Label>
@@ -562,16 +562,6 @@ export default function Clients() {
               <div>
                 <h3 className="font-semibold mb-4">Personal Information</h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
-                    <Input 
-                      id="edit-motherFullName" 
-                      name="motherFullName" 
-                      defaultValue={selectedClient.motherFullName}
-                      required 
-                      className="input-client" 
-                    />
-                  </div>
                   <div>
                     <Label htmlFor="edit-firstName">First Name *</Label>
                     <Input 
@@ -634,6 +624,16 @@ export default function Clients() {
                         </Command>
                       </PopoverContent>
                     </Popover>
+                  </div>
+                  <div className="col-span-2">
+                    <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
+                    <Input 
+                      id="edit-motherFullName" 
+                      name="motherFullName" 
+                      defaultValue={selectedClient.motherFullName}
+                      required 
+                      className="input-client" 
+                    />
                   </div>
                   <div className="col-span-2">
                     <Label htmlFor="edit-phone">Phone Number</Label>
