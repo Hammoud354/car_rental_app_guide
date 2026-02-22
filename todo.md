@@ -5217,3 +5217,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update create client form layout
 - [x] Update edit client form layout
 - [x] Test new field order - verified correct order in form
+
+
+## Add Father's Name Field to Client Form (Feb 23, 2026)
+- [x] Add fatherName field to database schema
+- [x] Run database migration
+- [x] Add Father's Name field to create client form (under First/Last Name)
+- [x] Add Father's Name field to edit client form
+- [x] Update server validation schemas
+- [x] Update bulk import functionality
+- [x] Update seed demo data with father's names (6 clients)
+- [x] Test Father's Name field works correctly - verified in form

@@ -205,9 +205,10 @@ export type InsertMaintenanceTask = typeof maintenanceTasks.$inferInsert;
 export const clients = mysqlTable("clients", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(), // Foreign key to users table
-  motherFullName: varchar("motherFullName", { length: 200 }).notNull(), // Client's mother's full name
   firstName: varchar("firstName", { length: 100 }).notNull(),
   lastName: varchar("lastName", { length: 100 }).notNull(),
+  fatherName: varchar("fatherName", { length: 200 }).notNull(), // Client's father's name
+  motherFullName: varchar("motherFullName", { length: 200 }).notNull(), // Client's mother's full name
   nationality: varchar("nationality", { length: 100 }),
   phone: varchar("phone", { length: 20 }),
   address: text("address"),

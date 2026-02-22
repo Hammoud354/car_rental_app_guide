@@ -128,9 +128,10 @@ export default function Clients() {
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
     createClient.mutate({
-      motherFullName: formData.get("motherFullName") as string,
       firstName,
       lastName,
+      fatherName: formData.get("fatherName") as string,
+      motherFullName: formData.get("motherFullName") as string,
       nationality: createSelectedNationality || undefined,
       phone: formData.get("phone") as string || undefined,
       address: formData.get("address") as string || undefined,
@@ -260,6 +261,10 @@ export default function Clients() {
                     <div>
                       <Label htmlFor="lastName">Last Name *</Label>
                       <Input id="lastName" name="lastName" required className="input-client" />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="fatherName">Father's Name *</Label>
+                      <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="nationality">Nationality</Label>

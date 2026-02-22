@@ -687,9 +687,10 @@ export const appRouter = router({
         if (!client) {
           client = await db.createClient({
             userId,
-            motherFullName: `${input.clientFirstName} ${input.clientLastName}`,
             firstName: input.clientFirstName,
             lastName: input.clientLastName,
+            fatherName: `${input.clientFirstName} ${input.clientLastName}`,
+            motherFullName: `${input.clientFirstName} ${input.clientLastName}`,
             nationality: input.clientNationality,
             phone: input.clientPhone,
             address: input.clientAddress,
@@ -986,9 +987,10 @@ export const appRouter = router({
     
     create: publicProcedure
       .input(z.object({
-        motherFullName: z.string().min(1).max(200),
         firstName: z.string().min(1).max(100),
         lastName: z.string().min(1).max(100),
+        fatherName: z.string().min(1).max(200),
+        motherFullName: z.string().min(1).max(200),
         nationality: z.string().max(100).optional(),
         phone: z.string().max(20).optional(),
         address: z.string().optional(),
@@ -1033,9 +1035,10 @@ export const appRouter = router({
     update: publicProcedure
       .input(z.object({
         id: z.number(),
-        motherFullName: z.string().min(1).max(200).optional(),
         firstName: z.string().min(1).max(100).optional(),
         lastName: z.string().min(1).max(100).optional(),
+        fatherName: z.string().min(1).max(200).optional(),
+        motherFullName: z.string().min(1).max(200).optional(),
         nationality: z.string().max(100).optional(),
         phone: z.string().max(20).optional(),
         address: z.string().optional(),
@@ -1964,9 +1967,10 @@ export const appRouter = router({
             
             const created = await db.createClient({
               userId,
-              motherFullName: client.name,
               firstName,
               lastName,
+              fatherName: client.name,
+              motherFullName: client.name,
               email: client.email,
               phone: client.phone,
               drivingLicenseNumber: client.drivingLicenseNumber || 'N/A',
