@@ -357,7 +357,7 @@ export default function ContractTemplateMapper() {
                     style={{
                       left: `${fp.x}%`,
                       top: `${fp.y}%`,
-                      transform: showPreview ? 'translate(0, -50%)' : 'translate(-50%, -50%)',
+                      transform: 'translate(-50%, -50%)',
                       textAlign: fp.alignment,
                     }}
                     title={CONTRACT_FIELDS.find(f => f.id === fp.fieldId)?.label}
