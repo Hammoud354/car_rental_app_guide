@@ -5309,3 +5309,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Allow users to click on a blank area to place a selected field there - working via template click handler
 - [x] Auto-center fields within the clicked area - fixed transform to always use translate(-50%, -50%)
 - [x] Test visual field placement with various contract layouts - TypeScript compilation successful
+
+
+## Add Auto-Placement for Fields in Center (Feb 23, 2026)
+- [x] Add logic to auto-place fields when selected from Available Fields list - implemented in onClick handler
+- [x] Set default X position to 50% (center of template) - fields placed at x: 50
+- [x] Calculate Y position based on number of fields already placed - y: 10 + (fieldPositions.length * 6)
+- [x] Show auto-placed field in Positioned Fields section immediately - field appears in list when selected
+- [x] Allow users to adjust position if needed - X/Y inputs allow fine-tuning
+- [x] Test auto-placement with multiple fields - TypeScript compilation successful

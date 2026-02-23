@@ -406,7 +406,20 @@ export default function ContractTemplateMapper() {
                     variant={isSelected ? "default" : isPositioned ? "secondary" : "outline"}
                     className="w-full justify-start"
                     size="sm"
-                    onClick={() => setSelectedField(field.id)}
+                    onClick={() => {
+                      setSelectedField(field.id);
+                      
+                      if (!isPositioned) {
+                        const yPosition = 10 + (fieldPositions.length * 6);
+                        setFieldPositions([...fieldPositions, {
+                          fieldId: field.id,
+                          x: 50,
+                          y: Math.min(yPosition, 90),
+                          fontSize: 12,
+                          alignment: "center",
+                        }]);
+                      }
+                    }}
                   >
                     {isPositioned && <span className="mr-2">✓</span>}
                     {field.label}
