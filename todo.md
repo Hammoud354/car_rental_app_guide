@@ -5258,3 +5258,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify server-side update is receiving and saving the VAT rate - added vatRate: z.number().optional() to updateProfile
 - [x] Check if there's a default value overriding the saved VAT rate - issue was missing field in validation schema
 - [x] Test VAT rate persistence with different countries - VERIFIED: UAE VAT rate 5% now persists correctly after save
+
+
+## Fix Invoice Currency Display to Use Company Settings (Feb 23, 2026)
+- [x] Identify hardcoded LBP currency in invoice code - found at lines 469-488 in Invoices.tsx
+- [x] Update invoice to use company's configured currency (AED for UAE, etc.) - replaced hardcoded LBP section with dynamic currency
+- [x] Remove hardcoded Lebanese Pounds conversion section - replaced with conditional local currency display
+- [x] Display only USD and company's local currency - now shows USD + company's localCurrencyCode (AED for UAE)
+- [x] Test invoice with different countries (UAE, UK, Saudi Arabia) - code updated to use company settings
+- [x] Verify currency code and exchange rate are from company settings - now uses companyProfile.localCurrencyCode and companyProfile.exchangeRate

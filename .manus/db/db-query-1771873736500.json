@@ -1,0 +1,27 @@
+{
+  "query": "SELECT * FROM invoices LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM invoices LIMIT 1;",
+  "rows": [
+    {
+      "id": "180001",
+      "userId": "870189",
+      "contractId": "180001",
+      "invoiceNumber": "INV-20260219-062427-199",
+      "invoiceDate": "2026-02-19",
+      "dueDate": "2026-03-21",
+      "subtotal": "105.00",
+      "taxAmount": "11.55",
+      "totalAmount": "116.55",
+      "paymentStatus": "paid",
+      "paymentMethod": "Cash",
+      "paidAt": "2026-02-19 06:52:00",
+      "notes": "NULL",
+      "createdAt": "2026-02-19 06:24:27",
+      "updatedAt": "2026-02-19 06:52:00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tcontractId\tinvoiceNumber\tinvoiceDate\tdueDate\tsubtotal\ttaxAmount\ttotalAmount\tpaymentStatus\tpaymentMethod\tpaidAt\tnotes\tcreatedAt\tupdatedAt\n180001\t870189\t180001\tINV-20260219-062427-199\t2026-02-19\t2026-03-21\t105.00\t11.55\t116.55\tpaid\tCash\t2026-02-19 06:52:00\tNULL\t2026-02-19 06:24:27\t2026-02-19 06:52:00\n",
+  "stderr": "",
+  "execution_time_ms": 1576
+}

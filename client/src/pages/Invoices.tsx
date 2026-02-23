@@ -48,9 +48,10 @@ export default function Invoices() {
 
   // Fetch company settings for exchange rate and VAT rate
   const { data: settings } = trpc.settings.get.useQuery();
-  const exchangeRate = settings?.exchangeRateLbpToUsd ? Number(settings.exchangeRateLbpToUsd) : 89700;
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
+  const exchangeRate = companyProfile?.exchangeRate ? Number(companyProfile.exchangeRate) : 1;
+  const localCurrencyCode = companyProfile?.localCurrencyCode || 'USD';
 
   // Fetch all users for Super Admin
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
@@ -466,26 +467,28 @@ export default function Invoices() {
                       </div>
                     </div>
 
-                    {/* LBP Amounts */}
-                    <div className="bg-gray-50 p-3 rounded-lg space-y-1 border-2 border-primary mt-2">
-                      <p className="text-xs text-gray-500 mb-3">Lebanese Pounds (LBP) at rate {exchangeRate.toLocaleString()} LBP/USD</p>
-                      <div className="flex justify-between text-base">
-                        <span className="text-gray-600">Subtotal (LBP):</span>
-                        <span className="font-medium tracking-wider">
-                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.subtotal), exchangeRate))}
-                        </span>
+                    {/* Local Currency Amounts */}
+                    {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
+                      <div className="bg-gray-50 p-3 rounded-lg space-y-1 border-2 border-primary mt-2">
+                        <p className="text-xs text-gray-500 mb-3">{companyProfile?.country || 'Local'} ({localCurrencyCode}) at rate {exchangeRate.toFixed(4)} {localCurrencyCode}/USD</p>
+                        <div className="flex justify-between text-base">
+                          <span className="text-gray-600">Subtotal ({localCurrencyCode}):</span>
+                          <span className="font-medium tracking-wider">
+                            {(parseFloat(invoiceDetails.subtotal) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-base">
+                          <span className="text-gray-600">Tax/VAT {vatRate}% ({localCurrencyCode}):</span>
+                          <span className="font-medium tracking-wider">
+                            {(parseFloat(invoiceDetails.taxAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xl font-bold border-t-2 border-primary pt-3 mt-2">
+                          <span>Total ({localCurrencyCode}):</span>
+                          <span className="tracking-wider">{(parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}</span>
+                        </div>
                       </div>
-                      <div className="flex justify-between text-base">
-                        <span className="text-gray-600">Tax/VAT {vatRate}% (LBP):</span>
-                        <span className="font-medium tracking-wider">
-                          {formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.taxAmount), exchangeRate))}
-                        </span>
-                      </div>
-                      <div className="flex justify-between text-xl font-bold border-t-2 border-primary pt-3 mt-2">
-                        <span>Total (LBP):</span>
-                        <span className="tracking-wider">{formatLBP(convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate))}</span>
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Notes */}
@@ -516,7 +519,8 @@ export default function Invoices() {
                       const phoneNumber = settings.phone.replace(/[\s\-\(\)]/g, '');
                       
                       // Create WhatsApp message
-                      const message = `New Invoice Generated!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${convertUSDToLBP(parseFloat(invoiceDetails.totalAmount), exchangeRate).toLocaleString()} LBP\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}`;
+                      const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                      const message = `New Invoice Generated!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${localAmount} ${localCurrencyCode}\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}`;
                       
                       // Encode message for URL
                       const encodedMessage = encodeURIComponent(message);
