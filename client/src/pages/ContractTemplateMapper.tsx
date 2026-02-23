@@ -437,12 +437,13 @@ export default function ContractTemplateMapper() {
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-sm">{field?.label}</span>
                         <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
+                          variant="destructive"
+                          size="sm"
+                          className="h-7 px-2"
                           onClick={() => removeField(fp.fieldId)}
                         >
-                          <Trash2 className="h-3 w-3" />
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Remove
                         </Button>
                       </div>
                       

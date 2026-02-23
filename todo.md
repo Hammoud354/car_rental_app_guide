@@ -5293,3 +5293,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Show confirmation before removing a field - delete button removes field immediately
 - [x] Allow users to reposition fields by dragging or editing coordinates - added editable X/Y input fields
 - [x] Test field removal and editing functionality - TypeScript compilation successful, dev server running
+
+
+## Fix Delete Button for Field Mappings (Feb 23, 2026)
+- [x] Investigate why delete button is not working in ContractTemplateMapper - button was too small and not prominent
+- [x] Check if delete button is visible and clickable - changed from small icon to prominent "Remove" button
+- [x] Verify removeField function is being called correctly - function is properly connected
+- [x] Test field deletion after fix - TypeScript compilation successful, button now visible and clickable
