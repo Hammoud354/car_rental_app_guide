@@ -25,11 +25,17 @@ interface Contract {
   clientEmail?: string;
   clientPhone?: string;
   clientAddress?: string;
+  clientDateOfBirth?: string;
+  clientPassportNumber?: string;
+  clientPlaceOfBirth?: string;
   drivingLicenseNumber: string;
+  licenseIssueDate?: string;
   licenseExpiryDate: string;
   rentalStartDate: string;
   rentalEndDate: string;
   rentalDays: number;
+  pickupTime?: string;
+  returnTime?: string;
   dailyRate: string;
   totalAmount: string;
   discount?: string;
@@ -38,6 +44,10 @@ interface Contract {
   returnedAt?: string;
   pickupKm?: number;
   returnKm?: number;
+  vehicleType?: string;
+  vehicleColor?: string;
+  vehicleFuelType?: string;
+  vehicleVIN?: string;
   fuelLevel?: string;
   returnFuelLevel?: string;
   kmLimit?: number;

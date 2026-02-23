@@ -5275,3 +5275,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Now displays company's localCurrencyCode (AED for UAE) instead of hardcoded LBP
 - [x] Updated invoice list to show: "$333.00" and "1,223.30 AED" instead of "1,223 LBP"
 - [x] Code verified: conditional rendering only shows local currency if not USD
+
+
+## Fix Missing Data Fields in Custom Contract Template (Feb 23, 2026)
+- [x] Find contract template file and field mapping configuration
+- [x] Identify why Birth Date, Vehicle Type, Color, Fuel fields are not displaying - fields were missing from rentalContracts table
+- [x] Fix odometer readings (pickup and return) not showing in template - added pickupKm and returnKm to contract object
+- [x] Fix rental dates and times not populating in contract - added pickupTime and returnTime fields
+- [x] Fix car condition fields not displaying - added vehicleType, vehicleColor, vehicleFuelType, vehicleVIN
+- [x] Verify all mapped fields are correctly bound to template placeholders - updated ContractPDFTemplate interface
+- [x] Test contract generation with complete data - schema migration successful, code updated

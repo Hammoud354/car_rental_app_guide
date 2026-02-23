@@ -243,18 +243,28 @@ export const rentalContracts = mysqlTable("rentalContracts", {
   clientNationality: varchar("clientNationality", { length: 100 }),
   clientPhone: varchar("clientPhone", { length: 20 }),
   clientAddress: text("clientAddress"),
+  clientDateOfBirth: date("clientDateOfBirth"), // Client's date of birth
+  clientPassportNumber: varchar("clientPassportNumber", { length: 100 }), // Passport or national ID number
+  clientPlaceOfBirth: varchar("clientPlaceOfBirth", { length: 200 }), // Client's place of birth
   drivingLicenseNumber: varchar("drivingLicenseNumber", { length: 100 }),
   licenseIssueDate: timestamp("licenseIssueDate"),
   licenseExpiryDate: timestamp("licenseExpiryDate"),
   rentalStartDate: timestamp("rentalStartDate").notNull(),
   rentalEndDate: timestamp("rentalEndDate").notNull(),
   rentalDays: int("rentalDays").notNull(),
+  pickupTime: varchar("pickupTime", { length: 20 }), // Pickup time (e.g., "10:00 AM")
+  returnTime: varchar("returnTime", { length: 20 }), // Return time (e.g., "10:00 AM")
   dailyRate: decimal("dailyRate", { precision: 10, scale: 2 }).notNull(),
   totalAmount: decimal("totalAmount", { precision: 10, scale: 2 }).notNull(),
   discount: decimal("discount", { precision: 10, scale: 2 }).default("0.00"),
   finalAmount: decimal("finalAmount", { precision: 10, scale: 2 }).notNull(),
   contractNumber: varchar("contractNumber", { length: 50 }).notNull(),
   signatureData: text("signatureData"), // Base64 encoded signature image
+  // Vehicle details snapshot at contract creation
+  vehicleType: varchar("vehicleType", { length: 50 }), // Vehicle category (Economy, Compact, SUV, etc.)
+  vehicleColor: varchar("vehicleColor", { length: 50 }), // Vehicle color
+  vehicleFuelType: varchar("vehicleFuelType", { length: 50 }), // Fuel type (Gasoline, Diesel, etc.)
+  vehicleVIN: varchar("vehicleVIN", { length: 17 }), // Vehicle VIN
   fuelLevel: mysqlEnum("fuelLevel", ["Empty", "1/4", "1/2", "3/4", "Full"]).default("Full"), // Fuel level at rental start
   returnFuelLevel: mysqlEnum("returnFuelLevel", ["Empty", "1/4", "1/2", "3/4", "Full"]), // Fuel level at return
   pickupKm: int("pickupKm"), // Odometer reading at pickup/contract creation

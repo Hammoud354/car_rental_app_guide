@@ -643,6 +643,8 @@ export const appRouter = router({
         rentalStartDate: z.date(),
         rentalEndDate: z.date(),
         rentalDays: z.number().int().positive(),
+        pickupTime: z.string().optional(),
+        returnTime: z.string().optional(),
         dailyRate: z.string(),
         totalAmount: z.string(),
         discount: z.string().optional(),
@@ -715,6 +717,9 @@ export const appRouter = router({
         const nextNumber = maxNumber + 1;
         const contractNumber = `CTR-${String(nextNumber).padStart(3, '0')}`;
         
+        // Get vehicle details for contract snapshot
+        const vehicle = await db.getVehicleById(input.vehicleId, userId);
+        
         const contract = await db.createRentalContract({
           userId,
           vehicleId: input.vehicleId,
@@ -724,18 +729,27 @@ export const appRouter = router({
           clientNationality: input.clientNationality || null,
           clientPhone: input.clientPhone || null,
           clientAddress: input.clientAddress || null,
+          clientDateOfBirth: client.dateOfBirth || null,
+          clientPassportNumber: client.passportIdNumber || null,
+          clientPlaceOfBirth: client.placeOfBirth || null,
           drivingLicenseNumber: input.drivingLicenseNumber,
           licenseIssueDate: input.licenseIssueDate || null,
           licenseExpiryDate: input.licenseExpiryDate,
           rentalStartDate: input.rentalStartDate,
           rentalEndDate: input.rentalEndDate,
           rentalDays: input.rentalDays,
+          pickupTime: input.pickupTime || null,
+          returnTime: input.returnTime || null,
           dailyRate: input.dailyRate,
           totalAmount: input.totalAmount,
           discount: input.discount || "0.00",
           finalAmount: input.finalAmount,
           contractNumber,
           signatureData: input.signatureData || null,
+          vehicleType: vehicle?.category || null,
+          vehicleColor: vehicle?.color || null,
+          vehicleFuelType: vehicle?.fuelType || null,
+          vehicleVIN: vehicle?.vin || null,
           fuelLevel: input.fuelLevel || "Full",
           pickupKm: input.pickupKm || null,
           // Insurance fields

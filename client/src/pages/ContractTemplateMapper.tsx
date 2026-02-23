@@ -17,18 +17,21 @@ const SAMPLE_DATA: Record<string, string> = {
   clientPhone: "+961 1 234567",
   clientEmail: "john.doe@example.com",
   clientNationality: "Lebanese",
+  clientDateOfBirth: "1990-05-20",
+  clientPassportNumber: "P1234567",
+  clientPlaceOfBirth: "Beirut",
   clientLicenseNumber: "DL123456",
   clientLicenseIssueDate: "2020-01-15",
   clientLicenseExpiryDate: "2030-01-15",
-  clientDateOfBirth: "1990-05-20",
-  clientPassportNumber: "P1234567",
   
   // Vehicle Information
   vehiclePlate: "ABC-1234",
   vehicleMake: "Toyota",
   vehicleModel: "Camry",
   vehicleYear: "2023",
+  vehicleType: "Sedan",
   vehicleColor: "Silver",
+  vehicleFuelType: "Gasoline",
   vehicleVIN: "1HGBH41JXMN109186",
   vehicleOdometer: "15,000 km",
   
@@ -40,6 +43,8 @@ const SAMPLE_DATA: Record<string, string> = {
   returnLocation: "Beirut Airport",
   pickupTime: "10:00 AM",
   returnTime: "10:00 AM",
+  pickupOdometer: "15,000 km",
+  returnOdometer: "15,250 km",
   
   // Financial Information
   dailyRate: "$50.00",
@@ -66,20 +71,25 @@ const CONTRACT_FIELDS = [
   { id: "clientPhone", label: "Client Phone" },
   { id: "clientEmail", label: "Client Email" },
   { id: "clientNationality", label: "Client Nationality" },
+  { id: "clientDateOfBirth", label: "Client Date of Birth" },
+  { id: "clientPassportNumber", label: "Passport Number" },
+  { id: "clientPlaceOfBirth", label: "Client Place of Birth" },
   { id: "clientLicenseNumber", label: "License Number" },
   { id: "clientLicenseIssueDate", label: "License Issue Date" },
   { id: "clientLicenseExpiryDate", label: "License Expiry Date" },
-  { id: "clientDateOfBirth", label: "Client Date of Birth" },
-  { id: "clientPassportNumber", label: "Passport Number" },
   
   // Vehicle Information
   { id: "vehiclePlate", label: "Vehicle Plate" },
   { id: "vehicleMake", label: "Vehicle Make" },
   { id: "vehicleModel", label: "Vehicle Model" },
   { id: "vehicleYear", label: "Vehicle Year" },
+  { id: "vehicleType", label: "Vehicle Type" },
   { id: "vehicleColor", label: "Vehicle Color" },
+  { id: "vehicleFuelType", label: "Vehicle Fuel Type" },
   { id: "vehicleVIN", label: "Vehicle VIN" },
   { id: "vehicleOdometer", label: "Odometer Reading" },
+  { id: "pickupOdometer", label: "Pickup Odometer" },
+  { id: "returnOdometer", label: "Return Odometer" },
   
   // Contract Details
   { id: "contractNumber", label: "Contract Number" },
@@ -89,6 +99,7 @@ const CONTRACT_FIELDS = [
   { id: "returnLocation", label: "Return Location" },
   { id: "pickupTime", label: "Pickup Time" },
   { id: "returnTime", label: "Return Time" },
+  { id: "rentalDays", label: "Rental Days" },
   
   // Financial Information
   { id: "dailyRate", label: "Daily Rate" },
