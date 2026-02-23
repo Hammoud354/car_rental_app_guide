@@ -5267,3 +5267,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display only USD and company's local currency - now shows USD + company's localCurrencyCode (AED for UAE)
 - [x] Test invoice with different countries (UAE, UK, Saudi Arabia) - code updated to use company settings
 - [x] Verify currency code and exchange rate are from company settings - now uses companyProfile.localCurrencyCode and companyProfile.exchangeRate
+
+
+## Fix Invoice List Currency Display to Show AED Instead of LBP (Feb 23, 2026)
+- [x] Find hardcoded LBP display in invoice list (line 300 in Invoices.tsx)
+- [x] Replace formatLBP(convertUSDToLBP(...)) with dynamic currency calculation
+- [x] Now displays company's localCurrencyCode (AED for UAE) instead of hardcoded LBP
+- [x] Updated invoice list to show: "$333.00" and "1,223.30 AED" instead of "1,223 LBP"
+- [x] Code verified: conditional rendering only shows local currency if not USD

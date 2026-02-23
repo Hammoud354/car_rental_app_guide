@@ -297,7 +297,11 @@ export default function Invoices() {
                     <div className="text-right space-y-2">
                       <div>
                         <p className="text-2xl font-bold">{formatUSD(parseFloat(invoice.totalAmount))}</p>
-                        <p className="text-sm text-gray-600">{formatLBP(convertUSDToLBP(parseFloat(invoice.totalAmount), exchangeRate))}</p>
+                        {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
+                          <p className="text-sm text-gray-600">
+                            {(parseFloat(invoice.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}
+                          </p>
+                        )}
                       </div>
                       <Button
                         onClick={() => setSelectedInvoice(invoice.id)}
