@@ -236,7 +236,7 @@ export default function CompanySettings() {
         }
       }
 
-      console.log('[handleSubmit] exchangeRate formData:', formData.exchangeRate);
+      console.log('[handleSubmit] vatRate formData:', formData.vatRate);
       const updateData: any = {
         ...formData,
         logoUrl,

@@ -5250,3 +5250,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix insurance cost calculation to use insuranceAnnualPremium instead of legacy insuranceCost field
 - [x] Include rental insurance costs from contracts if applicable
 - [x] Test insurance cost displays correctly - fix applied to db.ts line 1415
+
+
+## Fix VAT Rate Reverting to 11% After Save (Feb 23, 2026)
+- [x] Investigate Company Settings form VAT rate save logic - form was sending vatRate correctly
+- [x] Check if VAT rate is being properly included in the update request - vatRate was missing from server schema
+- [x] Verify server-side update is receiving and saving the VAT rate - added vatRate: z.number().optional() to updateProfile
+- [x] Check if there's a default value overriding the saved VAT rate - issue was missing field in validation schema
+- [x] Test VAT rate persistence with different countries - VERIFIED: UAE VAT rate 5% now persists correctly after save

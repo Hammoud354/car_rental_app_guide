@@ -1332,14 +1332,15 @@ export const appRouter = router({
         defaultCurrency: z.enum(["USD", "LOCAL"]).optional(),
         exchangeRate: z.number().optional(),
         localCurrencyCode: z.string().optional(),
+        vatRate: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        console.log('[updateProfile mutation] Called with input:', { exchangeRate: input.exchangeRate, localCurrencyCode: input.localCurrencyCode });
+        console.log('[updateProfile mutation] Called with input:', { exchangeRate: input.exchangeRate, localCurrencyCode: input.localCurrencyCode, vatRate: input.vatRate });
         const profile = await db.upsertCompanyProfile({
           userId: ctx.user.id,
           ...input,
         });
-        console.log('[updateProfile mutation] Result:', { exchangeRate: profile?.exchangeRate, localCurrencyCode: profile?.localCurrencyCode });
+        console.log('[updateProfile mutation] Result:', { exchangeRate: profile?.exchangeRate, localCurrencyCode: profile?.localCurrencyCode, vatRate: profile?.vatRate });
         return profile;
       }),
 
