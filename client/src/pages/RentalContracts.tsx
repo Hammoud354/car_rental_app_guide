@@ -332,6 +332,7 @@ export default function RentalContracts() {
       clientFirstName: formData.get("clientFirstName") as string,
       clientLastName: formData.get("clientLastName") as string,
       clientMotherFullName: formData.get("clientMotherFullName") as string || undefined,
+      clientFatherFullName: formData.get("clientFatherFullName") as string || undefined,
       clientNationality: formData.get("clientNationality") as string || undefined,
       clientPhone: formData.get("clientPhone") as string || undefined,
       clientAddress: formData.get("clientAddress") as string || undefined,
@@ -695,6 +696,10 @@ export default function RentalContracts() {
                       <div className="col-span-2">
                         <Label htmlFor="clientMotherFullName">Mother's Full Name</Label>
                         <Input id="clientMotherFullName" name="clientMotherFullName" placeholder="e.g., Jane Smith" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="clientFatherFullName">Father's Full Name</Label>
+                        <Input id="clientFatherFullName" name="clientFatherFullName" placeholder="e.g., John Smith" className="input-client" />
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="clientNationality">Nationality</Label>

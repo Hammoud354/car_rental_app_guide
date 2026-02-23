@@ -5318,3 +5318,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Show auto-placed field in Positioned Fields section immediately - field appears in list when selected
 - [x] Allow users to adjust position if needed - X/Y inputs allow fine-tuning
 - [x] Test auto-placement with multiple fields - TypeScript compilation successful
+
+
+## Add Father's Name Field to Contract Creation Form (Feb 23, 2026)
+- [x] Find contract creation form (RentalContracts.tsx or similar) - found at line 696
+- [x] Check if Father's Name field exists in the schema - was missing from contract form
+- [x] Add Father's Name field to contract form UI - added after Mother's Full Name field
+- [x] Update contract database schema if needed - field added to form data collection
+- [x] Add Father's Name to contract template mapper - added to SAMPLE_DATA and CONTRACT_FIELDS
+- [x] Test Father's Name field in contract creation form - TypeScript compilation successful
