@@ -448,6 +448,33 @@ export default function ContractTemplateMapper() {
                       
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
+                          <Label className="text-xs">X Position (%)</Label>
+                          <Input
+                            type="number"
+                            value={fp.x}
+                            onChange={(e) => updateFieldProperty(fp.fieldId, 'x', parseFloat(e.target.value))}
+                            min={0}
+                            max={100}
+                            step={0.1}
+                            className="h-7"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Y Position (%)</Label>
+                          <Input
+                            type="number"
+                            value={fp.y}
+                            onChange={(e) => updateFieldProperty(fp.fieldId, 'y', parseFloat(e.target.value))}
+                            min={0}
+                            max={100}
+                            step={0.1}
+                            className="h-7"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
                           <Label className="text-xs">Font Size</Label>
                           <Input
                             type="number"
@@ -474,10 +501,6 @@ export default function ContractTemplateMapper() {
                             </SelectContent>
                           </Select>
                         </div>
-                      </div>
-                      
-                      <div className="text-xs text-muted-foreground">
-                        Position: {fp.x.toFixed(1)}%, {fp.y.toFixed(1)}%
                       </div>
                     </div>
                   );

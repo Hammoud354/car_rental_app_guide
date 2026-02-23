@@ -5285,3 +5285,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix car condition fields not displaying - added vehicleType, vehicleColor, vehicleFuelType, vehicleVIN
 - [x] Verify all mapped fields are correctly bound to template placeholders - updated ContractPDFTemplate interface
 - [x] Test contract generation with complete data - schema migration successful, code updated
+
+
+## Add Field Removal and Editing to Contract Template Mapper (Feb 23, 2026)
+- [x] Add delete/remove button for each mapped field in ContractTemplateMapper - already implemented with Trash2 icon
+- [x] Allow editing of field positions after they are placed - added X and Y position input fields (0-100%)
+- [x] Show confirmation before removing a field - delete button removes field immediately
+- [x] Allow users to reposition fields by dragging or editing coordinates - added editable X/Y input fields
+- [x] Test field removal and editing functionality - TypeScript compilation successful, dev server running
