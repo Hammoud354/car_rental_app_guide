@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -83,6 +83,7 @@ export default function Clients() {
       setIsCreateDialogOpen(false);
       setCreateLicenseIssueDate(undefined);
       setCreateLicenseExpiryDate(undefined);
+      setCreateDateOfBirth(undefined);
       setCreateSelectedNationality("");
     },
     onError: (error) => {
@@ -98,6 +99,10 @@ export default function Clients() {
       await utils.clients.getById.invalidate();
       setIsEditDialogOpen(false);
       setSelectedClient(null);
+      setEditLicenseIssueDate(undefined);
+      setEditLicenseExpiryDate(undefined);
+      setEditDateOfBirth(undefined);
+      setEditSelectedNationality("");
     },
     onError: (error) => {
       toast.error(`Failed to update client: ${error.message}`);
@@ -108,6 +113,7 @@ export default function Clients() {
     onSuccess: () => {
       toast.success("Client deleted successfully");
       utils.clients.list.invalidate();
+      setSelectedClient(null);
     },
     onError: (error) => {
       toast.error(`Failed to delete client: ${error.message}`);
@@ -124,26 +130,56 @@ export default function Clients() {
       return;
     }
     
-    const dateOfBirthStr = formData.get("dateOfBirth") as string;
-    const firstName = formData.get("firstName") as string;
-    const lastName = formData.get("lastName") as string;
+    // Get and trim all form values
+    const firstName = (formData.get("firstName") as string || "").trim();
+    const lastName = (formData.get("lastName") as string || "").trim();
+    const fatherName = (formData.get("fatherName") as string || "").trim();
+    const motherFullName = (formData.get("motherFullName") as string || "").trim();
+    const drivingLicenseNumber = (formData.get("drivingLicenseNumber") as string || "").trim();
+    
+    // Validate required fields
+    if (!firstName) {
+      toast.error("First name is required");
+      return;
+    }
+    if (!lastName) {
+      toast.error("Last name is required");
+      return;
+    }
+    if (!fatherName) {
+      toast.error("Father's name is required");
+      return;
+    }
+    if (!motherFullName) {
+      toast.error("Mother's full name is required");
+      return;
+    }
+    if (!drivingLicenseNumber) {
+      toast.error("Driving license number is required");
+      return;
+    }
+    if (!createLicenseExpiryDate) {
+      toast.error("License expiry date is required");
+      return;
+    }
+    
     createClient.mutate({
       firstName,
       lastName,
-      fatherName: formData.get("fatherName") as string,
-      motherFullName: formData.get("motherFullName") as string,
+      fatherName,
+      motherFullName,
       nationality: createSelectedNationality || undefined,
-      phone: formData.get("phone") as string || undefined,
-      address: formData.get("address") as string || undefined,
-      dateOfBirth: dateOfBirthStr ? dateOfBirthStr : undefined,
-      placeOfBirth: formData.get("placeOfBirth") as string || undefined,
-      passportIdNumber: formData.get("passportIdNumber") as string || undefined,
-      registrationNumber: formData.get("registrationNumber") as string || undefined,
-      drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
+      phone: (formData.get("phone") as string || "").trim() || undefined,
+      address: (formData.get("address") as string || "").trim() || undefined,
+      dateOfBirth: createDateOfBirth?.toISOString().split('T')[0],
+      placeOfBirth: (formData.get("placeOfBirth") as string || "").trim() || undefined,
+      passportIdNumber: (formData.get("passportIdNumber") as string || "").trim() || undefined,
+      registrationNumber: (formData.get("registrationNumber") as string || "").trim() || undefined,
+      drivingLicenseNumber,
       licenseIssueDate: createLicenseIssueDate,
-      licenseExpiryDate: createLicenseExpiryDate!,
-      email: formData.get("email") as string || undefined,
-      notes: formData.get("notes") as string || undefined,
+      licenseExpiryDate: createLicenseExpiryDate,
+      email: (formData.get("email") as string || "").trim() || undefined,
+      notes: (formData.get("notes") as string || "").trim() || undefined,
       targetUserId: selectedTargetUserId || undefined,
     });
   };
@@ -152,6 +188,7 @@ export default function Clients() {
     setSelectedClient(client);
     setEditLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
     setEditLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
+    setEditDateOfBirth(client.dateOfBirth ? new Date(client.dateOfBirth) : undefined);
     setEditSelectedNationality(client.nationality || "");
     setIsEditDialogOpen(true);
   };
@@ -159,124 +196,403 @@ export default function Clients() {
   const handleEditSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedClient) return;
-    
+
     const formData = new FormData(e.currentTarget);
     
-    const dateOfBirthStr = formData.get("dateOfBirth") as string;
-    const updateData = {
+    // Get and trim all form values
+    const firstName = (formData.get("firstName") as string || "").trim();
+    const lastName = (formData.get("lastName") as string || "").trim();
+    const fatherName = (formData.get("fatherName") as string || "").trim();
+    const motherFullName = (formData.get("motherFullName") as string || "").trim();
+    const drivingLicenseNumber = (formData.get("drivingLicenseNumber") as string || "").trim();
+    
+    // Validate required fields
+    if (!firstName) {
+      toast.error("First name is required");
+      return;
+    }
+    if (!lastName) {
+      toast.error("Last name is required");
+      return;
+    }
+    if (!fatherName) {
+      toast.error("Father's name is required");
+      return;
+    }
+    if (!motherFullName) {
+      toast.error("Mother's full name is required");
+      return;
+    }
+    if (!drivingLicenseNumber) {
+      toast.error("Driving license number is required");
+      return;
+    }
+    if (!editLicenseExpiryDate) {
+      toast.error("License expiry date is required");
+      return;
+    }
+
+    updateClient.mutate({
       id: selectedClient.id,
-      firstName: formData.get("firstName") as string || undefined,
-      lastName: formData.get("lastName") as string || undefined,
+      firstName,
+      lastName,
+      fatherName,
+      motherFullName,
       nationality: editSelectedNationality || undefined,
-      phone: formData.get("phone") as string || undefined,
-      address: formData.get("address") as string || undefined,
-      dateOfBirth: dateOfBirthStr || undefined,
-      placeOfBirth: formData.get("placeOfBirth") as string || undefined,
-      passportIdNumber: formData.get("passportIdNumber") as string || undefined,
-      registrationNumber: formData.get("registrationNumber") as string || undefined,
-      drivingLicenseNumber: formData.get("drivingLicenseNumber") as string || undefined,
+      phone: (formData.get("phone") as string || "").trim() || undefined,
+      address: (formData.get("address") as string || "").trim() || undefined,
+      dateOfBirth: editDateOfBirth?.toISOString().split('T')[0],
+      placeOfBirth: (formData.get("placeOfBirth") as string || "").trim() || undefined,
+      passportIdNumber: (formData.get("passportIdNumber") as string || "").trim() || undefined,
+      registrationNumber: (formData.get("registrationNumber") as string || "").trim() || undefined,
+      drivingLicenseNumber,
       licenseIssueDate: editLicenseIssueDate,
       licenseExpiryDate: editLicenseExpiryDate,
-      email: formData.get("email") as string || undefined,
-      notes: formData.get("notes") as string || undefined,
-    };
-    
-    console.log('Updating client with data:', updateData);
-    updateClient.mutate(updateData);
+      email: (formData.get("email") as string || "").trim() || undefined,
+      notes: (formData.get("notes") as string || "").trim() || undefined,
+    });
   };
 
-  const handleDeleteClick = (clientId: number, clientName: string) => {
-    if (window.confirm(`Are you sure you want to delete ${clientName}? This action cannot be undone.`)) {
-      deleteClient.mutate({ id: clientId });
-    }
-  };
-
-  const handleViewDetails = (client: any) => {
-    setSelectedClient(client);
-    setIsDetailsDialogOpen(true);
-  };
-
-  // Filter clients based on search
-  const filteredClients = clients.filter((client: any) => {
-    const searchLower = searchTerm.toLowerCase();
-    return (
-      client.firstName.toLowerCase().includes(searchLower) ||
-      client.lastName.toLowerCase().includes(searchLower) ||
-      (client.email && client.email.toLowerCase().includes(searchLower)) ||
-      (client.phone && client.phone.includes(searchTerm)) ||
-      (client.drivingLicenseNumber && client.drivingLicenseNumber.toLowerCase().includes(searchLower)) ||
-      (client.nationality && client.nationality.toLowerCase().includes(searchLower))
-    );
-  });
+  const filteredClients = clients.filter((client) =>
+    `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.drivingLicenseNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <SidebarLayout>
-        
-        <div className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2">CLIENT MANAGEMENT</h2>
-            <p className="text-sm sm:text-base text-gray-600">Manage customer information and rental history</p>
+            <h1 className="text-3xl font-bold">Clients</h1>
+            <p className="text-muted-foreground">Manage your rental clients and their information</p>
           </div>
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
-              <Upload className="h-4 w-4 mr-2" />
-              Bulk Import
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                if (!clients || clients.length === 0) {
-                  toast.error("No clients to export");
-                  return;
-                }
-                exportClientsToCSV(clients);
-                toast.success(`Exported ${clients.length} clients`);
-              }}
+          <div className="flex gap-2">
+            <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import
+                </Button>
+              </DialogTrigger>
+              <BulkImportDialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+                type="clients"
+                onImport={async (data) => {
+                  const results = await Promise.all(
+                    data.map(async (client) => {
+                      try {
+                        await createClient.mutateAsync(client);
+                        return { success: true };
+                      } catch (error: any) {
+                        return { success: false, error: error.message };
+                      }
+                    })
+                  );
+                  utils.clients.list.invalidate();
+                  return { results };
+                }}
+              />
+            </Dialog>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportClientsToCSV(clients)}
             >
               <Download className="h-4 w-4 mr-2" />
-              Export CSV
+              Export
             </Button>
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white">
-                <Plus className="mr-2 h-4 w-4" />
-                New Client
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Client</DialogTitle>
-                <DialogDescription>Enter the client's personal and driving license information.</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleCreateSubmit} className="space-y-6">
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Client
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Client</DialogTitle>
+                  <DialogDescription>
+                    Enter the client's personal and license information
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleCreateSubmit} className="space-y-6">
+                  {/* Personal Information */}
+                  <div>
+                    <h3 className="font-semibold mb-4">Personal Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="firstName">First Name *</Label>
+                        <Input id="firstName" name="firstName" required className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName">Last Name *</Label>
+                        <Input id="lastName" name="lastName" required className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="fatherName">Father's Name *</Label>
+                        <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="nationality">Nationality</Label>
+                        <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={createNationalityOpen}
+                              className="w-full justify-between"
+                            >
+                              {createSelectedNationality || "Select nationality..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0">
+                            <Command>
+                              <CommandInput placeholder="Search nationality..." />
+                              <CommandList>
+                                <CommandEmpty>No nationality found.</CommandEmpty>
+                                <CommandGroup>
+                                  {nationalities.map((nat) => (
+                                    <CommandItem
+                                      key={nat}
+                                      value={nat}
+                                      onSelect={(value) => {
+                                        setCreateSelectedNationality(value);
+                                        setCreateNationalityOpen(false);
+                                      }}
+                                    >
+                                      <Check
+                                        className={`mr-2 h-4 w-4 ${
+                                          createSelectedNationality === nat ? "opacity-100" : "opacity-0"
+                                        }`}
+                                      />
+                                      {nat}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+                        <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="address">Address</Label>
+                        <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
+                      </div>
+                      <div>
+                        <Label>Date of Birth</Label>
+                        <DatePickerWithYearNav
+                          date={createDateOfBirth}
+                          onDateChange={setCreateDateOfBirth}
+                          placeholder="Select date of birth"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="placeOfBirth">Place of Birth</Label>
+                        <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="registrationNumber">Registration Number</Label>
+                        <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Driving License */}
+                  <div className="border-t border-gray-700 pt-4">
+                    <h3 className="font-semibold mb-4">Driving License</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="col-span-2">
+                        <Label htmlFor="drivingLicenseNumber">License Number *</Label>
+                        <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
+                      </div>
+                      <div>
+                        <DateDropdownSelector
+                          id="licenseIssueDate"
+                          label="Issue Date"
+                          value={createLicenseIssueDate}
+                          onChange={setCreateLicenseIssueDate}
+                          maxDate={new Date()}
+                        />
+                      </div>
+                      <div>
+                        <DateDropdownSelector
+                          id="licenseExpiryDate"
+                          label="Expiry Date *"
+                          value={createLicenseExpiryDate}
+                          onChange={setCreateLicenseExpiryDate}
+                          required
+                          minDate={new Date()}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes */}
+                  <div className="border-t border-gray-700 pt-4">
+                    <Label htmlFor="notes">Notes</Label>
+                    <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client" />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" disabled={createClient.isPending}>
+                      {createClient.isPending ? "Adding..." : "Add Client"}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by name, phone, or license number..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Clients List */}
+        <div className="grid gap-4">
+          {filteredClients.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6 text-center text-muted-foreground">
+                {clients.length === 0 ? "No clients yet. Create your first client to get started." : "No clients match your search."}
+              </CardContent>
+            </Card>
+          ) : (
+            filteredClients.map((client) => {
+              const licenseStatus = getLicenseExpiryStatus(client.licenseExpiryDate);
+              return (
+                <Card key={client.id} className={`${licenseStatus.bgColor} ${licenseStatus.borderColor} border`}>
+                  <CardContent className="pt-6">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{client.firstName} {client.lastName}</h3>
+                        <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                          <div>
+                            <span className="text-muted-foreground">Phone:</span>
+                            <p>{client.phone || "N/A"}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">License:</span>
+                            <p>{client.drivingLicenseNumber}</p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">License Expiry:</span>
+                            <p className={licenseStatus.color}>
+                              {new Date(client.licenseExpiryDate).toLocaleDateString()}
+                              {licenseStatus.message && ` - ${licenseStatus.message}`}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-muted-foreground">Nationality:</span>
+                            <p>{client.nationality || "N/A"}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedClient(client);
+                            setIsDetailsDialogOpen(true);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditClick(client)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this client?")) {
+                              deleteClient.mutate({ id: client.id });
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          )}
+        </div>
+
+        {/* Edit Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Client</DialogTitle>
+              <DialogDescription>
+                Update the client's information
+              </DialogDescription>
+            </DialogHeader>
+            {selectedClient && (
+              <form onSubmit={handleEditSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div>
                   <h3 className="font-semibold mb-4">Personal Information</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">First Name *</Label>
-                      <Input id="firstName" name="firstName" required className="input-client" />
+                      <Label htmlFor="edit-firstName">First Name *</Label>
+                      <Input id="edit-firstName" name="firstName" defaultValue={selectedClient.firstName} required className="input-client" />
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Last Name *</Label>
-                      <Input id="lastName" name="lastName" required className="input-client" />
+                      <Label htmlFor="edit-lastName">Last Name *</Label>
+                      <Input id="edit-lastName" name="lastName" defaultValue={selectedClient.lastName} required className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="fatherName">Father's Name *</Label>
-                      <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client" />
+                      <Label htmlFor="edit-fatherName">Father's Name *</Label>
+                      <Input id="edit-fatherName" name="fatherName" defaultValue={selectedClient.fatherName} required placeholder="Ahmed Hassan" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="nationality">Nationality</Label>
-                      <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
+                      <Label htmlFor="edit-nationality">Nationality</Label>
+                      <Popover open={editNationalityOpen} onOpenChange={setEditNationalityOpen}>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
                             role="combobox"
-                            aria-expanded={createNationalityOpen}
+                            aria-expanded={editNationalityOpen}
                             className="w-full justify-between"
                           >
-                            {createSelectedNationality || "Select nationality..."}
+                            {editSelectedNationality || "Select nationality..."}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
@@ -291,13 +607,13 @@ export default function Clients() {
                                     key={nat}
                                     value={nat}
                                     onSelect={(value) => {
-                                      setCreateSelectedNationality(value);
-                                      setCreateNationalityOpen(false);
+                                      setEditSelectedNationality(value);
+                                      setEditNationalityOpen(false);
                                     }}
                                   >
                                     <Check
                                       className={`mr-2 h-4 w-4 ${
-                                        createSelectedNationality === nat ? "opacity-100" : "opacity-0"
+                                        editSelectedNationality === nat ? "opacity-100" : "opacity-0"
                                       }`}
                                     />
                                     {nat}
@@ -310,40 +626,40 @@ export default function Clients() {
                       </Popover>
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="motherFullName">Mother's Full Name *</Label>
-                      <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
+                      <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
+                      <Input id="edit-motherFullName" name="motherFullName" defaultValue={selectedClient.motherFullName} required placeholder="Fatima Ahmed" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
+                      <Label htmlFor="edit-phone">Phone Number</Label>
+                      <Input id="edit-phone" name="phone" type="tel" defaultValue={selectedClient.phone || ""} placeholder="e.g., +1 234 567 8900" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client" />
+                      <Label htmlFor="edit-email">Email</Label>
+                      <Input id="edit-email" name="email" type="email" defaultValue={selectedClient.email || ""} placeholder="client@example.com" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="address">Address</Label>
-                      <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
+                      <Label htmlFor="edit-address">Address</Label>
+                      <Input id="edit-address" name="address" defaultValue={selectedClient.address || ""} placeholder="Street, City, State, ZIP" className="input-client" />
                     </div>
                     <div>
                       <Label>Date of Birth</Label>
                       <DatePickerWithYearNav
-                        date={createDateOfBirth}
-                        onDateChange={setCreateDateOfBirth}
+                        date={editDateOfBirth}
+                        onDateChange={setEditDateOfBirth}
                         placeholder="Select date of birth"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="placeOfBirth">Place of Birth</Label>
-                      <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
+                      <Label htmlFor="edit-placeOfBirth">Place of Birth</Label>
+                      <Input id="edit-placeOfBirth" name="placeOfBirth" defaultValue={selectedClient.placeOfBirth || ""} placeholder="City, Country" className="input-client" />
                     </div>
                     <div>
-                      <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
-                      <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                      <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
+                      <Input id="edit-passportIdNumber" name="passportIdNumber" defaultValue={selectedClient.passportIdNumber || ""} placeholder="Passport or National ID" className="input-client" />
                     </div>
                     <div>
-                      <Label htmlFor="registrationNumber">Registration Number</Label>
-                      <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                      <Label htmlFor="edit-registrationNumber">Registration Number</Label>
+                      <Input id="edit-registrationNumber" name="registrationNumber" defaultValue={selectedClient.registrationNumber || ""} placeholder="Business/Company Registration" className="input-client" />
                     </div>
                   </div>
                 </div>
@@ -353,26 +669,26 @@ export default function Clients() {
                   <h3 className="font-semibold mb-4">Driving License</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="col-span-2">
-                      <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                      <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
+                      <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
+                      <Input id="edit-drivingLicenseNumber" name="drivingLicenseNumber" defaultValue={selectedClient.drivingLicenseNumber} required className="input-client" />
                     </div>
                     <div>
                       <DateDropdownSelector
-                        id="licenseIssueDate"
+                        id="edit-licenseIssueDate"
                         label="Issue Date"
-                        value={createLicenseIssueDate}
-                        onChange={setCreateLicenseIssueDate}
-                        maxDate={new Date()} // Only allow current or past dates
+                        value={editLicenseIssueDate}
+                        onChange={setEditLicenseIssueDate}
+                        maxDate={new Date()}
                       />
                     </div>
                     <div>
                       <DateDropdownSelector
-                        id="licenseExpiryDate"
+                        id="edit-licenseExpiryDate"
                         label="Expiry Date *"
-                        value={createLicenseExpiryDate}
-                        onChange={setCreateLicenseExpiryDate}
+                        value={editLicenseExpiryDate}
+                        onChange={setEditLicenseExpiryDate}
                         required
-                        minDate={new Date()} // Only allow future dates
+                        minDate={new Date()}
                       />
                     </div>
                   </div>
@@ -380,590 +696,130 @@ export default function Clients() {
 
                 {/* Notes */}
                 <div className="border-t border-gray-700 pt-4">
-                  <Label htmlFor="notes">Notes</Label>
-                  <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client" />
+                  <Label htmlFor="edit-notes">Notes</Label>
+                  <Input id="edit-notes" name="notes" defaultValue={selectedClient.notes || ""} placeholder="Additional information about the client" className="input-client" />
                 </div>
 
                 <div className="flex justify-end gap-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit">
-                    Add Client
+                  <Button type="submit" disabled={updateClient.isPending}>
+                    {updateClient.isPending ? "Updating..." : "Update Client"}
                   </Button>
                 </div>
               </form>
-            </DialogContent>
-          </Dialog>
-          </div>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <Input
-              placeholder="Search by name, email, phone, license number, or nationality..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-white border-gray-300"
-            />
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Clients</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{clients.length}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Search Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{filteredClients.length}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-white border-gray-200">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">Active Filter</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-gray-900">{searchTerm ? "Yes" : "No"}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Clients List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredClients.map((client: any) => (
-            <Card key={client.id} className="bg-white border-gray-200 hover:border-gray-400 transition-colors">
-              <CardHeader>
-                <CardTitle className="text-gray-900 flex items-center justify-between">
-                  <span>{client.firstName} {client.lastName}</span>
-                  <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleViewDetails(client)}
-                      className="h-8 w-8 p-0"
-                      title="View Details"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setSelectedClient(client);
-                        setIsContractsDialogOpen(true);
-                      }}
-                      className="h-8 w-8 p-0"
-                      title="View Contracts"
-                    >
-                      <FileText className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleEditClick(client)}
-                      className="h-8 w-8 p-0"
-                      title="Edit Client"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDeleteClick(client.id, `${client.firstName} ${client.lastName}`)}
-                      className="h-8 w-8 p-0 text-red-400"
-                      title="Delete Client"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-gray-900 space-y-2">
-                {client.nationality && (
-                  <div className="text-sm">
-                    <span className="text-gray-800 font-medium">Nationality:</span> <span className="text-gray-900">{client.nationality}</span>
-                  </div>
-                )}
-                {client.phone && (
-                  <div className="text-sm">
-                    <span className="text-gray-800 font-medium">Phone:</span> <span className="text-gray-900">{client.phone}</span>
-                  </div>
-                )}
-                {client.email && (
-                  <div className="text-sm">
-                    <span className="text-gray-800 font-medium">Email:</span> <span className="text-gray-900">{client.email}</span>
-                  </div>
-                )}
-                <div className="text-sm">
-                  <span className="text-gray-800 font-medium">License:</span> <span className="text-gray-900">{client.drivingLicenseNumber}</span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-gray-800 font-medium">License Expiry:</span>{" "}
-                  <span className="text-gray-900">{new Date(client.licenseExpiryDate).toLocaleDateString()}</span>
-                  {(() => {
-                    const expiryStatus = getLicenseExpiryStatus(client.licenseExpiryDate);
-                    if (expiryStatus.status !== 'valid') {
-                      return (
-                        <span className={`ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${expiryStatus.color} ${expiryStatus.bgColor} ${expiryStatus.borderColor} border`}>
-                          <AlertTriangle className="h-3 w-3" />
-                          {expiryStatus.message}
-                        </span>
-                      );
-                    }
-                    return null;
-                  })()}
-                </div>
-                {client.address && (
-                  <div className="text-sm">
-                    <span className="text-gray-800 font-medium">Address:</span> <span className="text-gray-900">{client.address}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredClients.length === 0 && (
-          <Card className="bg-white border-gray-200 p-12 text-center">
-            <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {searchTerm ? "No Clients Found" : "No Clients Yet"}
-            </h3>
-            <p className="text-gray-400 mb-4">
-              {searchTerm 
-                ? "Try adjusting your search terms" 
-                : "Add your first client to start managing customer information"}
-            </p>
-            {!searchTerm && (
-              <Button onClick={() => setIsCreateDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add First Client
-              </Button>
             )}
-          </Card>
-        )}
+          </DialogContent>
+        </Dialog>
 
-      {/* Edit Client Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Client</DialogTitle>
-            <DialogDescription>Update the client's information below.</DialogDescription>
-          </DialogHeader>
-          {selectedClient && (
-            <form key={selectedClient.id} onSubmit={handleEditSubmit} className="space-y-6">
-              {/* Personal Information */}
-              <div>
-                <h3 className="font-semibold mb-4">Personal Information</h3>
+        {/* Details Dialog */}
+        <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Client Details</DialogTitle>
+            </DialogHeader>
+            {selectedClient && (
+              <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="edit-firstName">First Name *</Label>
-                    <Input 
-                      id="edit-firstName" 
-                      name="firstName" 
-                      defaultValue={selectedClient.firstName}
-                      required 
-                      className="input-client" 
-                    />
+                    <span className="text-muted-foreground">First Name</span>
+                    <p className="font-semibold">{selectedClient.firstName}</p>
                   </div>
                   <div>
-                    <Label htmlFor="edit-lastName">Last Name *</Label>
-                    <Input 
-                      id="edit-lastName" 
-                      name="lastName" 
-                      defaultValue={selectedClient.lastName}
-                      required 
-                      className="input-client" 
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-fatherName">Father's Name *</Label>
-                    <Input 
-                      id="edit-fatherName" 
-                      name="fatherName" 
-                      defaultValue={selectedClient.fatherName || ""}
-                      required 
-                      placeholder="Ahmed Hassan" 
-                      className="input-client" 
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-nationality">Nationality</Label>
-                    <Popover open={editNationalityOpen} onOpenChange={setEditNationalityOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={editNationalityOpen}
-                          className="w-full justify-between"
-                        >
-                          {editSelectedNationality || "Select nationality..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-full p-0">
-                        <Command>
-                          <CommandInput placeholder="Search nationality..." />
-                          <CommandList>
-                            <CommandEmpty>No nationality found.</CommandEmpty>
-                            <CommandGroup>
-                              {nationalities.map((nat) => (
-                                <CommandItem
-                                  key={nat}
-                                  value={nat}
-                                  onSelect={(value) => {
-                                    setEditSelectedNationality(value);
-                                    setEditNationalityOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={`mr-2 h-4 w-4 ${
-                                      editSelectedNationality === nat ? "opacity-100" : "opacity-0"
-                                    }`}
-                                  />
-                                  {nat}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
-                    <Input 
-                      id="edit-motherFullName" 
-                      name="motherFullName" 
-                      defaultValue={selectedClient.motherFullName}
-                      required 
-                      className="input-client" 
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-phone">Phone Number</Label>
-                    <Input 
-                      id="edit-phone" 
-                      name="phone" 
-                      type="tel" 
-                      defaultValue={selectedClient.phone || ""}
-                      placeholder="e.g., +1 234 567 8900" 
-                      className="input-client" 
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-email">Email</Label>
-                    <Input 
-                      id="edit-email" 
-                      name="email" 
-                      type="email" 
-                      defaultValue={selectedClient.email || ""}
-                      placeholder="client@example.com" 
-                      className="input-client" 
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-address">Address</Label>
-                    <Input 
-                      id="edit-address" 
-                      name="address" 
-                      defaultValue={selectedClient.address || ""}
-                      placeholder="Street, City, State, ZIP" 
-                      className="input-client" 
-                    />
+                    <span className="text-muted-foreground">Last Name</span>
+                    <p className="font-semibold">{selectedClient.lastName}</p>
                   </div>
                   <div>
-                    <Label>Date of Birth</Label>
-                    <DatePickerWithYearNav
-                      date={editDateOfBirth}
-                      onDateChange={setEditDateOfBirth}
-                      placeholder="Select date of birth"
-                    />
+                    <span className="text-muted-foreground">Father's Name</span>
+                    <p className="font-semibold">{selectedClient.fatherName}</p>
                   </div>
                   <div>
-                    <Label htmlFor="edit-placeOfBirth">Place of Birth</Label>
-                    <Input 
-                      id="edit-placeOfBirth" 
-                      name="placeOfBirth" 
-                      defaultValue={selectedClient.placeOfBirth || ""}
-                      placeholder="City, Country" 
-                      className="input-client" 
-                    />
+                    <span className="text-muted-foreground">Mother's Full Name</span>
+                    <p className="font-semibold">{selectedClient.motherFullName}</p>
                   </div>
                   <div>
-                    <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
-                    <Input 
-                      id="edit-passportIdNumber" 
-                      name="passportIdNumber" 
-                      defaultValue={selectedClient.passportIdNumber || ""}
-                      placeholder="Passport or National ID" 
-                      className="input-client" 
-                    />
+                    <span className="text-muted-foreground">Nationality</span>
+                    <p className="font-semibold">{selectedClient.nationality || "N/A"}</p>
                   </div>
                   <div>
-                    <Label htmlFor="edit-registrationNumber">Registration Number</Label>
-                    <Input 
-                      id="edit-registrationNumber" 
-                      name="registrationNumber" 
-                      defaultValue={selectedClient.registrationNumber || ""}
-                      placeholder="Business/Company Registration" 
-                      className="input-client" 
-                    />
+                    <span className="text-muted-foreground">Phone</span>
+                    <p className="font-semibold">{selectedClient.phone || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Email</span>
+                    <p className="font-semibold">{selectedClient.email || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Address</span>
+                    <p className="font-semibold">{selectedClient.address || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Date of Birth</span>
+                    <p className="font-semibold">{selectedClient.dateOfBirth ? new Date(selectedClient.dateOfBirth).toLocaleDateString() : "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Place of Birth</span>
+                    <p className="font-semibold">{selectedClient.placeOfBirth || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Passport/ID Number</span>
+                    <p className="font-semibold">{selectedClient.passportIdNumber || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Registration Number</span>
+                    <p className="font-semibold">{selectedClient.registrationNumber || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Driving License Number</span>
+                    <p className="font-semibold">{selectedClient.drivingLicenseNumber}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">License Issue Date</span>
+                    <p className="font-semibold">{selectedClient.licenseIssueDate ? new Date(selectedClient.licenseIssueDate).toLocaleDateString() : "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">License Expiry Date</span>
+                    <p className="font-semibold">{new Date(selectedClient.licenseExpiryDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Notes</span>
+                    <p className="font-semibold">{selectedClient.notes || "N/A"}</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Driving License */}
-              <div className="border-t border-gray-700 pt-4">
-                <h3 className="font-semibold mb-4">Driving License</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
-                    <Input 
-                      id="edit-drivingLicenseNumber" 
-                      name="drivingLicenseNumber" 
-                      defaultValue={selectedClient.drivingLicenseNumber}
-                      required 
-                      className="input-client" 
-                    />
+                {/* Contracts Section */}
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="font-semibold">Associated Contracts</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsContractsDialogOpen(true)}
+                    >
+                      View All
+                    </Button>
                   </div>
-                  <div>
-                    <DateDropdownSelector
-                      id="edit-licenseIssueDate"
-                      label="Issue Date"
-                      value={editLicenseIssueDate}
-                      onChange={setEditLicenseIssueDate}
-                      maxDate={new Date()} // Only allow current or past dates
-                    />
-                  </div>
-                  <div>
-                    <DateDropdownSelector
-                      id="edit-licenseExpiryDate"
-                      label="Expiry Date *"
-                      value={editLicenseExpiryDate}
-                      onChange={setEditLicenseExpiryDate}
-                      required
-                      minDate={new Date()} // Only allow future dates
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div className="border-t border-gray-700 pt-4">
-                <Label htmlFor="edit-notes">Notes</Label>
-                <Input 
-                  id="edit-notes" 
-                  name="notes" 
-                  defaultValue={selectedClient.notes || ""}
-                  placeholder="Additional information about the client" 
-                  className="input-client" 
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="submit">
-                  Update Client
-                </Button>
-              </div>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* View Details Dialog */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Client Details</DialogTitle>
-            <DialogDescription>View complete client information and rental history.</DialogDescription>
-          </DialogHeader>
-          {selectedClient && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-muted-foreground">Full Name</Label>
-                  <p className="font-medium text-foreground">{selectedClient.firstName} {selectedClient.lastName}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Nationality</Label>
-                  <p className="font-medium text-foreground">{selectedClient.nationality || "N/A"}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Email</Label>
-                  <p className="font-medium text-foreground">{selectedClient.email || "N/A"}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">Phone</Label>
-                  <p className="font-medium text-foreground">{selectedClient.phone || "N/A"}</p>
-                </div>
-                <div className="col-span-2">
-                  <Label className="text-muted-foreground">Address</Label>
-                  <p className="font-medium text-foreground">{selectedClient.address || "N/A"}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">License Number</Label>
-                  <p className="font-mono text-sm text-foreground">{selectedClient.drivingLicenseNumber}</p>
-                </div>
-                <div>
-                  <Label className="text-muted-foreground">License Expiry</Label>
-                  <p className="font-medium text-foreground">{new Date(selectedClient.licenseExpiryDate).toLocaleDateString()}</p>
-                </div>
-                {selectedClient.licenseIssueDate && (
-                  <div>
-                    <Label className="text-muted-foreground">License Issue Date</Label>
-                    <p className="font-medium text-foreground">{new Date(selectedClient.licenseIssueDate).toLocaleDateString()}</p>
-                  </div>
-                )}
-                {selectedClient.notes && (
-                  <div className="col-span-2">
-                    <Label className="text-muted-foreground">Notes</Label>
-                    <p className="font-medium text-foreground whitespace-pre-wrap">{selectedClient.notes}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* View Contracts Dialog */}
-      <Dialog open={isContractsDialogOpen} onOpenChange={setIsContractsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              Rental History - {selectedClient?.firstName} {selectedClient?.lastName}
-            </DialogTitle>
-            <DialogDescription>View all rental contracts for this client.</DialogDescription>
-          </DialogHeader>
-          {selectedClient && (
-            <div className="space-y-4">
-              {clientContracts.length === 0 ? (
-                <div className="text-center py-8">
-                  <FileText className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400">No rental contracts found for this client</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {clientContracts.map((contract: any) => (
-                    <Card key={contract.id} className="">
-                      <CardContent className="p-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div>
-                            <Label className="text-gray-400 text-xs">Contract Number</Label>
-                            <p className="font-mono text-sm text-orange-400">{contract.contractNumber}</p>
-                          </div>
-                          <div>
-                            <Label className="text-gray-400 text-xs">Status</Label>
-                            <p className="font-medium text-sm">
-                              <span className={`inline-block px-2 py-1 rounded text-xs ${
-                                contract.status === 'active' ? 'bg-green-900 text-green-300' :
-                                contract.status === 'completed' ? 'bg-blue-900 text-blue-300' :
-                                'bg-red-900 text-red-300'
-                              }`}>
-                                {contract.status.toUpperCase()}
-                              </span>
-                            </p>
-                          </div>
-                          <div>
-                            <Label className="text-gray-400 text-xs">Rental Period</Label>
-                            <p className="text-sm">
-                              {new Date(contract.rentalStartDate).toLocaleDateString()} - {new Date(contract.rentalEndDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div>
-                            <Label className="text-gray-400 text-xs">Total Amount</Label>
-                            <p className="font-bold text-sm text-green-400">${contract.finalAmount}</p>
-                          </div>
-                          <div>
-                            <Label className="text-gray-400 text-xs">Rental Days</Label>
-                            <p className="text-sm">{contract.rentalDays} days</p>
-                          </div>
-                          <div>
-                            <Label className="text-gray-400 text-xs">Daily Rate</Label>
-                            <p className="text-sm">${contract.dailyRate}/day</p>
-                          </div>
-                          {contract.pickupKm && (
-                            <div>
-                              <Label className="text-gray-400 text-xs">Pickup KM</Label>
-                              <p className="text-sm">{contract.pickupKm.toLocaleString()} km</p>
-                            </div>
-                          )}
-                          {contract.returnKm && (
-                            <div>
-                              <Label className="text-gray-400 text-xs">Return KM</Label>
-                              <p className="text-sm">{contract.returnKm.toLocaleString()} km</p>
-                            </div>
-                          )}
+                  {clientContracts && clientContracts.length > 0 ? (
+                    <div className="space-y-2">
+                      {clientContracts.slice(0, 3).map((contract) => (
+                        <div key={contract.id} className="p-2 bg-muted rounded text-sm">
+                          <p className="font-semibold">Contract #{contract.id}</p>
+                          <p className="text-muted-foreground">
+                            {new Date(contract.rentalStartDate).toLocaleDateString()} - {new Date(contract.rentalEndDate).toLocaleDateString()}
+                          </p>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-              <div className="pt-4 border-t border-gray-700">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-                  <div>
-                    <Label className="text-gray-400 text-xs">Total Contracts</Label>
-                    <p className="text-2xl font-bold text-white">{clientContracts.length}</p>
-                  </div>
-                  <div>
-                    <Label className="text-gray-400 text-xs">Active Contracts</Label>
-                    <p className="text-2xl font-bold text-green-400">
-                      {clientContracts.filter((c: any) => c.status === 'active').length}
-                    </p>
-                  </div>
-                  <div>
-                    <Label className="text-gray-400 text-xs">Total Revenue</Label>
-                    <p className="text-2xl font-bold text-orange-400">
-                      ${clientContracts.reduce((sum: number, c: any) => sum + Number(c.finalAmount || 0), 0).toFixed(2)}
-                    </p>
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">No contracts associated with this client</p>
+                  )}
                 </div>
               </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsContractsDialogOpen(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Bulk Import Dialog */}
-      <BulkImportDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-        type="clients"
-        onImport={async (clients) => {
-          const result = await utils.client.bulkImport.importClients.mutate({ clients });
-          if (result.results.some(r => r.success)) {
-            await utils.clients.list.invalidate();
-            toast.success(`Imported ${result.results.filter(r => r.success).length} clients`);
-          }
-          return result;
-        }}
-      />
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
     </SidebarLayout>
   );
 }
