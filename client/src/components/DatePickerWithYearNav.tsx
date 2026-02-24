@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, ChevronUp, ChevronDown } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -26,6 +26,11 @@ interface DatePickerWithYearNavProps {
   maxYear?: number;
 }
 
+const monthNames = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
 export function DatePickerWithYearNav({
   date,
   onDateChange,
@@ -42,6 +47,7 @@ export function DatePickerWithYearNav({
   
   const currentYear = month.getFullYear();
   const currentMonth = month.getMonth();
+  const currentMonthName = monthNames[currentMonth];
 
   const handleYearChange = (yearStr: string) => {
     const year = parseInt(yearStr);
@@ -59,11 +65,6 @@ export function DatePickerWithYearNav({
     setMonth(newDate);
   };
 
-  const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
@@ -79,22 +80,23 @@ export function DatePickerWithYearNav({
           {date ? format(date, "PPP") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4" align="start">
-        <div className="space-y-4">
-          {/* Year and Month Navigation */}
+      <PopoverContent className="w-auto p-0" align="start">
+        <div className="p-4 space-y-4">
+          {/* Header with Year and Month Selection */}
           <div className="flex items-center justify-between gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('prev')}
-              className="h-8 w-8 p-0"
+              className="h-9 w-9 p-0 hover:bg-accent"
+              title="Previous month"
             >
-              <ChevronUp className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
-            
-            <div className="flex items-center gap-2 flex-1">
+
+            <div className="flex items-center gap-2 flex-1 justify-center">
               <Select value={currentYear.toString()} onValueChange={handleYearChange}>
-                <SelectTrigger className="w-[100px] h-8">
+                <SelectTrigger className="w-[90px] h-9 text-sm font-semibold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px]">
@@ -106,8 +108,8 @@ export function DatePickerWithYearNav({
                 </SelectContent>
               </Select>
               
-              <span className="text-sm font-medium flex-1 text-center">
-                {monthNames[currentMonth]}
+              <span className="text-sm font-semibold text-foreground min-w-[80px] text-center">
+                {currentMonthName}
               </span>
             </div>
 
@@ -115,26 +117,48 @@ export function DatePickerWithYearNav({
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('next')}
-              className="h-8 w-8 p-0"
+              className="h-9 w-9 p-0 hover:bg-accent"
+              title="Next month"
             >
-              <ChevronDown className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
 
-          {/* Calendar */}
-          <Calendar
-            mode="single"
-            selected={date}
-            onSelect={(selectedDate) => {
-              onDateChange(selectedDate);
-              setIsOpen(false);
-            }}
-            month={month}
-            onMonthChange={setMonth}
-            fixedWeeks
-            showOutsideDays={false}
-            initialFocus
-          />
+          {/* Calendar Grid */}
+          <div className="rounded-md border border-input overflow-hidden">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={(selectedDate) => {
+                onDateChange(selectedDate);
+                setIsOpen(false);
+              }}
+              month={month}
+              onMonthChange={setMonth}
+              fixedWeeks
+              showOutsideDays={false}
+              initialFocus
+              classNames={{
+                months: "w-full",
+                month: "w-full space-y-2",
+                caption: "hidden",
+                nav: "hidden",
+                head_row: "grid grid-cols-7 bg-muted/50 border-b border-input",
+                head_cell: "text-xs font-semibold text-muted-foreground py-2 text-center",
+                row: "grid grid-cols-7 w-full",
+                cell: "relative p-0 text-center text-sm",
+                day: "h-9 w-full rounded-none hover:bg-accent transition-colors",
+                day_selected: "bg-primary text-primary-foreground hover:bg-primary",
+                day_today: "bg-accent text-accent-foreground font-bold",
+                day_outside: "text-muted-foreground opacity-50",
+              }}
+            />
+          </div>
+
+          {/* Footer with helpful text */}
+          <div className="text-xs text-muted-foreground text-center">
+            Click a date to select, use arrows to navigate months
+          </div>
         </div>
       </PopoverContent>
     </Popover>

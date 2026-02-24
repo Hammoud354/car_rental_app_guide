@@ -5364,3 +5364,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Use disabledDates prop in Calendar to enforce year range
 - [x] Test insurance expiry date picker - can now select years up to 2050
 - [x] Verified both add and edit vehicle forms use DatePickerWithYearNav
+
+
+## Improve Date Picker Design (Feb 24, 2026)
+- [x] Redesign DatePickerWithYearNav for better user experience
+- [x] Improve layout with better spacing and visual hierarchy
+- [x] Make year/month navigation more intuitive with left/right chevron buttons
+- [x] Add clearer labels and visual feedback (month names, helpful footer text)
+- [x] Add border around calendar grid for better visual separation
+- [x] Improve day cell styling with hover effects and better colors
+- [x] Keep year range extended to 1900-2050
+- [x] Test date picker with different months and years
