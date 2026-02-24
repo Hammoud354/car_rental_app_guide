@@ -5354,3 +5354,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Added border styling to calendar grid for better visual separation
 - [x] Improved reservation card styling with better colors and hover states
 - [x] Test calendar with different months and years - working correctly
+
+
+## Fix Insurance Policy Expiry Year Limit (Feb 24, 2026)
+- [x] Locate insurance expiry date picker components - found in FleetManagement.tsx
+- [x] Identify year range limitation - DatePickerWithYearNav using react-day-picker
+- [x] Update DatePickerWithYearNav to support years up to 2050
+- [x] Add minYear and maxYear props to DatePickerWithYearNav (default maxYear: 2050)
+- [x] Use disabledDates prop in Calendar to enforce year range
+- [x] Test insurance expiry date picker - can now select years up to 2050
+- [x] Verified both add and edit vehicle forms use DatePickerWithYearNav

@@ -15,6 +15,8 @@ interface DatePickerWithYearNavProps {
   onDateChange: (date: Date | undefined) => void;
   placeholder?: string;
   className?: string;
+  minYear?: number; // Minimum year allowed
+  maxYear?: number; // Maximum year allowed (default: 2050)
 }
 
 export function DatePickerWithYearNav({
@@ -22,8 +24,16 @@ export function DatePickerWithYearNav({
   onDateChange,
   placeholder = "Pick a date",
   className,
+  minYear = 1900,
+  maxYear = 2050,
 }: DatePickerWithYearNavProps) {
   const [month, setMonth] = useState<Date>(date || new Date());
+
+  // Create disabled function for dates outside the year range
+  const isDateDisabled = (date: Date) => {
+    const year = date.getFullYear();
+    return year < minYear || year > maxYear;
+  };
 
   return (
     <Popover>
@@ -51,6 +61,7 @@ export function DatePickerWithYearNav({
           showOutsideDays={false}
           initialFocus
           captionLayout="dropdown"
+          disabled={isDateDisabled}
         />
       </PopoverContent>
     </Popover>
