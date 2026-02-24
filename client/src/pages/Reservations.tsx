@@ -154,7 +154,7 @@ export default function Reservations() {
               {/* Calendar days */}
               {calendarDays.map((day, index) => {
                 if (day === null) {
-                  return <div key={`empty-${index}`} className="min-h-[120px] bg-gray-50 border-r border-b border-gray-200 last:border-r-0" />;
+                  return <div key={`empty-${index}`} className="min-h-[180px] bg-gray-50 border-r border-b border-gray-200 last:border-r-0" />;
                 }
                 
                 const dayReservations = getReservationsForDay(day);
@@ -169,7 +169,7 @@ export default function Reservations() {
                       setSelectedDate(currentDateObj);
                       setIsDateDialogOpen(true);
                     }}
-                    className={`min-h-[120px] p-3 cursor-pointer transition-all hover:bg-blue-50 border-r border-b border-gray-200 last:border-r-0 ${
+                    className={`min-h-[180px] p-4 cursor-pointer transition-all hover:bg-blue-50 border-r border-b border-gray-200 last:border-r-0 flex flex-col ${
                       isToday
                         ? "bg-blue-100 border-blue-300"
                         : isPast
@@ -178,7 +178,7 @@ export default function Reservations() {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-3">
-                      <div className={`text-base font-bold ${isToday ? "text-blue-700" : "text-gray-800"}`}>
+                      <div className={`text-lg font-bold ${isToday ? "text-blue-700" : "text-gray-800"}`}>
                         {day}
                       </div>
                       {dayReservations.length > 0 && (
@@ -187,8 +187,8 @@ export default function Reservations() {
                         </div>
                       )}
                     </div>
-                    <div className="space-y-1.5 overflow-y-auto max-h-[70px]">
-                      {dayReservations.map((reservation, idx) => {
+                    <div className="space-y-2 flex-1 overflow-hidden">
+                      {dayReservations.slice(0, 2).map((reservation, idx) => {
                         // Calculate rental duration in days
                         const startDate = new Date(reservation.rentalStartDate);
                         const endDate = new Date(reservation.rentalEndDate);
@@ -204,58 +204,45 @@ export default function Reservations() {
                         const returnDayBadge = isReturnDay(reservation, day);
                         
                         return (
-                            <div
-                              key={reservation.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.location.href = '/rental-contracts';
-                              }}
-                              title={tooltipText}
-                              className={`text-xs p-2 rounded cursor-pointer hover:shadow-sm transition-all relative border ${
-                                reservation.hasConflict
-                                  ? "bg-red-100 border-red-400 text-red-900 hover:bg-red-200"
-                                  : `${getRandomColor(idx)} hover:opacity-90`
-                              }`}
-                            >
+                          <div
+                            key={reservation.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/rental-contracts';
+                            }}
+                            title={tooltipText}
+                            className={`text-xs p-2.5 rounded cursor-pointer hover:shadow-md transition-all border ${
+                              reservation.hasConflict
+                                ? "bg-red-100 border-red-400 text-red-900 hover:bg-red-200"
+                                : `${getRandomColor(idx)} hover:opacity-90`
+                            }`}
+                          >
                             {returnDayBadge && (
-                              <div className="absolute top-1 left-1 bg-amber-400 text-amber-900 text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                                Return Today
+                              <div className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-amber-400 text-amber-900 mb-1 inline-block">
+                                Return
                               </div>
                             )}
                             
-                            {/* Duration indicator in top-right corner */}
-                            <div className="absolute top-1 right-1 flex items-center gap-0.5 bg-white/90 px-1 py-0.5 rounded text-[9px] font-semibold text-gray-700 shadow-sm">
-                              <Clock className="h-2.5 w-2.5" />
-                              <span>{durationDays}d</span>
-                            </div>
-                            
-                            <div className="flex items-center justify-between gap-1 mb-1">
-                              <div className="flex items-center gap-1">
-                                <Car className="h-3 w-3" />
-                                <span className="font-semibold truncate">
+                            <div className="flex items-start gap-1">
+                              <Car className="h-3 w-3 flex-shrink-0 mt-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold truncate text-xs">
                                   {reservation.vehicleBrand} {reservation.vehicleModel}
-                                </span>
+                                </div>
+                                <div className="flex items-center gap-0.5 text-[9px] mt-0.5">
+                                  <Clock className="h-2.5 w-2.5" />
+                                  <span>{durationDays}d</span>
+                                </div>
                               </div>
-                              {reservation.hasConflict && (
-                                <AlertTriangle className="h-3 w-3 text-red-600 flex-shrink-0" />
-                              )}
                             </div>
-                            <div className="flex items-center gap-1 text-[10px]">
-                              <User className="h-2.5 w-2.5" />
-                              <span className="truncate">{reservation.clientName}</span>
-                            </div>
-                            <div className="flex items-center gap-1 text-[10px]">
-                              <Phone className="h-2.5 w-2.5" />
-                              <span className="truncate">{reservation.clientPhone}</span>
-                            </div>
-                            {reservation.hasConflict && (
-                              <div className="mt-1 text-[9px] font-semibold text-red-700">
-                                ⚠️ {reservation.conflictCount} conflict{reservation.conflictCount > 1 ? 's' : ''}
-                              </div>
-                            )}
-                            </div>
+                          </div>
                         );
                       })}
+                      {dayReservations.length > 2 && (
+                        <div className="text-xs text-gray-600 font-medium px-2 py-1 bg-gray-100 rounded text-center">
+                          +{dayReservations.length - 2} more
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -263,45 +250,80 @@ export default function Reservations() {
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Date Details Dialog */}
-        <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-              </DialogTitle>
-            </DialogHeader>
+      {/* Date Detail Dialog */}
+      <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedDate && (
             <div className="space-y-4">
-              {selectedDate && getReservationsForDay(selectedDate.getDate()).length > 0 ? (
-                <div className="space-y-3">
+              {getReservationsForDay(selectedDate.getDate()).length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg text-gray-900">Reservations for this day</h3>
                   {getReservationsForDay(selectedDate.getDate()).map((reservation) => {
                     const startDate = new Date(reservation.rentalStartDate);
                     const endDate = new Date(reservation.rentalEndDate);
                     const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                    
+                    const returnDayBadge = isReturnDay(reservation, selectedDate.getDate());
+
                     return (
-                      <div key={reservation.id} className="p-3 border rounded-lg bg-gray-50">
-                        <div className="font-semibold text-gray-900 mb-2">
-                          {reservation.vehicleBrand} {reservation.vehicleModel}
+                      <div key={reservation.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all">
+                        <div className="flex items-start justify-between mb-3">
+                          <div>
+                            <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                              <Car className="h-4 w-4 text-blue-600" />
+                              {reservation.vehicleBrand} {reservation.vehicleModel}
+                            </h4>
+                            {returnDayBadge && (
+                              <span className="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded mt-1 inline-block">
+                                Return Today
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-lg font-bold text-green-600">${reservation.totalCost?.toFixed(2) || 'N/A'}</span>
                         </div>
-                        <div className="text-sm text-gray-700 space-y-1">
-                          <div><strong>Client:</strong> {reservation.clientName}</div>
-                          <div><strong>Phone:</strong> {reservation.clientPhone}</div>
-                          <div><strong>Duration:</strong> {durationDays} days</div>
-                          <div><strong>Total Cost:</strong> ${reservation.totalCost?.toFixed(2) || 'N/A'}</div>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-600">Rental Period</p>
+                            <p className="font-semibold text-gray-900">{durationDays} days</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Contract ID</p>
+                            <p className="font-semibold text-gray-900">#{reservation.id}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3 pt-3 border-t border-gray-200">
+                          <div className="flex items-center gap-2 text-sm text-gray-700">
+                            <User className="h-4 w-4" />
+                            <span>{reservation.clientName}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-700 mt-1">
+                            <Phone className="h-4 w-4" />
+                            <span>{reservation.clientPhone}</span>
+                          </div>
                         </div>
                       </div>
                     );
                   })}
                 </div>
               ) : (
-                <p className="text-gray-600">No reservations for this date</p>
+                <div className="text-center py-8">
+                  <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-600">No reservations for this day</p>
+                </div>
               )}
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </SidebarLayout>
   );
 }

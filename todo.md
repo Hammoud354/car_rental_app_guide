@@ -5402,3 +5402,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check if future contracts/reservations are being included (they were)
 - [x] Fix P&L to only include completed or current month transactions (added currentMonth filter)
 - [x] Test P&L calculations for accuracy - compiles successfully with TypeScript 0 errors
+
+
+## Fix Reservation Calendar Layout (Feb 24, 2026)
+- [x] Review Reservations calendar component layout
+- [x] Identify spacing and alignment issues causing scattered appearance (insufficient cell height, poor overflow handling)
+- [x] Improve card sizing and positioning within calendar cells (increased from 120px to 180px, better padding)
+- [x] Add better overflow handling for multiple reservations per day (show first 2, display +N more indicator)
+- [x] Ensure consistent grid layout across all months (fixed 7-column grid with consistent spacing)
+- [x] Test calendar with various reservation densities - compiles successfully with 0 TypeScript errors
