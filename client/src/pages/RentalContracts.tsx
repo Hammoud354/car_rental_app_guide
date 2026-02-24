@@ -662,6 +662,8 @@ export default function RentalContracts() {
                                       // Auto-fill form fields
                                       (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
                                       (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
+                                      (document.getElementById("clientMotherFullName") as HTMLInputElement).value = client.motherFullName || "";
+                                      (document.getElementById("clientFatherFullName") as HTMLInputElement).value = client.fatherName || "";
                                       setSelectedNationality(client.nationality || ""); // Fix: Update nationality state
                                       (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
                                       (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";

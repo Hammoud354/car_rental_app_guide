@@ -5386,3 +5386,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix BulkImportDialog component integration
 - [x] Fix mutation parameter names (clientId -> id)
 - [x] Test client creation - all TypeScript errors resolved
+
+
+## Fix Client Data Population in Contract Form (Feb 24, 2026)
+- [x] Locate contract form and client selection logic in RentalContracts.tsx
+- [x] Check how client data is retrieved when selecting from database
+- [x] Verify father's name and mother's name fields are mapped correctly
+- [x] Fix data population for all client fields in contract form (added clientMotherFullName and clientFatherFullName)
+- [x] Test client selection with complete data - compiles successfully
