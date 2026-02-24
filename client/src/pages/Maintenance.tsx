@@ -130,18 +130,27 @@ export default function Maintenance() {
       return;
     }
 
+    if (!performedAtDate) {
+      toast.error("Please select a date performed");
+      return;
+    }
+
+    const cost = formData.get("cost") as string;
+    const mileageAtService = formData.get("mileageAtService") as string;
+    const kmDueMaintenance = formData.get("kmDueMaintenance") as string;
+
     addMaintenanceMutation.mutate({
       vehicleId: selectedVehicleId,
       maintenanceType: formData.get("maintenanceType") as any,
       description: formData.get("description") as string,
-      cost: formData.get("cost") as string || undefined,
-      performedAt: new Date(formData.get("performedAt") as string),
-      performedBy: formData.get("performedBy") as string || undefined,
-      garageLocation: formData.get("garageLocation") as string || undefined,
-      mileageAtService: formData.get("mileageAtService") ? parseInt(formData.get("mileageAtService") as string) : undefined,
-      kmDueMaintenance: formData.get("kmDueMaintenance") ? parseInt(formData.get("kmDueMaintenance") as string) : undefined,
-      garageEntryDate: formData.get("garageEntryDate") ? new Date(formData.get("garageEntryDate") as string) : undefined,
-      garageExitDate: formData.get("garageExitDate") ? new Date(formData.get("garageExitDate") as string) : undefined,
+      cost: cost && cost.trim() ? parseFloat(cost).toString() : undefined,
+      performedAt: performedAtDate,
+      performedBy: (formData.get("performedBy") as string) || undefined,
+      garageLocation: (formData.get("garageLocation") as string) || undefined,
+      mileageAtService: mileageAtService && mileageAtService.trim() ? parseInt(mileageAtService) : undefined,
+      kmDueMaintenance: kmDueMaintenance && kmDueMaintenance.trim() ? parseInt(kmDueMaintenance) : undefined,
+      garageEntryDate: garageEntryDate || undefined,
+      garageExitDate: garageExitDate || undefined,
     });
   };
 

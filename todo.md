@@ -5411,3 +5411,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add better overflow handling for multiple reservations per day (show first 2, display +N more indicator)
 - [x] Ensure consistent grid layout across all months (fixed 7-column grid with consistent spacing)
 - [x] Test calendar with various reservation densities - compiles successfully with 0 TypeScript errors
+
+
+## Fix Maintenance Record Creation Error (Feb 24, 2026)
+- [x] Investigate maintenance record database schema
+- [x] Check maintenance form field mapping (DatePickerWithYearNav not populating FormData)
+- [x] Identify which fields are getting null values (performedAt, garageEntryDate, garageExitDate)
+- [x] Fix field type conversions and validation (use state values instead of FormData for dates)
+- [x] Test maintenance record creation - compiles successfully with 0 TypeScript errors
