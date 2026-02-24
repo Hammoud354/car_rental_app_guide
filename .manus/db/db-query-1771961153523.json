@@ -1,0 +1,13 @@
+{
+  "query": "\n-- Get superadmin user ID first\nSET @superadmin_id = (SELECT id FROM users WHERE role = 'admin' LIMIT 1);\n\n-- Delete all data while preserving superadmin\nDELETE FROM rentalContracts;\nDELETE FROM invoices;\nDELETE FROM vehicles;\nDELETE FROM clients;\nDELETE FROM companyProfiles;\nDELETE FROM users WHERE id != @superadmin_id;\n\n-- Verify superadmin still exists\nSELECT COUNT(*) as remaining_users FROM users;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Get superadmin user ID first\nSET @superadmin_id = (SELECT id FROM users WHERE role = 'admin' LIMIT 1);\n\n-- Delete all data while preserving superadmin\nDELETE FROM rentalContracts;\nDELETE FROM invoices;\nDELETE FROM vehicles;\nDELETE FROM clients;\nDELETE FROM companyProfiles;\nDELETE FROM users WHERE id != @superadmin_id;\n\n-- Verify superadmin still exists\nSELECT COUNT(*) as remaining_users FROM users;\n",
+  "rows": [
+    {
+      "remaining_users": "1"
+    }
+  ],
+  "messages": [],
+  "stdout": "remaining_users\n1\n",
+  "stderr": "",
+  "execution_time_ms": 3281
+}

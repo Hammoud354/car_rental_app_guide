@@ -43,7 +43,7 @@ export default function Reservations() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Create calendar grid
+  // Create calendar grid - only current month days
   const calendarDays = [];
   
   // Add empty cells for days before the first day of the month
@@ -114,27 +114,39 @@ export default function Reservations() {
           </Link>
         </div>
 
-        {/* Calendar Controls */}
-        <Card>
-          <CardHeader>
+        {/* Calendar Card */}
+        <Card className="shadow-lg border-0">
+          {/* Calendar Header with Navigation */}
+          <CardHeader className="pb-6 pt-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <Button variant="outline" size="sm" onClick={goToPreviousMonth}>
-                <ChevronLeft className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={goToPreviousMonth}
+                className="hover:bg-gray-100 h-10 w-10 p-0"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-600" />
               </Button>
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-2xl font-bold text-gray-900 min-w-[250px] text-center">
                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={goToNextMonth}>
-                <ChevronRight className="h-4 w-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={goToNextMonth}
+                className="hover:bg-gray-100 h-10 w-10 p-0"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-600" />
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+
+          <CardContent className="p-6">
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-0 border border-gray-200 rounded-lg overflow-hidden">
               {/* Day headers */}
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="text-center font-semibold text-gray-700 py-2">
+                <div key={day} className="text-center font-bold text-gray-700 py-4 text-sm bg-gray-50 border-b border-gray-200 border-r last:border-r-0">
                   {day}
                 </div>
               ))}
@@ -142,7 +154,7 @@ export default function Reservations() {
               {/* Calendar days */}
               {calendarDays.map((day, index) => {
                 if (day === null) {
-                  return <div key={`empty-${index}`} className="min-h-[120px] bg-gray-50 rounded-lg" />;
+                  return <div key={`empty-${index}`} className="min-h-[120px] bg-gray-50 border-r border-b border-gray-200 last:border-r-0" />;
                 }
                 
                 const dayReservations = getReservationsForDay(day);
@@ -157,25 +169,25 @@ export default function Reservations() {
                       setSelectedDate(currentDateObj);
                       setIsDateDialogOpen(true);
                     }}
-                    className={`min-h-[120px] p-2 rounded-lg border cursor-pointer hover:shadow-md transition-shadow ${
+                    className={`min-h-[120px] p-3 cursor-pointer transition-all hover:bg-blue-50 border-r border-b border-gray-200 last:border-r-0 ${
                       isToday
-                        ? "bg-blue-50 border-blue-300"
+                        ? "bg-blue-100 border-blue-300"
                         : isPast
-                        ? "bg-gray-50 border-gray-200"
-                        : "bg-white border-gray-200"
+                        ? "bg-gray-50"
+                        : "bg-white"
                     }`}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className={`text-sm font-semibold ${isToday ? "text-blue-600" : "text-gray-700"}`}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className={`text-base font-bold ${isToday ? "text-blue-700" : "text-gray-800"}`}>
                         {day}
                       </div>
                       {dayReservations.length > 0 && (
-                        <div className="bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        <div className="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">
                           {dayReservations.length}
                         </div>
                       )}
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1.5 overflow-y-auto max-h-[70px]">
                       {dayReservations.map((reservation, idx) => {
                         // Calculate rental duration in days
                         const startDate = new Date(reservation.rentalStartDate);
@@ -199,10 +211,10 @@ export default function Reservations() {
                                 window.location.href = '/rental-contracts';
                               }}
                               title={tooltipText}
-                              className={`text-xs p-2 rounded cursor-pointer hover:shadow-md transition-shadow relative ${
+                              className={`text-xs p-2 rounded cursor-pointer hover:shadow-sm transition-all relative border ${
                                 reservation.hasConflict
-                                  ? "bg-red-100 border-2 border-red-500 text-red-900"
-                                  : `border ${getRandomColor(idx)}`
+                                  ? "bg-red-100 border-red-400 text-red-900 hover:bg-red-200"
+                                  : `${getRandomColor(idx)} hover:opacity-90`
                               }`}
                             >
                             {returnDayBadge && (
@@ -246,116 +258,50 @@ export default function Reservations() {
                       })}
                     </div>
                   </div>
-                );              })}
+                );
+              })}
             </div>
           </CardContent>
         </Card>
 
-
-
-        {isLoading && (
-          <div className="text-center py-8 text-gray-500">Loading reservations...</div>
-        )}
+        {/* Date Details Dialog */}
+        <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {selectedDate && getReservationsForDay(selectedDate.getDate()).length > 0 ? (
+                <div className="space-y-3">
+                  {getReservationsForDay(selectedDate.getDate()).map((reservation) => {
+                    const startDate = new Date(reservation.rentalStartDate);
+                    const endDate = new Date(reservation.rentalEndDate);
+                    const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+                    
+                    return (
+                      <div key={reservation.id} className="p-3 border rounded-lg bg-gray-50">
+                        <div className="font-semibold text-gray-900 mb-2">
+                          {reservation.vehicleBrand} {reservation.vehicleModel}
+                        </div>
+                        <div className="text-sm text-gray-700 space-y-1">
+                          <div><strong>Client:</strong> {reservation.clientName}</div>
+                          <div><strong>Phone:</strong> {reservation.clientPhone}</div>
+                          <div><strong>Duration:</strong> {durationDays} days</div>
+                          <div><strong>Total Cost:</strong> ${reservation.totalCost?.toFixed(2) || 'N/A'}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-gray-600">No reservations for this date</p>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* Date Details Dialog */}
-      <Dialog open={isDateDialogOpen} onOpenChange={setIsDateDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl">
-              Reservations for {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            {selectedDate && (() => {
-              const day = selectedDate.getDate();
-              const dayReservations = getReservationsForDay(day);
-              
-              if (dayReservations.length === 0) {
-                return (
-                  <div className="text-center py-8 text-gray-500">
-                    <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <p>No reservations scheduled for this date</p>
-                  </div>
-                );
-              }
-              
-              return dayReservations.map((reservation, idx) => {
-                const startDate = new Date(reservation.rentalStartDate);
-                const endDate = new Date(reservation.rentalEndDate);
-                const durationDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                
-                return (
-                  <Card key={reservation.id} className={reservation.hasConflict ? "border-red-500" : ""}>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Car className="h-5 w-5" />
-                          <span>{reservation.vehicleBrand} {reservation.vehicleModel}</span>
-                        </div>
-                        {reservation.hasConflict && (
-                          <div className="flex items-center gap-1 text-red-600 text-sm">
-                            <AlertTriangle className="h-4 w-4" />
-                            <span>Conflict</span>
-                          </div>
-                        )}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1">
-                            <User className="h-4 w-4" />
-                            Client
-                          </div>
-                          <div className="font-medium">{reservation.clientName}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1">
-                            <Phone className="h-4 w-4" />
-                            Phone
-                          </div>
-                          <div className="font-medium">{reservation.clientPhone}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            Start Date
-                          </div>
-                          <div className="font-medium">{startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            End Date
-                          </div>
-                          <div className="font-medium">{endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1">
-                            <Clock className="h-4 w-4" />
-                            Duration
-                          </div>
-                          <div className="font-medium">{durationDays} day{durationDays > 1 ? 's' : ''}</div>
-                        </div>
-                        <div>
-                          <div className="text-sm text-gray-600">Total Cost</div>
-                          <div className="font-medium text-lg">${reservation.totalCost?.toFixed(2) || 'N/A'}</div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 pt-2">
-                        <Link href="/rental-contracts" className="flex-1">
-                          <Button variant="outline" className="w-full">View Contract</Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              });
-            })()}
-          </div>
-        </DialogContent>
-      </Dialog>
     </SidebarLayout>
   );
 }

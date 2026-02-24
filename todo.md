@@ -5327,3 +5327,30 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update contract database schema if needed - field added to form data collection
 - [x] Add Father's Name to contract template mapper - added to SAMPLE_DATA and CONTRACT_FIELDS
 - [x] Test Father's Name field in contract creation form - TypeScript compilation successful
+
+
+## Implement Local Authentication (Login/Signup) (Feb 23, 2026)
+- [ ] Create login API endpoint (POST /api/auth/login)
+- [ ] Create signup API endpoint (POST /api/auth/signup)
+- [ ] Create logout API endpoint (POST /api/auth/logout)
+- [ ] Create Login page component
+- [ ] Create Signup page component
+- [ ] Update App.tsx routing to show login page when not authenticated
+- [ ] Update useAuth hook to support local authentication
+- [ ] Test login with Hammoud user
+- [ ] Test signup with new user
+- [ ] Verify session persistence with cookies
+
+
+## Improve Calendar Interface (Feb 24, 2026)
+- [x] Remove redundant month/year dropdown selectors from DatePickerWithYearNav
+- [x] Use react-day-picker's built-in dropdown caption layout instead of custom selectors
+- [x] Make month/year header more prominent (increased font size to 2xl, bold weight)
+- [x] Improve Reservations calendar grid layout with fixed 7-column grid
+- [x] Hide dates from adjacent months (only show current month days)
+- [x] Improve spacing and padding (larger day cells, better padding)
+- [x] Add hover effects for better interactivity (hover:bg-blue-50 on day cells)
+- [x] Enhanced calendar header with larger navigation buttons
+- [x] Added border styling to calendar grid for better visual separation
+- [x] Improved reservation card styling with better colors and hover states
+- [x] Test calendar with different months and years - working correctly
