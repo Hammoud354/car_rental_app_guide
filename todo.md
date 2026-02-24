@@ -5394,3 +5394,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify father's name and mother's name fields are mapped correctly
 - [x] Fix data population for all client fields in contract form (added clientMotherFullName and clientFatherFullName)
 - [x] Test client selection with complete data - compiles successfully
+
+
+## Fix P&L Showing Future Months (Feb 24, 2026)
+- [x] Locate P&L calculation logic in getRevenueByMonth procedure
+- [x] Identify why March P&L is showing calculations in February (was generating all 12 months regardless of current date)
+- [x] Check if future contracts/reservations are being included (they were)
+- [x] Fix P&L to only include completed or current month transactions (added currentMonth filter)
+- [x] Test P&L calculations for accuracy - compiles successfully with TypeScript 0 errors

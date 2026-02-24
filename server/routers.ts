@@ -1775,12 +1775,16 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         const userId = ctx.user.id;
         const year = input.year || new Date().getFullYear();
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth();
 
         const contracts = await db.getCompletedContracts(userId);
         const invoices = await db.getPaidInvoices(userId);
 
-        // Group by month
-        const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+        // Only include months up to current month if it's the current year
+        const monthsToShow = year === currentYear ? currentMonth + 1 : 12;
+        const monthlyData = Array.from({ length: monthsToShow }, (_, i) => ({
           month: i + 1,
           monthName: new Date(year, i).toLocaleString('default', { month: 'long' }),
           revenue: 0,
