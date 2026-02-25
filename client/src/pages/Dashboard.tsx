@@ -31,13 +31,13 @@ function ExportToExcelButton() {
         throw new Error("No data to export");
       }
 
-      const { vehicles, contracts, clients, maintenanceRecords, invoices } = result.data;
+      const { vehicles = [], contracts = [], clients = [], maintenanceRecords = [], invoices = [] } = result.data || {};
 
       // Create workbook
       const workbook = XLSX.utils.book_new();
 
       // Add Fleet sheet
-      const fleetData = vehicles.map(v => ({
+      const fleetData = (vehicles || []).map(v => ({
         "Brand": v.brand,
         "Model": v.model,
         "Year": v.year,
@@ -60,7 +60,7 @@ function ExportToExcelButton() {
       XLSX.utils.book_append_sheet(workbook, fleetSheet, "Fleet");
 
       // Add Contracts sheet
-      const contractsData = contracts.map(c => ({
+      const contractsData = (contracts || []).map(c => ({
         "Contract Number": c.contractNumber,
         "Client Name": `${c.clientFirstName || ""} ${c.clientLastName || ""}`.trim(),
         "Vehicle ID": c.vehicleId,
@@ -80,7 +80,7 @@ function ExportToExcelButton() {
       XLSX.utils.book_append_sheet(workbook, contractsSheet, "Contracts");
 
       // Add Clients sheet
-      const clientsData = clients.map(c => ({
+      const clientsData = (clients || []).map(c => ({
         "First Name": c.firstName,
         "Last Name": c.lastName,
         "Nationality": c.nationality || "",
@@ -94,7 +94,7 @@ function ExportToExcelButton() {
       XLSX.utils.book_append_sheet(workbook, clientsSheet, "Clients");
 
       // Add Maintenance sheet
-      const maintenanceData = maintenanceRecords.map(m => ({
+      const maintenanceData = (maintenanceRecords || []).map(m => ({
         "Vehicle ID": m.vehicleId,
         "Performed At": m.performedAt ? new Date(m.performedAt).toLocaleDateString() : "",
         "Maintenance Type": m.maintenanceType,
@@ -110,7 +110,7 @@ function ExportToExcelButton() {
       XLSX.utils.book_append_sheet(workbook, maintenanceSheet, "Maintenance");
 
       // Add Invoices sheet
-      const invoicesData = invoices.map(i => ({
+      const invoicesData = (invoices || []).map(i => ({
         "Invoice Number": i.invoiceNumber,
         "Contract ID": i.contractId,
         "Invoice Date": i.invoiceDate ? new Date(i.invoiceDate).toLocaleDateString() : "",
