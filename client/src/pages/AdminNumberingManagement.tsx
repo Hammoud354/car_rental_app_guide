@@ -9,10 +9,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, RefreshCw, Edit2 } from "lucide-react";
+import { Loader2, RefreshCw, Edit2, ChevronRight } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function AdminNumberingManagement() {
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [migrationFormData, setMigrationFormData] = useState({
     contractNumber: "",
@@ -82,6 +84,18 @@ export default function AdminNumberingManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <button
+          onClick={() => setLocation("/dashboard")}
+          className="hover:text-foreground transition-colors font-medium text-blue-600 hover:underline"
+        >
+          Dashboard
+        </button>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">Numbering Management</span>
+      </div>
+
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Numbering Management</h1>

@@ -5517,3 +5517,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add "admin" to expandedSections in SidebarLayout
 - [x] Verify admin section displays in sidebar
 - [x] Test admin navigation links are clickable
+
+
+## Breadcrumb Navigation for Admin Pages
+- [x] Add breadcrumb component to AdminNumberingManagement page
+- [x] Show navigation path: Dashboard > Numbering Management
+- [x] Make breadcrumb links clickable for navigation
+- [ ] Test breadcrumb on all admin pages
