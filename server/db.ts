@@ -2947,3 +2947,56 @@ export async function getAllInsurancePolicies(userId: number) {
     return [];
   }
 }
+
+
+// Numbering Management Queries
+export async function getAllUsersWithNumberingStatus() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    // Get all users
+    const allUsers = await db.select().from(users);
+    
+    // Get numbering counters for all users
+    const { numberingCounters } = await import("../drizzle/schema");
+    const counters = await db.select().from(numberingCounters);
+    
+    // Create a map of counters by userId for quick lookup
+    const counterMap = new Map(counters.map(c => [c.userId, c]));
+    
+    // Combine users with their numbering status
+    return allUsers.map(user => {
+      const counter = counterMap.get(user.id);
+      return {
+        userId: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        lastContractNumber: counter?.lastContractNumber ?? 0,
+        lastInvoiceNumber: counter?.lastInvoiceNumber ?? 0,
+        nextContractNumber: (counter?.lastContractNumber ?? 0) + 1,
+        nextInvoiceNumber: (counter?.lastInvoiceNumber ?? 0) + 1,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching users with numbering status:", error);
+    return [];
+  }
+}
+
+export async function getUserNumberingAuditTrail(userId: number, limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const { numberingAudit } = await import("../drizzle/schema");
+    const result = await db
+      .select()
+      .from(numberingAudit)
+      .where(eq(numberingAudit.userId, userId))
+      .limit(limit);
+    return result;
+  } catch (error) {
+    console.error("Error fetching numbering audit trail:", error);
+    return [];
+  }
+}

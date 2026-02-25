@@ -5478,3 +5478,36 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Test full workflow with multiple users
 - [ ] Test concurrent operations
 - [ ] Create checkpoint and deliver
+
+
+## Admin Numbering Management Dashboard
+
+### Phase 1: Database Queries
+- [x] Create query to get all users with their numbering status
+- [x] Create query to get numbering audit trail for a specific user
+- [x] Add filtering and sorting capabilities
+
+### Phase 2: tRPC Procedures
+- [x] Create getAllUsersNumberingStatus query (admin only)
+- [x] Create getUserNumberingAuditTrail query (admin only)
+- [x] Ensure proper admin authorization checks
+
+### Phase 3: UI Component
+- [x] Build NumberingManagement page component
+- [x] Create users table showing all users and their numbering status
+- [x] Add migration form for contract numbers
+- [x] Add migration form for invoice numbers
+- [x] Add audit trail viewer for each user
+- [x] Add success/error notifications
+
+### Phase 4: Integration
+- [x] Add route to App.tsx for admin numbering management
+- [x] Add navigation link in admin sidebar
+- [x] Test full workflow
+
+### Phase 5: Testing & Delivery
+- [x] Test viewing all users' numbering status
+- [x] Test contract number migration
+- [x] Test invoice number migration
+- [x] Test audit trail display
+- [x] Create checkpoint and deliver

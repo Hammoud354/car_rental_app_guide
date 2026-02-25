@@ -103,6 +103,15 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         { href: "/invoices", label: "Invoices", icon: Receipt },
       ],
     },
+    ...(user?.role === "super_admin" ? [{
+      label: "admin",
+      displayLabel: "ADMIN",
+      items: [
+        { href: "/admin/numbering", label: "Numbering Management", icon: FileText },
+        { href: "/admin/user-management", label: "User Management", icon: Users },
+        { href: "/admin/audit-logs", label: "Audit Logs", icon: FileText },
+      ],
+    }] : []),
   ];
 
   return (

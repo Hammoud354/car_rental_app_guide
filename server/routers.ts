@@ -2196,6 +2196,20 @@ export const appRouter = router({
         );
         return { success: true };
       }),
+    
+    getAllUsersNumberingStatus: superAdminProcedure
+      .query(async ({ ctx }) => {
+        return await db.getAllUsersWithNumberingStatus();
+      }),
+    
+    getUserAuditTrail: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        limit: z.number().default(100),
+      }))
+      .query(async ({ input, ctx }) => {
+        return await db.getUserNumberingAuditTrail(input.userId, input.limit);
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

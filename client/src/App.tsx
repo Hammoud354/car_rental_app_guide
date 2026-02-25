@@ -37,6 +37,7 @@ import ProfitAndLoss from "./pages/ProfitAndLoss";
 import Demo from "./pages/Demo";
 import Home from "./pages/Home";
 import AIMaintenance from "./pages/AIMaintenance";
+import AdminNumberingManagement from "./pages/AdminNumberingManagement";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -69,6 +70,7 @@ function Router() {
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/user-management" component={UserManagement} />
       <Route path="/admin/audit-logs" component={AuditLogs} />
+      <Route path="/admin/numbering" component={AdminNumberingManagement} />
       <Route path="/analysis" component={Analysis} />
       <Route path="/reservations" component={Reservations} />
       <Route path="/company-settings" component={CompanySettings} />
