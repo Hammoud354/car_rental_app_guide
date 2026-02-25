@@ -5419,3 +5419,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Identify which fields are getting null values (performedAt, garageEntryDate, garageExitDate)
 - [x] Fix field type conversions and validation (use state values instead of FormData for dates)
 - [x] Test maintenance record creation - compiles successfully with 0 TypeScript errors
+
+
+## Fix Car Details View Error in Fleet Section (Feb 25, 2026)
+- [x] Investigate car details view rendering
+- [x] Identify source of "An unexpected error occurred" error (JSX syntax error in Maintenance.tsx)
+- [x] Check for missing data or null values in car details
+- [x] Fix the rendering issue (moved className attribute outside of comment in mileage input)
+- [x] Test car details view with various vehicles - application now loads correctly

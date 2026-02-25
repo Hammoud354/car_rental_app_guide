@@ -299,7 +299,8 @@ export default function Maintenance() {
                         min="0" 
                         placeholder="e.g., 45000"
                         defaultValue={autoFilledKm || undefined}
-                        key={autoFilledKm || 'empty'} // Force re-render when autoFilledKm changes className="input-client"
+                        key={autoFilledKm || 'empty'}
+                        className="input-client"
                       />
                     </div>
                     <div>
