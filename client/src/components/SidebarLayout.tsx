@@ -42,7 +42,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   });
 
   // All sections expanded by default
-  const [expandedSections] = useState<Set<string>>(new Set(["main", "management", "clients-invoices"]));
+  const [expandedSections] = useState<Set<string>>(new Set(["main", "management", "clients-invoices", "admin"]));
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Auto-collapse on mobile devices
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
