@@ -139,15 +139,15 @@ export function DatePickerWithYearNav({
               showOutsideDays={false}
               initialFocus
               classNames={{
-                months: "w-full",
-                month: "w-full space-y-0",
+                months: "w-full p-0 m-0",
+                month: "w-full space-y-0 p-0 m-0",
                 caption: "hidden",
                 nav: "hidden",
                 head_row: "grid grid-cols-7 bg-muted/40 border-b border-input",
                 head_cell: "text-xs font-semibold text-muted-foreground py-1.5 text-center",
                 row: "grid grid-cols-7 w-full",
-                cell: "relative p-0 text-center text-xs",
-                day: "h-8 w-full rounded-none hover:bg-blue-50 transition-colors",
+                cell: "relative p-0 text-center text-xs flex items-center justify-center",
+                day: "h-8 w-full flex items-center justify-center rounded-none hover:bg-blue-50 transition-colors",
                 day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-semibold",
                 day_today: "bg-blue-500 text-white font-bold hover:bg-blue-600",
                 day_outside: "text-muted-foreground opacity-40",
