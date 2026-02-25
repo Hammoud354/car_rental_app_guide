@@ -81,22 +81,22 @@ export function DatePickerWithYearNav({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-4 space-y-4">
+        <div className="p-3 space-y-2">
           {/* Header with Year and Month Selection */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('prev')}
-              className="h-9 w-9 p-0 hover:bg-accent"
+              className="h-8 w-8 p-0 hover:bg-accent"
               title="Previous month"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
-            <div className="flex items-center gap-2 flex-1 justify-center">
+            <div className="flex items-center gap-1.5 flex-1 justify-center">
               <Select value={currentYear.toString()} onValueChange={handleYearChange}>
-                <SelectTrigger className="w-[90px] h-9 text-sm font-semibold">
+                <SelectTrigger className="w-[80px] h-8 text-xs font-semibold">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px]">
@@ -108,7 +108,7 @@ export function DatePickerWithYearNav({
                 </SelectContent>
               </Select>
               
-              <span className="text-sm font-semibold text-foreground min-w-[80px] text-center">
+              <span className="text-xs font-semibold text-foreground min-w-[70px] text-center">
                 {currentMonthName}
               </span>
             </div>
@@ -117,7 +117,7 @@ export function DatePickerWithYearNav({
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('next')}
-              className="h-9 w-9 p-0 hover:bg-accent"
+              className="h-8 w-8 p-0 hover:bg-accent"
               title="Next month"
             >
               <ChevronRight className="h-4 w-4" />
@@ -140,24 +140,24 @@ export function DatePickerWithYearNav({
               initialFocus
               classNames={{
                 months: "w-full",
-                month: "w-full space-y-2",
+                month: "w-full space-y-0",
                 caption: "hidden",
                 nav: "hidden",
-                head_row: "grid grid-cols-7 bg-muted/50 border-b border-input",
-                head_cell: "text-xs font-semibold text-muted-foreground py-2 text-center",
+                head_row: "grid grid-cols-7 bg-muted/40 border-b border-input",
+                head_cell: "text-xs font-semibold text-muted-foreground py-1.5 text-center",
                 row: "grid grid-cols-7 w-full",
-                cell: "relative p-0 text-center text-sm",
-                day: "h-9 w-full rounded-none hover:bg-accent transition-colors",
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary",
-                day_today: "bg-accent text-accent-foreground font-bold",
-                day_outside: "text-muted-foreground opacity-50",
+                cell: "relative p-0 text-center text-xs",
+                day: "h-8 w-full rounded-none hover:bg-blue-50 transition-colors",
+                day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-semibold",
+                day_today: "bg-blue-500 text-white font-bold hover:bg-blue-600",
+                day_outside: "text-muted-foreground opacity-40",
               }}
             />
           </div>
 
           {/* Footer with helpful text */}
-          <div className="text-xs text-muted-foreground text-center">
-            Click a date to select, use arrows to navigate months
+          <div className="text-xs text-muted-foreground text-center py-1">
+            Click a date to select, use arrows to navigate
           </div>
         </div>
       </PopoverContent>
