@@ -619,7 +619,7 @@ export default function Dashboard() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All Users</SelectItem>
-                        {allUsers.map((u) => (
+                        {allUsers && Array.isArray(allUsers) && allUsers.map((u) => (
                           <SelectItem key={u.id} value={u.id.toString()}>
                             {u.name || u.username || u.email || `User ${u.id}`}
                           </SelectItem>
