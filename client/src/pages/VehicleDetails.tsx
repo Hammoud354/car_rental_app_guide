@@ -527,7 +527,7 @@ export default function VehicleDetails() {
                                 {new Date(record.performedAt).toLocaleDateString()}
                               </span>
                               <span className="font-semibold text-primary">
-                                ${record.cost?.toFixed(2) || "0.00"}
+                                ${record.cost ? parseFloat(record.cost).toFixed(2) : "0.00"}
                               </span>
                             </div>
                             {record.description && (
