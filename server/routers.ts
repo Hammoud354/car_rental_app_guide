@@ -4,6 +4,14 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, superAdminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import {
+  getNextContractNumber,
+  getNextInvoiceNumber,
+  migrateContractNumber,
+  migrateInvoiceNumber,
+  getNumberingStatus,
+  getNumberingAuditTrail,
+} from "./numbering";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -2128,6 +2136,65 @@ export const appRouter = router({
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {
         return await db.getActiveInsurancePolicy(input.vehicleId, ctx.user.id);
+      }),
+  }),
+  numbering: router({
+    getNextContractNumber: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return await getNextContractNumber(ctx.user.id);
+      }),
+    
+    getNextInvoiceNumber: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        return await getNextInvoiceNumber(ctx.user.id);
+      }),
+    
+    getStatus: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await getNumberingStatus(ctx.user.id);
+      }),
+    
+    getAuditTrail: protectedProcedure
+      .input(z.object({
+        numberType: z.enum(["contract", "invoice"]).optional(),
+        limit: z.number().default(100),
+      }))
+      .query(async ({ input, ctx }) => {
+        return await getNumberingAuditTrail(ctx.user.id, input.numberType, input.limit);
+      }),
+    
+    migrateContractNumber: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        startingNumber: z.number().min(0),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await migrateContractNumber(
+          input.userId,
+          input.startingNumber,
+          ctx.user.id,
+          ctx.user.username || "admin",
+          input.reason
+        );
+        return { success: true };
+      }),
+    
+    migrateInvoiceNumber: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        startingNumber: z.number().min(0),
+        reason: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await migrateInvoiceNumber(
+          input.userId,
+          input.startingNumber,
+          ctx.user.id,
+          ctx.user.username || "admin",
+          input.reason
+        );
+        return { success: true };
       }),
   }),
 });

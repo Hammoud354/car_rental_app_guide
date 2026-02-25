@@ -553,3 +553,44 @@ export const insurancePolicies = mysqlTable("insurancePolicies", {
 
 export type InsurancePolicy = typeof insurancePolicies.$inferSelect;
 export type InsertInsurancePolicy = typeof insurancePolicies.$inferInsert;
+
+
+/**
+ * Numbering Counters table - tracks the last used number for contracts and invoices per user
+ * Ensures sequential, non-resetting numbering with per-user isolation
+ */
+export const numberingCounters = mysqlTable("numberingCounters", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // One counter record per user
+  lastContractNumber: int("lastContractNumber").default(0).notNull(), // Last used contract sequential number
+  lastInvoiceNumber: int("lastInvoiceNumber").default(0).notNull(), // Last used invoice sequential number
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type NumberingCounter = typeof numberingCounters.$inferSelect;
+export type InsertNumberingCounter = typeof numberingCounters.$inferInsert;
+
+/**
+ * Numbering Audit table - complete audit trail for all numbering operations
+ * Tracks every number generation, migration, and reset for full traceability
+ */
+export const numberingAudit = mysqlTable("numberingAudit", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // User whose numbering was affected
+  numberType: mysqlEnum("numberType", ["contract", "invoice"]).notNull(), // Type of number generated
+  action: mysqlEnum("action", ["generated", "migrated", "reset"]).notNull(), // Type of action performed
+  generatedNumber: varchar("generatedNumber", { length: 50 }).notNull(), // The actual number generated (e.g., CONTRACT-15-000982)
+  sequentialNumber: int("sequentialNumber").notNull(), // The sequential part only (e.g., 982)
+  relatedId: int("relatedId"), // ID of related contract or invoice
+  previousNumber: int("previousNumber"), // Previous counter value (for migrations/resets)
+  newNumber: int("newNumber"), // New counter value (for migrations/resets)
+  reason: text("reason"), // Reason for migration/reset
+  actorId: int("actorId"), // Admin who performed migration/reset (if applicable)
+  actorUsername: varchar("actorUsername", { length: 100 }), // Username of admin
+  ipAddress: varchar("ipAddress", { length: 45 }), // IP address of request
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type NumberingAudit = typeof numberingAudit.$inferSelect;
+export type InsertNumberingAudit = typeof numberingAudit.$inferInsert;

@@ -5438,3 +5438,43 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify fix compiles without errors
 - [x] Test dashboard loads correctly
 - [x] Ready for deployment
+
+
+## Contract & Invoice Numbering System
+
+### Phase 1: Database Schema
+- [x] Create numberingCounters table to track last used numbers per user
+- [x] Create numberingAudit table for full audit trail
+- [x] Push database migrations
+
+### Phase 2: Numbering Service Implementation
+- [x] Create numbering service with atomic operations
+- [x] Implement getNextContractNumber(userId) with database lock
+- [x] Implement getNextInvoiceNumber(userId) with database lock
+- [x] Add validation to prevent duplicate numbers
+- [x] Implement concurrent request safety
+- [x] Add full audit trail logging
+
+### Phase 3: tRPC Procedures
+- [x] Create getNextContractNumber mutation
+- [x] Create getNextInvoiceNumber mutation
+- [x] Create getStatus query for current numbering state
+- [x] Create getAuditTrail query for audit history
+- [x] Create migrateContractNumber admin procedure
+- [x] Create migrateInvoiceNumber admin procedure
+
+### Phase 4: Unit Tests
+- [x] Test sequential number generation
+- [x] Test per-user isolation (no cross-user numbering)
+- [x] Test atomic operations
+- [x] Test duplicate prevention
+- [x] Test migration/reset functionality
+- [x] Test audit trail logging
+- [x] Test independent contract/invoice sequences
+
+### Phase 5: Integration & Delivery
+- [ ] Integrate numbering with contract creation flow
+- [ ] Integrate numbering with invoice creation flow
+- [ ] Test full workflow with multiple users
+- [ ] Test concurrent operations
+- [ ] Create checkpoint and deliver

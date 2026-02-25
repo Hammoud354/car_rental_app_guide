@@ -309,6 +309,13 @@
       "when": 1771876126910,
       "tag": "0044_mean_maginty",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "5",
+      "when": 1772053707964,
+      "tag": "0045_far_scalphunter",
+      "breakpoints": true
     }
   ]
 }
