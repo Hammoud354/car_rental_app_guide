@@ -3154,17 +3154,16 @@ export async function getUserSubscription(userId: number) {
   if (!db) return null;
 
   try {
-    const { userSubscriptions, subscriptionTiers } = await import("../drizzle/schema");
-    const result = await db
-      .select({
-        subscription: userSubscriptions,
-        tier: subscriptionTiers,
-      })
-      .from(userSubscriptions)
-      .innerJoin(subscriptionTiers, eq(userSubscriptions.tierId, subscriptionTiers.id))
-      .where(eq(userSubscriptions.userId, userId))
-      .limit(1);
-    return result.length > 0 ? result[0] : null;
+    // Use raw SQL query to avoid column name mapping issues
+    const result = await db.execute(
+      sql`SELECT us.*, st.* FROM userSubscriptions us INNER JOIN subscriptionTiers st ON us.tierId = st.id WHERE us.userId = ${userId} LIMIT 1`
+    );
+    
+    // Extract the actual rows from the result
+    if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0]) && result[0].length > 0) {
+      return result[0][0];
+    }
+    return null;
   } catch (error) {
     console.error("Error fetching user subscription:", error);
     return null;
@@ -3303,8 +3302,16 @@ export async function getAllSubscriptionTiers() {
   if (!db) return [];
 
   try {
-    const { subscriptionTiers } = await import("../drizzle/schema");
-    return await db.select().from(subscriptionTiers);
+    // Use raw SQL query to avoid column name mapping issues
+    const result = await db.execute(
+      sql`SELECT * FROM subscriptionTiers ORDER BY monthlyPrice ASC`
+    );
+    
+    // Extract the actual rows from the result
+    if (Array.isArray(result) && result.length > 0) {
+      return result[0] as unknown as any[];
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching all subscription tiers:", error);
     return [];

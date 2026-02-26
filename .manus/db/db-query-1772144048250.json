@@ -1,0 +1,16 @@
+{
+  "query": "SELECT GROUP_CONCAT(COLUMN_NAME) as columns FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN ('subscriptionTiers', 'userSubscriptions') AND TABLE_SCHEMA = DATABASE() GROUP BY TABLE_NAME;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT GROUP_CONCAT(COLUMN_NAME) as columns FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME IN ('subscriptionTiers', 'userSubscriptions') AND TABLE_SCHEMA = DATABASE() GROUP BY TABLE_NAME;",
+  "rows": [
+    {
+      "columns": "id,name,monthlyPrice,description,maxVehicles,maxClients,maxUsers,features,createdAt,updatedAt"
+    },
+    {
+      "columns": "id,userId,tierId,startDate,renewalDate,cancelledAt,createdAt,updatedAt,status,reason"
+    }
+  ],
+  "messages": [],
+  "stdout": "columns\nid,name,monthlyPrice,description,maxVehicles,maxClients,maxUsers,features,createdAt,updatedAt\nid,userId,tierId,startDate,renewalDate,cancelledAt,createdAt,updatedAt,status,reason\n",
+  "stderr": "",
+  "execution_time_ms": 66
+}

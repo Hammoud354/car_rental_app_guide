@@ -1,0 +1,22 @@
+{
+  "query": "SELECT * FROM userSubscriptions LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM userSubscriptions LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "userId": "2670018",
+      "tierId": "1",
+      "startDate": "2026-02-26 21:36:38",
+      "renewalDate": "NULL",
+      "cancelledAt": "NULL",
+      "createdAt": "2026-02-26 21:28:33",
+      "updatedAt": "2026-02-26 21:36:38",
+      "status": "active",
+      "reason": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttierId\tstartDate\trenewalDate\tcancelledAt\tcreatedAt\tupdatedAt\tstatus\treason\n1\t2670018\t1\t2026-02-26 21:36:38\tNULL\tNULL\t2026-02-26 21:28:33\t2026-02-26 21:36:38\tactive\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

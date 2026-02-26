@@ -73,7 +73,7 @@ export default function SubscriptionPlans() {
     );
   }
 
-  const sortedPlans = [...plans].sort((a, b) => Number(a.monthlyPrice) - Number(b.monthlyPrice));
+  const sortedPlans = Array.isArray(plans) ? [...plans].sort((a, b) => Number(a.monthlyPrice) - Number(b.monthlyPrice)) : [];
   const professionalPlan = sortedPlans.find(p => p.name === "professional");
 
   return (
@@ -141,14 +141,30 @@ export default function SubscriptionPlans() {
                   <div className="mb-8 flex-1">
                     <h4 className="font-semibold mb-3 text-sm">Features included:</h4>
                     <ul className="space-y-2">
-                      {Object.entries(plan.features as Record<string, boolean>)
-                        .filter(([, enabled]) => enabled)
-                        .map(([featureKey]) => (
-                          <li key={featureKey} className="flex items-start gap-2 text-sm">
-                            <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                            <span>{FEATURE_DISPLAY_NAMES[featureKey] || featureKey}</span>
-                          </li>
-                        ))}
+                      {(() => {
+                        // Handle features that might be a string, object, or array
+                        let features: Record<string, boolean> = {};
+                        
+                        if (typeof plan.features === 'string') {
+                          try {
+                            features = JSON.parse(plan.features);
+                          } catch (e) {
+                            // If it's not valid JSON, treat it as empty
+                            features = {};
+                          }
+                        } else if (typeof plan.features === 'object' && plan.features !== null) {
+                          features = plan.features as Record<string, boolean>;
+                        }
+                        
+                        return Object.entries(features)
+                          .filter(([, enabled]) => enabled)
+                          .map(([featureKey]) => (
+                            <li key={featureKey} className="flex items-start gap-2 text-sm">
+                              <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                              <span>{FEATURE_DISPLAY_NAMES[featureKey] || featureKey}</span>
+                            </li>
+                          ));
+                      })()}
                     </ul>
                   </div>
 

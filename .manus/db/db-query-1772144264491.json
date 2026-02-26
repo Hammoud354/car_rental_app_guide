@@ -1,0 +1,22 @@
+{
+  "query": "SELECT * FROM subscriptionTiers LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT * FROM subscriptionTiers LIMIT 1;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Starter",
+      "monthlyPrice": "50",
+      "description": "For small agencies",
+      "maxVehicles": "15",
+      "maxClients": "100",
+      "maxUsers": "1",
+      "features": "Unlimited contracts,Basic reporting,Invoice generation,WhatsApp integration,Email support (48h)",
+      "createdAt": "2026-02-26 21:28:24",
+      "updatedAt": "2026-02-26 21:28:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tmonthlyPrice\tdescription\tmaxVehicles\tmaxClients\tmaxUsers\tfeatures\tcreatedAt\tupdatedAt\n1\tStarter\t50\tFor small agencies\t15\t100\t1\tUnlimited contracts,Basic reporting,Invoice generation,WhatsApp integration,Email support (48h)\t2026-02-26 21:28:24\t2026-02-26 21:28:24\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

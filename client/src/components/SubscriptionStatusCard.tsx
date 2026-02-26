@@ -91,14 +91,14 @@ export function SubscriptionStatusCard() {
           <p className="font-medium text-gray-700">Included Features:</p>
           <ul className="space-y-1">
             {tier.features && typeof tier.features === "string" ? (
-              tier.features.split(",").map((feature, idx) => (
+              tier.features.split(",").map((feature: string, idx: number) => (
                 <li key={idx} className="flex items-start gap-2 text-gray-600">
                   <span className="mt-1 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
                   {feature.trim()}
                 </li>
               ))
             ) : Array.isArray(tier.features) ? (
-              tier.features.map((feature, idx) => (
+              tier.features.map((feature: any, idx: number) => (
                 <li key={idx} className="flex items-start gap-2 text-gray-600">
                   <span className="mt-1 h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
                   {feature}
