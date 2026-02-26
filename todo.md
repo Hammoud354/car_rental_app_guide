@@ -5524,3 +5524,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Show navigation path: Dashboard > Numbering Management
 - [x] Make breadcrumb links clickable for navigation
 - [ ] Test breadcrumb on all admin pages
+
+
+## Sign-Up Flow Modification
+- [x] Modify sign-up to redirect to login page instead of dashboard
+- [x] Remove automatic login after registration
+- [x] Require explicit login after sign-up
+- [x] Test sign-up and login flow

@@ -24,8 +24,8 @@ export default function Register() {
 
   const signUpMutation = trpc.auth.signUp.useMutation({
     onSuccess: () => {
-      // Redirect to dashboard after successful registration
-      setLocation("/dashboard");
+      // Redirect to sign in after successful registration
+      setLocation("/signin");
     },
     onError: (error) => {
       setErrors({ submit: error.message });
