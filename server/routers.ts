@@ -109,13 +109,7 @@ export const appRouter = router({
           // Continue even if population fails
         }
 
-        // Auto-login after signup
-        const cookieOptions = getSessionCookieOptions(ctx.req);
-        ctx.res.cookie(COOKIE_NAME, `user-${newUser.id}`, {
-          ...cookieOptions,
-          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
-
+        // Do NOT auto-login after signup - user must explicitly log in
         return {
           success: true,
           user: newUser,

@@ -5531,3 +5531,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Remove automatic login after registration
 - [x] Require explicit login after sign-up
 - [x] Test sign-up and login flow
+
+
+## Bug Fix: Sign-Up and Login Error
+- [x] Fix "Username already exists" error after sign-up and login
+- [x] Fix 500 server error on auth.signUp mutation
+- [x] Investigate mutation conflict between sign-up and login
+- [x] Test complete sign-up and login flow
