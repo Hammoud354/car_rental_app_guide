@@ -1,0 +1,8 @@
+{
+  "query": "INSERT INTO vehicles (userId, plateNumber, brand, model, year, category, color, vinNumber, dailyRate, status, createdAt, updatedAt) VALUES \n(2, 'M 653408', 'Kia', 'Cerato', 2023, 'Sedan', 'Silver', 'KNDGJ41D87U123456', 50.00, 'Available', NOW(), NOW()),\n(2, 'TM-1234', 'Toyota', 'Corolla', 2022, 'Sedan', 'White', 'JTDKN3AU9J0123456', 45.00, 'Available', NOW(), NOW()),\n(2, 'TM-5678', 'Honda', 'Civic', 2023, 'Sedan', 'Black', 'JHGCV56K932123456', 55.00, 'Available', NOW(), NOW()),\n(2, 'TM-9012', 'Mazda', 'CX-5', 2022, 'SUV', 'Blue', 'JM2BK23K500123456', 65.00, 'Available', NOW(), NOW()),\n(2, 'TM-3456', 'Hyundai', 'Elantra', 2023, 'Sedan', 'Red', 'KMHEC4A46EU123456', 48.00, 'Available', NOW(), NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO vehicles (userId, plateNumber, brand, model, year, category, color, vinNumber, dailyRate, status, createdAt, updatedAt) VALUES \n(2, 'M 653408', 'Kia', 'Cerato', 2023, 'Sedan', 'Silver', 'KNDGJ41D87U123456', 50.00, 'Available', NOW(), NOW()),\n(2, 'TM-1234', 'Toyota', 'Corolla', 2022, 'Sedan', 'White', 'JTDKN3AU9J0123456', 45.00, 'Available', NOW(), NOW()),\n(2, 'TM-5678', 'Honda', 'Civic', 2023, 'Sedan', 'Black', 'JHGCV56K932123456', 55.00, 'Available', NOW(), NOW()),\n(2, 'TM-9012', 'Mazda', 'CX-5', 2022, 'SUV', 'Blue', 'JM2BK23K500123456', 65.00, 'Available', NOW(), NOW()),\n(2, 'TM-3456', 'Hyundai', 'Elantra', 2023, 'Sedan', 'Red', 'KMHEC4A46EU123456', 48.00, 'Available', NOW(), NOW());",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'vinNumber' in 'field list'"
+  ]
+}
