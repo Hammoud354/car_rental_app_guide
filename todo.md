@@ -5581,3 +5581,5 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Verify end-to-end subscription workflow
 - [x] Test subscription activation with Professional plan
 - [x] Replace subscription limit toast with professional modal dialog
+- [x] Add subscription limit check before opening Add Vehicle dialog
+- [x] Show modal immediately when clicking ADD VEHICLE if limit is reached

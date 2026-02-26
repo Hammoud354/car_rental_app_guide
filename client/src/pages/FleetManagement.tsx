@@ -421,7 +421,33 @@ export default function FleetManagement() {
               }
             }}>
               <DialogTrigger asChild>
-                <Button className="font-mono bg-gray-900 hover:bg-gray-800 whitespace-nowrap">
+                <Button 
+                  className="font-mono bg-gray-900 hover:bg-gray-800 whitespace-nowrap"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    try {
+                      const subscription = await utils.subscription.getCurrentPlan.fetch();
+                      if (subscription && vehicles) {
+                        const vehicleCount = vehicles.length;
+                        const limit = subscription.tier?.maxVehicles || 0;
+                        
+                        if (vehicleCount >= limit) {
+                          setSubscriptionLimitError({
+                            show: true,
+                            message: `You have reached your vehicle limit`,
+                            limit,
+                            current: vehicleCount
+                          });
+                          return;
+                        }
+                      }
+                      setIsAddDialogOpen(true);
+                    } catch (error) {
+                      console.error('Error checking subscription:', error);
+                      setIsAddDialogOpen(true);
+                    }
+                  }}
+                >
                   <Plus className="mr-2 h-4 w-4" />
                   ADD VEHICLE
                 </Button>
