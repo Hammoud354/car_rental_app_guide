@@ -1,0 +1,190 @@
+{
+  "query": "SELECT id, email, name FROM users;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, email, name FROM users;",
+  "rows": [
+    {
+      "id": "270003",
+      "email": "invoice@test.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2430003",
+      "email": "hammoud@admin.local",
+      "name": "Hammoud"
+    },
+    {
+      "id": "2430007",
+      "email": "hammoud@example.com",
+      "name": "Hammoud"
+    },
+    {
+      "id": "2430008",
+      "email": "demo@example.com",
+      "name": "Demo User"
+    },
+    {
+      "id": "2430009",
+      "email": "walid.eltayeh@air.global",
+      "name": "Walid El Tayeh"
+    },
+    {
+      "id": "2430014",
+      "email": "mohammadfhammoud@live.com",
+      "name": "Mohammadf"
+    },
+    {
+      "id": "2430053",
+      "email": "walid@walid.com",
+      "name": "Walid"
+    },
+    {
+      "id": "2490001",
+      "email": "test@test.com",
+      "name": "Test"
+    },
+    {
+      "id": "2610001",
+      "email": "invoice@test.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2610002",
+      "email": "test@example.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2610003",
+      "email": "contractinvoice@example.com",
+      "name": "Contract Invoice Test User"
+    },
+    {
+      "id": "2610004",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610005",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610006",
+      "email": "invoice@test.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2610007",
+      "email": "invoice@test.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2610008",
+      "email": "test@example.com",
+      "name": "Invoice Test User"
+    },
+    {
+      "id": "2610009",
+      "email": "contractinvoice@example.com",
+      "name": "Contract Invoice Test User"
+    },
+    {
+      "id": "2610010",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610011",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610012",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610013",
+      "email": "nophone@example.com",
+      "name": "Test User No Phone"
+    },
+    {
+      "id": "2610014",
+      "email": "test@example.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610015",
+      "email": "noalerts@example.com",
+      "name": "Test User No Alerts"
+    },
+    {
+      "id": "2610016",
+      "email": "testuser1_1772053800421@test.com",
+      "name": "Test User 1"
+    },
+    {
+      "id": "2610017",
+      "email": "testuser2_1772053800555@test.com",
+      "name": "Test User 2"
+    },
+    {
+      "id": "2610018",
+      "email": "audit_test_1772053800553@test.com",
+      "name": "Audit Test User"
+    },
+    {
+      "id": "2610020",
+      "email": "NULL",
+      "name": "Test User"
+    },
+    {
+      "id": "2610021",
+      "email": "admin_1772053801437@test.com",
+      "name": "Test Admin"
+    },
+    {
+      "id": "2610022",
+      "email": "user_1772053801496@test.com",
+      "name": "Test User"
+    },
+    {
+      "id": "2610024",
+      "email": "resettest1772053802411@example.com",
+      "name": "Reset Test User"
+    },
+    {
+      "id": "2610025",
+      "email": "testuser_1772053802762@test.com",
+      "name": "Test Company Registration"
+    },
+    {
+      "id": "2610026",
+      "email": "owner@test.com",
+      "name": "Test Owner Updated"
+    },
+    {
+      "id": "2670005",
+      "email": "mohammadfhammoud@live.com",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "2670018",
+      "email": "test@test.com",
+      "name": "test"
+    },
+    {
+      "id": "2670029",
+      "email": "walidof@hotmail.com",
+      "name": "Walid El Tayeh"
+    },
+    {
+      "id": "2730024",
+      "email": "test@test.com",
+      "name": "testuser"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\n270003\tinvoice@test.com\tInvoice Test User\n2430003\thammoud@admin.local\tHammoud\n2430007\thammoud@example.com\tHammoud\n2430008\tdemo@example.com\tDemo User\n2430009\twalid.eltayeh@air.global\tWalid El Tayeh\n2430014\tmohammadfhammoud@live.com\tMohammadf\n2430053\twalid@walid.com\tWalid\n2490001\ttest@test.com\tTest\n2610001\tinvoice@test.com\tInvoice Test User\n2610002\ttest@example.com\tInvoice Test User\n2610003\tcontractinvoice@example.com\tContract Invoice Test User\n2610004\ttest@example.com\tTest User\n2610005\ttest@example.com\tTest User\n2610006\tinvoice@test.com\tInvoice Test User\n2610007\tinvoice@test.com\tInvoice Test User\n2610008\ttest@example.com\tInvoice Test User\n2610009\tcontractinvoice@example.com\tContract Invoice Test User\n2610010\ttest@example.com\tTest User\n2610011\ttest@example.com\tTest User\n2610012\ttest@example.com\tTest User\n2610013\tnophone@example.com\tTest User No Phone\n2610014\ttest@example.com\tTest User\n2610015\tnoalerts@example.com\tTest User No Alerts\n2610016\ttestuser1_1772053800421@test.com\tTest User 1\n2610017\ttestuser2_1772053800555@test.com\tTest User 2\n2610018\taudit_test_1772053800553@test.com\tAudit Test User\n2610020\tNULL\tTest User\n2610021\tadmin_1772053801437@test.com\tTest Admin\n2610022\tuser_1772053801496@test.com\tTest User\n2610024\tresettest1772053802411@example.com\tReset Test User\n2610025\ttestuser_1772053802762@test.com\tTest Company Registration\n2610026\towner@test.com\tTest Owner Updated\n2670005\tmohammadfhammoud@live.com\tmohammad hammoud\n2670018\ttest@test.com\ttest\n2670029\twalidof@hotmail.com\tWalid El Tayeh\n2730024\ttest@test.com\ttestuser\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

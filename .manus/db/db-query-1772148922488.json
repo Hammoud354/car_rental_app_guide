@@ -1,0 +1,122 @@
+{
+  "query": "SELECT userId, COUNT(*) as vehicle_count FROM vehicles GROUP BY userId; SELECT userId, COUNT(*) as client_count FROM clients GROUP BY userId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT userId, COUNT(*) as vehicle_count FROM vehicles GROUP BY userId; SELECT userId, COUNT(*) as client_count FROM clients GROUP BY userId;",
+  "rows": [
+    {
+      "userId": "2610003",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610014",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2",
+      "vehicle_count": "15"
+    },
+    {
+      "userId": "2610013",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610006",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610010",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610015",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2490001",
+      "vehicle_count": "2"
+    },
+    {
+      "userId": "2610020",
+      "vehicle_count": "2"
+    },
+    {
+      "userId": "2610011",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "1",
+      "vehicle_count": "7"
+    },
+    {
+      "userId": "2610002",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610012",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610008",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610009",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2670018",
+      "vehicle_count": "15"
+    },
+    {
+      "userId": "2610005",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610001",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2430008",
+      "vehicle_count": "10"
+    },
+    {
+      "userId": "2610004",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2610007",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "2430014",
+      "vehicle_count": "2"
+    },
+    {
+      "userId": "userId",
+      "vehicle_count": "client_count"
+    },
+    {
+      "userId": "2",
+      "vehicle_count": "90"
+    },
+    {
+      "userId": "2430008",
+      "vehicle_count": "6"
+    },
+    {
+      "userId": "2430014",
+      "vehicle_count": "2"
+    },
+    {
+      "userId": "2490001",
+      "vehicle_count": "1"
+    },
+    {
+      "userId": "1",
+      "vehicle_count": "2"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tvehicle_count\n2610003\t1\n2610014\t1\n2\t15\n2610013\t1\n2610006\t1\n2610010\t1\n2610015\t1\n2490001\t2\n2610020\t2\n2610011\t1\n1\t7\n2610002\t1\n2610012\t1\n2610008\t1\n2610009\t1\n2670018\t15\n2610005\t1\n2610001\t1\n2430008\t10\n2610004\t1\n2610007\t1\n2430014\t2\nuserId\tclient_count\n2\t90\n2430008\t6\n2430014\t2\n2490001\t1\n1\t2\n",
+  "stderr": "",
+  "execution_time_ms": 63
+}

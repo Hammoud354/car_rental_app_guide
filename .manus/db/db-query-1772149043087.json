@@ -1,0 +1,22 @@
+{
+  "query": "SELECT userId, COUNT(*) FROM vehicles GROUP BY userId; SELECT userId, COUNT(*) FROM clients GROUP BY userId;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT userId, COUNT(*) FROM vehicles GROUP BY userId; SELECT userId, COUNT(*) FROM clients GROUP BY userId;",
+  "rows": [
+    {
+      "userId": "2730024",
+      "COUNT(*)": "68"
+    },
+    {
+      "userId": "userId",
+      "COUNT(*)": "COUNT(*)"
+    },
+    {
+      "userId": "2730024",
+      "COUNT(*)": "101"
+    }
+  ],
+  "messages": [],
+  "stdout": "userId\tCOUNT(*)\n2730024\t68\nuserId\tCOUNT(*)\n2730024\t101\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

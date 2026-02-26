@@ -1,0 +1,76 @@
+{
+  "query": "SELECT id, userId, brand, model FROM vehicles LIMIT 5; SELECT id, userId, firstName, lastName FROM clients LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, userId, brand, model FROM vehicles LIMIT 5; SELECT id, userId, firstName, lastName FROM clients LIMIT 5;",
+  "rows": [
+    {
+      "id": "360001",
+      "userId": "2430008",
+      "brand": "Toyota",
+      "model": "Camry"
+    },
+    {
+      "id": "360002",
+      "userId": "2430008",
+      "brand": "Honda",
+      "model": "Civic"
+    },
+    {
+      "id": "360003",
+      "userId": "2430008",
+      "brand": "Ford",
+      "model": "Explorer"
+    },
+    {
+      "id": "360004",
+      "userId": "2430008",
+      "brand": "Hyundai",
+      "model": "Elantra"
+    },
+    {
+      "id": "360005",
+      "userId": "2430008",
+      "brand": "BMW",
+      "model": "5 Series"
+    },
+    {
+      "id": "id",
+      "userId": "userId",
+      "brand": "firstName",
+      "model": "lastName"
+    },
+    {
+      "id": "330001",
+      "userId": "2430008",
+      "brand": "John",
+      "model": "Smith"
+    },
+    {
+      "id": "330002",
+      "userId": "2430008",
+      "brand": "Sarah",
+      "model": "Johnson"
+    },
+    {
+      "id": "330003",
+      "userId": "2430008",
+      "brand": "Michael",
+      "model": "Brown"
+    },
+    {
+      "id": "330004",
+      "userId": "2430008",
+      "brand": "Emily",
+      "model": "Davis"
+    },
+    {
+      "id": "330005",
+      "userId": "2430008",
+      "brand": "David",
+      "model": "Wilson"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\tbrand\tmodel\n360001\t2430008\tToyota\tCamry\n360002\t2430008\tHonda\tCivic\n360003\t2430008\tFord\tExplorer\n360004\t2430008\tHyundai\tElantra\n360005\t2430008\tBMW\t5 Series\nid\tuserId\tfirstName\tlastName\n330001\t2430008\tJohn\tSmith\n330002\t2430008\tSarah\tJohnson\n330003\t2430008\tMichael\tBrown\n330004\t2430008\tEmily\tDavis\n330005\t2430008\tDavid\tWilson\n",
+  "stderr": "",
+  "execution_time_ms": 98
+}

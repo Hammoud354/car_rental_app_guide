@@ -3,12 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle } from "lucide-react";
 import SidebarLayout from "@/components/SidebarLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
@@ -34,6 +35,7 @@ export default function FleetManagement() {
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [subscriptionLimitError, setSubscriptionLimitError] = useState<{ show: boolean; message: string; limit?: number; current?: number }>({ show: false, message: "" });
   
   // Car maker and model state for Add form
   const [selectedMakerId, setSelectedMakerId] = useState<number | null>(null);
@@ -151,7 +153,18 @@ export default function FleetManagement() {
       setIsAddDialogOpen(false);
     },
     onError: (error) => {
-      toast.error(`Failed to add vehicle: ${error.message}`);
+      if (error.message.includes("limit") || error.message.includes("subscription")) {
+        const limitMatch = error.message.match(/(\d+)\s*vehicles?/);
+        const currentMatch = error.message.match(/have\s+(\d+)/);
+        setSubscriptionLimitError({
+          show: true,
+          message: error.message,
+          limit: limitMatch ? parseInt(limitMatch[1]) : undefined,
+          current: currentMatch ? parseInt(currentMatch[1]) : undefined,
+        });
+      } else {
+        toast.error(`Failed to add vehicle: ${error.message}`);
+      }
     },
   });
 
@@ -328,6 +341,43 @@ export default function FleetManagement() {
 
   return (
     <SidebarLayout>
+      {/* Subscription Limit Error Modal */}
+      <AlertDialog open={subscriptionLimitError.show} onOpenChange={(open) => {
+        if (!open) {
+          setSubscriptionLimitError({ show: false, message: "" });
+        }
+      }}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-amber-500" />
+              <AlertDialogTitle>Subscription Limit Reached</AlertDialogTitle>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogDescription className="space-y-3">
+            <p className="text-base">
+              You have reached the maximum number of vehicles allowed under your current subscription plan.
+            </p>
+            {subscriptionLimitError.limit && subscriptionLimitError.current && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm font-semibold text-amber-900">
+                  Current Usage: {subscriptionLimitError.current} / {subscriptionLimitError.limit} vehicles
+                </p>
+              </div>
+            )}
+            <p className="text-sm text-muted-foreground">
+              To add more vehicles, please upgrade your subscription plan to a higher tier.
+            </p>
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <Link href="/subscription-plans">
+              <AlertDialogAction className="bg-primary hover:bg-primary/90">Upgrade Plan</AlertDialogAction>
+            </Link>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="container py-8">
       <div className="space-y-8">
         

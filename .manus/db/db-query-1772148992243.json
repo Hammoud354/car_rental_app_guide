@@ -1,0 +1,31 @@
+{
+  "query": "SELECT COUNT(*) as vehicle_count FROM vehicles; SELECT COUNT(*) as client_count FROM clients; SELECT DISTINCT userId FROM vehicles; SELECT DISTINCT userId FROM clients;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT COUNT(*) as vehicle_count FROM vehicles; SELECT COUNT(*) as client_count FROM clients; SELECT DISTINCT userId FROM vehicles; SELECT DISTINCT userId FROM clients;",
+  "rows": [
+    {
+      "vehicle_count": "68"
+    },
+    {
+      "vehicle_count": "client_count"
+    },
+    {
+      "vehicle_count": "101"
+    },
+    {
+      "vehicle_count": "userId"
+    },
+    {
+      "vehicle_count": "2730024"
+    },
+    {
+      "vehicle_count": "userId"
+    },
+    {
+      "vehicle_count": "2730024"
+    }
+  ],
+  "messages": [],
+  "stdout": "vehicle_count\n68\nclient_count\n101\nuserId\n2730024\nuserId\n2730024\n",
+  "stderr": "",
+  "execution_time_ms": 70
+}

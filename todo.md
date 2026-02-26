@@ -5580,3 +5580,4 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix subscription data structure for dashboard display
 - [x] Verify end-to-end subscription workflow
 - [x] Test subscription activation with Professional plan
+- [x] Replace subscription limit toast with professional modal dialog
