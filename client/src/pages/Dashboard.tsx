@@ -438,6 +438,24 @@ export default function Dashboard() {
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery({ filterUserId: selectedUserId || undefined });
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery({ filterUserId: selectedUserId || undefined });
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const selectPlanMutation = trpc.subscription.selectPlan.useMutation();
+
+  // Auto-activate subscription plan if one was selected before signup
+  useEffect(() => {
+    const selectedPlanId = localStorage.getItem('selectedSubscriptionPlanId');
+    if (selectedPlanId && user) {
+      const planId = parseInt(selectedPlanId, 10);
+      selectPlanMutation.mutate({ tierId: planId }, {
+        onSuccess: () => {
+          localStorage.removeItem('selectedSubscriptionPlanId');
+          utils.subscription.getCurrentPlan.invalidate();
+        },
+        onError: (error) => {
+          console.error('Failed to activate subscription plan:', error);
+        },
+      });
+    }
+  }, [user]);
 
   // Invalidate all queries when selectedUserId changes to force refetch with new filter
   useEffect(() => {

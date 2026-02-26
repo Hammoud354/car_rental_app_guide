@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Loader2 } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import { getLoginUrl } from "@/const";
 
 interface SubscriptionPlan {
   id: number;
@@ -59,6 +60,11 @@ export default function SubscriptionPlans() {
   const handleSelectPlan = (planId: number) => {
     setIsLoading(true);
     setSelectedPlanId(planId);
+    
+    // Store the selected plan ID in localStorage for post-signup activation
+    localStorage.setItem('selectedSubscriptionPlanId', planId.toString());
+    
+    // Try to select the plan if user is authenticated
     selectPlanMutation.mutate({ tierId: planId });
   };
 

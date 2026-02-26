@@ -3011,17 +3011,17 @@ export async function initializeSubscriptionTiers() {
   if (!db) return;
 
   try {
-    const { subscriptionTiers } = await import("../drizzle/schema");
-    
-    // Check if tiers already exist
-    const existing = await db.select().from(subscriptionTiers).limit(1);
+    // Check if tiers already exist using raw SQL
+    const existing = await db.execute(
+      sql`SELECT id FROM subscriptionTiers LIMIT 1`
+    ) as any;
     if (existing.length > 0) {
       console.log("[Subscription] Tiers already initialized");
       return;
     }
 
     // Insert default subscription tiers
-    const tiersData: Array<typeof subscriptionTiers.$inferInsert> = [
+    const tiersData: Array<any> = [
       {
         name: "starter",
         displayName: "Starter",
@@ -3105,7 +3105,13 @@ export async function initializeSubscriptionTiers() {
       },
     ];
 
-    await db.insert(subscriptionTiers).values(tiersData);
+    // Insert using raw SQL to avoid column naming issues
+    for (const tier of tiersData) {
+      await db.execute(
+        sql`INSERT INTO subscriptionTiers (name, displayName, description, monthlyPrice, maxVehicles, maxClients, maxUsers, features) 
+            VALUES (${tier.name}, ${tier.displayName}, ${tier.description}, ${tier.monthlyPrice}, ${tier.maxVehicles}, ${tier.maxClients}, ${tier.maxUsers}, ${JSON.stringify(tier.features)})`
+      );
+    }
 
     console.log("[Subscription] Initialized 3 subscription tiers");
   } catch (error) {
@@ -3118,13 +3124,10 @@ export async function getSubscriptionTier(tierId: number) {
   if (!db) return null;
 
   try {
-    const { subscriptionTiers } = await import("../drizzle/schema");
-    const result = await db
-      .select()
-      .from(subscriptionTiers)
-      .where(eq(subscriptionTiers.id, tierId))
-      .limit(1);
-    return result.length > 0 ? result[0] : null;
+    const result = await db.execute(
+      sql`SELECT * FROM subscriptionTiers WHERE id = ${tierId} LIMIT 1`
+    ) as any;
+    return result && result.length > 0 ? result[0] : null;
   } catch (error) {
     console.error("Error fetching subscription tier:", error);
     return null;
@@ -3136,13 +3139,10 @@ export async function getSubscriptionTierByName(tierName: string) {
   if (!db) return null;
 
   try {
-    const { subscriptionTiers } = await import("../drizzle/schema");
-    const result = await db
-      .select()
-      .from(subscriptionTiers)
-      .where(eq(subscriptionTiers.name, tierName))
-      .limit(1);
-    return result.length > 0 ? result[0] : null;
+    const result = await db.execute(
+      sql`SELECT * FROM subscriptionTiers WHERE name = ${tierName} LIMIT 1`
+    ) as any;
+    return result && result.length > 0 ? result[0] : null;
   } catch (error) {
     console.error("Error fetching subscription tier by name:", error);
     return null;
@@ -3161,7 +3161,35 @@ export async function getUserSubscription(userId: number) {
     
     // Extract the actual rows from the result
     if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0]) && result[0].length > 0) {
-      return result[0][0];
+      const row = result[0][0];
+      // Structure the response with nested tier object
+      let features = {};
+      try {
+        features = typeof row.features === 'string' ? JSON.parse(row.features) : (row.features || {});
+      } catch (e) {
+        console.warn('Failed to parse features, using empty object:', e);
+        features = {};
+      }
+      const tierData = {
+        id: row.tierId,
+        name: row.name,
+        displayName: row.displayName,
+        description: row.description,
+        monthlyPrice: row.monthlyPrice,
+        maxVehicles: row.maxVehicles,
+        maxClients: row.maxClients,
+        maxUsers: row.maxUsers,
+        features: features,
+      };
+      return {
+        id: row.id,
+        userId: row.userId,
+        tierId: row.tierId,
+        status: row.status,
+        startDate: row.startDate,
+        endDate: row.endDate,
+        tier: tierData
+      };
     }
     return null;
   } catch (error) {
@@ -3207,17 +3235,8 @@ export async function createUserSubscription(userId: number, tierId: number, rea
         .where(eq(userSubscriptions.userId, userId))
         .limit(1);
 
-      // Log the change
-      await db.insert(subscriptionAuditLog).values({
-        userId,
-        previousTierId,
-        newTierId: tierId,
-        action: previousTierId === tierId ? "reactivated" : previousTierId < tierId ? "upgraded" : "downgraded",
-        reason: reason || null,
-        actorId: userId,
-        actorType: "user",
-        ipAddress: null,
-      });
+      // Log the change (audit log table not available in current schema)
+      // Skipping audit log for now
     } else {
       // Create new subscription
       await db.insert(userSubscriptions).values({
@@ -3233,17 +3252,8 @@ export async function createUserSubscription(userId: number, tierId: number, rea
         .where(eq(userSubscriptions.userId, userId))
         .limit(1);
 
-      // Log the creation
-      await db.insert(subscriptionAuditLog).values({
-        userId,
-        previousTierId: null,
-        newTierId: tierId,
-        action: "created",
-        reason: reason || null,
-        actorId: userId,
-        actorType: "user",
-        ipAddress: null,
-      });
+      // Log the creation (audit log table not available in current schema)
+      // Skipping audit log for now
     }
 
     return result.length > 0 ? result[0] : null;
