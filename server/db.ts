@@ -3323,7 +3323,9 @@ export async function checkSubscriptionLimit(userId: number, limitType: "vehicle
   try {
     const subscription = await getUserSubscription(userId);
     if (!subscription) {
-      return { allowed: false, current: 0, limit: 0 };
+      // If no subscription exists, allow the action (user hasn't selected a plan yet)
+      // They should select a plan first, but don't block them completely
+      return { allowed: true, current: 0, limit: null };
     }
 
     const tier = subscription.tier;
@@ -3338,6 +3340,7 @@ export async function checkSubscriptionLimit(userId: number, limitType: "vehicle
         .where(eq(vehicles.userId, userId));
       current = result[0]?.count ? Number(result[0].count) : 0;
       limit = tier.maxVehicles;
+      console.log(`[Subscription Debug] User ${userId} vehicles: current=${current}, limit=${limit}, tier=${tier.displayName}`);
     } else if (limitType === "clients") {
       const { clients } = await import("../drizzle/schema");
       const result = await db
