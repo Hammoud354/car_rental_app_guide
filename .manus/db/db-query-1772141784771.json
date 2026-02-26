@@ -1,0 +1,110 @@
+{
+  "query": "SELECT id, username, email FROM `users` LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, email FROM `users` LIMIT 20;",
+  "rows": [
+    {
+      "id": "270003",
+      "username": "invoiceuser1770416560856",
+      "email": "invoice@test.com"
+    },
+    {
+      "id": "2430003",
+      "username": "Hammoud",
+      "email": "hammoud@admin.local"
+    },
+    {
+      "id": "2430007",
+      "username": "hammoud",
+      "email": "hammoud@example.com"
+    },
+    {
+      "id": "2430008",
+      "username": "demo@system",
+      "email": "demo@example.com"
+    },
+    {
+      "id": "2430009",
+      "username": "oauth_5HANethK6yyJBGGbZaNzUd",
+      "email": "walid.eltayeh@air.global"
+    },
+    {
+      "id": "2430014",
+      "username": "mohammadfh",
+      "email": "mohammadfhammoud@live.com"
+    },
+    {
+      "id": "2430053",
+      "username": "walid",
+      "email": "walid@walid.com"
+    },
+    {
+      "id": "2490001",
+      "username": "testuser",
+      "email": "test@test.com"
+    },
+    {
+      "id": "2610001",
+      "username": "invoiceuser1772053197863",
+      "email": "invoice@test.com"
+    },
+    {
+      "id": "2610002",
+      "username": "test_invoice_1772053198067",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610003",
+      "username": "test_contract_invoice_1772053200889",
+      "email": "contractinvoice@example.com"
+    },
+    {
+      "id": "2610004",
+      "username": "testuser-1772053204259",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610005",
+      "username": "testuser-1772053207560",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610006",
+      "username": "invoiceuser1772053223228",
+      "email": "invoice@test.com"
+    },
+    {
+      "id": "2610007",
+      "username": "invoiceuser1772053797865",
+      "email": "invoice@test.com"
+    },
+    {
+      "id": "2610008",
+      "username": "test_invoice_1772053797971",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610009",
+      "username": "test_contract_invoice_1772053798764",
+      "email": "contractinvoice@example.com"
+    },
+    {
+      "id": "2610010",
+      "username": "testuser-1772053799655",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610011",
+      "username": "testuser-1772053799896",
+      "email": "test@example.com"
+    },
+    {
+      "id": "2610012",
+      "username": "testuser-1772053799977",
+      "email": "test@example.com"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\n270003\tinvoiceuser1770416560856\tinvoice@test.com\n2430003\tHammoud\thammoud@admin.local\n2430007\thammoud\thammoud@example.com\n2430008\tdemo@system\tdemo@example.com\n2430009\toauth_5HANethK6yyJBGGbZaNzUd\twalid.eltayeh@air.global\n2430014\tmohammadfh\tmohammadfhammoud@live.com\n2430053\twalid\twalid@walid.com\n2490001\ttestuser\ttest@test.com\n2610001\tinvoiceuser1772053197863\tinvoice@test.com\n2610002\ttest_invoice_1772053198067\ttest@example.com\n2610003\ttest_contract_invoice_1772053200889\tcontractinvoice@example.com\n2610004\ttestuser-1772053204259\ttest@example.com\n2610005\ttestuser-1772053207560\ttest@example.com\n2610006\tinvoiceuser1772053223228\tinvoice@test.com\n2610007\tinvoiceuser1772053797865\tinvoice@test.com\n2610008\ttest_invoice_1772053797971\ttest@example.com\n2610009\ttest_contract_invoice_1772053798764\tcontractinvoice@example.com\n2610010\ttestuser-1772053799655\ttest@example.com\n2610011\ttestuser-1772053799896\ttest@example.com\n2610012\ttestuser-1772053799977\ttest@example.com\n",
+  "stderr": "",
+  "execution_time_ms": 57
+}

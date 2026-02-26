@@ -1,0 +1,17 @@
+{
+  "query": "SELECT u.id, u.username, u.email, s.id as subscription_id, st.name as tier_name \nFROM `users` u \nLEFT JOIN `subscriptions` s ON u.id = s.userId \nLEFT JOIN `subscriptionTiers` st ON s.tierId = st.id \nWHERE u.username = 'test11' OR u.email LIKE '%test11%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT u.id, u.username, u.email, s.id as subscription_id, st.name as tier_name \nFROM `users` u \nLEFT JOIN `subscriptions` s ON u.id = s.userId \nLEFT JOIN `subscriptionTiers` st ON s.tierId = st.id \nWHERE u.username = 'test11' OR u.email LIKE '%test11%';",
+  "rows": [
+    {
+      "id": "2670018",
+      "username": "test11",
+      "email": "test@test.com",
+      "subscription_id": "1",
+      "tier_name": "Starter"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tusername\temail\tsubscription_id\ttier_name\n2670018\ttest11\ttest@test.com\t1\tStarter\n",
+  "stderr": "",
+  "execution_time_ms": 83
+}

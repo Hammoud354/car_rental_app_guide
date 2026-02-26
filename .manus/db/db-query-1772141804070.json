@@ -1,0 +1,18 @@
+{
+  "query": "SELECT u.username, u.email, st.name as tier_name, st.monthlyPrice, st.maxVehicles, s.startDate \nFROM `subscriptions` s \nJOIN `users` u ON s.userId = u.id \nJOIN `subscriptionTiers` st ON s.tierId = st.id \nWHERE u.username = 'test11';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT u.username, u.email, st.name as tier_name, st.monthlyPrice, st.maxVehicles, s.startDate \nFROM `subscriptions` s \nJOIN `users` u ON s.userId = u.id \nJOIN `subscriptionTiers` st ON s.tierId = st.id \nWHERE u.username = 'test11';",
+  "rows": [
+    {
+      "username": "test11",
+      "email": "test@test.com",
+      "tier_name": "Starter",
+      "monthlyPrice": "50",
+      "maxVehicles": "15",
+      "startDate": "2026-02-26 21:36:38"
+    }
+  ],
+  "messages": [],
+  "stdout": "username\temail\ttier_name\tmonthlyPrice\tmaxVehicles\tstartDate\ntest11\ttest@test.com\tStarter\t50\t15\t2026-02-26 21:36:38\n",
+  "stderr": "",
+  "execution_time_ms": 59
+}
