@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO `subscriptionTiers` (`name`, `monthlyPrice`, `description`, `maxVehicles`, `maxClients`, `maxUsers`, `features`) VALUES\n('Starter', '50', 'For small agencies', 15, 100, 1, 'Unlimited contracts,Basic reporting,Invoice generation,WhatsApp integration,Email support (48h)'),\n('Professional', '70', 'For growing agencies', 50, NULL, NULL, 'P&L analysis,Advanced analytics,Damage inspection,Contract amendments,Excel export,Priority support (24h)'),\n('Enterprise', '85', 'For large agencies', NULL, NULL, NULL, 'Multi-user access,Custom reports,API access,White-label option,Dedicated account manager,24/7 priority support');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute INSERT INTO `subscriptionTiers` (`name`, `monthlyPrice`, `description`, `maxVehicles`, `maxClients`, `maxUsers`, `features`) VALUES\n('Starter', '50', 'For small agencies', 15, 100, 1, 'Unlimited contracts,Basic reporting,Invoice generation,WhatsApp integration,Email support (48h)'),\n('Professional', '70', 'For growing agencies', 50, NULL, NULL, 'P&L analysis,Advanced analytics,Damage inspection,Contract amendments,Excel export,Priority support (24h)'),\n('Enterprise', '85', 'For large agencies', NULL, NULL, NULL, 'Multi-user access,Custom reports,API access,White-label option,Dedicated account manager,24/7 priority support');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 68
+}
