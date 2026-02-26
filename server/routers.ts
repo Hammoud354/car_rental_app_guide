@@ -315,6 +315,14 @@ export const appRouter = router({
           userId = ctx.user?.id || 1; // Creating for themselves
         }
         
+        // Check subscription vehicle limit
+        const vehicleLimit = await db.checkSubscriptionLimit(userId, "vehicles");
+        if (!vehicleLimit.allowed) {
+          const subscription = await db.getUserSubscription(userId);
+          const tierName = subscription?.tier.displayName || "your plan";
+          throw new Error(`Vehicle limit reached: You have ${vehicleLimit.current} vehicles but ${tierName} plan allows only ${vehicleLimit.limit}. Please upgrade your subscription to add more vehicles.`);
+        }
+        
         const { targetUserId: _, ...vehicleData } = input;
         return await db.createVehicle({ ...vehicleData, userId });
       }),

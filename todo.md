@@ -5549,3 +5549,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Integrate subscription into onboarding flow
 - [x] Implement subscription rule enforcement
 - [x] Test all three subscription tiers
+
+
+## Subscription Limit Validation & Error Handling
+- [x] Add subscription limit check to vehicle creation procedure
+- [ ] Add subscription limit check to client creation procedure
+- [x] Improve error messages for subscription limit exceeded
+- [x] Display current usage vs limit in error message
+- [ ] Test subscription enforcement with all three tiers
