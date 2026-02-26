@@ -5538,3 +5538,14 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix 500 server error on auth.signUp mutation
 - [x] Investigate mutation conflict between sign-up and login
 - [x] Test complete sign-up and login flow
+
+
+## Subscription System Implementation
+- [x] Design subscription database schema (subscriptions, subscription_tiers tables)
+- [x] Define subscription tier rules and limits
+- [x] Create subscription management procedures
+- [x] Build subscription selection UI component
+- [x] Add tRPC procedures for subscription management
+- [x] Integrate subscription into onboarding flow
+- [x] Implement subscription rule enforcement
+- [x] Test all three subscription tiers

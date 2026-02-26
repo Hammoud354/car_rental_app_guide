@@ -2205,5 +2205,25 @@ export const appRouter = router({
         return await db.getUserNumberingAuditTrail(input.userId, input.limit);
       }),
   }),
+  subscription: router({
+    getAllPlans: publicProcedure.query(async () => {
+      return await db.getAllSubscriptionTiers();
+    }),
+    getCurrentPlan: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserSubscription(ctx.user.id);
+    }),
+    selectPlan: protectedProcedure
+      .input(z.object({
+        tierId: z.number(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.initializeSubscriptionTiers();
+        const result = await db.createUserSubscription(ctx.user.id, input.tierId, "User selected plan");
+        if (!result) {
+          throw new Error("Failed to activate subscription");
+        }
+        return { success: true, subscription: result };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

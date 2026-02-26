@@ -3000,3 +3000,380 @@ export async function getUserNumberingAuditTrail(userId: number, limit: number =
     return [];
   }
 }
+
+
+// ============================================================================
+// SUBSCRIPTION MANAGEMENT FUNCTIONS
+// ============================================================================
+
+export async function initializeSubscriptionTiers() {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const { subscriptionTiers } = await import("../drizzle/schema");
+    
+    // Check if tiers already exist
+    const existing = await db.select().from(subscriptionTiers).limit(1);
+    if (existing.length > 0) {
+      console.log("[Subscription] Tiers already initialized");
+      return;
+    }
+
+    // Insert default subscription tiers
+    const tiersData: Array<typeof subscriptionTiers.$inferInsert> = [
+      {
+        name: "starter",
+        displayName: "Starter",
+        description: "For small agencies",
+        monthlyPrice: "50" as any,
+        maxVehicles: 15,
+        maxClients: 100,
+        maxUsers: 1,
+        features: {
+          pnlAnalysis: false,
+          advancedAnalytics: false,
+          damageInspection: false,
+          contractAmendments: false,
+          excelExport: false,
+          prioritySupport: false,
+          multiUserAccess: false,
+          customReports: false,
+          apiAccess: false,
+          whiteLabel: false,
+          dedicatedAccountManager: false,
+          support24_7: false,
+          basicReporting: true,
+          invoiceGeneration: true,
+          whatsappIntegration: true,
+          emailSupport: true,
+        },
+      },
+      {
+        name: "professional",
+        displayName: "Professional",
+        description: "For growing agencies",
+        monthlyPrice: "70" as any,
+        maxVehicles: 50,
+        maxClients: null, // unlimited
+        maxUsers: 3,
+        features: {
+          pnlAnalysis: true,
+          advancedAnalytics: true,
+          damageInspection: true,
+          contractAmendments: true,
+          excelExport: true,
+          prioritySupport: true,
+          multiUserAccess: false,
+          customReports: false,
+          apiAccess: false,
+          whiteLabel: false,
+          dedicatedAccountManager: false,
+          support24_7: false,
+          basicReporting: true,
+          invoiceGeneration: true,
+          whatsappIntegration: true,
+          emailSupport: true,
+        },
+      },
+      {
+        name: "enterprise",
+        displayName: "Enterprise",
+        description: "For large agencies",
+        monthlyPrice: "85" as any,
+        maxVehicles: null, // unlimited
+        maxClients: null, // unlimited
+        maxUsers: null, // unlimited
+        features: {
+          pnlAnalysis: true,
+          advancedAnalytics: true,
+          damageInspection: true,
+          contractAmendments: true,
+          excelExport: true,
+          prioritySupport: true,
+          multiUserAccess: true,
+          customReports: true,
+          apiAccess: true,
+          whiteLabel: true,
+          dedicatedAccountManager: true,
+          support24_7: true,
+          basicReporting: true,
+          invoiceGeneration: true,
+          whatsappIntegration: true,
+          emailSupport: true,
+        },
+      },
+    ];
+
+    await db.insert(subscriptionTiers).values(tiersData);
+
+    console.log("[Subscription] Initialized 3 subscription tiers");
+  } catch (error) {
+    console.error("[Subscription] Error initializing tiers:", error);
+  }
+}
+
+export async function getSubscriptionTier(tierId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { subscriptionTiers } = await import("../drizzle/schema");
+    const result = await db
+      .select()
+      .from(subscriptionTiers)
+      .where(eq(subscriptionTiers.id, tierId))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error fetching subscription tier:", error);
+    return null;
+  }
+}
+
+export async function getSubscriptionTierByName(tierName: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { subscriptionTiers } = await import("../drizzle/schema");
+    const result = await db
+      .select()
+      .from(subscriptionTiers)
+      .where(eq(subscriptionTiers.name, tierName))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error fetching subscription tier by name:", error);
+    return null;
+  }
+}
+
+export async function getUserSubscription(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { userSubscriptions, subscriptionTiers } = await import("../drizzle/schema");
+    const result = await db
+      .select({
+        subscription: userSubscriptions,
+        tier: subscriptionTiers,
+      })
+      .from(userSubscriptions)
+      .innerJoin(subscriptionTiers, eq(userSubscriptions.tierId, subscriptionTiers.id))
+      .where(eq(userSubscriptions.userId, userId))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error fetching user subscription:", error);
+    return null;
+  }
+}
+
+export async function createUserSubscription(userId: number, tierId: number, reason?: string) {
+  const db = await getDb();
+  if (!db) return null;
+
+  try {
+    const { userSubscriptions, subscriptionAuditLog } = await import("../drizzle/schema");
+    
+    // Get existing subscription if any
+    const existing = await db
+      .select()
+      .from(userSubscriptions)
+      .where(eq(userSubscriptions.userId, userId))
+      .limit(1);
+
+    let result;
+    if (existing.length > 0) {
+      // Update existing subscription
+      const previousTierId = existing[0].tierId;
+      await db
+        .update(userSubscriptions)
+        .set({
+          tierId,
+          status: "active",
+          startDate: new Date(),
+          renewalDate: null,
+          cancelledAt: null,
+          reason: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(userSubscriptions.userId, userId));
+
+      result = await db
+        .select()
+        .from(userSubscriptions)
+        .where(eq(userSubscriptions.userId, userId))
+        .limit(1);
+
+      // Log the change
+      await db.insert(subscriptionAuditLog).values({
+        userId,
+        previousTierId,
+        newTierId: tierId,
+        action: previousTierId === tierId ? "reactivated" : previousTierId < tierId ? "upgraded" : "downgraded",
+        reason: reason || null,
+        actorId: userId,
+        actorType: "user",
+        ipAddress: null,
+      });
+    } else {
+      // Create new subscription
+      await db.insert(userSubscriptions).values({
+        userId,
+        tierId,
+        status: "active",
+        startDate: new Date(),
+      });
+
+      result = await db
+        .select()
+        .from(userSubscriptions)
+        .where(eq(userSubscriptions.userId, userId))
+        .limit(1);
+
+      // Log the creation
+      await db.insert(subscriptionAuditLog).values({
+        userId,
+        previousTierId: null,
+        newTierId: tierId,
+        action: "created",
+        reason: reason || null,
+        actorId: userId,
+        actorType: "user",
+        ipAddress: null,
+      });
+    }
+
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    console.error("Error creating user subscription:", error);
+    return null;
+  }
+}
+
+export async function cancelUserSubscription(userId: number, reason?: string) {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const { userSubscriptions, subscriptionAuditLog } = await import("../drizzle/schema");
+    
+    const existing = await db
+      .select()
+      .from(userSubscriptions)
+      .where(eq(userSubscriptions.userId, userId))
+      .limit(1);
+
+    if (existing.length === 0) return false;
+
+    await db
+      .update(userSubscriptions)
+      .set({
+        status: "cancelled",
+        cancelledAt: new Date(),
+        reason: reason || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(userSubscriptions.userId, userId));
+
+    // Log the cancellation
+    await db.insert(subscriptionAuditLog).values({
+      userId,
+      previousTierId: existing[0].tierId,
+      newTierId: existing[0].tierId,
+      action: "cancelled",
+      reason: reason || null,
+      actorId: userId,
+      actorType: "user",
+      ipAddress: null,
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Error cancelling user subscription:", error);
+    return false;
+  }
+}
+
+export async function getAllSubscriptionTiers() {
+  const db = await getDb();
+  if (!db) return [];
+
+  try {
+    const { subscriptionTiers } = await import("../drizzle/schema");
+    return await db.select().from(subscriptionTiers);
+  } catch (error) {
+    console.error("Error fetching all subscription tiers:", error);
+    return [];
+  }
+}
+
+
+// ============================================================================
+// SUBSCRIPTION RULE ENFORCEMENT
+// ============================================================================
+
+export async function checkSubscriptionLimit(userId: number, limitType: "vehicles" | "clients" | "users"): Promise<{ allowed: boolean; current: number; limit: number | null }> {
+  const db = await getDb();
+  if (!db) return { allowed: true, current: 0, limit: null };
+
+  try {
+    const subscription = await getUserSubscription(userId);
+    if (!subscription) {
+      return { allowed: false, current: 0, limit: 0 };
+    }
+
+    const tier = subscription.tier;
+    let current = 0;
+    let limit: number | null = null;
+
+    if (limitType === "vehicles") {
+      const { vehicles } = await import("../drizzle/schema");
+      const result = await db
+        .select({ count: sql`COUNT(*) as count` })
+        .from(vehicles)
+        .where(eq(vehicles.userId, userId));
+      current = result[0]?.count ? Number(result[0].count) : 0;
+      limit = tier.maxVehicles;
+    } else if (limitType === "clients") {
+      const { clients } = await import("../drizzle/schema");
+      const result = await db
+        .select({ count: sql`COUNT(*) as count` })
+        .from(clients)
+        .where(eq(clients.userId, userId));
+      current = result[0]?.count ? Number(result[0].count) : 0;
+      limit = tier.maxClients;
+    } else if (limitType === "users") {
+      const { users: usersTable } = await import("../drizzle/schema");
+      // For now, we'll just return 1 as the current user count
+      // In a multi-tenant system, this would count team members
+      current = 1;
+      limit = tier.maxUsers;
+    }
+
+    const allowed = limit === null || current < limit;
+    return { allowed, current, limit };
+  } catch (error) {
+    console.error("Error checking subscription limit:", error);
+    return { allowed: true, current: 0, limit: null };
+  }
+}
+
+export async function hasSubscriptionFeature(userId: number, feature: string): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+
+  try {
+    const subscription = await getUserSubscription(userId);
+    if (!subscription) return false;
+
+    const features = subscription.tier.features as Record<string, boolean>;
+    return features[feature] === true;
+  } catch (error) {
+    console.error("Error checking subscription feature:", error);
+    return false;
+  }
+}

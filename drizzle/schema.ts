@@ -594,3 +594,62 @@ export const numberingAudit = mysqlTable("numberingAudit", {
 
 export type NumberingAudit = typeof numberingAudit.$inferSelect;
 export type InsertNumberingAudit = typeof numberingAudit.$inferInsert;
+
+
+/**
+ * Subscription tiers table - defines the available subscription plans
+ */
+export const subscriptionTiers = mysqlTable("subscriptionTiers", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 50 }).notNull().unique(), // "starter", "professional", "enterprise"
+  displayName: varchar("displayName", { length: 100 }).notNull(), // "Starter", "Professional", "Enterprise"
+  description: text("description"), // Plan description
+  monthlyPrice: decimal("monthlyPrice", { precision: 10, scale: 2 }).notNull(), // Price in USD
+  maxVehicles: int("maxVehicles"), // Maximum vehicles allowed (null = unlimited)
+  maxClients: int("maxClients"), // Maximum clients allowed (null = unlimited)
+  maxUsers: int("maxUsers"), // Maximum team members (null = unlimited)
+  features: json("features"), // JSON array of feature flags: {pnlAnalysis, advancedAnalytics, damageInspection, contractAmendments, excelExport, prioritySupport, multiUserAccess, customReports, apiAccess, whiteLabel, dedicatedAccountManager, support24_7}
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SubscriptionTier = typeof subscriptionTiers.$inferSelect;
+export type InsertSubscriptionTier = typeof subscriptionTiers.$inferInsert;
+
+/**
+ * User subscriptions table - tracks which subscription tier each user has
+ */
+export const userSubscriptions = mysqlTable("userSubscriptions", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(), // Foreign key to users table (one subscription per user)
+  tierId: int("tierId").notNull(), // Foreign key to subscriptionTiers table
+  status: mysqlEnum("status", ["active", "inactive", "cancelled", "expired"]).default("active").notNull(),
+  startDate: timestamp("startDate").defaultNow().notNull(), // When subscription started
+  renewalDate: timestamp("renewalDate"), // When subscription renews (for future use with payment)
+  cancelledAt: timestamp("cancelledAt"), // When subscription was cancelled
+  reason: text("reason"), // Reason for cancellation
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
+export type InsertUserSubscription = typeof userSubscriptions.$inferInsert;
+
+/**
+ * Subscription audit log - tracks all subscription changes
+ */
+export const subscriptionAuditLog = mysqlTable("subscriptionAuditLog", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // User whose subscription changed
+  previousTierId: int("previousTierId"), // Previous subscription tier (null if first subscription)
+  newTierId: int("newTierId").notNull(), // New subscription tier
+  action: mysqlEnum("action", ["created", "upgraded", "downgraded", "cancelled", "reactivated"]).notNull(),
+  reason: text("reason"), // Reason for change
+  actorId: int("actorId"), // User/admin who made the change (null if system)
+  actorType: mysqlEnum("actorType", ["user", "admin", "system"]).notNull(),
+  ipAddress: varchar("ipAddress", { length: 45 }), // IP address of request
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SubscriptionAuditLog = typeof subscriptionAuditLog.$inferSelect;
+export type InsertSubscriptionAuditLog = typeof subscriptionAuditLog.$inferInsert;
