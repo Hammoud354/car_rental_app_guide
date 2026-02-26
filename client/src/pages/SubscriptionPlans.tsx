@@ -73,8 +73,8 @@ export default function SubscriptionPlans() {
     );
   }
 
-  const sortedPlans = Array.isArray(plans) ? [...plans].sort((a, b) => Number(a.monthlyPrice) - Number(b.monthlyPrice)) : [];
-  const professionalPlan = sortedPlans.find(p => p.name === "professional");
+  const sortedPlans = Array.isArray(plans) ? [...plans].filter(p => p && p.monthlyPrice).sort((a, b) => Number(a.monthlyPrice) - Number(b.monthlyPrice)) : [];
+  const professionalPlan = sortedPlans.find(p => p && p.name === "professional");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted py-12 px-4">
@@ -100,7 +100,7 @@ export default function SubscriptionPlans() {
 
               <Card
                 className={`h-full flex flex-col transition-all ${
-                  plan.name === "professional"
+                  plan && plan.name === "professional"
                     ? "border-blue-500 border-2 shadow-lg"
                     : "border-border"
                 }`}

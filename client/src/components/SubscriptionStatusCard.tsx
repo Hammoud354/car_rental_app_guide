@@ -45,14 +45,36 @@ export function SubscriptionStatusCard() {
     );
   }
 
-  const tier = subscription.tier;
+  const tier = subscription?.tier;
+  
+  if (!tier) {
+    return (
+      <Card className="border-amber-200 bg-amber-50">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-amber-900">
+            <AlertCircle className="h-5 w-5" />
+            Subscription Error
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-sm text-amber-800">
+            Unable to load subscription details. Please try refreshing the page.
+          </p>
+          <Button className="w-full" onClick={() => window.location.reload()}>
+            Refresh Page
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const tierColors: Record<string, { bg: string; border: string; badge: string }> = {
     starter: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-800" },
     professional: { bg: "bg-purple-50", border: "border-purple-200", badge: "bg-purple-100 text-purple-800" },
     enterprise: { bg: "bg-green-50", border: "border-green-200", badge: "bg-green-100 text-green-800" },
   };
 
-  const colors = tierColors[tier.name.toLowerCase()] || tierColors.starter;
+  const colors = tierColors[tier.name?.toLowerCase?.()] || tierColors.starter;
 
   return (
     <Card className={`${colors.border} ${colors.bg} border-2`}>

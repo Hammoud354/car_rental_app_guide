@@ -5553,11 +5553,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 ## Subscription Limit Validation & Error Handling
 - [x] Add subscription limit check to vehicle creation procedure
-- [ ] Add subscription limit check to client creation procedure
+- [x] Add subscription limit check to client creation procedure
 - [x] Improve error messages for subscription limit exceeded
 - [x] Display current usage vs limit in error message
 - [x] Fix false limit blocking when user has no subscription
-- [ ] Test subscription enforcement with all three tiers
+- [x] Test subscription enforcement with all three tiers
 
 
 ## Subscription Status Widget
@@ -5566,3 +5566,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Show usage metrics (vehicles/clients used vs limit)
 - [x] Add upgrade button linking to subscription plans
 - [x] Integrate into dashboard
+
+## Subscription Plans Page & Plan Selection
+- [x] Create subscription plans page with pricing cards
+- [x] Display all three subscription tiers with pricing
+- [x] Show plan features and limits on cards
+- [x] Implement "Get Started" button for plan selection
+- [x] Fix database schema mismatch (column naming issues)
+- [x] Fix subscription activation flow
+- [x] Update subscription status widget on dashboard
+- [x] Test plan selection and subscription updates
