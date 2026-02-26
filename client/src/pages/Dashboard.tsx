@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
+import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -653,6 +654,9 @@ export default function Dashboard() {
 
           {/* Insurance Expiry Alert Widget */}
           {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
+
+          {/* Subscription Status Widget */}
+          {!selectedUserId && <SubscriptionStatusCard />}
 
           {/* Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

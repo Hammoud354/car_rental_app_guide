@@ -5558,3 +5558,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Display current usage vs limit in error message
 - [x] Fix false limit blocking when user has no subscription
 - [ ] Test subscription enforcement with all three tiers
+
+
+## Subscription Status Widget
+- [x] Create SubscriptionStatusCard component
+- [x] Display current plan name and tier
+- [x] Show usage metrics (vehicles/clients used vs limit)
+- [x] Add upgrade button linking to subscription plans
+- [x] Integrate into dashboard
