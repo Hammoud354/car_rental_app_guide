@@ -1,0 +1,35 @@
+{
+  "query": "SELECT id, email, name FROM users ORDER BY id DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, email, name FROM users ORDER BY id DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "2730024",
+      "email": "test@test.com",
+      "name": "testuser"
+    },
+    {
+      "id": "2670029",
+      "email": "walidof@hotmail.com",
+      "name": "Walid El Tayeh"
+    },
+    {
+      "id": "2670018",
+      "email": "test@test.com",
+      "name": "test"
+    },
+    {
+      "id": "2670005",
+      "email": "mohammadfhammoud@live.com",
+      "name": "mohammad hammoud"
+    },
+    {
+      "id": "2610026",
+      "email": "owner@test.com",
+      "name": "Test Owner Updated"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\temail\tname\n2730024\ttest@test.com\ttestuser\n2670029\twalidof@hotmail.com\tWalid El Tayeh\n2670018\ttest@test.com\ttest\n2670005\tmohammadfhammoud@live.com\tmohammad hammoud\n2610026\towner@test.com\tTest Owner Updated\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
