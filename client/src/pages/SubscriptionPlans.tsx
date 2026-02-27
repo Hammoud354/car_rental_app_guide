@@ -45,6 +45,7 @@ export default function SubscriptionPlans() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: plans = [], isLoading: plansLoading } = trpc.subscription.getAllPlans.useQuery();
+  const { data: currentPlan } = trpc.subscription.getCurrentPlan.useQuery();
 
   const selectPlanMutation = trpc.subscription.selectPlan.useMutation({
     onSuccess: () => {
@@ -175,24 +176,38 @@ export default function SubscriptionPlans() {
                   </div>
 
                   {/* CTA Button */}
-                  <Button
-                    onClick={() => handleSelectPlan(plan.id)}
-                    disabled={isLoading}
-                    className={`w-full ${
-                      plan.name === "professional"
-                        ? "bg-blue-500 hover:bg-blue-600"
-                        : "bg-gray-200 hover:bg-gray-300 text-foreground"
-                    }`}
-                  >
-                    {isLoading && selectedPlanId === plan.id ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Activating...
-                      </>
-                    ) : (
-                      "Get Started"
-                    )}
-                  </Button>
+                  {currentPlan?.tier?.id === plan.id ? (
+                    <div className="w-full">
+                      <Badge className="w-full justify-center bg-green-500 text-white mb-2 py-2">
+                        You are here
+                      </Badge>
+                      <Button
+                        disabled
+                        className="w-full bg-gray-300 text-gray-600 cursor-not-allowed"
+                      >
+                        Current Plan
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handleSelectPlan(plan.id)}
+                      disabled={isLoading}
+                      className={`w-full ${
+                        plan.name === "professional"
+                          ? "bg-blue-500 hover:bg-blue-600"
+                          : "bg-gray-200 hover:bg-gray-300 text-foreground"
+                      }`}
+                    >
+                      {isLoading && selectedPlanId === plan.id ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Activating...
+                        </>
+                      ) : (
+                        "Get Started"
+                      )}
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>
