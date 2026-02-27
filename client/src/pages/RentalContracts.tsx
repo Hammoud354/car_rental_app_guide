@@ -373,21 +373,57 @@ export default function RentalContracts() {
       fuelLevel,
     }, {
       onSuccess: (contract) => {
-        // Save damage marks
+        if (damageMarks.length === 0) {
+          setShowInspection(false);
+          setContractData(null);
+          setIsCreateDialogOpen(false);
+          toast.success("Contract created successfully!");
+          setTimeout(() => setLocation("/dashboard"), 500);
+          return;
+        }
+        
+        let savedCount = 0;
+        let errorCount = 0;
+        
         damageMarks.forEach(mark => {
-          trpc.contracts.addDamageMark.useMutation().mutate({
+          const mutation = trpc.contracts.addDamageMark.useMutation();
+          mutation.mutate({
             contractId: contract.id,
             xPosition: mark.x.toString(),
             yPosition: mark.y.toString(),
             description: mark.description,
+          }, {
+            onSuccess: () => {
+              savedCount++;
+              if (savedCount + errorCount === damageMarks.length) {
+                setShowInspection(false);
+                setContractData(null);
+                setIsCreateDialogOpen(false);
+                toast.success("Contract created successfully!");
+                setTimeout(() => setLocation("/dashboard"), 500);
+              }
+            },
+            onError: (error) => {
+              errorCount++;
+              console.error("Error saving damage mark:", error);
+              if (savedCount + errorCount === damageMarks.length) {
+                setShowInspection(false);
+                setContractData(null);
+                setIsCreateDialogOpen(false);
+                if (errorCount > 0) {
+                  toast.warning("Contract created but some damage marks failed to save");
+                } else {
+                  toast.success("Contract created successfully!");
+                }
+                setTimeout(() => setLocation("/dashboard"), 500);
+              }
+            },
           });
         });
-        setShowInspection(false);
-        setContractData(null);
-        setIsCreateDialogOpen(false);
-        toast.success("Contract created successfully!");
-        // Redirect to Dashboard
-        setLocation("/dashboard");
+      },
+      onError: (error) => {
+        console.error("Error creating contract:", error);
+        toast.error(`Failed to create contract: ${error.message}`);
       },
     });
   };

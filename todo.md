@@ -5610,3 +5610,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Fix Rental Contracts page responsive design
 - [ ] Fix other pages responsive design
 - [ ] Test on multiple screen sizes (mobile, tablet, desktop)
+
+
+## Bug Fix - Inspection Completion Button Stuck in Loading State
+- [x] Identify the inspection completion component and mutation handler
+- [x] Debug the mutation response and loading state
+- [x] Fix the navigation after successful inspection completion
+- [x] Test the fix and verify proper navigation

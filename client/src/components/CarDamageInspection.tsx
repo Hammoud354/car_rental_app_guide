@@ -101,7 +101,12 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const handleSubmit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    onComplete(damageMarks, "", fuelLevel);
+    try {
+      onComplete(damageMarks, "", fuelLevel);
+    } catch (error) {
+      console.error("Error completing inspection:", error);
+      setIsSubmitting(false);
+    }
   };
 
   return (
