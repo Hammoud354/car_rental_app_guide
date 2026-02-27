@@ -263,6 +263,15 @@ export const appRouter = router({
         return await db.getAllVehicles(targetUserId, input?.filterUserId);
       }),
     
+    getVehicleCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id || 1;
+        const database = await db.getDb();
+        if (!database) return 0;
+        const result = await database.execute(`SELECT COUNT(*) as count FROM vehicles WHERE userid = ${userId}`);
+        return (result[0] as any)?.count || 0;
+      }),
+    
     getById: publicProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ input, ctx }) => {
@@ -1004,6 +1013,15 @@ export const appRouter = router({
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
         return await db.getAllClients(ctx.user?.id || 1, input?.filterUserId || ctx.filterUserId);
+      }),
+    
+    getClientCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id || 1;
+        const database = await db.getDb();
+        if (!database) return 0;
+        const result = await database.execute(`SELECT COUNT(*) as count FROM clients WHERE userid = ${userId}`);
+        return (result[0] as any)?.count || 0;
       }),
     
     getById: publicProcedure

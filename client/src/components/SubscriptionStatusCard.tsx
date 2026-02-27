@@ -8,6 +8,8 @@ import { Loader2 } from "lucide-react";
 
 export function SubscriptionStatusCard() {
   const { data: subscription, isLoading } = trpc.subscription.getCurrentPlan.useQuery();
+  const { data: vehicleCount = 0 } = trpc.fleet.getVehicleCount.useQuery();
+  const { data: clientCount = 0 } = trpc.clients.getClientCount.useQuery();
 
   if (isLoading) {
     return (
@@ -95,7 +97,17 @@ export function SubscriptionStatusCard() {
               <span>Vehicles</span>
             </div>
             <div className="mt-1 text-lg font-semibold">
-              {tier.maxVehicles === null ? "Unlimited" : `Up to ${tier.maxVehicles}`}
+              {tier.maxVehicles === null ? "Unlimited" : `${vehicleCount} of ${tier.maxVehicles}`}
+            </div>
+            <div className="mt-1 text-xs text-gray-500">
+              {tier.maxVehicles !== null && (
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div 
+                    className="bg-blue-600 h-1.5 rounded-full" 
+                    style={{ width: `${Math.min((vehicleCount / tier.maxVehicles) * 100, 100)}%` }}
+                  />
+                </div>
+              )}
             </div>
           </div>
           <div className="rounded-lg bg-white/50 p-3">
@@ -104,7 +116,17 @@ export function SubscriptionStatusCard() {
               <span>Clients</span>
             </div>
             <div className="mt-1 text-lg font-semibold">
-              {tier.maxClients === null ? "Unlimited" : `Up to ${tier.maxClients}`}
+              {tier.maxClients === null ? "Unlimited" : `${clientCount} of ${tier.maxClients}`}
+            </div>
+            <div className="mt-1 text-xs text-gray-500">
+              {tier.maxClients !== null && (
+                <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                  <div 
+                    className="bg-purple-600 h-1.5 rounded-full" 
+                    style={{ width: `${Math.min((clientCount / tier.maxClients) * 100, 100)}%` }}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
