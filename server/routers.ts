@@ -73,8 +73,8 @@ export const appRouter = router({
         name: z.string(),
         email: z.string().email(),
         phone: z.string(),
-        countryCode: z.string(),
         country: z.string(),
+        countryName: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const bcrypt = await import('bcrypt');
@@ -97,9 +97,12 @@ export const appRouter = router({
           password: hashedPassword,
           name: input.name,
           email: input.email,
-          phone: `${input.countryCode}${input.phone}`,
+          phone: input.phone,
           country: input.country,
         });
+
+        // Note: Country data will be auto-populated in company settings on first login
+        // via the Dashboard component using the country from user profile
 
         // Populate car makers and models for the user's country
         try {

@@ -8,23 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff } from "lucide-react";
-
-const COUNTRIES = [
-  { code: "+1", name: "United States", country: "US" },
-  { code: "+44", name: "United Kingdom", country: "GB" },
-  { code: "+971", name: "United Arab Emirates", country: "AE" },
-  { code: "+966", name: "Saudi Arabia", country: "SA" },
-  { code: "+20", name: "Egypt", country: "EG" },
-  { code: "+962", name: "Jordan", country: "JO" },
-  { code: "+961", name: "Lebanon", country: "LB" },
-  { code: "+965", name: "Kuwait", country: "KW" },
-  { code: "+968", name: "Oman", country: "OM" },
-  { code: "+974", name: "Qatar", country: "QA" },
-  { code: "+973", name: "Bahrain", country: "BH" },
-  { code: "+212", name: "Morocco", country: "MA" },
-  { code: "+213", name: "Algeria", country: "DZ" },
-  { code: "+216", name: "Tunisia", country: "TN" },
-];
+import { countries, getCountryData } from "@shared/countries";
 
 export default function SignUp() {
   const [, setLocation] = useLocation();
@@ -37,6 +21,7 @@ export default function SignUp() {
     phone: "",
     countryCode: "+971",
     country: "AE",
+    countryName: "United Arab Emirates",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,6 +29,11 @@ export default function SignUp() {
   const signUpMutation = trpc.auth.signUp.useMutation({
     onSuccess: () => {
       toast.success("Account created successfully! Please sign in with your credentials.");
+      // Store country data in localStorage for post-signup auto-population
+      const countryData = getCountryData(formData.country);
+      if (countryData) {
+        localStorage.setItem('pendingCountryData', JSON.stringify(countryData));
+      }
       setTimeout(() => setLocation("/signin"), 1000);
     },
     onError: (error) => {
@@ -70,18 +60,18 @@ export default function SignUp() {
       name: formData.fullName,
       email: formData.email,
       phone: formData.phone,
-      countryCode: formData.countryCode,
       country: formData.country,
+      countryName: formData.countryName,
     });
   };
 
   const handleCountryChange = (value: string) => {
-    const country = COUNTRIES.find(c => c.country === value);
+    const country = countries.find(c => c.code === value);
     if (country) {
       setFormData(prev => ({
         ...prev,
-        country: country.country,
-        countryCode: country.code,
+        country: country.code,
+        countryName: country.name,
       }));
     }
   };
@@ -140,10 +130,10 @@ export default function SignUp() {
                 <SelectTrigger>
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
-                <SelectContent>
-                  {COUNTRIES.map((country) => (
-                    <SelectItem key={country.country} value={country.country}>
-                      {country.name} ({country.code})
+                <SelectContent className="max-h-64">
+                  {countries.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -152,23 +142,15 @@ export default function SignUp() {
 
             <div className="space-y-2 input-client">
               <Label htmlFor="phone">Phone Number</Label>
-              <div className="flex gap-2 input-client">
-                <Input
-                  type="text"
-                  value={formData.countryCode}
-                  disabled
-                  className="w-20 input-client"
-                />
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="501234567"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  required
-                  className="flex-1 input-client"
-                />
-              </div>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                value={formData.phone}
+                onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                required
+                className="input-client"
+              />
             </div>
 
             <div className="space-y-2 input-client">

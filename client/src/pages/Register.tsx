@@ -76,8 +76,8 @@ export default function Register() {
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
-      countryCode: formData.countryCode,
       country: formData.country,
+      countryName: formData.country,
     });
   };
 

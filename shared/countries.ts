@@ -1,4 +1,13 @@
-export const countries = [
+export interface CountryData {
+  code: string;
+  name: string;
+  currency?: string;
+  currencyCode?: string;
+  vatRate?: number;
+  currencySymbol?: string;
+}
+
+export const countries: CountryData[] = [
   { code: 'AF', name: 'Afghanistan' },
   { code: 'AX', name: 'Åland Islands' },
   { code: 'AL', name: 'Albania' },
@@ -249,3 +258,61 @@ export const countries = [
   { code: 'ZM', name: 'Zambia' },
   { code: 'ZW', name: 'Zimbabwe' },
 ];
+
+/**
+ * Country data with VAT rates and currency information
+ */
+export const COUNTRY_VAT_CURRENCY: Record<string, CountryData> = {
+  US: { code: 'US', name: 'United States', currency: 'US Dollar', currencyCode: 'USD', vatRate: 0, currencySymbol: '$' },
+  GB: { code: 'GB', name: 'United Kingdom', currency: 'British Pound', currencyCode: 'GBP', vatRate: 20, currencySymbol: '£' },
+  DE: { code: 'DE', name: 'Germany', currency: 'Euro', currencyCode: 'EUR', vatRate: 19, currencySymbol: '€' },
+  FR: { code: 'FR', name: 'France', currency: 'Euro', currencyCode: 'EUR', vatRate: 20, currencySymbol: '€' },
+  IT: { code: 'IT', name: 'Italy', currency: 'Euro', currencyCode: 'EUR', vatRate: 22, currencySymbol: '€' },
+  ES: { code: 'ES', name: 'Spain', currency: 'Euro', currencyCode: 'EUR', vatRate: 21, currencySymbol: '€' },
+  NL: { code: 'NL', name: 'Netherlands', currency: 'Euro', currencyCode: 'EUR', vatRate: 21, currencySymbol: '€' },
+  BE: { code: 'BE', name: 'Belgium', currency: 'Euro', currencyCode: 'EUR', vatRate: 21, currencySymbol: '€' },
+  AT: { code: 'AT', name: 'Austria', currency: 'Euro', currencyCode: 'EUR', vatRate: 20, currencySymbol: '€' },
+  CH: { code: 'CH', name: 'Switzerland', currency: 'Swiss Franc', currencyCode: 'CHF', vatRate: 8.1, currencySymbol: 'CHF' },
+  SE: { code: 'SE', name: 'Sweden', currency: 'Swedish Krona', currencyCode: 'SEK', vatRate: 25, currencySymbol: 'kr' },
+  NO: { code: 'NO', name: 'Norway', currency: 'Norwegian Krone', currencyCode: 'NOK', vatRate: 25, currencySymbol: 'kr' },
+  DK: { code: 'DK', name: 'Denmark', currency: 'Danish Krone', currencyCode: 'DKK', vatRate: 25, currencySymbol: 'kr' },
+  CA: { code: 'CA', name: 'Canada', currency: 'Canadian Dollar', currencyCode: 'CAD', vatRate: 5, currencySymbol: '$' },
+  AU: { code: 'AU', name: 'Australia', currency: 'Australian Dollar', currencyCode: 'AUD', vatRate: 10, currencySymbol: '$' },
+  JP: { code: 'JP', name: 'Japan', currency: 'Japanese Yen', currencyCode: 'JPY', vatRate: 10, currencySymbol: '¥' },
+  CN: { code: 'CN', name: 'China', currency: 'Chinese Yuan', currencyCode: 'CNY', vatRate: 13, currencySymbol: '¥' },
+  IN: { code: 'IN', name: 'India', currency: 'Indian Rupee', currencyCode: 'INR', vatRate: 18, currencySymbol: '₹' },
+  BR: { code: 'BR', name: 'Brazil', currency: 'Brazilian Real', currencyCode: 'BRL', vatRate: 18, currencySymbol: 'R$' },
+  MX: { code: 'MX', name: 'Mexico', currency: 'Mexican Peso', currencyCode: 'MXN', vatRate: 16, currencySymbol: '$' },
+  ZA: { code: 'ZA', name: 'South Africa', currency: 'South African Rand', currencyCode: 'ZAR', vatRate: 15, currencySymbol: 'R' },
+  SG: { code: 'SG', name: 'Singapore', currency: 'Singapore Dollar', currencyCode: 'SGD', vatRate: 8, currencySymbol: '$' },
+  HK: { code: 'HK', name: 'Hong Kong', currency: 'Hong Kong Dollar', currencyCode: 'HKD', vatRate: 0, currencySymbol: '$' },
+  AE: { code: 'AE', name: 'United Arab Emirates', currency: 'UAE Dirham', currencyCode: 'AED', vatRate: 5, currencySymbol: 'د.إ' },
+  SA: { code: 'SA', name: 'Saudi Arabia', currency: 'Saudi Riyal', currencyCode: 'SAR', vatRate: 15, currencySymbol: '﷼' },
+  KR: { code: 'KR', name: 'Korea, Republic of', currency: 'South Korean Won', currencyCode: 'KRW', vatRate: 10, currencySymbol: '₩' },
+  TH: { code: 'TH', name: 'Thailand', currency: 'Thai Baht', currencyCode: 'THB', vatRate: 7, currencySymbol: '฿' },
+  MY: { code: 'MY', name: 'Malaysia', currency: 'Malaysian Ringgit', currencyCode: 'MYR', vatRate: 6, currencySymbol: 'RM' },
+  PH: { code: 'PH', name: 'Philippines', currency: 'Philippine Peso', currencyCode: 'PHP', vatRate: 12, currencySymbol: '₱' },
+  ID: { code: 'ID', name: 'Indonesia', currency: 'Indonesian Rupiah', currencyCode: 'IDR', vatRate: 11, currencySymbol: 'Rp' },
+  VN: { code: 'VN', name: 'Viet Nam', currency: 'Vietnamese Dong', currencyCode: 'VND', vatRate: 10, currencySymbol: '₫' },
+  PK: { code: 'PK', name: 'Pakistan', currency: 'Pakistani Rupee', currencyCode: 'PKR', vatRate: 17, currencySymbol: '₨' },
+  BD: { code: 'BD', name: 'Bangladesh', currency: 'Bangladeshi Taka', currencyCode: 'BDT', vatRate: 15, currencySymbol: '৳' },
+  EG: { code: 'EG', name: 'Egypt', currency: 'Egyptian Pound', currencyCode: 'EGP', vatRate: 14, currencySymbol: 'E£' },
+  NG: { code: 'NG', name: 'Nigeria', currency: 'Nigerian Naira', currencyCode: 'NGN', vatRate: 7.5, currencySymbol: '₦' },
+  KE: { code: 'KE', name: 'Kenya', currency: 'Kenyan Shilling', currencyCode: 'KES', vatRate: 16, currencySymbol: 'KSh' },
+  NZ: { code: 'NZ', name: 'New Zealand', currency: 'New Zealand Dollar', currencyCode: 'NZD', vatRate: 15, currencySymbol: '$' },
+  IE: { code: 'IE', name: 'Ireland', currency: 'Euro', currencyCode: 'EUR', vatRate: 23, currencySymbol: '€' },
+  PT: { code: 'PT', name: 'Portugal', currency: 'Euro', currencyCode: 'EUR', vatRate: 23, currencySymbol: '€' },
+  GR: { code: 'GR', name: 'Greece', currency: 'Euro', currencyCode: 'EUR', vatRate: 24, currencySymbol: '€' },
+  PL: { code: 'PL', name: 'Poland', currency: 'Polish Zloty', currencyCode: 'PLN', vatRate: 23, currencySymbol: 'zł' },
+  CZ: { code: 'CZ', name: 'Czechia', currency: 'Czech Koruna', currencyCode: 'CZK', vatRate: 21, currencySymbol: 'Kč' },
+  HU: { code: 'HU', name: 'Hungary', currency: 'Hungarian Forint', currencyCode: 'HUF', vatRate: 27, currencySymbol: 'Ft' },
+  RO: { code: 'RO', name: 'Romania', currency: 'Romanian Leu', currencyCode: 'RON', vatRate: 19, currencySymbol: 'lei' },
+  TR: { code: 'TR', name: 'Turkey', currency: 'Turkish Lira', currencyCode: 'TRY', vatRate: 18, currencySymbol: '₺' },
+};
+
+/**
+ * Get country data by country code
+ */
+export function getCountryData(countryCode: string): CountryData | null {
+  return COUNTRY_VAT_CURRENCY[countryCode] || null;
+}

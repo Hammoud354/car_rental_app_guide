@@ -5583,3 +5583,20 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Replace subscription limit toast with professional modal dialog
 - [x] Add subscription limit check before opening Add Vehicle dialog
 - [x] Show modal immediately when clicking ADD VEHICLE if limit is reached
+
+
+## Country Auto-Population in Signup
+- [ ] Create country data mapping with VAT rates and currencies
+- [ ] Update signup flow to capture country selection
+- [ ] Auto-populate company settings with country data after signup
+- [ ] Test signup flow with country auto-population
+- [ ] Verify VAT and currency settings are correctly set
+
+
+## Country Auto-Population in Signup
+- [x] Create country data mapping with VAT rates and currencies for 40+ countries
+- [x] Update signup form to use comprehensive country list
+- [x] Update signup procedure to accept country information
+- [x] Store country data for post-signup auto-population
+- [ ] Implement Dashboard auto-population of company settings on first login
+- [ ] Test signup with different countries to verify VAT and currency auto-population
