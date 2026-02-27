@@ -77,18 +77,18 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4 input-client">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-3 sm:p-4 input-client">
       <Card className="w-full max-w-md input-client">
-        <CardHeader>
-          <CardTitle className="text-2xl input-client">Create Account</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
+          <CardTitle className="text-xl sm:text-2xl input-client">Create Account</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Sign up to get started with Car Rental Management System
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4 input-client">
-            <div className="space-y-2 input-client">
-              <Label htmlFor="username">Username</Label>
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 input-client">
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="username" className="text-xs sm:text-sm">Username</Label>
               <Input
                 id="username"
                 type="text"
@@ -97,11 +97,12 @@ export default function SignUp() {
                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                 required
                 minLength={3}
+                className="text-sm"
               />
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="fullName">Full Name</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="fullName" className="text-xs sm:text-sm">Full Name</Label>
               <Input
                 id="fullName"
                 type="text"
@@ -109,11 +110,12 @@ export default function SignUp() {
                 value={formData.fullName}
                 onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
                 required
+                className="text-sm"
               />
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -121,13 +123,14 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
+                className="text-sm"
               />
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="country">Country</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="country" className="text-xs sm:text-sm">Country</Label>
               <Select value={formData.country} onValueChange={handleCountryChange}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
@@ -140,8 +143,8 @@ export default function SignUp() {
               </Select>
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="phone">Phone Number</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -149,12 +152,12 @@ export default function SignUp() {
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 required
-                className="input-client"
+                className="text-sm input-client"
               />
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="password" className="text-xs sm:text-sm">Password</Label>
               <div className="relative input-client">
                 <Input
                   id="password"
@@ -164,7 +167,7 @@ export default function SignUp() {
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   required
                   minLength={6}
-                  className="pr-10 input-client"
+                  className="pr-10 text-sm input-client"
                 />
                 <button
                   type="button"
@@ -177,8 +180,8 @@ export default function SignUp() {
               </div>
             </div>
 
-            <div className="space-y-2 input-client">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="space-y-1.5 sm:space-y-2 input-client">
+              <Label htmlFor="confirmPassword" className="text-xs sm:text-sm">Confirm Password</Label>
               <div className="relative input-client">
                 <Input
                   id="confirmPassword"
@@ -188,7 +191,7 @@ export default function SignUp() {
                   onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                   required
                   minLength={6}
-                  className="pr-10 input-client"
+                  className="pr-10 text-sm input-client"
                 />
                 <button
                   type="button"
@@ -203,7 +206,7 @@ export default function SignUp() {
 
             <Button
               type="submit"
-              className="w-full input-client"
+              className="w-full mt-4 sm:mt-6 py-2 sm:py-2.5 text-sm sm:text-base input-client"
               disabled={signUpMutation.isPending}
             >
               {signUpMutation.isPending ? (
@@ -216,12 +219,12 @@ export default function SignUp() {
               )}
             </Button>
 
-            <div className="text-center text-sm text-muted-foreground input-client">
+            <div className="text-center text-xs sm:text-sm text-muted-foreground input-client mt-3 sm:mt-4">
               Already have an account?{" "}
               <Button
                 type="button"
                 variant="link"
-                className="p-0 h-auto input-client"
+                className="p-0 h-auto text-xs sm:text-sm input-client"
                 onClick={() => setLocation("/signin")}
               >
                 Sign In

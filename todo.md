@@ -5600,3 +5600,13 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Store country data for post-signup auto-population
 - [ ] Implement Dashboard auto-population of company settings on first login
 - [ ] Test signup with different countries to verify VAT and currency auto-population
+
+
+## Mobile Responsive Design Fixes
+- [x] Fix SignUp page responsive design (padding, margins, font sizes)
+- [ ] Fix Dashboard responsive design
+- [ ] Fix Fleet Management responsive design
+- [ ] Fix Clients page responsive design
+- [ ] Fix Rental Contracts page responsive design
+- [ ] Fix other pages responsive design
+- [ ] Test on multiple screen sizes (mobile, tablet, desktop)
