@@ -5617,3 +5617,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Debug the mutation response and loading state
 - [x] Fix the navigation after successful inspection completion
 - [x] Test the fix and verify proper navigation
+
+
+## Bug Fix - Vehicle Limit Dialog Shows on Unlimited Plan
+- [x] Identify the vehicle creation and limit check logic
+- [x] Debug the subscription tier data being used for limit validation
+- [x] Fix the vehicle limit check to handle unlimited tiers
+- [x] Test the fix and verify vehicles can be added

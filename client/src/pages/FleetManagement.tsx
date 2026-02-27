@@ -429,9 +429,10 @@ export default function FleetManagement() {
                       const subscription = await utils.subscription.getCurrentPlan.fetch();
                       if (subscription && vehicles) {
                         const vehicleCount = vehicles.length;
-                        const limit = subscription.tier?.maxVehicles || 0;
+                        const limit = subscription.tier?.maxVehicles;
                         
-                        if (vehicleCount >= limit) {
+                        // If limit is null, it means unlimited vehicles
+                        if (limit !== null && vehicleCount >= limit) {
                           setSubscriptionLimitError({
                             show: true,
                             message: `You have reached your vehicle limit`,
