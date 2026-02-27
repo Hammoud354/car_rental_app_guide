@@ -5624,3 +5624,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Debug the subscription tier data being used for limit validation
 - [x] Fix the vehicle limit check to handle unlimited tiers
 - [x] Test the fix and verify vehicles can be added
+
+
+## Feature - Subscription Limits Update on Plan Change
+- [x] Verify getCurrentPlan query refreshes after selectPlan mutation
+- [x] Test upgrading from Starter to Professional (15 → 50 vehicles)
+- [x] Test downgrading from Professional to Starter (50 → 15 vehicles)
+- [x] Add validation to prevent data loss when downgrading
+- [x] Verify dashboard subscription card updates immediately

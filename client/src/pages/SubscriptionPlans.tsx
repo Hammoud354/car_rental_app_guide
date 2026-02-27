@@ -46,9 +46,16 @@ export default function SubscriptionPlans() {
 
   const { data: plans = [], isLoading: plansLoading } = trpc.subscription.getAllPlans.useQuery();
   const { data: currentPlan } = trpc.subscription.getCurrentPlan.useQuery();
+  const utils = trpc.useUtils();
 
   const selectPlanMutation = trpc.subscription.selectPlan.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      // Invalidate the getCurrentPlan query to refresh subscription data immediately
+      await utils.subscription.getCurrentPlan.invalidate();
+      // Also invalidate fleet and clients queries to update vehicle/client limits
+      await utils.fleet.getVehicleCount.invalidate();
+      await utils.clients.getClientCount.invalidate();
+      
       toast.success("Subscription plan activated! Redirecting to dashboard...");
       setTimeout(() => setLocation("/dashboard"), 1500);
     },
