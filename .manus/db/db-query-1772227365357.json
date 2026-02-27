@@ -1,0 +1,20 @@
+{
+  "query": "SELECT id, username, role FROM users WHERE id IN (1, 2730024) LIMIT 10; SELECT userid, COUNT(*) as vehicle_count FROM vehicles GROUP BY userid;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, username, role FROM users WHERE id IN (1, 2730024) LIMIT 10; SELECT userid, COUNT(*) as vehicle_count FROM vehicles GROUP BY userid;",
+  "rows": [
+    {
+      "id": "2730024",
+      "username": "test111",
+      "role": "user"
+    }
+  ],
+  "messages": [
+    "userid\tvehicle_count",
+    "2790001\t1",
+    "2730024\t15",
+    "2820001\t1"
+  ],
+  "stdout": "id\tusername\trole\n2730024\ttest111\tuser\nuserid\tvehicle_count\n2790001\t1\n2730024\t15\n2820001\t1\n",
+  "stderr": "",
+  "execution_time_ms": 54
+}

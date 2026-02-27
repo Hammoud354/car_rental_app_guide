@@ -1,0 +1,29 @@
+{
+  "query": "SELECT userId, COUNT(*) as count FROM vehicles GROUP BY userId; SELECT id, plateNumber, userId FROM vehicles LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT userId, COUNT(*) as count FROM vehicles GROUP BY userId; SELECT id, plateNumber, userId FROM vehicles LIMIT 5;",
+  "rows": [
+    {
+      "userId": "2820001",
+      "count": "1"
+    },
+    {
+      "userId": "1",
+      "count": "15"
+    },
+    {
+      "userId": "2790001",
+      "count": "1"
+    }
+  ],
+  "messages": [
+    "id\tplateNumber\tuserId",
+    "480067\tVH-001\t1",
+    "480068\tVH-002\t1",
+    "480069\tVH-003\t1",
+    "480070\tVH-004\t1",
+    "480071\tVH-005\t1"
+  ],
+  "stdout": "userId\tcount\n2820001\t1\n1\t15\n2790001\t1\nid\tplateNumber\tuserId\n480067\tVH-001\t1\n480068\tVH-002\t1\n480069\tVH-003\t1\n480070\tVH-004\t1\n480071\tVH-005\t1\n",
+  "stderr": "",
+  "execution_time_ms": 52
+}

@@ -268,7 +268,7 @@ export const appRouter = router({
         const userId = ctx.user?.id || 1;
         const database = await db.getDb();
         if (!database) return 0;
-        const result = await database.execute(`SELECT COUNT(*) as count FROM vehicles WHERE userid = ${userId}`);
+        const result = await database.execute(`SELECT COUNT(*) as count FROM vehicles WHERE userId = ${userId}`);
         return (result[0] as any)?.count || 0;
       }),
     
@@ -1020,7 +1020,7 @@ export const appRouter = router({
         const userId = ctx.user?.id || 1;
         const database = await db.getDb();
         if (!database) return 0;
-        const result = await database.execute(`SELECT COUNT(*) as count FROM clients WHERE userid = ${userId}`);
+        const result = await database.execute(`SELECT COUNT(*) as count FROM clients WHERE userId = ${userId}`);
         return (result[0] as any)?.count || 0;
       }),
     
