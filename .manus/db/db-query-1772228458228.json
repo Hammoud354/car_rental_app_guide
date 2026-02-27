@@ -1,0 +1,19 @@
+{
+  "query": "SELECT id, name, email, username FROM users WHERE id = 2730024; SELECT us.id, us.userId, us.status FROM userSubscriptions us WHERE us.userId = 2730024;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, name, email, username FROM users WHERE id = 2730024; SELECT us.id, us.userId, us.status FROM userSubscriptions us WHERE us.userId = 2730024;",
+  "rows": [
+    {
+      "id": "2730024",
+      "name": "testuser",
+      "email": "test@test.com",
+      "username": "test111"
+    }
+  ],
+  "messages": [
+    "id\tuserId\tstatus",
+    "30002\t2730024\tactive"
+  ],
+  "stdout": "id\tname\temail\tusername\n2730024\ttestuser\ttest@test.com\ttest111\nid\tuserId\tstatus\n30002\t2730024\tactive\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

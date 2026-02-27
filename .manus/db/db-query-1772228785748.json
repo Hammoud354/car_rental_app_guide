@@ -1,0 +1,20 @@
+{
+  "query": "SELECT us.id, us.userId, us.tierId, us.status, st.id as tier_id, st.name, st.maxVehicles, st.maxClients FROM userSubscriptions us INNER JOIN subscriptionTiers st ON us.tierId = st.id WHERE us.userId = 2730024;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT us.id, us.userId, us.tierId, us.status, st.id as tier_id, st.name, st.maxVehicles, st.maxClients FROM userSubscriptions us INNER JOIN subscriptionTiers st ON us.tierId = st.id WHERE us.userId = 2730024;",
+  "rows": [
+    {
+      "id": "30002",
+      "userId": "2730024",
+      "tierId": "1",
+      "status": "active",
+      "tier_id": "1",
+      "name": "Starter",
+      "maxVehicles": "15",
+      "maxClients": "100"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tuserId\ttierId\tstatus\ttier_id\tname\tmaxVehicles\tmaxClients\n30002\t2730024\t1\tactive\t1\tStarter\t15\t100\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

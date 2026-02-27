@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, superAdminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { sql } from "drizzle-orm";
 import {
   getNextContractNumber,
   getNextInvoiceNumber,
@@ -268,8 +269,10 @@ export const appRouter = router({
         const userId = ctx.user?.id || 1;
         const database = await db.getDb();
         if (!database) return 0;
-        const result = await database.execute(`SELECT COUNT(*) as count FROM vehicles WHERE userId = ${userId}`);
-        return (result[0] as any)?.count || 0;
+        const result = await database.execute(
+          sql`SELECT COUNT(*) as count FROM vehicles WHERE userId = ${userId}`
+        ) as any;
+        return result && result.length > 0 && result[0]?.length > 0 ? result[0][0].count : 0;
       }),
     
     getById: publicProcedure
@@ -1020,8 +1023,10 @@ export const appRouter = router({
         const userId = ctx.user?.id || 1;
         const database = await db.getDb();
         if (!database) return 0;
-        const result = await database.execute(`SELECT COUNT(*) as count FROM clients WHERE userId = ${userId}`);
-        return (result[0] as any)?.count || 0;
+        const result = await database.execute(
+          sql`SELECT COUNT(*) as count FROM clients WHERE userId = ${userId}`
+        ) as any;
+        return result && result.length > 0 && result[0]?.length > 0 ? result[0][0].count : 0;
       }),
     
     getById: publicProcedure

@@ -1,0 +1,61 @@
+{
+  "query": "SELECT COUNT(*) as count FROM vehicles WHERE userId = 2730024; SELECT plateNumber, brand, model, dailyRate FROM vehicles WHERE userId = 2730024 LIMIT 15;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT COUNT(*) as count FROM vehicles WHERE userId = 2730024; SELECT plateNumber, brand, model, dailyRate FROM vehicles WHERE userId = 2730024 LIMIT 15;",
+  "rows": [
+    {
+      "count": "15"
+    },
+    {
+      "count": "plateNumber\tbrand\tmodel\tdailyRate"
+    },
+    {
+      "count": "NY-001\tToyota\tCamry\t55.00"
+    },
+    {
+      "count": "NY-002\tHonda\tAccord\t58.00"
+    },
+    {
+      "count": "NY-003\tBMW\tX5\t85.00"
+    },
+    {
+      "count": "NY-004\tMercedes\tC-Class\t95.00"
+    },
+    {
+      "count": "NY-005\tAudi\tA4\t88.00"
+    },
+    {
+      "count": "NY-006\tVolkswagen\tGolf\t45.00"
+    },
+    {
+      "count": "NY-007\tMazda\tCX-5\t68.00"
+    },
+    {
+      "count": "NY-008\tKia\tSorento\t62.00"
+    },
+    {
+      "count": "NY-009\tHyundai\tSanta Fe\t65.00"
+    },
+    {
+      "count": "NY-010\tFord\tF-150\t75.00"
+    },
+    {
+      "count": "NY-011\tChevrolet\tSilverado\t72.00"
+    },
+    {
+      "count": "NY-012\tNissan\tAltima\t52.00"
+    },
+    {
+      "count": "NY-013\tSubaru\tOutback\t60.00"
+    },
+    {
+      "count": "NY-014\tLexus\tRX\t92.00"
+    },
+    {
+      "count": "NY-015\tTesla\tModel 3\t78.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "count\n15\nplateNumber\tbrand\tmodel\tdailyRate\nNY-001\tToyota\tCamry\t55.00\nNY-002\tHonda\tAccord\t58.00\nNY-003\tBMW\tX5\t85.00\nNY-004\tMercedes\tC-Class\t95.00\nNY-005\tAudi\tA4\t88.00\nNY-006\tVolkswagen\tGolf\t45.00\nNY-007\tMazda\tCX-5\t68.00\nNY-008\tKia\tSorento\t62.00\nNY-009\tHyundai\tSanta Fe\t65.00\nNY-010\tFord\tF-150\t75.00\nNY-011\tChevrolet\tSilverado\t72.00\nNY-012\tNissan\tAltima\t52.00\nNY-013\tSubaru\tOutback\t60.00\nNY-014\tLexus\tRX\t92.00\nNY-015\tTesla\tModel 3\t78.00\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}
