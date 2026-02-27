@@ -177,17 +177,12 @@ export default function SubscriptionPlans() {
 
                   {/* CTA Button */}
                   {currentPlan?.tier?.id === plan.id ? (
-                    <div className="w-full">
-                      <Badge className="w-full justify-center bg-green-500 text-white mb-2 py-2">
-                        You are here
-                      </Badge>
-                      <Button
-                        disabled
-                        className="w-full bg-gray-300 text-gray-600 cursor-not-allowed"
-                      >
-                        Current Plan
-                      </Button>
-                    </div>
+                    <Button
+                      disabled
+                      className="w-full bg-gray-300 text-gray-600 cursor-not-allowed"
+                    >
+                      Current Plan
+                    </Button>
                   ) : (
                     <Button
                       onClick={() => handleSelectPlan(plan.id)}
@@ -216,7 +211,7 @@ export default function SubscriptionPlans() {
 
         {/* FAQ or additional info */}
         <div className="text-center text-sm text-muted-foreground">
-          <p>All plans include 24/7 access to your account and data. No credit card required to get started.</p>
+          <p>All plans include 24/7 access to your account and data.</p>
         </div>
       </div>
     </div>
