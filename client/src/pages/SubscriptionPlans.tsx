@@ -149,28 +149,40 @@ export default function SubscriptionPlans() {
                     <h4 className="font-semibold mb-3 text-sm">Features included:</h4>
                     <ul className="space-y-2">
                       {(() => {
-                        // Handle features that might be a string, object, or array
-                        let features: Record<string, boolean> = {};
+                        // Handle features that might be a comma-separated string, JSON object, or array
+                        let featuresList: string[] = [];
                         
                         if (typeof plan.features === 'string') {
-                          try {
-                            features = JSON.parse(plan.features);
-                          } catch (e) {
-                            // If it's not valid JSON, treat it as empty
-                            features = {};
+                          // Check if it's a comma-separated string
+                          if (plan.features.includes(',')) {
+                            featuresList = plan.features.split(',').map((f: string) => f.trim());
+                          } else {
+                            // Try to parse as JSON
+                            try {
+                              const parsed = JSON.parse(plan.features);
+                              if (typeof parsed === 'object' && parsed !== null) {
+                                featuresList = Object.entries(parsed)
+                                  .filter(([, enabled]) => enabled)
+                                  .map(([key]) => key);
+                              }
+                            } catch (e) {
+                              // If parsing fails, treat as empty
+                              featuresList = [];
+                            }
                           }
                         } else if (typeof plan.features === 'object' && plan.features !== null) {
-                          features = plan.features as Record<string, boolean>;
+                          // Handle object format
+                          featuresList = Object.entries(plan.features as Record<string, boolean>)
+                            .filter(([, enabled]) => enabled)
+                            .map(([key]) => key);
                         }
                         
-                        return Object.entries(features)
-                          .filter(([, enabled]) => enabled)
-                          .map(([featureKey]) => (
-                            <li key={featureKey} className="flex items-start gap-2 text-sm">
-                              <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span>{FEATURE_DISPLAY_NAMES[featureKey] || featureKey}</span>
-                            </li>
-                          ));
+                        return featuresList.map((feature) => (
+                          <li key={feature} className="flex items-start gap-2 text-sm">
+                            <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ));
                       })()}
                     </ul>
                   </div>
