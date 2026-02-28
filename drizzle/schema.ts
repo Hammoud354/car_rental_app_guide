@@ -22,6 +22,7 @@ export const users = mysqlTable("users", {
   country: varchar("country", { length: 100 }), // Country where system is managed
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
+  isInternal: boolean("isInternal").default(false).notNull(), // Internal/company user - bypasses subscription limits and gets all features
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

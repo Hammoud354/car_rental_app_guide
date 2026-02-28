@@ -20,6 +20,7 @@ import { Shield, Trash2, Crown, FileText, Home } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
+import { Switch } from "@/components/ui/switch";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
@@ -49,6 +50,17 @@ export default function AdminUsers() {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to delete user");
+    },
+  });
+
+  // Toggle internal flag mutation
+  const toggleInternalMutation = trpc.admin.toggleUserInternal.useMutation({
+    onSuccess: (data) => {
+      toast.success(`User ${data.isInternal ? 'marked as' : 'unmarked as'} internal`);
+      utils.admin.listUsers.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to toggle internal flag");
     },
   });
 
@@ -131,6 +143,7 @@ export default function AdminUsers() {
                   <TableHead>Role</TableHead>
                   <TableHead>Created At</TableHead>
                   <TableHead>Last Sign In</TableHead>
+                  <TableHead>Internal</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -167,6 +180,15 @@ export default function AdminUsers() {
                     </TableCell>
                     <TableCell>
                       {new Date(u.lastSignedIn).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={u.isInternal || false}
+                        onCheckedChange={(checked) => {
+                          toggleInternalMutation.mutate({ userId: u.id, isInternal: checked });
+                        }}
+                        disabled={toggleInternalMutation.isPending || u.role === "super_admin"}
+                      />
                     </TableCell>
                     <TableCell className="text-right">
                       {u.role !== "super_admin" && (

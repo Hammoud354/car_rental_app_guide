@@ -1526,6 +1526,22 @@ export const appRouter = router({
         const logs = await db.getAuditLogsByAction(input.action, input.limit);
         return logs;
       }),
+    
+    toggleUserInternal: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        isInternal: z.boolean(),
+      }))
+      .mutation(async ({ input }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error('Database not available');
+        
+        await dbInstance.execute(
+          sql`UPDATE users SET isInternal = ${input.isInternal} WHERE id = ${input.userId}`
+        );
+        
+        return { success: true, userId: input.userId, isInternal: input.isInternal };
+      }),
   }),
 
   // Excel Export Router

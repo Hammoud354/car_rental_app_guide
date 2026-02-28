@@ -323,6 +323,13 @@
       "when": 1772137266542,
       "tag": "0046_dark_the_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "5",
+      "when": 1772237142667,
+      "tag": "0047_tearful_thaddeus_ross",
+      "breakpoints": true
     }
   ]
 }

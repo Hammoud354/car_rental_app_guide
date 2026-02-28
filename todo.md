@@ -5632,3 +5632,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test downgrading from Professional to Starter (50 → 15 vehicles)
 - [x] Add validation to prevent data loss when downgrading
 - [x] Verify dashboard subscription card updates immediately
+
+
+## Feature - Internal User Flag (Bypass Subscription Limits)
+- [x] Add isInternal flag to users table schema
+- [x] Update subscription queries to check isInternal flag
+- [x] Update vehicle/client limit checks to bypass for internal users
+- [x] Add admin UI toggle to User Management page
+- [x] Test internal user access and feature availability

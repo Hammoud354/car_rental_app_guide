@@ -1,0 +1,34 @@
+{
+  "query": "SELECT id, name, monthlyPrice, maxVehicles, maxClients, maxUsers FROM subscriptionTiers;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute SELECT id, name, monthlyPrice, maxVehicles, maxClients, maxUsers FROM subscriptionTiers;",
+  "rows": [
+    {
+      "id": "1",
+      "name": "Starter",
+      "monthlyPrice": "50",
+      "maxVehicles": "15",
+      "maxClients": "100",
+      "maxUsers": "1"
+    },
+    {
+      "id": "2",
+      "name": "Professional",
+      "monthlyPrice": "70",
+      "maxVehicles": "50",
+      "maxClients": "NULL",
+      "maxUsers": "NULL"
+    },
+    {
+      "id": "3",
+      "name": "Enterprise",
+      "monthlyPrice": "85",
+      "maxVehicles": "NULL",
+      "maxClients": "NULL",
+      "maxUsers": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tname\tmonthlyPrice\tmaxVehicles\tmaxClients\tmaxUsers\n1\tStarter\t50\t15\t100\t1\n2\tProfessional\t70\t50\tNULL\tNULL\n3\tEnterprise\t85\tNULL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 1521
+}

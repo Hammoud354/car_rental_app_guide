@@ -3154,6 +3154,35 @@ export async function getUserSubscription(userId: number) {
   if (!db) return null;
 
   try {
+    // Check if user is internal (bypasses subscription limits)
+    const userResult = await db.execute(
+      sql`SELECT isInternal FROM users WHERE id = ${userId} LIMIT 1`
+    );
+    const isInternal = (userResult as any)?.[0]?.[0]?.isInternal ?? false;
+    
+    // If user is internal, return unlimited tier
+    if (isInternal) {
+      return {
+        id: 999,
+        userId: userId,
+        tierId: 999,
+        status: 'active',
+        startDate: new Date(),
+        endDate: null,
+        tier: {
+          id: 999,
+          name: 'internal',
+          displayName: 'Internal',
+          description: 'Internal company account with unlimited access',
+          monthlyPrice: 0,
+          maxVehicles: null,
+          maxClients: null,
+          maxUsers: null,
+          features: {},
+        }
+      };
+    }
+    
     // Use raw SQL query to avoid column name mapping issues
     const result = await db.execute(
       sql`SELECT us.*, st.* FROM userSubscriptions us INNER JOIN subscriptionTiers st ON us.tierId = st.id WHERE us.userId = ${userId} LIMIT 1`
