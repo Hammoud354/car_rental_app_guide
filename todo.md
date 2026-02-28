@@ -5640,3 +5640,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update vehicle/client limit checks to bypass for internal users
 - [x] Add admin UI toggle to User Management page
 - [x] Test internal user access and feature availability
+
+
+## Feature - Super Admin Unlimited Access
+- [x] Update subscription queries to check super_admin role
+- [x] Update vehicle and client limit checks for super admins
+- [x] Test super admin unlimited access

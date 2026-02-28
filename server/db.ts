@@ -3154,14 +3154,16 @@ export async function getUserSubscription(userId: number) {
   if (!db) return null;
 
   try {
-    // Check if user is internal (bypasses subscription limits)
+    // Check if user is super admin or internal (bypasses subscription limits)
     const userResult = await db.execute(
-      sql`SELECT isInternal FROM users WHERE id = ${userId} LIMIT 1`
+      sql`SELECT role, isInternal FROM users WHERE id = ${userId} LIMIT 1`
     );
+    const userRole = (userResult as any)?.[0]?.[0]?.role ?? 'user';
     const isInternal = (userResult as any)?.[0]?.[0]?.isInternal ?? false;
+    const isSuperAdmin = userRole === 'super_admin';
     
-    // If user is internal, return unlimited tier
-    if (isInternal) {
+    // If user is super admin or internal, return unlimited tier
+    if (isSuperAdmin || isInternal) {
       return {
         id: 999,
         userId: userId,
