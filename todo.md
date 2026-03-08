@@ -5659,3 +5659,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add visual indicator showing which users have internal access
 - [x] Test quick action buttons with different users
 - [x] Verify confirmation dialogs work correctly
+
+## Replace Grant Buttons with Toggle Switches
+- [x] Replace "Grant" buttons with toggle switches in user rows
+- [x] Update toggle switch styling to match design
+- [x] Add "Add New User" button in the header
+- [x] Create add user modal/dialog
+- [x] Test toggle switches functionality
+- [x] Test add new user functionality

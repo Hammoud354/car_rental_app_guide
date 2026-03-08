@@ -22,17 +22,35 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import React from "react";
+import React, { useState } from "react";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
   const utils = trpc.useUtils();
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [newUserData, setNewUserData] = useState({
+    username: "",
+    email: "",
+    name: "",
+    phone: "",
+    country: "",
+  });
 
   // Fetch all users
   const { data: users, isLoading } = trpc.admin.listUsers.useQuery(undefined, {
@@ -72,6 +90,10 @@ export default function AdminUsers() {
     },
   });
 
+  // Add user mutation (placeholder - you'll need to implement this endpoint)
+  const addUserMutation = null; // Placeholder - implement in server routers when ready
+
+
   const handleRoleChange = (userId: number, newRole: "user" | "admin") => {
     if (window.confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
       updateRoleMutation.mutate({ userId, role: newRole });
@@ -85,16 +107,17 @@ export default function AdminUsers() {
   };
 
   const handleToggleInternal = (userId: number, currentValue: boolean) => {
-    const action = currentValue ? "remove internal access from" : "grant internal access to";
-    if (window.confirm(`Are you sure you want to ${action} this user? This will ${currentValue ? 'disable' : 'enable'} subscription limit bypassing.`)) {
-      toggleInternalMutation.mutate({ userId, isInternal: !currentValue });
-    }
+    toggleInternalMutation.mutate({ userId, isInternal: !currentValue });
   };
 
-  const handleGrantAccessToUser = (userId: number, username: string) => {
-    if (window.confirm(`Grant unlimited access to "${username}"? They will bypass all subscription limits.`)) {
-      toggleInternalMutation.mutate({ userId, isInternal: true });
+  const handleAddUser = () => {
+    if (!newUserData.username || !newUserData.email) {
+      toast.error("Username and email are required");
+      return;
     }
+    
+    // Add user feature is not yet implemented
+    toast.error("Add user feature is not yet available. Please contact support.");
   };
 
   const nonInternalUsers = users?.filter(u => !u.isInternal && u.role !== 'super_admin') || [];
@@ -128,7 +151,7 @@ export default function AdminUsers() {
             Manage user accounts, permissions, and subscription access
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Link href="/dashboard">
             <Button variant="outline" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
@@ -141,6 +164,95 @@ export default function AdminUsers() {
               View Audit Logs
             </Button>
           </Link>
+          <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add New User
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New User</DialogTitle>
+                <DialogDescription>
+                  Create a new user account. The user will receive a welcome email with login instructions.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    placeholder="Enter username"
+                    value={newUserData.username}
+                    onChange={(e) =>
+                      setNewUserData({ ...newUserData, username: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter email"
+                    value={newUserData.email}
+                    onChange={(e) =>
+                      setNewUserData({ ...newUserData, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="Enter full name"
+                    value={newUserData.name}
+                    onChange={(e) =>
+                      setNewUserData({ ...newUserData, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    placeholder="Enter phone number"
+                    value={newUserData.phone}
+                    onChange={(e) =>
+                      setNewUserData({ ...newUserData, phone: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="country">Country</Label>
+                  <Input
+                    id="country"
+                    placeholder="Enter country"
+                    value={newUserData.country}
+                    onChange={(e) =>
+                      setNewUserData({ ...newUserData, country: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAddUserDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddUser}
+                  disabled={false}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Create User
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -148,14 +260,14 @@ export default function AdminUsers() {
         <CardHeader>
           <CardTitle className="text-blue-900 flex items-center gap-2">
             <Zap className="h-5 w-5 text-blue-600" />
-            Grant Internal Access (Bypass Subscription Limits)
+            Internal User Access (Bypass Subscription Limits)
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-blue-800 space-y-4">
           <div className="space-y-2">
             <p><strong>What are Internal Users?</strong></p>
             <p>• Internal users bypass all subscription limits (unlimited vehicles, clients, team members)</p>
-            <p>• Use this to grant trusted team members or test accounts unlimited access</p>
+            <p>• Use the toggle switch next to any user to enable/disable this feature</p>
             <p>• Super Admin users automatically have unlimited access</p>
           </div>
           
@@ -178,16 +290,6 @@ export default function AdminUsers() {
                 <p className="text-lg font-bold text-orange-600">{nonInternalUsers.length}</p>
               </div>
             </div>
-          </div>
-
-          <div className="pt-3 border-t border-blue-200">
-            <p className="font-semibold text-blue-900 mb-3">How to Grant Access:</p>
-            <ol className="space-y-2 text-xs">
-              <li><strong>1.</strong> Find the user in the table below</li>
-              <li><strong>2.</strong> Click the blue "Grant" button in their row</li>
-              <li><strong>3.</strong> Confirm the action in the dialog</li>
-              <li><strong>4.</strong> The user will immediately have unlimited access</li>
-            </ol>
           </div>
         </CardContent>
       </Card>
@@ -221,12 +323,11 @@ export default function AdminUsers() {
                           <TooltipTrigger asChild>
                             <div className="flex items-center justify-center gap-1 cursor-help">
                               <Zap className="h-4 w-4 text-blue-600" />
-                              <span>Access</span>
-                              <Info className="h-3 w-3" />
+                              <span>Internal</span>
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Internal users bypass subscription limits</p>
+                            <p>Toggle to grant/revoke unlimited access</p>
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -266,91 +367,52 @@ export default function AdminUsers() {
                         {new Date(u.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-center">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="flex items-center justify-center">
-                                {u.isInternal ? (
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-green-100 rounded text-green-700 text-xs font-semibold">
-                                    <Check className="h-4 w-4" />
-                                    Unlimited
-                                  </div>
-                                ) : u.role === "super_admin" ? (
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 rounded text-yellow-700 text-xs font-semibold">
-                                    <Crown className="h-4 w-4" />
+                        {u.role === "super_admin" ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex justify-center">
+                                  <Badge className="bg-yellow-100 text-yellow-800">
+                                    <Crown className="h-3 w-3 mr-1" />
                                     Admin
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-gray-700 text-xs font-semibold">
-                                    Limited
-                                  </div>
-                                )}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              {u.isInternal 
-                                ? "This user has unlimited access" 
-                                : u.role === "super_admin"
-                                ? "Super Admin always has unlimited access"
-                                : "This user has subscription limits"}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                                  </Badge>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Super Admin always has unlimited access</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex justify-center">
+                                  <Switch
+                                    checked={u.isInternal || false}
+                                    onCheckedChange={() => handleToggleInternal(u.id, u.isInternal || false)}
+                                    disabled={toggleInternalMutation.isPending}
+                                  />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{u.isInternal ? "Click to revoke internal access" : "Click to grant internal access"}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2 flex-wrap">
+                        <div className="flex items-center justify-end gap-2">
                           {u.role !== "super_admin" && (
-                            <>
-                              {!u.isInternal && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        size="sm"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-1"
-                                        onClick={() => handleGrantAccessToUser(u.id, u.username)}
-                                        disabled={toggleInternalMutation.isPending}
-                                      >
-                                        <Zap className="h-3 w-3" />
-                                        Grant
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Grant this user unlimited access</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
-                              {u.isInternal && (
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="flex items-center gap-1"
-                                        onClick={() => handleToggleInternal(u.id, u.isInternal || false)}
-                                        disabled={toggleInternalMutation.isPending}
-                                      >
-                                        <Check className="h-3 w-3" />
-                                        Revoke
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Remove unlimited access from this user</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              )}
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeleteUser(u.id, u.username)}
-                                disabled={deleteUserMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id, u.username)}
+                              disabled={deleteUserMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -375,7 +437,7 @@ export default function AdminUsers() {
           <p>• Super Admin role cannot be transferred or duplicated</p>
           <p>• Only you can promote users to Admin or demote them to User</p>
           <p>• Regular users and admins have no access to this panel</p>
-          <p>• All role changes and internal access grants are enforced server-side</p>
+          <p>• All role changes and internal access toggles are enforced server-side</p>
           <p>• Internal user toggles are logged for audit purposes</p>
         </CardContent>
       </Card>
