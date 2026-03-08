@@ -340,6 +340,48 @@ export default function AdminUsers() {
         </CardContent>
       </Card>
 
+      <Card className="border-yellow-200 bg-yellow-50">
+        <CardHeader>
+          <CardTitle className="text-yellow-800 flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Security Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-yellow-900 space-y-4">
+          <div className="space-y-2">
+            <p className="font-semibold text-yellow-900">🔐 Super Admin Privileges</p>
+            <p className="text-yellow-900">• You are the <strong>only Super Admin</strong> in the system with complete control</p>
+            <p className="text-yellow-900">• Super Admin role cannot be transferred, duplicated, or created by any user or system action</p>
+            <p className="text-yellow-900">• Only you can promote users to Admin or demote them to User role</p>
+            <p className="text-yellow-900">• Regular users and admins have no access to this admin panel</p>
+          </div>
+          
+          <div className="space-y-2 pt-2 border-t border-yellow-200">
+            <p className="font-semibold text-yellow-900">🔑 Password & Authentication</p>
+            <p className="text-yellow-900">• Passwords must be at least 8 characters long</p>
+            <p className="text-yellow-900">• When creating new users, set a strong initial password</p>
+            <p className="text-yellow-900">• Users can change their password after first login</p>
+            <p className="text-yellow-900">• All authentication is enforced server-side for security</p>
+          </div>
+          
+          <div className="space-y-2 pt-2 border-t border-yellow-200">
+            <p className="font-semibold text-yellow-900">🔓 Internal User Access</p>
+            <p className="text-yellow-900">• Toggle internal access to grant users unlimited subscription features</p>
+            <p className="text-yellow-900">• Internal users bypass all subscription limits (vehicles, clients, team members)</p>
+            <p className="text-yellow-900">• All internal user toggle changes are logged for audit and compliance</p>
+            <p className="text-yellow-900">• Use this feature for testing accounts or internal team members</p>
+          </div>
+          
+          <div className="space-y-2 pt-2 border-t border-yellow-200">
+            <p className="font-semibold text-yellow-900">⚠️ Security Best Practices</p>
+            <p className="text-yellow-900">• Regularly review user access levels and permissions</p>
+            <p className="text-yellow-900">• Revoke internal access when no longer needed</p>
+            <p className="text-yellow-900">• Monitor admin user activity and role assignments</p>
+            <p className="text-yellow-900">• All changes are enforced and validated server-side</p>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -468,48 +510,6 @@ export default function AdminUsers() {
               </Table>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card className="border-yellow-200 bg-yellow-50">
-        <CardHeader>
-          <CardTitle className="text-yellow-800 flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Security Information
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-yellow-900 space-y-4">
-          <div className="space-y-2">
-            <p className="font-semibold text-yellow-900">🔐 Super Admin Privileges</p>
-            <p className="text-yellow-900">• You are the <strong>only Super Admin</strong> in the system with complete control</p>
-            <p className="text-yellow-900">• Super Admin role cannot be transferred, duplicated, or created by any user or system action</p>
-            <p className="text-yellow-900">• Only you can promote users to Admin or demote them to User role</p>
-            <p className="text-yellow-900">• Regular users and admins have no access to this admin panel</p>
-          </div>
-          
-          <div className="space-y-2 pt-2 border-t border-yellow-200">
-            <p className="font-semibold text-yellow-900">🔑 Password & Authentication</p>
-            <p className="text-yellow-900">• Passwords must be at least 8 characters long</p>
-            <p className="text-yellow-900">• When creating new users, set a strong initial password</p>
-            <p className="text-yellow-900">• Users can change their password after first login</p>
-            <p className="text-yellow-900">• All authentication is enforced server-side for security</p>
-          </div>
-          
-          <div className="space-y-2 pt-2 border-t border-yellow-200">
-            <p className="font-semibold text-yellow-900">🔓 Internal User Access</p>
-            <p className="text-yellow-900">• Toggle internal access to grant users unlimited subscription features</p>
-            <p className="text-yellow-900">• Internal users bypass all subscription limits (vehicles, clients, team members)</p>
-            <p className="text-yellow-900">• All internal user toggle changes are logged for audit and compliance</p>
-            <p className="text-yellow-900">• Use this feature for testing accounts or internal team members</p>
-          </div>
-          
-          <div className="space-y-2 pt-2 border-t border-yellow-200">
-            <p className="font-semibold text-yellow-900">⚠️ Security Best Practices</p>
-            <p className="text-yellow-900">• Regularly review user access levels and permissions</p>
-            <p className="text-yellow-900">• Revoke internal access when no longer needed</p>
-            <p className="text-yellow-900">• Monitor admin user activity and role assignments</p>
-            <p className="text-yellow-900">• All changes are enforced and validated server-side</p>
-          </div>
         </CardContent>
       </Card>
     </div>
