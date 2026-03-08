@@ -90,8 +90,24 @@ export default function AdminUsers() {
     },
   });
 
-  // Add user mutation (placeholder - you'll need to implement this endpoint)
-  const addUserMutation = null; // Placeholder - implement in server routers when ready
+  // Add user mutation
+  const addUserMutation = trpc.admin.createUser.useMutation({
+    onSuccess: () => {
+      toast.success("User created successfully");
+      utils.admin.listUsers.invalidate();
+      setIsAddUserDialogOpen(false);
+      setNewUserData({
+        username: "",
+        email: "",
+        name: "",
+        phone: "",
+        country: "",
+      });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create user");
+    },
+  });
 
 
   const handleRoleChange = (userId: number, newRole: "user" | "admin") => {
@@ -116,8 +132,7 @@ export default function AdminUsers() {
       return;
     }
     
-    // Add user feature is not yet implemented
-    toast.error("Add user feature is not yet available. Please contact support.");
+    addUserMutation.mutate(newUserData);
   };
 
   const nonInternalUsers = users?.filter(u => !u.isInternal && u.role !== 'super_admin') || [];

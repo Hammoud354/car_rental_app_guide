@@ -1542,6 +1542,49 @@ export const appRouter = router({
         
         return { success: true, userId: input.userId, isInternal: input.isInternal };
       }),
+    
+    createUser: superAdminProcedure
+      .input(z.object({
+        username: z.string().min(3, "Username must be at least 3 characters"),
+        email: z.string().email("Invalid email address"),
+        name: z.string().optional(),
+        phone: z.string().optional(),
+        country: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const existingUser = await db.getUserByUsername(input.username);
+        if (existingUser) {
+          throw new Error("Username already exists");
+        }
+        
+        const tempPassword = Math.random().toString(36).slice(-12);
+        
+        const newUser = await db.createUser({
+          username: input.username,
+          password: tempPassword,
+          name: input.name || input.username,
+          email: input.email,
+          phone: input.phone || "",
+          country: input.country || "",
+        });
+        
+        await db.createAuditLog({
+          actorId: ctx.user.id,
+          actorUsername: ctx.user.username,
+          actorRole: ctx.user.role,
+          action: "user_created",
+          targetUserId: newUser.id,
+          targetUsername: newUser.username,
+          details: `Created new user: ${input.username}`,
+          newState: {
+            username: input.username,
+            email: input.email,
+            name: input.name,
+          },
+        });
+        
+        return newUser;
+      })
   }),
 
   // Excel Export Router
