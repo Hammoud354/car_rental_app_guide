@@ -478,37 +478,37 @@ export default function AdminUsers() {
             Security Information
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-sm text-yellow-700 space-y-4">
+        <CardContent className="text-sm text-yellow-900 space-y-4">
           <div className="space-y-2">
             <p className="font-semibold text-yellow-900">🔐 Super Admin Privileges</p>
-            <p>• You are the <strong>only Super Admin</strong> in the system with complete control</p>
-            <p>• Super Admin role cannot be transferred, duplicated, or created by any user or system action</p>
-            <p>• Only you can promote users to Admin or demote them to User role</p>
-            <p>• Regular users and admins have no access to this admin panel</p>
+            <p className="text-yellow-900">• You are the <strong>only Super Admin</strong> in the system with complete control</p>
+            <p className="text-yellow-900">• Super Admin role cannot be transferred, duplicated, or created by any user or system action</p>
+            <p className="text-yellow-900">• Only you can promote users to Admin or demote them to User role</p>
+            <p className="text-yellow-900">• Regular users and admins have no access to this admin panel</p>
           </div>
           
           <div className="space-y-2 pt-2 border-t border-yellow-200">
             <p className="font-semibold text-yellow-900">🔑 Password & Authentication</p>
-            <p>• Passwords must be at least 8 characters long</p>
-            <p>• When creating new users, set a strong initial password</p>
-            <p>• Users can change their password after first login</p>
-            <p>• All authentication is enforced server-side for security</p>
+            <p className="text-yellow-900">• Passwords must be at least 8 characters long</p>
+            <p className="text-yellow-900">• When creating new users, set a strong initial password</p>
+            <p className="text-yellow-900">• Users can change their password after first login</p>
+            <p className="text-yellow-900">• All authentication is enforced server-side for security</p>
           </div>
           
           <div className="space-y-2 pt-2 border-t border-yellow-200">
             <p className="font-semibold text-yellow-900">🔓 Internal User Access</p>
-            <p>• Toggle internal access to grant users unlimited subscription features</p>
-            <p>• Internal users bypass all subscription limits (vehicles, clients, team members)</p>
-            <p>• All internal user toggle changes are logged for audit and compliance</p>
-            <p>• Use this feature for testing accounts or internal team members</p>
+            <p className="text-yellow-900">• Toggle internal access to grant users unlimited subscription features</p>
+            <p className="text-yellow-900">• Internal users bypass all subscription limits (vehicles, clients, team members)</p>
+            <p className="text-yellow-900">• All internal user toggle changes are logged for audit and compliance</p>
+            <p className="text-yellow-900">• Use this feature for testing accounts or internal team members</p>
           </div>
           
           <div className="space-y-2 pt-2 border-t border-yellow-200">
             <p className="font-semibold text-yellow-900">⚠️ Security Best Practices</p>
-            <p>• Regularly review user access levels and permissions</p>
-            <p>• Revoke internal access when no longer needed</p>
-            <p>• Monitor admin user activity and role assignments</p>
-            <p>• All changes are enforced and validated server-side</p>
+            <p className="text-yellow-900">• Regularly review user access levels and permissions</p>
+            <p className="text-yellow-900">• Revoke internal access when no longer needed</p>
+            <p className="text-yellow-900">• Monitor admin user activity and role assignments</p>
+            <p className="text-yellow-900">• All changes are enforced and validated server-side</p>
           </div>
         </CardContent>
       </Card>
