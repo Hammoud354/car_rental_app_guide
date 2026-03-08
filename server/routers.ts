@@ -1547,6 +1547,7 @@ export const appRouter = router({
       .input(z.object({
         username: z.string().min(3, "Username must be at least 3 characters"),
         email: z.string().email("Invalid email address"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
         name: z.string().optional(),
         phone: z.string().optional(),
         country: z.string().optional(),
@@ -1557,11 +1558,9 @@ export const appRouter = router({
           throw new Error("Username already exists");
         }
         
-        const tempPassword = Math.random().toString(36).slice(-12);
-        
         const newUser = await db.createUser({
           username: input.username,
-          password: tempPassword,
+          password: input.password,
           name: input.name || input.username,
           email: input.email,
           phone: input.phone || "",

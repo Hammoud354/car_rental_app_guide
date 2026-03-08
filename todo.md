@@ -5675,3 +5675,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Send welcome email with login instructions
 - [x] Update frontend to use the new createUser procedure
 - [x] Test add user functionality end-to-end
+
+## Add Password Field to Add New User Dialog
+- [x] Add password input field to the Add New User dialog
+- [x] Add password validation (minimum length, strength requirements)
+- [x] Update backend createUser procedure to accept password parameter
+- [x] Remove auto-generated temporary password logic
+- [x] Test password field with various inputs
+- [x] Verify users can login with the set password

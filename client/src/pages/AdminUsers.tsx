@@ -50,7 +50,9 @@ export default function AdminUsers() {
     name: "",
     phone: "",
     country: "",
+    password: "",
   });
+  const [passwordError, setPasswordError] = useState("");
 
   // Fetch all users
   const { data: users, isLoading } = trpc.admin.listUsers.useQuery(undefined, {
@@ -102,7 +104,9 @@ export default function AdminUsers() {
         name: "",
         phone: "",
         country: "",
+        password: "",
       });
+      setPasswordError("");
     },
     onError: (error) => {
       toast.error(error.message || "Failed to create user");
@@ -132,6 +136,17 @@ export default function AdminUsers() {
       return;
     }
     
+    if (!newUserData.password) {
+      setPasswordError("Password is required");
+      return;
+    }
+    
+    if (newUserData.password.length < 8) {
+      setPasswordError("Password must be at least 8 characters");
+      return;
+    }
+    
+    setPasswordError("");
     addUserMutation.mutate(newUserData);
   };
 
@@ -249,6 +264,22 @@ export default function AdminUsers() {
                       setNewUserData({ ...newUserData, country: e.target.value })
                     }
                   />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter password (min 8 characters)"
+                    value={newUserData.password}
+                    onChange={(e) => {
+                      setNewUserData({ ...newUserData, password: e.target.value });
+                      setPasswordError("");
+                    }}
+                  />
+                  {passwordError && (
+                    <p className="text-sm text-red-500">{passwordError}</p>
+                  )}
                 </div>
               </div>
               <div className="flex gap-2 justify-end">
