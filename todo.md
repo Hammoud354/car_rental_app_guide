@@ -5652,3 +5652,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update subscription queries to check super_admin role
 - [x] Update vehicle and client limit checks for super admins
 - [x] Test super admin unlimited access
+
+## Add Quick Action Button for Internal Access
+- [x] Add prominent "Grant Internal Access" button in User Management header
+- [x] Add quick action button in each user row for granting/revoking access
+- [x] Add visual indicator showing which users have internal access
+- [x] Test quick action buttons with different users
+- [x] Verify confirmation dialogs work correctly
