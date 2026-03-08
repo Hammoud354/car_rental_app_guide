@@ -16,11 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Shield, Trash2, Crown, FileText, Home } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Shield, Trash2, Crown, FileText, Home, Zap, Info } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminUsers() {
   const { user, loading } = useAuth();
@@ -76,6 +83,13 @@ export default function AdminUsers() {
     }
   };
 
+  const handleToggleInternal = (userId: number, currentValue: boolean) => {
+    const action = currentValue ? "remove internal access from" : "grant internal access to";
+    if (window.confirm(`Are you sure you want to ${action} this user? This will ${currentValue ? 'enable' : 'disable'} subscription limit bypassing.`)) {
+      toggleInternalMutation.mutate({ userId, isInternal: !currentValue });
+    }
+  };
+
   // Redirect if not super admin
   if (loading) {
     return (
@@ -101,7 +115,7 @@ export default function AdminUsers() {
             Super Admin Panel
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage user accounts and permissions
+            Manage user accounts, permissions, and subscription access
           </p>
         </div>
         <div className="flex gap-2">
@@ -120,6 +134,21 @@ export default function AdminUsers() {
         </div>
       </div>
 
+      <Card className="border-blue-200 bg-blue-50">
+        <CardHeader>
+          <CardTitle className="text-blue-900 flex items-center gap-2">
+            <Zap className="h-5 w-5 text-blue-600" />
+            Internal User Access
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-blue-800 space-y-2">
+          <p>• <strong>Internal Users</strong> bypass all subscription limits (vehicles, clients, team members)</p>
+          <p>• Use this feature to grant unlimited access to trusted team members or testing accounts</p>
+          <p>• Toggle the <strong>Internal</strong> switch next to any user to enable/disable this feature</p>
+          <p>• Super Admin users automatically have unlimited access and cannot be toggled</p>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -134,78 +163,117 @@ export default function AdminUsers() {
               <p className="mt-4 text-muted-foreground">Loading users...</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Username</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Last Sign In</TableHead>
-                  <TableHead>Internal</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users?.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.username}</TableCell>
-                    <TableCell>{u.name || "-"}</TableCell>
-                    <TableCell>{u.email || "-"}</TableCell>
-                    <TableCell>
-                      {u.role === "super_admin" ? (
-                        <div className="flex items-center gap-2">
-                          <Crown className="h-4 w-4 text-yellow-500" />
-                          <span className="font-semibold text-yellow-600">Super Admin</span>
-                        </div>
-                      ) : (
-                        <Select
-                          value={u.role}
-                          onValueChange={(value) => handleRoleChange(u.id, value as "user" | "admin")}
-                          disabled={updateRoleMutation.isPending}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(u.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(u.lastSignedIn).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={u.isInternal || false}
-                        onCheckedChange={(checked) => {
-                          toggleInternalMutation.mutate({ userId: u.id, isInternal: checked });
-                        }}
-                        disabled={toggleInternalMutation.isPending || u.role === "super_admin"}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {u.role !== "super_admin" && (
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteUser(u.id, u.username)}
-                          disabled={deleteUserMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Username</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead>Last Sign In</TableHead>
+                    <TableHead className="text-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center justify-center gap-1 cursor-help">
+                              <Zap className="h-4 w-4 text-blue-600" />
+                              <span>Internal</span>
+                              <Info className="h-3 w-3" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Toggle to bypass subscription limits</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users?.map((u) => (
+                    <TableRow key={u.id} className={u.isInternal ? "bg-blue-50" : ""}>
+                      <TableCell className="font-medium">{u.username}</TableCell>
+                      <TableCell>{u.name || "-"}</TableCell>
+                      <TableCell>{u.email || "-"}</TableCell>
+                      <TableCell>
+                        {u.role === "super_admin" ? (
+                          <div className="flex items-center gap-2">
+                            <Crown className="h-4 w-4 text-yellow-500" />
+                            <span className="font-semibold text-yellow-600">Super Admin</span>
+                          </div>
+                        ) : (
+                          <Select
+                            value={u.role}
+                            onValueChange={(value) => handleRoleChange(u.id, value as "user" | "admin")}
+                            disabled={updateRoleMutation.isPending}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(u.lastSignedIn).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <div className="flex items-center justify-center">
+                                <Switch
+                                  checked={u.isInternal || false}
+                                  onCheckedChange={() => handleToggleInternal(u.id, u.isInternal || false)}
+                                  disabled={toggleInternalMutation.isPending || u.role === "super_admin"}
+                                  className="cursor-pointer"
+                                />
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {u.role === "super_admin" 
+                                ? "Super Admin always has unlimited access" 
+                                : u.isInternal 
+                                ? "Click to remove internal access" 
+                                : "Click to grant internal access"}
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          {u.isInternal && (
+                            <Badge variant="secondary" className="flex items-center gap-1 bg-blue-100 text-blue-800">
+                              <Zap className="h-3 w-3" />
+                              Internal
+                            </Badge>
+                          )}
+                          {u.role !== "super_admin" && (
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id, u.username)}
+                              disabled={deleteUserMutation.isPending}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -223,6 +291,7 @@ export default function AdminUsers() {
           <p>• Only you can promote users to Admin or demote them to User</p>
           <p>• Regular users and admins have no access to this panel</p>
           <p>• All role changes are enforced server-side for maximum security</p>
+          <p>• Internal user toggles are logged and can be audited</p>
         </CardContent>
       </Card>
     </div>

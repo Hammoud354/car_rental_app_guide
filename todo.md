@@ -355,6 +355,12 @@
 - [x] Test print to PDF and verify all contract details appear
 - [x] Save checkpoint
 
+## Internal User Toggle Feature
+- [x] Improve internal user toggle visibility in User Management page
+- [x] Add better UI indicators for internal users
+- [x] Add tooltip/help text explaining internal user bypass feature
+- [x] Test internal toggle functionality with different users
+
 ## Simplify Landing Page
 - [x] Review current landing page design
 - [x] Remove complex elements and create simple form-focused design
