@@ -2008,6 +2008,76 @@ export const appRouter = router({
           totalVehicles: vehicles.length,
         };
       }),
+
+    getExpiringDocuments: protectedProcedure
+      .input(z.object({ daysThreshold: z.number().default(30) }).optional())
+      .query(async ({ ctx, input }) => {
+        const userId = ctx.user.id;
+        const daysThreshold = input?.daysThreshold || 30;
+        const expiringDocuments: any[] = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const vehicles = await db.getAllVehicles(userId);
+        
+        vehicles.forEach((vehicle: any) => {
+          if (vehicle.insuranceExpiryDate) {
+            const expiryDate = new Date(vehicle.insuranceExpiryDate);
+            const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            
+            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+              expiringDocuments.push({
+                documentType: 'Insurance Policy',
+                vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
+                clientName: null,
+                expiryDate: vehicle.insuranceExpiryDate,
+                daysRemaining,
+                additionalInfo: vehicle.insurancePolicyNumber ? `Policy #${vehicle.insurancePolicyNumber}` : null,
+              });
+            }
+          }
+
+          if (vehicle.registrationExpiryDate) {
+            const expiryDate = new Date(vehicle.registrationExpiryDate);
+            const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            
+            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+              expiringDocuments.push({
+                documentType: 'Vehicle Registration',
+                vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
+                clientName: null,
+                expiryDate: vehicle.registrationExpiryDate,
+                daysRemaining,
+                additionalInfo: null,
+              });
+            }
+          }
+        });
+
+        const clients = await db.getAllClients(userId);
+        
+        clients.forEach((client: any) => {
+          if (client.licenseExpiryDate) {
+            const expiryDate = new Date(client.licenseExpiryDate);
+            const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+            
+            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+              expiringDocuments.push({
+                documentType: 'Driver License',
+                vehicleName: null,
+                clientName: `${client.firstName} ${client.lastName}`,
+                expiryDate: client.licenseExpiryDate,
+                daysRemaining,
+                additionalInfo: client.drivingLicenseNumber ? `License #${client.drivingLicenseNumber}` : null,
+              });
+            }
+          }
+        });
+
+        expiringDocuments.sort((a, b) => a.daysRemaining - b.daysRemaining);
+
+        return expiringDocuments;
+      }),
   }),
 
   bulkImport: router({

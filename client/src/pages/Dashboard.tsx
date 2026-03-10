@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
 import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
+import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
 import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -153,9 +154,9 @@ function ExportToExcelButton() {
     <Button
       onClick={handleExport}
       disabled={isExporting}
-      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto whitespace-nowrap"
+      className="bg-green-500 hover:bg-green-600 text-white w-full h-12 whitespace-nowrap text-base font-medium"
     >
-      <FileSpreadsheet className="mr-2 h-4 w-4" />
+      <FileSpreadsheet className="mr-2 h-5 w-5" />
       {isExporting ? "Exporting..." : "Export to Excel"}
     </Button>
   );
@@ -413,6 +414,30 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   );
 }
 
+function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCount: number }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      <Card 
+        className="bg-card shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+        onClick={() => setIsModalOpen(true)}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">Expiring Docs</CardTitle>
+          <div className="p-2 bg-yellow-100 rounded-lg">
+            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-foreground">{expiringDocsCount}</div>
+        </CardContent>
+      </Card>
+      <ExpiringDocumentsModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
+    </>
+  );
+}
+
 export default function Dashboard() {
   const { user } = useAuth();
   
@@ -650,14 +675,14 @@ export default function Dashboard() {
               </div>
               
               {/* Action Buttons Group */}
-              <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
-                <div className="w-full xs:w-auto">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
+                <div className="flex-1">
                   <ExportToExcelButton />
                 </div>
                 {user?.role === "super_admin" && (
-                  <Link href="/admin/users" className="w-full xs:w-auto">
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full xs:w-auto whitespace-nowrap">
-                      <Crown className="mr-2 h-4 w-4" />
+                  <Link href="/admin/users" className="flex-1">
+                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full h-12 whitespace-nowrap text-base font-medium">
+                      <Crown className="mr-2 h-5 w-5" />
                       Admin Panel
                     </Button>
                   </Link>
@@ -726,18 +751,7 @@ export default function Dashboard() {
             )}
 
             {widgetVisibility.expiringDocs && (
-
-            <Card className="bg-card shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Expiring Docs</CardTitle>
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">{expiringDocs}</div>
-              </CardContent>
-            </Card>
+              <ExpiringDocumentsCardWithModal expiringDocsCount={expiringDocs} />
             )}
           </div>
 

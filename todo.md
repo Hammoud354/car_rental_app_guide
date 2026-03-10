@@ -5755,3 +5755,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Test on iPad (768px width)
 - [x] Test on desktop (1024px+ width)
 - [x] Verify all forms are usable on all screen sizes
+
+
+## Dashboard Button Layout & Expiring Docs Card Fixes (Mar 11, 2026)
+
+- [ ] Fix dashboard buttons layout on desktop - should be on same line and enlarged
+- [ ] Make Expiring Docs card clickable to open modal
