@@ -154,9 +154,9 @@ function ExportToExcelButton() {
     <Button
       onClick={handleExport}
       disabled={isExporting}
-      className="bg-green-500 hover:bg-green-600 text-white w-full h-12 whitespace-nowrap text-base font-medium"
+      className="bg-green-500 hover:bg-green-600 text-white w-full h-11 whitespace-nowrap text-sm font-medium"
     >
-      <FileSpreadsheet className="mr-2 h-5 w-5" />
+      <FileSpreadsheet className="mr-2 h-4 w-4" />
       {isExporting ? "Exporting..." : "Export to Excel"}
     </Button>
   );
@@ -533,11 +533,11 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               {/* Settings and Admin Controls Group */}
-              <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="whitespace-nowrap w-full xs:w-auto">
-                      <SettingsIcon className="mr-2 h-4 w-4" />
+                    <Button variant="outline" size="lg" className="whitespace-nowrap w-full sm:w-auto h-11 text-base">
+                      <SettingsIcon className="mr-2 h-5 w-5" />
                       Customize
                     </Button>
                   </DialogTrigger>
@@ -652,13 +652,13 @@ export default function Dashboard() {
                 </DialogContent>
               </Dialog>
                 {isSuperAdmin && allUsers && allUsers.length > 0 && (
-                  <div className="flex items-center gap-2 w-full xs:w-auto">
-                    <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-none">
+                    <Users className="h-5 w-5 text-gray-500 flex-shrink-0" />
                     <Select
                       value={selectedUserId === null ? "all" : selectedUserId.toString()}
                       onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
                     >
-                      <SelectTrigger className="w-full xs:w-[180px]">
+                      <SelectTrigger className="w-full sm:w-[200px] h-11 text-base">
                         <SelectValue placeholder="Select user" />
                       </SelectTrigger>
                       <SelectContent>
@@ -681,8 +681,8 @@ export default function Dashboard() {
                 </div>
                 {user?.role === "super_admin" && (
                   <Link href="/admin/users" className="flex-1">
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full h-12 whitespace-nowrap text-base font-medium">
-                      <Crown className="mr-2 h-5 w-5" />
+                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full h-11 whitespace-nowrap text-sm font-medium">
+                      <Crown className="mr-2 h-4 w-4" />
                       Admin Panel
                     </Button>
                   </Link>
