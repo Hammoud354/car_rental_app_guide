@@ -394,25 +394,27 @@ export default function Clients() {
                         <Label htmlFor="address">Address</Label>
                         <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                       </div>
-                      <div>
-                        <Label>Date of Birth</Label>
-                        <DatePickerWithYearNav
-                          date={createDateOfBirth}
-                          onDateChange={setCreateDateOfBirth}
-                          placeholder="Select date of birth"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="placeOfBirth">Place of Birth</Label>
-                        <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
-                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="registrationNumber">Registration Number</Label>
-                        <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="col-span-1">
+                          <Label>Date of Birth</Label>
+                          <DatePickerWithYearNav
+                            date={createDateOfBirth}
+                            onDateChange={setCreateDateOfBirth}
+                            placeholder="Select date of birth"
+                          />
+                        </div>
+                        <div className="col-span-1">
+                          <Label htmlFor="placeOfBirth">Place of Birth</Label>
+                          <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
+                        </div>
+                        <div className="col-span-1">
+                          <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                          <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                        </div>
+                        <div className="col-span-1">
+                          <Label htmlFor="registrationNumber">Registration Number</Label>
+                          <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -421,11 +423,11 @@ export default function Clients() {
                   <div className="border-t border-gray-700 pt-4">
                     <h3 className="font-semibold mb-4">Driving License</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="col-span-2">
+                      <div className="col-span-1 sm:col-span-2">
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                       </div>
-                      <div>
+                      <div className="col-span-1">
                         <DateDropdownSelector
                           id="licenseIssueDate"
                           label="Issue Date"
@@ -434,7 +436,7 @@ export default function Clients() {
                           maxDate={new Date()}
                         />
                       </div>
-                      <div>
+                      <div className="col-span-1">
                         <DateDropdownSelector
                           id="licenseExpiryDate"
                           label="Expiry Date *"

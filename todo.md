@@ -5721,3 +5721,37 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Update frontend form to accept insurance issue date
 - [x] Test automatic calculation in vehicle creation
 - [x] Verify expiry date is stored correctly in database
+
+
+## Responsive Design Fixes (Mar 11, 2026)
+
+### Phase 1: Dashboard Responsive Layout
+- [x] Fix dashboard buttons (Export to Excel, Admin Panel) wrapping on mobile
+- [x] Make dashboard cards stack properly on small screens
+- [x] Fix subscription card layout for mobile
+- [x] Ensure proper spacing and padding on mobile
+
+### Phase 2: Client Management Form Responsive Layout
+- [x] Fix two-column field layouts (Date of Birth + Place of Birth)
+- [x] Fix Passport/ID + Registration Number field alignment
+- [x] Fix date picker dropdowns (Year, Month, Day) alignment
+- [x] Ensure form fields are full-width on mobile
+- [x] Fix Cancel/Add Client button spacing
+
+### Phase 3: Fleet Management Form Responsive Layout
+- [x] Fix insurance date fields alignment on mobile
+- [x] Fix vehicle details form field wrapping
+- [x] Ensure proper grid layout for all screen sizes
+- [x] Fix AI Maintenance section layout on mobile
+
+### Phase 4: Dialog and Modal Responsive Behavior
+- [x] Fix modal width and padding on mobile
+- [x] Ensure buttons don't overlap on small screens
+- [x] Fix scrolling behavior in dialogs
+- [x] Ensure keyboard doesn't hide important fields
+
+### Phase 5: Testing
+- [x] Test on iPhone (375px width)
+- [x] Test on iPad (768px width)
+- [x] Test on desktop (1024px+ width)
+- [x] Verify all forms are usable on all screen sizes

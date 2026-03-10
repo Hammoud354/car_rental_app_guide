@@ -621,16 +621,16 @@ export default function FleetManagement() {
                   <Input id="mileage" name="mileage" type="number" min="0" />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="col-span-1">
                     <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
                     <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client" />
                   </div>
-                  <div>
+                  <div className="col-span-1">
                     <Label htmlFor="weeklyRate">Weekly Rate ($)</Label>
                     <Input id="weeklyRate" name="weeklyRate" type="number" step="0.01" min="0" />
                   </div>
-                  <div>
+                  <div className="col-span-1 sm:col-span-2 lg:col-span-1">
                     <Label htmlFor="monthlyRate">Monthly Rate ($)</Label>
                     <Input id="monthlyRate" name="monthlyRate" type="number" step="0.01" min="0" />
                   </div>
@@ -639,36 +639,40 @@ export default function FleetManagement() {
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
                   <h4 className="font-medium text-sm">Insurance Information</h4>
                   
-                  <div>
-                    <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                    <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
-                    <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
-                  </div>
-
-                  <div>
-                    <Label>Policy Start Date</Label>
-                    <DatePickerWithYearNav
-                      date={insuranceStartDate}
-                      onDateChange={setInsuranceStartDate}
-                      placeholder="Select start date"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">Expiry date will be automatically set to 1 year from start date</p>
-                  </div>
-
-                  <div>
-                    <Label>Policy Expiry Date (Auto-calculated)</Label>
-                    <div className="p-2 bg-muted rounded border border-muted-foreground/20">
-                      <p className="text-sm font-medium">
-                        {insuranceStartDate 
-                          ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
-                          : 'Select a start date above'}
-                      </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <Label htmlFor="insuranceProvider">Insurance Provider</Label>
+                      <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">Automatically calculated as 1 year from the policy start date</p>
+
+                    <div className="col-span-1">
+                      <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
+                      <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="col-span-1">
+                      <Label>Policy Start Date</Label>
+                      <DatePickerWithYearNav
+                        date={insuranceStartDate}
+                        onDateChange={setInsuranceStartDate}
+                        placeholder="Select start date"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Expiry date will be automatically set to 1 year from start date</p>
+                    </div>
+
+                    <div className="col-span-1">
+                      <Label>Policy Expiry Date (Auto-calculated)</Label>
+                      <div className="p-2 bg-muted rounded border border-muted-foreground/20">
+                        <p className="text-sm font-medium">
+                          {insuranceStartDate 
+                            ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
+                            : 'Select a start date above'}
+                        </p>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Automatically calculated as 1 year from the policy start date</p>
+                    </div>
                   </div>
 
                   <div>

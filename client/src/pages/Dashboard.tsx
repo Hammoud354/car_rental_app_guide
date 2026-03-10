@@ -501,17 +501,17 @@ export default function Dashboard() {
     <SidebarLayout>
       <div className="space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
               <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               {/* Settings and Admin Controls Group */}
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="whitespace-nowrap">
+                    <Button variant="outline" size="sm" className="whitespace-nowrap w-full xs:w-auto">
                       <SettingsIcon className="mr-2 h-4 w-4" />
                       Customize
                     </Button>
@@ -627,13 +627,13 @@ export default function Dashboard() {
                 </DialogContent>
               </Dialog>
                 {isSuperAdmin && allUsers && allUsers.length > 0 && (
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 w-full xs:w-auto">
                     <Users className="h-4 w-4 text-gray-500 flex-shrink-0" />
                     <Select
                       value={selectedUserId === null ? "all" : selectedUserId.toString()}
                       onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
                     >
-                      <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectTrigger className="w-full xs:w-[180px]">
                         <SelectValue placeholder="Select user" />
                       </SelectTrigger>
                       <SelectContent>
@@ -650,11 +650,13 @@ export default function Dashboard() {
               </div>
               
               {/* Action Buttons Group */}
-              <div className="flex gap-2 flex-shrink-0">
-                <ExportToExcelButton />
+              <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
+                <div className="w-full xs:w-auto">
+                  <ExportToExcelButton />
+                </div>
                 {user?.role === "super_admin" && (
-                  <Link href="/admin/users" className="w-full sm:w-auto">
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full sm:w-auto whitespace-nowrap">
+                  <Link href="/admin/users" className="w-full xs:w-auto">
+                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full xs:w-auto whitespace-nowrap">
                       <Crown className="mr-2 h-4 w-4" />
                       Admin Panel
                     </Button>
