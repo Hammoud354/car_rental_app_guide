@@ -656,15 +656,19 @@ export default function FleetManagement() {
                       onDateChange={setInsuranceStartDate}
                       placeholder="Select start date"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">Expiry date will be automatically set to 1 year from start date</p>
                   </div>
 
                   <div>
-                    <Label>Policy Expiry Date</Label>
-                    <DatePickerWithYearNav
-                      date={insuranceExpiryDate}
-                      onDateChange={setInsuranceExpiryDate}
-                      placeholder="Select expiry date"
-                    />
+                    <Label>Policy Expiry Date (Auto-calculated)</Label>
+                    <div className="p-2 bg-muted rounded border border-muted-foreground/20">
+                      <p className="text-sm font-medium">
+                        {insuranceStartDate 
+                          ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
+                          : 'Select a start date above'}
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Automatically calculated as 1 year from the policy start date</p>
                   </div>
 
                   <div>

@@ -5712,3 +5712,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Create PDF generation system
 - [ ] Build contract preview and PDF flow
 - [ ] Test end-to-end workflow
+
+
+## Insurance Policy Expiry Date Auto-Calculation (Mar 11, 2026)
+
+- [x] Analyze vehicle creation flow and database schema
+- [x] Update backend to calculate expiry date (1 year from issue date)
+- [x] Update frontend form to accept insurance issue date
+- [x] Test automatic calculation in vehicle creation
+- [x] Verify expiry date is stored correctly in database

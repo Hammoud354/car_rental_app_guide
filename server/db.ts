@@ -229,13 +229,23 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (vehicle.mileage !== undefined && vehicle.mileage !== null) insertData.mileage = vehicle.mileage;
   if (vehicle.vin && vehicle.vin !== '') insertData.vin = vehicle.vin;
   if (vehicle.insurancePolicyNumber && vehicle.insurancePolicyNumber !== '') insertData.insurancePolicyNumber = vehicle.insurancePolicyNumber;
+  if (vehicle.insuranceProvider && vehicle.insuranceProvider !== '') insertData.insuranceProvider = vehicle.insuranceProvider;
+  if (vehicle.insurancePolicyStartDate) insertData.insurancePolicyStartDate = vehicle.insurancePolicyStartDate;
   if (vehicle.insuranceCost && vehicle.insuranceCost !== '') insertData.insuranceCost = vehicle.insuranceCost;
   if (vehicle.purchaseCost && vehicle.purchaseCost !== '') insertData.purchaseCost = vehicle.purchaseCost;
   if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
   if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
   
   // For timestamp fields, only add if they exist
-  if (vehicle.insuranceExpiryDate) insertData.insuranceExpiryDate = vehicle.insuranceExpiryDate;
+  // If insurance policy start date is provided, automatically calculate expiry date as 1 year later
+  if (vehicle.insurancePolicyStartDate) {
+    const startDate = new Date(vehicle.insurancePolicyStartDate);
+    const expiryDate = new Date(startDate);
+    expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+    insertData.insuranceExpiryDate = expiryDate;
+  } else if (vehicle.insuranceExpiryDate) {
+    insertData.insuranceExpiryDate = vehicle.insuranceExpiryDate;
+  }
   if (vehicle.registrationExpiryDate) insertData.registrationExpiryDate = vehicle.registrationExpiryDate;
   if (vehicle.nextMaintenanceDate) insertData.nextMaintenanceDate = vehicle.nextMaintenanceDate;
   if (vehicle.nextMaintenanceKm !== undefined && vehicle.nextMaintenanceKm !== null) insertData.nextMaintenanceKm = vehicle.nextMaintenanceKm;
