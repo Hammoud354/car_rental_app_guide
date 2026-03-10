@@ -3428,3 +3428,141 @@ export async function hasSubscriptionFeature(userId: number, feature: string): P
     return false;
   }
 }
+
+
+// ============================================================================
+// Contract Template Functions
+// ============================================================================
+
+export async function createContractTemplate(data: {
+  userId: number;
+  templateName: string;
+  templateUrl: string;
+  templateType: "pdf" | "image";
+  templateWidth: number;
+  templateHeight: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contractTemplates } = await import("../drizzle/schema");
+  
+  const result = await db.insert(contractTemplates).values({
+    userId: data.userId,
+    templateName: data.templateName,
+    templateUrl: data.templateUrl,
+    templateType: data.templateType,
+    templateWidth: data.templateWidth,
+    templateHeight: data.templateHeight,
+    isActive: true,
+  });
+
+  return { insertId: result[0]?.insertId || 0 };
+}
+
+export async function getContractTemplate(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { contractTemplates, templateFields } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const template = await db
+    .select()
+    .from(contractTemplates)
+    .where(eq(contractTemplates.userId, userId))
+    .limit(1);
+
+  if (!template.length) return null;
+
+  const fields = await db
+    .select()
+    .from(templateFields)
+    .where(eq(templateFields.templateId, template[0].id));
+
+  return {
+    ...template[0],
+    fields: fields.sort((a, b) => a.displayOrder - b.displayOrder),
+  };
+}
+
+export async function updateTemplateFields(templateId: number, fields: any[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { templateFields } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  // Delete existing fields
+  await db.delete(templateFields).where(eq(templateFields.templateId, templateId));
+
+  // Insert new fields
+  if (fields.length > 0) {
+    await db.insert(templateFields).values(
+      fields.map((field, index) => ({
+        templateId,
+        fieldName: field.fieldName,
+        fieldLabel: field.fieldLabel,
+        fieldType: field.fieldType || "text",
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fontSize: field.fontSize || 12,
+        fontFamily: field.fontFamily || "Arial",
+        textAlignment: field.textAlignment || "left",
+        fontColor: field.fontColor || "#000000",
+        isRequired: field.isRequired || false,
+        displayOrder: index,
+      }))
+    );
+  }
+}
+
+export async function saveGeneratedContract(data: {
+  userId: number;
+  rentalContractId: number;
+  templateId: number;
+  pdfUrl: string;
+  pdfFileName: string;
+  filledData: Record<string, any>;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { generatedContracts } = await import("../drizzle/schema");
+
+  const result = await db.insert(generatedContracts).values({
+    userId: data.userId,
+    rentalContractId: data.rentalContractId,
+    templateId: data.templateId,
+    pdfUrl: data.pdfUrl,
+    pdfFileName: data.pdfFileName,
+    filledData: JSON.stringify(data.filledData),
+  });
+
+  return result;
+}
+
+export async function getGeneratedContract(rentalContractId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { generatedContracts } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  const contract = await db
+    .select()
+    .from(generatedContracts)
+    .where(eq(generatedContracts.rentalContractId, rentalContractId))
+    .limit(1);
+
+  if (contract.length > 0 && contract[0].filledData) {
+    return {
+      ...contract[0],
+      filledData: JSON.parse(contract[0].filledData as string),
+    };
+  }
+
+  return contract[0] || null;
+}

@@ -654,3 +654,73 @@ export const subscriptionAuditLog = mysqlTable("subscriptionAuditLog", {
 
 export type SubscriptionAuditLog = typeof subscriptionAuditLog.$inferSelect;
 export type InsertSubscriptionAuditLog = typeof subscriptionAuditLog.$inferInsert;
+
+
+/**
+ * Contract templates table - stores contract template files and metadata for each agency
+ * Each agency has one contract template with customizable field positions
+ */
+export const contractTemplates = mysqlTable("contractTemplates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table (agency owner)
+  templateName: varchar("templateName", { length: 255 }).notNull(), // e.g., "Standard Rental Agreement"
+  templateUrl: text("templateUrl").notNull(), // S3 URL to the uploaded template file (PDF or image)
+  templateType: mysqlEnum("templateType", ["pdf", "image"]).notNull(), // File type: PDF or image
+  templateWidth: int("templateWidth").notNull(), // Width in pixels for display/editing
+  templateHeight: int("templateHeight").notNull(), // Height in pixels for display/editing
+  isActive: boolean("isActive").default(true).notNull(), // Whether this is the active template
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type ContractTemplate = typeof contractTemplates.$inferSelect;
+export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
+
+/**
+ * Template fields table - stores field configurations for contract templates
+ * Each field represents a data placeholder on the contract template (e.g., customer name, date, etc.)
+ */
+export const templateFields = mysqlTable("templateFields", {
+  id: int("id").autoincrement().primaryKey(),
+  templateId: int("templateId").notNull(), // Foreign key to contractTemplates table
+  fieldName: varchar("fieldName", { length: 100 }).notNull(), // e.g., "customerName", "rentalStartDate", "carPlateNumber"
+  fieldLabel: varchar("fieldLabel", { length: 200 }).notNull(), // Display label e.g., "Customer Name", "Rental Start Date"
+  fieldType: mysqlEnum("fieldType", ["text", "date", "number", "phone"]).default("text").notNull(), // Data type for validation
+  // Position and sizing
+  positionX: int("positionX").notNull(), // X coordinate in pixels
+  positionY: int("positionY").notNull(), // Y coordinate in pixels
+  width: int("width").notNull(), // Field width in pixels
+  height: int("height").notNull(), // Field height in pixels
+  // Text formatting
+  fontSize: int("fontSize").default(12).notNull(), // Font size in pixels
+  fontFamily: varchar("fontFamily", { length: 50 }).default("Arial").notNull(), // Font family
+  textAlignment: mysqlEnum("textAlignment", ["left", "center", "right"]).default("left").notNull(), // Text alignment
+  fontColor: varchar("fontColor", { length: 7 }).default("#000000").notNull(), // Hex color code
+  // Field configuration
+  isRequired: boolean("isRequired").default(false).notNull(), // Whether field must be filled
+  displayOrder: int("displayOrder").default(0).notNull(), // Order for displaying fields in forms
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type TemplateField = typeof templateFields.$inferSelect;
+export type InsertTemplateField = typeof templateFields.$inferInsert;
+
+/**
+ * Generated contracts table - stores filled contracts (PDFs) generated from templates
+ * Links a rental contract to its generated PDF for record keeping and retrieval
+ */
+export const generatedContracts = mysqlTable("generatedContracts", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // Foreign key to users table (agency owner)
+  rentalContractId: int("rentalContractId").notNull(), // Foreign key to rentalContracts table
+  templateId: int("templateId").notNull(), // Foreign key to contractTemplates table (template used)
+  pdfUrl: text("pdfUrl").notNull(), // S3 URL to the generated PDF file
+  pdfFileName: varchar("pdfFileName", { length: 255 }).notNull(), // Original filename for download
+  filledData: text("filledData"), // JSON string of field values used to generate the PDF
+  generatedAt: timestamp("generatedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type GeneratedContract = typeof generatedContracts.$inferSelect;
+export type InsertGeneratedContract = typeof generatedContracts.$inferInsert;

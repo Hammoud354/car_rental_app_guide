@@ -39,6 +39,7 @@ import Home from "./pages/Home";
 import AIMaintenance from "./pages/AIMaintenance";
 import AdminNumberingManagement from "./pages/AdminNumberingManagement";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
+import ContractManagement from "./pages/ContractManagement";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -77,6 +78,7 @@ function Router() {
       <Route path="/reservations" component={Reservations} />
       <Route path="/company-settings" component={CompanySettings} />
       <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
+      <Route path="/contract-management" component={ContractManagement} />
       <Route path="/invoices" component={Invoices} />
       {/* Final fallback route */}
       <Route component={NotFound} />

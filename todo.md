@@ -5696,3 +5696,19 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Check CSS styling for text visibility issues
 - [x] Verify text color contrast against background
 - [x] Test the fix in the browser
+
+
+## Fix Empty Black Rectangle on Admin Panel
+- [ ] Identify what element is causing the empty black rectangle
+- [ ] Fix the rendering issue
+- [ ] Verify the page displays correctly without the empty rectangle
+
+
+## Contract Template System
+- [x] Design database schema for contract templates and fields
+- [x] Create backend API for template upload and management
+- [x] Build visual template editor UI with drag-and-drop
+- [x] Implement field configuration (alignment, sizing)
+- [ ] Create PDF generation system
+- [ ] Build contract preview and PDF flow
+- [ ] Test end-to-end workflow

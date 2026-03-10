@@ -2317,5 +2317,99 @@ export const appRouter = router({
         return { success: true, subscription: result };
       }),
   }),
+  contractTemplate: router({
+    uploadTemplate: protectedProcedure
+      .input(z.object({
+        templateName: z.string().min(1),
+        templateUrl: z.string().url(),
+        templateType: z.enum(["pdf", "image"]),
+        templateWidth: z.number().positive(),
+        templateHeight: z.number().positive(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.createContractTemplate({
+          userId: ctx.user.id,
+          templateName: input.templateName,
+          templateUrl: input.templateUrl,
+          templateType: input.templateType,
+          templateWidth: input.templateWidth,
+          templateHeight: input.templateHeight,
+        });
+        return { success: true, templateId: result.insertId || 0 };
+      }),
+    
+    getTemplate: protectedProcedure.query(async ({ ctx }) => {
+      const template = await db.getContractTemplate(ctx.user.id);
+      if (!template) {
+        return null;
+      }
+      return template;
+    }),
+    
+    saveFields: protectedProcedure
+      .input(z.object({
+        templateId: z.number(),
+        fields: z.array(z.object({
+          fieldName: z.string(),
+          fieldLabel: z.string(),
+          fieldType: z.string().optional(),
+          positionX: z.number(),
+          positionY: z.number(),
+          width: z.number(),
+          height: z.number(),
+          fontSize: z.number().optional(),
+          fontFamily: z.string().optional(),
+          textAlignment: z.enum(["left", "center", "right"]).optional(),
+          fontColor: z.string().optional(),
+          isRequired: z.boolean().optional(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify template belongs to user
+        const template = await db.getContractTemplate(ctx.user.id);
+        if (!template || template.id !== input.templateId) {
+          throw new Error("Template not found or access denied");
+        }
+        
+        await db.updateTemplateFields(input.templateId, input.fields);
+        return { success: true };
+      }),
+    
+    saveGeneratedContract: protectedProcedure
+      .input(z.object({
+        rentalContractId: z.number(),
+        templateId: z.number(),
+        pdfUrl: z.string().url(),
+        pdfFileName: z.string(),
+        filledData: z.record(z.string(), z.any()),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.saveGeneratedContract({
+          userId: ctx.user.id,
+          rentalContractId: input.rentalContractId,
+          templateId: input.templateId,
+          pdfUrl: input.pdfUrl,
+          pdfFileName: input.pdfFileName,
+          filledData: input.filledData,
+        });
+        return { success: true };
+      }),
+    
+    getGeneratedContract: protectedProcedure
+      .input(z.object({
+        rentalContractId: z.number(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const contract = await db.getGeneratedContract(input.rentalContractId);
+        if (!contract) {
+          return null;
+        }
+        // Verify user owns this contract
+        if (contract.userId !== ctx.user.id) {
+          throw new Error("Access denied");
+        }
+        return contract;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
