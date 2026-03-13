@@ -5761,3 +5761,12 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 
 - [ ] Fix dashboard buttons layout on desktop - should be on same line and enlarged
 - [ ] Make Expiring Docs card clickable to open modal
+
+
+## Form Issues - Bug Fixes (Mar 13, 2026)
+
+- [ ] Fix date picker z-index and positioning to prevent overlap with form fields
+- [ ] Fix client form data structure - missing required fields in INSERT statement
+- [ ] Fix Date of Birth and Place of Birth field alignment in client form
+- [ ] Add proper form validation before submission
+- [ ] Test all forms and verify fixes work correctly

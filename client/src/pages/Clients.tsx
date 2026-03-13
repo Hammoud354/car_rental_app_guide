@@ -162,6 +162,10 @@ export default function Clients() {
       toast.error("License expiry date is required");
       return;
     }
+    if (!createLicenseIssueDate) {
+      toast.error("License issue date is required");
+      return;
+    }
     
     createClient.mutate({
       firstName,
@@ -394,18 +398,20 @@ export default function Clients() {
                         <Label htmlFor="address">Address</Label>
                         <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="col-span-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="col-span-1 w-full">
                           <Label>Date of Birth</Label>
-                          <DatePickerWithYearNav
-                            date={createDateOfBirth}
-                            onDateChange={setCreateDateOfBirth}
-                            placeholder="Select date of birth"
-                          />
+                          <div className="w-full">
+                            <DatePickerWithYearNav
+                              date={createDateOfBirth}
+                              onDateChange={setCreateDateOfBirth}
+                              placeholder="Select date of birth"
+                            />
+                          </div>
                         </div>
-                        <div className="col-span-1">
+                        <div className="col-span-1 w-full">
                           <Label htmlFor="placeOfBirth">Place of Birth</Label>
-                          <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client" />
+                          <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
                         </div>
                         <div className="col-span-1">
                           <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
