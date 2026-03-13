@@ -5770,3 +5770,15 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [ ] Fix Date of Birth and Place of Birth field alignment in client form
 - [ ] Add proper form validation before submission
 - [ ] Test all forms and verify fixes work correctly
+
+## Date Picker Redesign - Modern SaaS Styling (Mar 13, 2026)
+- [x] Fix text overlap in Date of Birth field ("Select date of" overlapping with placeholder)
+- [x] Create modern date picker component with SaaS styling
+- [x] Improve date picker calendar size and spacing
+- [x] Add hover effects to calendar days
+- [x] Add clear highlight for selected date
+- [x] Make month/year navigation arrows more visible
+- [x] Highlight today's date with subtle border
+- [x] Add smooth animations when switching months
+- [x] Apply modern date picker to all date fields (Clients, Fleet, etc.)
+- [x] Test date picker on mobile, tablet, desktop

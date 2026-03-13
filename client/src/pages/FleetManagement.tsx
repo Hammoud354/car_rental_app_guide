@@ -24,6 +24,7 @@ import { SearchableSelect } from "@/components/SearchableSelect";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
 import { exportVehiclesToCSV } from "@shared/csvExport";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 
 export default function FleetManagement() {
   const utils = trpc.useUtils();
@@ -654,7 +655,7 @@ export default function FleetManagement() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="col-span-1">
                       <Label>Policy Start Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={insuranceStartDate}
                         onDateChange={setInsuranceStartDate}
                         placeholder="Select start date"
@@ -684,7 +685,7 @@ export default function FleetManagement() {
 
                 <div>
                   <Label>Registration Expiry Date</Label>
-                  <DatePickerWithYearNav
+                  <ModernDatePicker
                     date={registrationExpiryDate}
                     onDateChange={setRegistrationExpiryDate}
                     placeholder="Select expiry date"
@@ -693,7 +694,7 @@ export default function FleetManagement() {
 
                 <div>
                   <Label>Next Maintenance Date</Label>
-                  <DatePickerWithYearNav
+                  <ModernDatePicker
                     date={nextMaintenanceDate}
                     onDateChange={setNextMaintenanceDate}
                     placeholder="Select maintenance date"
@@ -769,7 +770,7 @@ export default function FleetManagement() {
                     
                     <div>
                       <Label>Purchase Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editPurchaseDate}
                         onDateChange={setEditPurchaseDate}
                         placeholder="Select purchase date"
@@ -818,7 +819,7 @@ export default function FleetManagement() {
                     
                     <div>
                       <Label>Last Service Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editLastServiceDate}
                         onDateChange={setEditLastServiceDate}
                         placeholder="Select last service date"
@@ -1208,7 +1209,7 @@ export default function FleetManagement() {
 
                   <div>
                     <Label>Policy Start Date</Label>
-                    <DatePickerWithYearNav
+                    <ModernDatePicker
                       date={editInsuranceStartDate}
                       onDateChange={setEditInsuranceStartDate}
                       placeholder="Select start date"
@@ -1217,7 +1218,7 @@ export default function FleetManagement() {
 
                   <div>
                     <Label>Policy Expiry Date</Label>
-                    <DatePickerWithYearNav
+                    <ModernDatePicker
                       date={editInsuranceExpiryDate}
                       onDateChange={setEditInsuranceExpiryDate}
                       placeholder="Select expiry date"
@@ -1240,7 +1241,7 @@ export default function FleetManagement() {
 
                 <div>
                   <Label>Registration Expiry Date</Label>
-                  <DatePickerWithYearNav
+                  <ModernDatePicker
                     date={editRegistrationExpiryDate}
                     onDateChange={setEditRegistrationExpiryDate}
                     placeholder="Select expiry date"

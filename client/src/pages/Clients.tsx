@@ -14,6 +14,7 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
@@ -401,13 +402,11 @@ export default function Clients() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="col-span-1 w-full">
                           <Label>Date of Birth</Label>
-                          <div className="w-full">
-                            <DatePickerWithYearNav
-                              date={createDateOfBirth}
-                              onDateChange={setCreateDateOfBirth}
-                              placeholder="Select date of birth"
-                            />
-                          </div>
+                          <ModernDatePicker
+                            date={createDateOfBirth}
+                            onDateChange={setCreateDateOfBirth}
+                            placeholder="Select date"
+                          />
                         </div>
                         <div className="col-span-1 w-full">
                           <Label htmlFor="placeOfBirth">Place of Birth</Label>
@@ -651,10 +650,10 @@ export default function Clients() {
                     </div>
                     <div>
                       <Label>Date of Birth</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editDateOfBirth}
                         onDateChange={setEditDateOfBirth}
-                        placeholder="Select date of birth"
+                        placeholder="Select date"
                       />
                     </div>
                     <div>
