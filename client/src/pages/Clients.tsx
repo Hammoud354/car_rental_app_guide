@@ -425,12 +425,12 @@ export default function Clients() {
                   {/* Driving License */}
                   <div className="border-t border-gray-700 pt-4">
                     <h3 className="font-semibold mb-4">Driving License</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="col-span-1 sm:col-span-2">
+                    <div className="space-y-4">
+                      <div>
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                       </div>
-                      <div className="col-span-1">
+                      <div>
                         <DateDropdownSelector
                           id="licenseIssueDate"
                           label="Issue Date"
@@ -439,7 +439,7 @@ export default function Clients() {
                           maxDate={new Date()}
                         />
                       </div>
-                      <div className="col-span-1">
+                      <div>
                         <DateDropdownSelector
                           id="licenseExpiryDate"
                           label="Expiry Date *"
@@ -672,8 +672,8 @@ export default function Clients() {
                 {/* Driving License */}
                 <div className="border-t border-gray-700 pt-4">
                   <h3 className="font-semibold mb-4">Driving License</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="col-span-2">
+                  <div className="space-y-4">
+                    <div>
                       <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
                       <Input id="edit-drivingLicenseNumber" name="drivingLicenseNumber" defaultValue={selectedClient.drivingLicenseNumber} required className="input-client" />
                     </div>

@@ -5811,3 +5811,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Create MaintenanceModal component for viewing maintenance records
 - [x] Apply popup functionality to Maintenance dashboard card
 - [x] Test popup on desktop and mobile screens - Modal opens and displays correctly
+
+## Driving License Form Field Layout Fix (Mar 14, 2026)
+- [x] Fix License Number field layout
+- [x] Fix Issue Date and Expiry Date field overlap
+- [x] Ensure proper spacing and alignment on desktop and mobile - All fields now display on separate lines
