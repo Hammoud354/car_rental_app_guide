@@ -5790,3 +5790,8 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix Registration Number field layout on desktop
 - [x] Ensure fields display on separate lines on desktop version
 - [x] Test layout on mobile, tablet, and desktop
+
+## Database Cleanup & Integrity (Mar 14, 2026)
+- [x] Delete orphaned vehicles (vehicles with invalid userId references) - 48 orphaned vehicles deleted
+- [x] Add foreign key constraint to vehicles table to prevent future orphaned records
+- [x] Verify cleanup results and test application - 10 valid vehicles remain, all with valid users

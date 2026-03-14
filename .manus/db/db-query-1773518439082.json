@@ -1,0 +1,25 @@
+{
+  "query": "\n-- First, let's see exactly how many orphaned vehicles we're about to delete\nSELECT COUNT(*) as orphaned_count FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n\n-- Delete orphaned vehicles\nDELETE FROM vehicles WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify the deletion\nSELECT COUNT(*) as remaining_vehicles FROM vehicles;\nSELECT COUNT(*) as remaining_orphaned FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- First, let's see exactly how many orphaned vehicles we're about to delete\nSELECT COUNT(*) as orphaned_count FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n\n-- Delete orphaned vehicles\nDELETE FROM vehicles WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify the deletion\nSELECT COUNT(*) as remaining_vehicles FROM vehicles;\nSELECT COUNT(*) as remaining_orphaned FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n",
+  "rows": [
+    {
+      "orphaned_count": "46"
+    },
+    {
+      "orphaned_count": "remaining_vehicles"
+    },
+    {
+      "orphaned_count": "10"
+    },
+    {
+      "orphaned_count": "remaining_orphaned"
+    },
+    {
+      "orphaned_count": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "orphaned_count\n46\nremaining_vehicles\n10\nremaining_orphaned\n0\n",
+  "stderr": "",
+  "execution_time_ms": 2242
+}

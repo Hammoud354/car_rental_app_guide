@@ -1,0 +1,22 @@
+{
+  "query": "\n-- Check if foreign key constraint exists\nSELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME \nFROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE \nWHERE TABLE_NAME = 'vehicles' AND COLUMN_NAME = 'userId';\n\n-- Verify vehicle count\nSELECT COUNT(*) as total_vehicles FROM vehicles;\n\n-- Verify no orphaned vehicles exist\nSELECT COUNT(*) as orphaned_vehicles FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Check if foreign key constraint exists\nSELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME \nFROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE \nWHERE TABLE_NAME = 'vehicles' AND COLUMN_NAME = 'userId';\n\n-- Verify vehicle count\nSELECT COUNT(*) as total_vehicles FROM vehicles;\n\n-- Verify no orphaned vehicles exist\nSELECT COUNT(*) as orphaned_vehicles FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n",
+  "rows": [
+    {
+      "CONSTRAINT_NAME": "vehicles_userId_users_id_fk",
+      "TABLE_NAME": "vehicles",
+      "COLUMN_NAME": "userId",
+      "REFERENCED_TABLE_NAME": "users",
+      "REFERENCED_COLUMN_NAME": "id"
+    }
+  ],
+  "messages": [
+    "total_vehicles",
+    "10",
+    "orphaned_vehicles",
+    "0"
+  ],
+  "stdout": "CONSTRAINT_NAME\tTABLE_NAME\tCOLUMN_NAME\tREFERENCED_TABLE_NAME\tREFERENCED_COLUMN_NAME\nvehicles_userId_users_id_fk\tvehicles\tuserId\tusers\tid\ntotal_vehicles\n10\norphaned_vehicles\n0\n",
+  "stderr": "",
+  "execution_time_ms": 1932
+}

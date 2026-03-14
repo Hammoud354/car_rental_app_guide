@@ -1,0 +1,112 @@
+{
+  "query": "\n-- Count total vehicles\nSELECT COUNT(*) as total_vehicles FROM vehicles;\n\n-- Count vehicles with NULL userId\nSELECT COUNT(*) as vehicles_with_null_userid FROM vehicles WHERE userId IS NULL;\n\n-- Count vehicles grouped by userId\nSELECT userId, COUNT(*) as vehicle_count FROM vehicles GROUP BY userId ORDER BY vehicle_count DESC;\n\n-- Find vehicles whose userId doesn't exist in users table (orphaned)\nSELECT COUNT(*) as orphaned_vehicles FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n\n-- Show details of orphaned vehicles\nSELECT v.id, v.userId, v.plateNumber, v.brand, v.model FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users) LIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Count total vehicles\nSELECT COUNT(*) as total_vehicles FROM vehicles;\n\n-- Count vehicles with NULL userId\nSELECT COUNT(*) as vehicles_with_null_userid FROM vehicles WHERE userId IS NULL;\n\n-- Count vehicles grouped by userId\nSELECT userId, COUNT(*) as vehicle_count FROM vehicles GROUP BY userId ORDER BY vehicle_count DESC;\n\n-- Find vehicles whose userId doesn't exist in users table (orphaned)\nSELECT COUNT(*) as orphaned_vehicles FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users);\n\n-- Show details of orphaned vehicles\nSELECT v.id, v.userId, v.plateNumber, v.brand, v.model FROM vehicles v WHERE v.userId NOT IN (SELECT id FROM users) LIMIT 10;\n",
+  "rows": [
+    {
+      "total_vehicles": "56"
+    },
+    {
+      "total_vehicles": "vehicles_with_null_userid"
+    },
+    {
+      "total_vehicles": "0"
+    },
+    {
+      "total_vehicles": "userId\tvehicle_count"
+    },
+    {
+      "total_vehicles": "1\t16"
+    },
+    {
+      "total_vehicles": "2730024\t15"
+    },
+    {
+      "total_vehicles": "3240001\t10"
+    },
+    {
+      "total_vehicles": "2430007\t2"
+    },
+    {
+      "total_vehicles": "2880003\t1"
+    },
+    {
+      "total_vehicles": "2820001\t1"
+    },
+    {
+      "total_vehicles": "2880001\t1"
+    },
+    {
+      "total_vehicles": "3300008\t1"
+    },
+    {
+      "total_vehicles": "3300009\t1"
+    },
+    {
+      "total_vehicles": "2790001\t1"
+    },
+    {
+      "total_vehicles": "3300005\t1"
+    },
+    {
+      "total_vehicles": "3300003\t1"
+    },
+    {
+      "total_vehicles": "3300004\t1"
+    },
+    {
+      "total_vehicles": "3300007\t1"
+    },
+    {
+      "total_vehicles": "3300006\t1"
+    },
+    {
+      "total_vehicles": "3300010\t1"
+    },
+    {
+      "total_vehicles": "2880002\t1"
+    },
+    {
+      "total_vehicles": "orphaned_vehicles"
+    },
+    {
+      "total_vehicles": "46"
+    },
+    {
+      "total_vehicles": "id\tuserId\tplateNumber\tbrand\tmodel"
+    },
+    {
+      "total_vehicles": "480067\t1\tVH-001\tToyota\tCorolla"
+    },
+    {
+      "total_vehicles": "480068\t1\tVH-002\tHonda\tCivic"
+    },
+    {
+      "total_vehicles": "480069\t1\tVH-003\tMazda\tMazda3"
+    },
+    {
+      "total_vehicles": "480070\t1\tVH-004\tKia\tCerato"
+    },
+    {
+      "total_vehicles": "480071\t1\tVH-005\tHyundai\tElantra"
+    },
+    {
+      "total_vehicles": "480072\t1\tVH-006\tNissan\tAltima"
+    },
+    {
+      "total_vehicles": "480073\t1\tVH-007\tFord\tFocus"
+    },
+    {
+      "total_vehicles": "480074\t1\tVH-008\tChevrolet\tMalibu"
+    },
+    {
+      "total_vehicles": "480075\t1\tVH-009\tVolkswagen\tGolf"
+    },
+    {
+      "total_vehicles": "480076\t1\tVH-010\tSubaru\tLegacy"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_vehicles\n56\nvehicles_with_null_userid\n0\nuserId\tvehicle_count\n1\t16\n2730024\t15\n3240001\t10\n2430007\t2\n2880003\t1\n2820001\t1\n2880001\t1\n3300008\t1\n3300009\t1\n2790001\t1\n3300005\t1\n3300003\t1\n3300004\t1\n3300007\t1\n3300006\t1\n3300010\t1\n2880002\t1\norphaned_vehicles\n46\nid\tuserId\tplateNumber\tbrand\tmodel\n480067\t1\tVH-001\tToyota\tCorolla\n480068\t1\tVH-002\tHonda\tCivic\n480069\t1\tVH-003\tMazda\tMazda3\n480070\t1\tVH-004\tKia\tCerato\n480071\t1\tVH-005\tHyundai\tElantra\n480072\t1\tVH-006\tNissan\tAltima\n480073\t1\tVH-007\tFord\tFocus\n480074\t1\tVH-008\tChevrolet\tMalibu\n480075\t1\tVH-009\tVolkswagen\tGolf\n480076\t1\tVH-010\tSubaru\tLegacy\n",
+  "stderr": "",
+  "execution_time_ms": 2916
+}

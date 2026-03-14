@@ -80,51 +80,56 @@ export type InsertCompanyProfile = typeof companyProfiles.$inferInsert;
 /**
  * Vehicles table for fleet management
  */
-export const vehicles = mysqlTable("vehicles", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
-  plateNumber: varchar("plateNumber", { length: 20 }).notNull().unique(),
-  brand: varchar("brand", { length: 100 }).notNull(),
-  model: varchar("model", { length: 100 }).notNull(),
-  year: int("year").notNull(),
-  color: varchar("color", { length: 50 }).notNull(),
-  category: mysqlEnum("category", ["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]).notNull(),
-  status: mysqlEnum("status", ["Available", "Rented", "Maintenance", "Out of Service"]).default("Available").notNull(),
-  dailyRate: decimal("dailyRate", { precision: 10, scale: 2 }).notNull(),
-  weeklyRate: decimal("weeklyRate", { precision: 10, scale: 2 }),
-  monthlyRate: decimal("monthlyRate", { precision: 10, scale: 2 }),
-  mileage: int("mileage").default(0),
-  vin: varchar("vin", { length: 17 }),
-  insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 100 }),
-  insuranceProvider: varchar("insuranceProvider", { length: 200 }), // Insurance company name
-  insurancePolicyStartDate: timestamp("insurancePolicyStartDate"), // When current policy started
-  insuranceExpiryDate: timestamp("insuranceExpiryDate"), // When current policy expires (1 year from start)
-  insuranceAnnualPremium: decimal("insuranceAnnualPremium", { precision: 10, scale: 2 }), // Annual insurance premium cost
-  insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Legacy field - kept for backward compatibility
-  purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
-  registrationExpiryDate: timestamp("registrationExpiryDate"),
-  // AI Maintenance - Vehicle specifications for intelligent scheduling
-  engineType: varchar("engineType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Hybrid", "Electric"
-  transmission: varchar("transmission", { length: 50 }), // e.g., "Automatic", "Manual", "CVT"
-  fuelType: varchar("fuelType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Electric", "Hybrid"
-  engineSize: varchar("engineSize", { length: 20 }), // e.g., "2.0L", "1.6L"
-  purchaseDate: timestamp("purchaseDate"), // When vehicle was acquired
-  averageDailyKm: int("averageDailyKm"), // Average daily usage for predictive maintenance
-  usagePattern: varchar("usagePattern", { length: 50 }), // e.g., "City", "Highway", "Mixed"
-  climate: varchar("climate", { length: 50 }), // e.g., "Hot", "Cold", "Moderate", "Humid"
-  lastServiceDate: timestamp("lastServiceDate"), // Last major service date
-  lastServiceKm: int("lastServiceKm"), // Mileage at last service
-  // Maintenance schedule tracking
-  nextMaintenanceDate: timestamp("nextMaintenanceDate"), // Next scheduled maintenance date
-  nextMaintenanceKm: int("nextMaintenanceKm"), // Next maintenance at this mileage
-  maintenanceIntervalKm: int("maintenanceIntervalKm").default(5000), // Maintenance every X km (default 5000km)
-  maintenanceIntervalMonths: int("maintenanceIntervalMonths").default(6), // Maintenance every X months (default 6 months)
-  aiMaintenanceEnabled: boolean("aiMaintenanceEnabled").default(true), // Whether AI maintenance is enabled for this vehicle
-  photoUrl: text("photoUrl"),
-  notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
+export const vehicles = mysqlTable(
+  "vehicles",
+  {
+    id: int("id").autoincrement().primaryKey(),
+    userId: int("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+    plateNumber: varchar("plateNumber", { length: 20 }).notNull().unique(),
+    brand: varchar("brand", { length: 100 }).notNull(),
+    model: varchar("model", { length: 100 }).notNull(),
+    year: int("year").notNull(),
+    color: varchar("color", { length: 50 }).notNull(),
+    category: mysqlEnum("category", ["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]).notNull(),
+    status: mysqlEnum("status", ["Available", "Rented", "Maintenance", "Out of Service"]).default("Available").notNull(),
+    dailyRate: decimal("dailyRate", { precision: 10, scale: 2 }).notNull(),
+    weeklyRate: decimal("weeklyRate", { precision: 10, scale: 2 }),
+    monthlyRate: decimal("monthlyRate", { precision: 10, scale: 2 }),
+    mileage: int("mileage").default(0),
+    vin: varchar("vin", { length: 17 }),
+    insurancePolicyNumber: varchar("insurancePolicyNumber", { length: 100 }),
+    insuranceProvider: varchar("insuranceProvider", { length: 200 }), // Insurance company name
+    insurancePolicyStartDate: timestamp("insurancePolicyStartDate"), // When current policy started
+    insuranceExpiryDate: timestamp("insuranceExpiryDate"), // When current policy expires (1 year from start)
+    insuranceAnnualPremium: decimal("insuranceAnnualPremium", { precision: 10, scale: 2 }), // Annual insurance premium cost
+    insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }), // Legacy field - kept for backward compatibility
+    purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }), // Vehicle purchase cost for P&L analysis
+    registrationExpiryDate: timestamp("registrationExpiryDate"),
+    // AI Maintenance - Vehicle specifications for intelligent scheduling
+    engineType: varchar("engineType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Hybrid", "Electric"
+    transmission: varchar("transmission", { length: 50 }), // e.g., "Automatic", "Manual", "CVT"
+    fuelType: varchar("fuelType", { length: 50 }), // e.g., "Gasoline", "Diesel", "Electric", "Hybrid"
+    engineSize: varchar("engineSize", { length: 20 }), // e.g., "2.0L", "1.6L"
+    purchaseDate: timestamp("purchaseDate"), // When vehicle was acquired
+    averageDailyKm: int("averageDailyKm"), // Average daily usage for predictive maintenance
+    usagePattern: varchar("usagePattern", { length: 50 }), // e.g., "City", "Highway", "Mixed"
+    climate: varchar("climate", { length: 50 }), // e.g., "Hot", "Cold", "Moderate", "Humid"
+    lastServiceDate: timestamp("lastServiceDate"), // Last major service date
+    lastServiceKm: int("lastServiceKm"), // Mileage at last service
+    // Maintenance schedule tracking
+    nextMaintenanceDate: timestamp("nextMaintenanceDate"), // Next scheduled maintenance date
+    nextMaintenanceKm: int("nextMaintenanceKm"), // Next maintenance at this mileage
+    maintenanceIntervalKm: int("maintenanceIntervalKm").default(5000), // Maintenance every X km (default 5000km)
+    maintenanceIntervalMonths: int("maintenanceIntervalMonths").default(6), // Maintenance every X months (default 6 months)
+    aiMaintenanceEnabled: boolean("aiMaintenanceEnabled").default(true), // Whether AI maintenance is enabled for this vehicle
+    photoUrl: text("photoUrl"),
+    notes: text("notes"),
+    createdAt: timestamp("createdAt").defaultNow().notNull(),
+    updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  }
+);
 
 export type Vehicle = typeof vehicles.$inferSelect;
 export type InsertVehicle = typeof vehicles.$inferInsert;
