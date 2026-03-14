@@ -85,7 +85,7 @@ export function ModernDatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0 border border-gray-300 shadow-md rounded-lg overflow-hidden bg-white" 
+        className="w-auto p-0 border border-gray-300 shadow-md rounded-lg overflow-visible bg-white" 
         align="start"
       >
         {/* Compact Header with Year and Month Selection */}
@@ -102,10 +102,10 @@ export function ModernDatePicker({
 
           <div className="flex items-center gap-1 flex-1 justify-center min-w-0">
             <Select value={currentYear.toString()} onValueChange={handleYearChange}>
-              <SelectTrigger className="w-[70px] h-7 text-xs font-semibold border-gray-300 bg-white hover:bg-gray-50 px-2">
+              <SelectTrigger className="w-[70px] h-7 text-xs font-semibold border-gray-300 bg-white hover:bg-gray-50 px-2 z-50">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="max-h-[200px]">
+              <SelectContent className="max-h-[200px] z-50">
                 {years.map((year) => (
                   <SelectItem key={year} value={year.toString()} className="text-xs">
                     {year}
@@ -123,7 +123,7 @@ export function ModernDatePicker({
             variant="ghost"
             size="sm"
             onClick={() => handleMonthChange('next')}
-            className="h-7 w-7 p-0 hover:bg-gray-200 rounded transition-colors"
+            className="h-7 w-7 p-0 hover:bg-200 rounded transition-colors"
             title="Next month"
           >
             <ChevronRight className="h-4 w-4 text-gray-700" />
