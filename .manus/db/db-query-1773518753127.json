@@ -1,0 +1,52 @@
+{
+  "query": "\n-- Check table structure and identify key relationships\nSELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME\nFROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE\nWHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL\nORDER BY TABLE_NAME, COLUMN_NAME;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Check table structure and identify key relationships\nSELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME\nFROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE\nWHERE TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME IS NOT NULL\nORDER BY TABLE_NAME, COLUMN_NAME;\n",
+  "rows": [
+    {
+      "TABLE_NAME": "subscriptionAuditLog",
+      "COLUMN_NAME": "newTierId",
+      "CONSTRAINT_NAME": "fk_3",
+      "REFERENCED_TABLE_NAME": "subscriptionTiers",
+      "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+      "TABLE_NAME": "subscriptionAuditLog",
+      "COLUMN_NAME": "previousTierId",
+      "CONSTRAINT_NAME": "fk_2",
+      "REFERENCED_TABLE_NAME": "subscriptionTiers",
+      "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+      "TABLE_NAME": "subscriptionAuditLog",
+      "COLUMN_NAME": "userId",
+      "CONSTRAINT_NAME": "fk_1",
+      "REFERENCED_TABLE_NAME": "users",
+      "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+      "TABLE_NAME": "userSubscriptions",
+      "COLUMN_NAME": "tierId",
+      "CONSTRAINT_NAME": "fk_2",
+      "REFERENCED_TABLE_NAME": "subscriptionTiers",
+      "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+      "TABLE_NAME": "userSubscriptions",
+      "COLUMN_NAME": "userId",
+      "CONSTRAINT_NAME": "fk_1",
+      "REFERENCED_TABLE_NAME": "users",
+      "REFERENCED_COLUMN_NAME": "id"
+    },
+    {
+      "TABLE_NAME": "vehicles",
+      "COLUMN_NAME": "userId",
+      "CONSTRAINT_NAME": "vehicles_userId_users_id_fk",
+      "REFERENCED_TABLE_NAME": "users",
+      "REFERENCED_COLUMN_NAME": "id"
+    }
+  ],
+  "messages": [],
+  "stdout": "TABLE_NAME\tCOLUMN_NAME\tCONSTRAINT_NAME\tREFERENCED_TABLE_NAME\tREFERENCED_COLUMN_NAME\nsubscriptionAuditLog\tnewTierId\tfk_3\tsubscriptionTiers\tid\nsubscriptionAuditLog\tpreviousTierId\tfk_2\tsubscriptionTiers\tid\nsubscriptionAuditLog\tuserId\tfk_1\tusers\tid\nuserSubscriptions\ttierId\tfk_2\tsubscriptionTiers\tid\nuserSubscriptions\tuserId\tfk_1\tusers\tid\nvehicles\tuserId\tvehicles_userId_users_id_fk\tusers\tid\n",
+  "stderr": "",
+  "execution_time_ms": 1526
+}

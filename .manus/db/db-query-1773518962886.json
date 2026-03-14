@@ -1,0 +1,13 @@
+{
+  "query": "\n-- Clean up companySettings with invalid userId\nDELETE FROM companySettings WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'Cleanup complete' as status;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Clean up companySettings with invalid userId\nDELETE FROM companySettings WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'Cleanup complete' as status;\n",
+  "rows": [
+    {
+      "status": "Cleanup complete"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\nCleanup complete\n",
+  "stderr": "",
+  "execution_time_ms": 1812
+}

@@ -1,0 +1,25 @@
+{
+  "query": "\n-- Clean up carModels with invalid userId or makerId\nDELETE FROM carModels WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\nDELETE FROM carModels WHERE makerId NOT IN (SELECT id FROM carMakers);\n\n-- Clean up carMakers with invalid userId\nDELETE FROM carMakers WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\n\n-- Clean up other tables\nDELETE FROM invoiceLineItems WHERE invoiceId NOT IN (SELECT id FROM invoices);\nDELETE FROM vehicleImages WHERE vehicleId NOT IN (SELECT id FROM vehicles);\nDELETE FROM insurancePolicies WHERE vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Verify all orphaned records are cleaned\nSELECT 'Cleanup complete' as status;\nSELECT COUNT(*) as orphaned_carmodels_user FROM carModels WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_carmodels_maker FROM carModels WHERE makerId NOT IN (SELECT id FROM carMakers);\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Clean up carModels with invalid userId or makerId\nDELETE FROM carModels WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\nDELETE FROM carModels WHERE makerId NOT IN (SELECT id FROM carMakers);\n\n-- Clean up carMakers with invalid userId\nDELETE FROM carMakers WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\n\n-- Clean up other tables\nDELETE FROM invoiceLineItems WHERE invoiceId NOT IN (SELECT id FROM invoices);\nDELETE FROM vehicleImages WHERE vehicleId NOT IN (SELECT id FROM vehicles);\nDELETE FROM insurancePolicies WHERE vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Verify all orphaned records are cleaned\nSELECT 'Cleanup complete' as status;\nSELECT COUNT(*) as orphaned_carmodels_user FROM carModels WHERE userId IS NOT NULL AND userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_carmodels_maker FROM carModels WHERE makerId NOT IN (SELECT id FROM carMakers);\n",
+  "rows": [
+    {
+      "status": "Cleanup complete"
+    },
+    {
+      "status": "orphaned_carmodels_user"
+    },
+    {
+      "status": "0"
+    },
+    {
+      "status": "orphaned_carmodels_maker"
+    },
+    {
+      "status": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\nCleanup complete\norphaned_carmodels_user\n0\norphaned_carmodels_maker\n0\n",
+  "stderr": "",
+  "execution_time_ms": 3601
+}

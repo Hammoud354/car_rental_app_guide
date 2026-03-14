@@ -139,8 +139,8 @@ export type InsertVehicle = typeof vehicles.$inferInsert;
  */
 export const maintenanceRecords = mysqlTable("maintenanceRecords", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
-  vehicleId: int("vehicleId").notNull(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+  vehicleId: int("vehicleId").notNull().references(() => vehicles.id, { onDelete: "cascade" }), // Foreign key to vehicles table with cascade delete
   maintenanceType: mysqlEnum("maintenanceType", [
     "Routine", 
     "Repair", 
@@ -172,8 +172,8 @@ export type InsertMaintenanceRecord = typeof maintenanceRecords.$inferInsert;
  */
 export const maintenanceTasks = mysqlTable("maintenanceTasks", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
-  vehicleId: int("vehicleId").notNull(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+  vehicleId: int("vehicleId").notNull().references(() => vehicles.id, { onDelete: "cascade" }), // Foreign key to vehicles table with cascade delete
   taskName: varchar("taskName", { length: 200 }).notNull(), // e.g., "Engine Oil Change", "Brake Inspection"
   description: text("description"), // Detailed description of the task
   priority: mysqlEnum("priority", ["Critical", "Important", "Recommended", "Optional"]).notNull(),
@@ -210,7 +210,7 @@ export type InsertMaintenanceTask = typeof maintenanceTasks.$inferInsert;
  */
 export const clients = mysqlTable("clients", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
   firstName: varchar("firstName", { length: 100 }).notNull(),
   lastName: varchar("lastName", { length: 100 }).notNull(),
   fatherName: varchar("fatherName", { length: 200 }).notNull(), // Client's father's name
@@ -239,9 +239,9 @@ export type InsertClient = typeof clients.$inferInsert;
  */
 export const rentalContracts = mysqlTable("rentalContracts", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
-  vehicleId: int("vehicleId").notNull(),
-  clientId: int("clientId"), // Optional: reference to clients table if using existing client
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+  vehicleId: int("vehicleId").notNull().references(() => vehicles.id, { onDelete: "cascade" }), // Foreign key to vehicles table with cascade delete
+  clientId: int("clientId").references(() => clients.id, { onDelete: "set null" }), // Optional: reference to clients table if using existing client
   // Keep inline client fields for backward compatibility and quick contracts without pre-registered clients
   clientFirstName: varchar("clientFirstName", { length: 100 }),
   clientLastName: varchar("clientLastName", { length: 100 }),
@@ -308,8 +308,8 @@ export type InsertRentalContract = typeof rentalContracts.$inferInsert;
  */
 export const damageMarks = mysqlTable("damageMarks", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(), // Foreign key to users table
-  contractId: int("contractId").notNull(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+  contractId: int("contractId").notNull().references(() => rentalContracts.id, { onDelete: "cascade" }), // Foreign key to rental contracts with cascade delete
   xPosition: decimal("xPosition", { precision: 5, scale: 2 }).notNull(), // Percentage position
   yPosition: decimal("yPosition", { precision: 5, scale: 2 }).notNull(), // Percentage position
   description: varchar("description", { length: 500 }),
@@ -339,11 +339,11 @@ export type InsertCarMaker = typeof carMakers.$inferInsert;
  */
 export const carModels = mysqlTable("carModels", {
   id: int("id").autoincrement().primaryKey(),
-  makerId: int("makerId").notNull(), // Foreign key to carMakers
+  makerId: int("makerId").notNull().references(() => carMakers.id, { onDelete: "cascade" }), // Foreign key to carMakers with cascade delete
   modelName: varchar("modelName", { length: 100 }).notNull(),
   year: int("year"), // Optional year for specific model years
   isCustom: boolean("isCustom").default(false).notNull(), // True if added by user
-  userId: int("userId"), // User who added this custom model
+  userId: int("userId").references(() => users.id, { onDelete: "cascade" }), // User who added this custom model with cascade delete
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -356,7 +356,7 @@ export type InsertCarModel = typeof carModels.$inferInsert;
  */
 export const companySettings = mysqlTable("companySettings", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull().unique(), // One settings record per user
+  userId: int("userId").notNull().unique().references(() => users.id, { onDelete: "cascade" }), // One settings record per user with cascade delete
   companyName: varchar("companyName", { length: 255 }).notNull(),
   logo: text("logo"), // S3 URL for company logo
   address: text("address"),
@@ -380,8 +380,8 @@ export type InsertCompanySettings = typeof companySettings.$inferInsert;
  */
 export const invoices = mysqlTable("invoices", {
   id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
-  contractId: int("contractId").notNull(),
+  userId: int("userId").notNull().references(() => users.id, { onDelete: "cascade" }), // Foreign key to users table with cascade delete
+  contractId: int("contractId").notNull().references(() => rentalContracts.id, { onDelete: "cascade" }), // Foreign key to rental contracts with cascade delete
   invoiceNumber: varchar("invoiceNumber", { length: 50 }).notNull().unique(),
   invoiceDate: date("invoiceDate").notNull(),
   dueDate: date("dueDate").notNull(),

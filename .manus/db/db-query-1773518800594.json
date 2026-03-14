@@ -1,0 +1,21 @@
+{
+  "query": "\n-- Get all orphaned record counts in one query\nSELECT \n  (SELECT COUNT(*) FROM clients c WHERE c.userId NOT IN (SELECT id FROM users)) as orphaned_clients,\n  (SELECT COUNT(*) FROM invoices i WHERE i.userId NOT IN (SELECT id FROM users)) as orphaned_invoices_no_user,\n  (SELECT COUNT(*) FROM invoices i WHERE i.contractId NOT IN (SELECT id FROM rentalContracts)) as orphaned_invoices_no_contract,\n  (SELECT COUNT(*) FROM rentalContracts rc WHERE rc.userId NOT IN (SELECT id FROM users)) as orphaned_contracts_no_user,\n  (SELECT COUNT(*) FROM rentalContracts rc WHERE rc.vehicleId NOT IN (SELECT id FROM vehicles)) as orphaned_contracts_no_vehicle,\n  (SELECT COUNT(*) FROM maintenanceRecords mr WHERE mr.userId NOT IN (SELECT id FROM users)) as orphaned_maintenance_no_user,\n  (SELECT COUNT(*) FROM maintenanceRecords mr WHERE mr.vehicleId NOT IN (SELECT id FROM vehicles)) as orphaned_maintenance_no_vehicle,\n  (SELECT COUNT(*) FROM damageMarks dm WHERE dm.userId NOT IN (SELECT id FROM users)) as orphaned_damage_no_user,\n  (SELECT COUNT(*) FROM damageMarks dm WHERE dm.contractId NOT IN (SELECT id FROM rentalContracts)) as orphaned_damage_no_contract;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Get all orphaned record counts in one query\nSELECT \n  (SELECT COUNT(*) FROM clients c WHERE c.userId NOT IN (SELECT id FROM users)) as orphaned_clients,\n  (SELECT COUNT(*) FROM invoices i WHERE i.userId NOT IN (SELECT id FROM users)) as orphaned_invoices_no_user,\n  (SELECT COUNT(*) FROM invoices i WHERE i.contractId NOT IN (SELECT id FROM rentalContracts)) as orphaned_invoices_no_contract,\n  (SELECT COUNT(*) FROM rentalContracts rc WHERE rc.userId NOT IN (SELECT id FROM users)) as orphaned_contracts_no_user,\n  (SELECT COUNT(*) FROM rentalContracts rc WHERE rc.vehicleId NOT IN (SELECT id FROM vehicles)) as orphaned_contracts_no_vehicle,\n  (SELECT COUNT(*) FROM maintenanceRecords mr WHERE mr.userId NOT IN (SELECT id FROM users)) as orphaned_maintenance_no_user,\n  (SELECT COUNT(*) FROM maintenanceRecords mr WHERE mr.vehicleId NOT IN (SELECT id FROM vehicles)) as orphaned_maintenance_no_vehicle,\n  (SELECT COUNT(*) FROM damageMarks dm WHERE dm.userId NOT IN (SELECT id FROM users)) as orphaned_damage_no_user,\n  (SELECT COUNT(*) FROM damageMarks dm WHERE dm.contractId NOT IN (SELECT id FROM rentalContracts)) as orphaned_damage_no_contract;\n",
+  "rows": [
+    {
+      "orphaned_clients": "98",
+      "orphaned_invoices_no_user": "15",
+      "orphaned_invoices_no_contract": "0",
+      "orphaned_contracts_no_user": "19",
+      "orphaned_contracts_no_vehicle": "19",
+      "orphaned_maintenance_no_user": "29",
+      "orphaned_maintenance_no_vehicle": "29",
+      "orphaned_damage_no_user": "4",
+      "orphaned_damage_no_contract": "3"
+    }
+  ],
+  "messages": [],
+  "stdout": "orphaned_clients\torphaned_invoices_no_user\torphaned_invoices_no_contract\torphaned_contracts_no_user\torphaned_contracts_no_vehicle\torphaned_maintenance_no_user\torphaned_maintenance_no_vehicle\torphaned_damage_no_user\torphaned_damage_no_contract\n98\t15\t0\t19\t19\t29\t29\t4\t3\n",
+  "stderr": "",
+  "execution_time_ms": 1573
+}

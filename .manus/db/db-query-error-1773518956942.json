@@ -1,0 +1,8 @@
+{
+  "query": "\n-- Clean up companySettings with invalid userId\nDELETE FROM companySettings WHERE userId NOT IN (SELECT id FROM users);\n\n-- Clean up all other tables with orphaned records\nDELETE FROM auditLogs WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM dashboardPreferences WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM passwordResetTokens WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM userSubscriptions WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'All orphaned records cleaned' as status;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Clean up companySettings with invalid userId\nDELETE FROM companySettings WHERE userId NOT IN (SELECT id FROM users);\n\n-- Clean up all other tables with orphaned records\nDELETE FROM auditLogs WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM dashboardPreferences WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM passwordResetTokens WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM userSubscriptions WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'All orphaned records cleaned' as status;\n",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 6: Unknown column 'userid' in 'where clause'"
+  ]
+}

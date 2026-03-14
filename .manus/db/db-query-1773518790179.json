@@ -1,0 +1,79 @@
+{
+  "query": "\n-- Orphaned clients (clients without valid userId)\nSELECT COUNT(*) as orphaned_clients FROM clients c WHERE c.userId NOT IN (SELECT id FROM users);\n\n-- Orphaned invoices (invoices without valid userId or contractId)\nSELECT COUNT(*) as orphaned_invoices_no_user FROM invoices i WHERE i.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_invoices_no_contract FROM invoices i WHERE i.contractId NOT IN (SELECT id FROM rentalContracts);\n\n-- Orphaned rental contracts (contracts without valid userId or vehicleId)\nSELECT COUNT(*) as orphaned_contracts_no_user FROM rentalContracts rc WHERE rc.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_contracts_no_vehicle FROM rentalContracts rc WHERE rc.vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Orphaned maintenance records\nSELECT COUNT(*) as orphaned_maintenance_no_user FROM maintenanceRecords mr WHERE mr.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_maintenance_no_vehicle FROM maintenanceRecords mr WHERE mr.vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Orphaned damage marks\nSELECT COUNT(*) as orphaned_damage_no_user FROM damageMarks dm WHERE dm.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_damage_no_contract FROM damageMarks dm WHERE dm.contractId NOT IN (SELECT id FROM rentalContracts);\n\n-- Check totals\nSELECT 'clients' as table_name, COUNT(*) as total_records FROM clients\nUNION ALL\nSELECT 'invoices', COUNT(*) FROM invoices\nUNION ALL\nSELECT 'rentalContracts', COUNT(*) FROM rentalContracts\nUNION ALL\nSELECT 'maintenanceRecords', COUNT(*) FROM maintenanceRecords\nUNION ALL\nSELECT 'damageMarks', COUNT(*) FROM damageMarks;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Orphaned clients (clients without valid userId)\nSELECT COUNT(*) as orphaned_clients FROM clients c WHERE c.userId NOT IN (SELECT id FROM users);\n\n-- Orphaned invoices (invoices without valid userId or contractId)\nSELECT COUNT(*) as orphaned_invoices_no_user FROM invoices i WHERE i.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_invoices_no_contract FROM invoices i WHERE i.contractId NOT IN (SELECT id FROM rentalContracts);\n\n-- Orphaned rental contracts (contracts without valid userId or vehicleId)\nSELECT COUNT(*) as orphaned_contracts_no_user FROM rentalContracts rc WHERE rc.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_contracts_no_vehicle FROM rentalContracts rc WHERE rc.vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Orphaned maintenance records\nSELECT COUNT(*) as orphaned_maintenance_no_user FROM maintenanceRecords mr WHERE mr.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_maintenance_no_vehicle FROM maintenanceRecords mr WHERE mr.vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Orphaned damage marks\nSELECT COUNT(*) as orphaned_damage_no_user FROM damageMarks dm WHERE dm.userId NOT IN (SELECT id FROM users);\nSELECT COUNT(*) as orphaned_damage_no_contract FROM damageMarks dm WHERE dm.contractId NOT IN (SELECT id FROM rentalContracts);\n\n-- Check totals\nSELECT 'clients' as table_name, COUNT(*) as total_records FROM clients\nUNION ALL\nSELECT 'invoices', COUNT(*) FROM invoices\nUNION ALL\nSELECT 'rentalContracts', COUNT(*) FROM rentalContracts\nUNION ALL\nSELECT 'maintenanceRecords', COUNT(*) FROM maintenanceRecords\nUNION ALL\nSELECT 'damageMarks', COUNT(*) FROM damageMarks;\n",
+  "rows": [
+    {
+      "orphaned_clients": "98"
+    },
+    {
+      "orphaned_clients": "orphaned_invoices_no_user"
+    },
+    {
+      "orphaned_clients": "15"
+    },
+    {
+      "orphaned_clients": "orphaned_invoices_no_contract"
+    },
+    {
+      "orphaned_clients": "0"
+    },
+    {
+      "orphaned_clients": "orphaned_contracts_no_user"
+    },
+    {
+      "orphaned_clients": "19"
+    },
+    {
+      "orphaned_clients": "orphaned_contracts_no_vehicle"
+    },
+    {
+      "orphaned_clients": "19"
+    },
+    {
+      "orphaned_clients": "orphaned_maintenance_no_user"
+    },
+    {
+      "orphaned_clients": "29"
+    },
+    {
+      "orphaned_clients": "orphaned_maintenance_no_vehicle"
+    },
+    {
+      "orphaned_clients": "29"
+    },
+    {
+      "orphaned_clients": "orphaned_damage_no_user"
+    },
+    {
+      "orphaned_clients": "4"
+    },
+    {
+      "orphaned_clients": "orphaned_damage_no_contract"
+    },
+    {
+      "orphaned_clients": "3"
+    },
+    {
+      "orphaned_clients": "table_name\ttotal_records"
+    },
+    {
+      "orphaned_clients": "rentalContracts\t19"
+    },
+    {
+      "orphaned_clients": "clients\t98"
+    },
+    {
+      "orphaned_clients": "damageMarks\t4"
+    },
+    {
+      "orphaned_clients": "maintenanceRecords\t29"
+    },
+    {
+      "orphaned_clients": "invoices\t15"
+    }
+  ],
+  "messages": [],
+  "stdout": "orphaned_clients\n98\norphaned_invoices_no_user\n15\norphaned_invoices_no_contract\n0\norphaned_contracts_no_user\n19\norphaned_contracts_no_vehicle\n19\norphaned_maintenance_no_user\n29\norphaned_maintenance_no_vehicle\n29\norphaned_damage_no_user\n4\norphaned_damage_no_contract\n3\ntable_name\ttotal_records\nrentalContracts\t19\nclients\t98\ndamageMarks\t4\nmaintenanceRecords\t29\ninvoices\t15\n",
+  "stderr": "",
+  "execution_time_ms": 3566
+}

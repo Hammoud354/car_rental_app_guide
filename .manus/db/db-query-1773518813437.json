@@ -1,0 +1,31 @@
+{
+  "query": "\n-- Step 1: Delete orphaned damage marks (depends on contracts)\nDELETE FROM damageMarks WHERE contractId NOT IN (SELECT id FROM rentalContracts);\nDELETE FROM damageMarks WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 2: Delete orphaned invoices (depends on contracts)\nDELETE FROM invoices WHERE contractId NOT IN (SELECT id FROM rentalContracts);\nDELETE FROM invoices WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 3: Delete orphaned maintenance records (depends on vehicles)\nDELETE FROM maintenanceRecords WHERE vehicleId NOT IN (SELECT id FROM vehicles);\nDELETE FROM maintenanceRecords WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 4: Delete orphaned rental contracts (depends on users and vehicles)\nDELETE FROM rentalContracts WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM rentalContracts WHERE vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Step 5: Delete orphaned clients (depends on users)\nDELETE FROM clients WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'After cleanup:' as status;\nSELECT 'clients' as table_name, COUNT(*) as total_records FROM clients\nUNION ALL\nSELECT 'invoices', COUNT(*) FROM invoices\nUNION ALL\nSELECT 'rentalContracts', COUNT(*) FROM rentalContracts\nUNION ALL\nSELECT 'maintenanceRecords', COUNT(*) FROM maintenanceRecords\nUNION ALL\nSELECT 'damageMarks', COUNT(*) FROM damageMarks;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3JZ9fT9capQqaJ5.root --database 7Q8gdiHiBpSXUrkFz6JMfV --execute \n-- Step 1: Delete orphaned damage marks (depends on contracts)\nDELETE FROM damageMarks WHERE contractId NOT IN (SELECT id FROM rentalContracts);\nDELETE FROM damageMarks WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 2: Delete orphaned invoices (depends on contracts)\nDELETE FROM invoices WHERE contractId NOT IN (SELECT id FROM rentalContracts);\nDELETE FROM invoices WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 3: Delete orphaned maintenance records (depends on vehicles)\nDELETE FROM maintenanceRecords WHERE vehicleId NOT IN (SELECT id FROM vehicles);\nDELETE FROM maintenanceRecords WHERE userId NOT IN (SELECT id FROM users);\n\n-- Step 4: Delete orphaned rental contracts (depends on users and vehicles)\nDELETE FROM rentalContracts WHERE userId NOT IN (SELECT id FROM users);\nDELETE FROM rentalContracts WHERE vehicleId NOT IN (SELECT id FROM vehicles);\n\n-- Step 5: Delete orphaned clients (depends on users)\nDELETE FROM clients WHERE userId NOT IN (SELECT id FROM users);\n\n-- Verify cleanup\nSELECT 'After cleanup:' as status;\nSELECT 'clients' as table_name, COUNT(*) as total_records FROM clients\nUNION ALL\nSELECT 'invoices', COUNT(*) FROM invoices\nUNION ALL\nSELECT 'rentalContracts', COUNT(*) FROM rentalContracts\nUNION ALL\nSELECT 'maintenanceRecords', COUNT(*) FROM maintenanceRecords\nUNION ALL\nSELECT 'damageMarks', COUNT(*) FROM damageMarks;\n",
+  "rows": [
+    {
+      "status": "After cleanup:"
+    },
+    {
+      "status": "table_name\ttotal_records"
+    },
+    {
+      "status": "clients\t0"
+    },
+    {
+      "status": "invoices\t0"
+    },
+    {
+      "status": "maintenanceRecords\t0"
+    },
+    {
+      "status": "damageMarks\t0"
+    },
+    {
+      "status": "rentalContracts\t0"
+    }
+  ],
+  "messages": [],
+  "stdout": "status\nAfter cleanup:\ntable_name\ttotal_records\nclients\t0\ninvoices\t0\nmaintenanceRecords\t0\ndamageMarks\t0\nrentalContracts\t0\n",
+  "stderr": "",
+  "execution_time_ms": 3873
+}

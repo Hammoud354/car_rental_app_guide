@@ -344,6 +344,13 @@
       "when": 1773518543454,
       "tag": "0049_talented_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "5",
+      "when": 1773518900690,
+      "tag": "0050_rapid_texas_twister",
+      "breakpoints": true
     }
   ]
 }
