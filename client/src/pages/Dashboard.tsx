@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
 import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
+import { MaintenanceModal } from "@/components/MaintenanceModal";
 import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -414,6 +415,30 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   );
 }
 
+function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: number }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  return (
+    <>
+      <Card 
+        className="bg-card shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+        onClick={() => setIsModalOpen(true)}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">In Maintenance</CardTitle>
+          <div className="p-2 bg-red-100 rounded-lg">
+            <Wrench className="h-5 w-5 text-red-600" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-bold text-foreground">{maintenanceCount}</div>
+        </CardContent>
+      </Card>
+      <MaintenanceModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
+    </>
+  );
+}
+
 function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCount: number }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -736,18 +761,7 @@ export default function Dashboard() {
             )}
 
             {widgetVisibility.inMaintenance && (
-
-            <Card className="bg-card shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">In Maintenance</CardTitle>
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <Wrench className="h-5 w-5 text-red-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">{inMaintenance}</div>
-              </CardContent>
-            </Card>
+              <MaintenanceCardWithModal maintenanceCount={inMaintenance} />
             )}
 
             {widgetVisibility.expiringDocs && (

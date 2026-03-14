@@ -5805,3 +5805,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Clean up other orphaned records across all tables (carModels, companySettings, damageMarks, etc.)
 - [x] Add foreign key constraints to all related tables (14 constraints added)
 - [x] Verify data integrity across entire database - All constraints active and working
+
+## Dashboard Maintenance Popup Feature (Mar 14, 2026)
+- [x] Examine Expiring Docs popup implementation
+- [x] Create MaintenanceModal component for viewing maintenance records
+- [x] Apply popup functionality to Maintenance dashboard card
+- [x] Test popup on desktop and mobile screens - Modal opens and displays correctly
