@@ -85,82 +85,80 @@ export function ModernDatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0 border border-gray-200 shadow-lg rounded-lg overflow-hidden" 
+        className="w-auto p-0 border border-gray-300 shadow-md rounded-lg overflow-hidden bg-white" 
         align="start"
       >
-        <div className="p-3 bg-white">
-          {/* Header with Year and Month Selection */}
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleMonthChange('prev')}
-              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md transition-colors"
-              title="Previous month"
-            >
-              <ChevronLeft className="h-4 w-4 text-gray-600" />
-            </Button>
+        {/* Compact Header with Year and Month Selection */}
+        <div className="flex items-center justify-between gap-1 px-2 py-2 border-b border-gray-200 bg-gray-50">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleMonthChange('prev')}
+            className="h-7 w-7 p-0 hover:bg-gray-200 rounded transition-colors"
+            title="Previous month"
+          >
+            <ChevronLeft className="h-4 w-4 text-gray-700" />
+          </Button>
 
-            <div className="flex items-center gap-2 flex-1 justify-center">
-              <Select value={currentYear.toString()} onValueChange={handleYearChange}>
-                <SelectTrigger className="w-[80px] h-8 text-xs font-semibold border-gray-200 bg-white hover:bg-gray-50">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="max-h-[240px]">
-                  {years.map((year) => (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <span className="text-xs font-semibold text-gray-900 min-w-[70px] text-center">
-                {currentMonthName}
-              </span>
-            </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleMonthChange('next')}
-              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md transition-colors"
-              title="Next month"
-            >
-              <ChevronRight className="h-4 w-4 text-gray-600" />
-            </Button>
+          <div className="flex items-center gap-1 flex-1 justify-center min-w-0">
+            <Select value={currentYear.toString()} onValueChange={handleYearChange}>
+              <SelectTrigger className="w-[70px] h-7 text-xs font-semibold border-gray-300 bg-white hover:bg-gray-50 px-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-[200px]">
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()} className="text-xs">
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <span className="text-xs font-semibold text-gray-900 px-1 truncate">
+              {currentMonthName}
+            </span>
           </div>
 
-          {/* Calendar Grid */}
-          <div className="rounded-md border border-gray-200 overflow-hidden bg-white">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(selectedDate) => {
-                onDateChange(selectedDate);
-                setIsOpen(false);
-              }}
-              month={month}
-              onMonthChange={setMonth}
-              fixedWeeks
-              showOutsideDays={false}
-              initialFocus
-              classNames={{
-                months: "w-full p-0 m-0",
-                month: "w-full space-y-0 p-0 m-0",
-                caption: "hidden",
-                nav: "hidden",
-                head_row: "grid grid-cols-7 bg-gray-50 border-b border-gray-100",
-                head_cell: "text-xs font-semibold text-gray-600 py-2 text-center",
-                row: "grid grid-cols-7 w-full",
-                cell: "relative p-0 text-center text-xs flex items-center justify-center h-9",
-                day: "h-9 w-full flex items-center justify-center rounded hover:bg-blue-50 transition-all duration-150 text-gray-700 font-medium text-sm",
-                day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-semibold shadow-sm",
-                day_today: "border-2 border-blue-500 text-blue-600 font-bold hover:bg-blue-50 bg-blue-50",
-                day_outside: "text-gray-300 opacity-50",
-              }}
-            />
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleMonthChange('next')}
+            className="h-7 w-7 p-0 hover:bg-gray-200 rounded transition-colors"
+            title="Next month"
+          >
+            <ChevronRight className="h-4 w-4 text-gray-700" />
+          </Button>
+        </div>
+
+        {/* Compact Calendar Grid - No Extra Padding */}
+        <div className="px-2 py-2">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(selectedDate) => {
+              onDateChange(selectedDate);
+              setIsOpen(false);
+            }}
+            month={month}
+            onMonthChange={setMonth}
+            fixedWeeks
+            showOutsideDays={false}
+            initialFocus
+            classNames={{
+              months: "w-full p-0 m-0",
+              month: "w-full space-y-0 p-0 m-0",
+              caption: "hidden",
+              nav: "hidden",
+              head_row: "grid grid-cols-7 gap-0",
+              head_cell: "text-xs font-bold text-gray-600 py-1 text-center h-6",
+              row: "grid grid-cols-7 gap-0",
+              cell: "relative p-0 text-center text-xs flex items-center justify-center h-7 border border-gray-100",
+              day: "h-7 w-7 flex items-center justify-center rounded-none hover:bg-blue-100 transition-colors text-gray-700 font-medium text-xs cursor-pointer",
+              day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-semibold",
+              day_today: "border-2 border-blue-500 text-blue-600 font-bold bg-blue-50 hover:bg-blue-100",
+              day_outside: "text-gray-300 opacity-40",
+            }}
+          />
         </div>
       </PopoverContent>
     </Popover>
