@@ -5782,3 +5782,11 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Add smooth animations when switching months
 - [x] Apply modern date picker to all date fields (Clients, Fleet, etc.)
 - [x] Test date picker on mobile, tablet, desktop
+
+## Field Layout Improvements (Mar 14, 2026)
+- [x] Fix Date of Birth field layout on desktop
+- [x] Fix Place of Birth field layout on desktop
+- [x] Fix Passport Number field layout on desktop
+- [x] Fix Registration Number field layout on desktop
+- [x] Ensure fields display on separate lines on desktop version
+- [x] Test layout on mobile, tablet, and desktop

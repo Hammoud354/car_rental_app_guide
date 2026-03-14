@@ -399,27 +399,25 @@ export default function Clients() {
                         <Label htmlFor="address">Address</Label>
                         <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="col-span-1 w-full">
-                          <Label>Date of Birth</Label>
-                          <ModernDatePicker
-                            date={createDateOfBirth}
-                            onDateChange={setCreateDateOfBirth}
-                            placeholder="Select date"
-                          />
-                        </div>
-                        <div className="col-span-1 w-full">
-                          <Label htmlFor="placeOfBirth">Place of Birth</Label>
-                          <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
-                        </div>
-                        <div className="col-span-1">
-                          <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
-                          <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
-                        </div>
-                        <div className="col-span-1">
-                          <Label htmlFor="registrationNumber">Registration Number</Label>
-                          <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
-                        </div>
+                      <div className="col-span-2">
+                        <Label>Date of Birth</Label>
+                        <ModernDatePicker
+                          date={createDateOfBirth}
+                          onDateChange={setCreateDateOfBirth}
+                          placeholder="Select date"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="placeOfBirth">Place of Birth</Label>
+                        <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="registrationNumber">Registration Number</Label>
+                        <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
                       </div>
                     </div>
                   </div>
@@ -648,7 +646,7 @@ export default function Clients() {
                       <Label htmlFor="edit-address">Address</Label>
                       <Input id="edit-address" name="address" defaultValue={selectedClient.address || ""} placeholder="Street, City, State, ZIP" className="input-client" />
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <Label>Date of Birth</Label>
                       <ModernDatePicker
                         date={editDateOfBirth}
@@ -656,15 +654,15 @@ export default function Clients() {
                         placeholder="Select date"
                       />
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <Label htmlFor="edit-placeOfBirth">Place of Birth</Label>
                       <Input id="edit-placeOfBirth" name="placeOfBirth" defaultValue={selectedClient.placeOfBirth || ""} placeholder="City, Country" className="input-client" />
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
                       <Input id="edit-passportIdNumber" name="passportIdNumber" defaultValue={selectedClient.passportIdNumber || ""} placeholder="Passport or National ID" className="input-client" />
                     </div>
-                    <div>
+                    <div className="col-span-2">
                       <Label htmlFor="edit-registrationNumber">Registration Number</Label>
                       <Input id="edit-registrationNumber" name="registrationNumber" defaultValue={selectedClient.registrationNumber || ""} placeholder="Business/Company Registration" className="input-client" />
                     </div>
