@@ -5816,3 +5816,10 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix License Number field layout
 - [x] Fix Issue Date and Expiry Date field overlap
 - [x] Ensure proper spacing and alignment on desktop and mobile - All fields now display on separate lines
+
+## Date Picker Calendar Redesign - Reduce White Space (Mar 15, 2026)
+- [x] Analyze current date picker component layout
+- [x] Reduce padding and margins in calendar grid
+- [x] Optimize helper text placement
+- [x] Make calendar more compact and professional
+- [x] Test on desktop and mobile - Calendar now compact with no excessive white space

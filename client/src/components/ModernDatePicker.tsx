@@ -88,22 +88,22 @@ export function ModernDatePicker({
         className="w-auto p-0 border border-gray-200 shadow-lg rounded-lg overflow-hidden" 
         align="start"
       >
-        <div className="p-4 space-y-4 bg-white">
+        <div className="p-3 bg-white">
           {/* Header with Year and Month Selection */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-2 mb-3">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('prev')}
-              className="h-9 w-9 p-0 hover:bg-gray-100 rounded-md transition-colors"
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md transition-colors"
               title="Previous month"
             >
-              <ChevronLeft className="h-5 w-5 text-gray-600" />
+              <ChevronLeft className="h-4 w-4 text-gray-600" />
             </Button>
 
             <div className="flex items-center gap-2 flex-1 justify-center">
               <Select value={currentYear.toString()} onValueChange={handleYearChange}>
-                <SelectTrigger className="w-[90px] h-9 text-sm font-semibold border-gray-200 bg-white hover:bg-gray-50">
+                <SelectTrigger className="w-[80px] h-8 text-xs font-semibold border-gray-200 bg-white hover:bg-gray-50">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="max-h-[240px]">
@@ -115,7 +115,7 @@ export function ModernDatePicker({
                 </SelectContent>
               </Select>
               
-              <span className="text-sm font-semibold text-gray-900 min-w-[80px] text-center">
+              <span className="text-xs font-semibold text-gray-900 min-w-[70px] text-center">
                 {currentMonthName}
               </span>
             </div>
@@ -124,15 +124,15 @@ export function ModernDatePicker({
               variant="ghost"
               size="sm"
               onClick={() => handleMonthChange('next')}
-              className="h-9 w-9 p-0 hover:bg-gray-100 rounded-md transition-colors"
+              className="h-8 w-8 p-0 hover:bg-gray-100 rounded-md transition-colors"
               title="Next month"
             >
-              <ChevronRight className="h-5 w-5 text-gray-600" />
+              <ChevronRight className="h-4 w-4 text-gray-600" />
             </Button>
           </div>
 
           {/* Calendar Grid */}
-          <div className="rounded-lg border border-gray-200 overflow-hidden bg-white">
+          <div className="rounded-md border border-gray-200 overflow-hidden bg-white">
             <Calendar
               mode="single"
               selected={date}
@@ -151,20 +151,15 @@ export function ModernDatePicker({
                 caption: "hidden",
                 nav: "hidden",
                 head_row: "grid grid-cols-7 bg-gray-50 border-b border-gray-100",
-                head_cell: "text-xs font-semibold text-gray-600 py-3 text-center",
+                head_cell: "text-xs font-semibold text-gray-600 py-2 text-center",
                 row: "grid grid-cols-7 w-full",
-                cell: "relative p-0 text-center text-sm flex items-center justify-center h-10",
-                day: "h-10 w-full flex items-center justify-center rounded-md hover:bg-blue-50 transition-all duration-150 text-gray-700 font-medium",
+                cell: "relative p-0 text-center text-xs flex items-center justify-center h-9",
+                day: "h-9 w-full flex items-center justify-center rounded hover:bg-blue-50 transition-all duration-150 text-gray-700 font-medium text-sm",
                 day_selected: "bg-blue-600 text-white hover:bg-blue-700 font-semibold shadow-sm",
                 day_today: "border-2 border-blue-500 text-blue-600 font-bold hover:bg-blue-50 bg-blue-50",
                 day_outside: "text-gray-300 opacity-50",
               }}
             />
-          </div>
-
-          {/* Footer with helpful text */}
-          <div className="text-xs text-gray-500 text-center py-1 border-t border-gray-100 pt-3">
-            Click a date to select • Use arrows to navigate months
           </div>
         </div>
       </PopoverContent>
