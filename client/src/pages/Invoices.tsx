@@ -235,20 +235,20 @@ export default function Invoices() {
       <div className="space-y-6">
         
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold">Invoices</h1>
-            <p className="text-gray-600">Manage billing and payments</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">Invoices</h1>
+            <p className="text-gray-600 text-sm">Manage billing and payments</p>
           </div>
         </div>
 
         {/* Filter */}
         <Card>
           <CardContent className="pt-6">
-            <div className="flex gap-4 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
               <label className="text-sm font-medium">Filter by Status:</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,11 +275,11 @@ export default function Invoices() {
             {filteredInvoices.map((invoice) => (
               <Card key={invoice.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="pt-6">
-                  <div className="flex justify-between items-start">
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                     <div className="space-y-2">
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <FileText className="w-5 h-5 text-primary" />
-                        <h3 className="font-semibold text-lg">{invoice.invoiceNumber}</h3>
+                        <h3 className="font-semibold text-base sm:text-lg">{invoice.invoiceNumber}</h3>
                         {getStatusBadge(invoice.paymentStatus)}
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
@@ -294,9 +294,9 @@ export default function Invoices() {
                         )}
                       </div>
                     </div>
-                    <div className="text-right space-y-2">
+                    <div className="sm:text-right space-y-2 w-full sm:w-auto">
                       <div>
-                        <p className="text-2xl font-bold">{formatUSD(parseFloat(invoice.totalAmount))}</p>
+                        <p className="text-xl sm:text-2xl font-bold">{formatUSD(parseFloat(invoice.totalAmount))}</p>
                         {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
                           <p className="text-sm text-gray-600">
                             {(parseFloat(invoice.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}
@@ -307,6 +307,7 @@ export default function Invoices() {
                         onClick={() => setSelectedInvoice(invoice.id)}
                         variant="outline"
                         size="sm"
+                        className="w-full sm:w-auto"
                       >
                         View Details
                       </Button>
@@ -614,7 +615,7 @@ export default function Invoices() {
                       <CardTitle className="text-lg">Update Payment Status</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <label className="text-sm font-medium mb-2 block">Status</label>
                           <Select value={paymentStatus} onValueChange={(value) => setPaymentStatus(value)}>

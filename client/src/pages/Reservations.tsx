@@ -99,15 +99,15 @@ export default function Reservations() {
     <SidebarLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Reservations Calendar</h1>
-            <p className="text-gray-600 mt-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Reservations Calendar</h1>
+            <p className="text-gray-600 mt-1 text-sm">
               View upcoming rental reservations and vehicle availability
             </p>
           </div>
           <Link href="/rental-contracts">
-            <Button className="bg-gray-900 hover:bg-gray-800">
+            <Button className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto" size="sm">
               <Calendar className="h-4 w-4 mr-2" />
               Create New Reservation
             </Button>
@@ -127,7 +127,7 @@ export default function Reservations() {
               >
                 <ChevronLeft className="h-5 w-5 text-gray-600" />
               </Button>
-              <CardTitle className="text-2xl font-bold text-gray-900 min-w-[250px] text-center">
+              <CardTitle className="text-lg sm:text-2xl font-bold text-gray-900 min-w-0 text-center">
                 {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
               </CardTitle>
               <Button 
@@ -141,12 +141,13 @@ export default function Reservations() {
             </div>
           </CardHeader>
 
-          <CardContent className="p-6">
+          <CardContent className="p-2 sm:p-6">
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-0 border border-gray-200 rounded-lg overflow-hidden">
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+            <div className="grid grid-cols-7 gap-0 border border-gray-200 rounded-lg overflow-hidden min-w-[640px]">
               {/* Day headers */}
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="text-center font-bold text-gray-700 py-4 text-sm bg-gray-50 border-b border-gray-200 border-r last:border-r-0">
+                <div key={day} className="text-center font-bold text-gray-700 py-2 sm:py-4 text-xs sm:text-sm bg-gray-50 border-b border-gray-200 border-r last:border-r-0">
                   {day}
                 </div>
               ))}
@@ -154,7 +155,7 @@ export default function Reservations() {
               {/* Calendar days */}
               {calendarDays.map((day, index) => {
                 if (day === null) {
-                  return <div key={`empty-${index}`} className="min-h-[180px] bg-gray-50 border-r border-b border-gray-200 last:border-r-0" />;
+                  return <div key={`empty-${index}`} className="min-h-[100px] sm:min-h-[180px] bg-gray-50 border-r border-b border-gray-200 last:border-r-0" />;
                 }
                 
                 const dayReservations = getReservationsForDay(day);
@@ -169,7 +170,7 @@ export default function Reservations() {
                       setSelectedDate(currentDateObj);
                       setIsDateDialogOpen(true);
                     }}
-                    className={`min-h-[180px] p-4 cursor-pointer transition-all hover:bg-blue-50 border-r border-b border-gray-200 last:border-r-0 flex flex-col ${
+                    className={`min-h-[100px] sm:min-h-[180px] p-2 sm:p-4 cursor-pointer transition-all hover:bg-blue-50 border-r border-b border-gray-200 last:border-r-0 flex flex-col ${
                       isToday
                         ? "bg-blue-100 border-blue-300"
                         : isPast
@@ -248,6 +249,7 @@ export default function Reservations() {
                 );
               })}
             </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -289,7 +291,7 @@ export default function Reservations() {
                           <span className="text-lg font-bold text-green-600">${reservation.totalCost?.toFixed(2) || 'N/A'}</span>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                           <div>
                             <p className="text-gray-600">Rental Period</p>
                             <p className="font-semibold text-gray-900">{durationDays} days</p>

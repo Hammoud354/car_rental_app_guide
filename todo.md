@@ -5830,3 +5830,18 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix contract completion button stuck on 'completing' after contract is completed
 - [x] Add missing client details (passport, registration, DOB, place of birth) to contract form
 - [x] Fix maintenance exit date auto-releasing vehicle + add manual 'Remove from Maintenance' button
+
+## Responsive Design & Layout Fixes Batch - Mar 15, 2026
+- [x] Fix page width shift (1080px to 1072px) when modals open - scrollbar causing layout shift
+- [x] Fix sign-up button cut off on iPhone 11
+- [x] Fix vehicle form text overflow on mobile (purchase date, last service date fields)
+- [x] Fix Clients page buttons (New Client) cut off on mobile - no horizontal scrolling
+- [x] Fix User Management page horizontal scrolling on mobile - make viewable without scrolling
+- [x] Fix Reservations page Add Reservation button not fully visible on mobile
+- [x] Fix Profit & Loss page buttons cut off on mobile screens
+- [x] Fix all non-responsive grid-cols-2/3 patterns across all pages (Clients, CompanySettings, ContractManagement, ContractTemplateMapper, FleetManagement, Invoices, ProfitAndLoss, Settings, VehicleDetails, Reservations, RentalContracts, Dashboard)
+- [x] Make Reservations calendar horizontally scrollable on mobile with min-width wrapper
+- [x] Fix Invoices page header and filter layout for mobile
+- [x] Fix Maintenance page header button layout for mobile
+- [x] Fix RentalContracts header buttons to wrap on mobile
+- [x] Fix popover width overflow on mobile (vehicle selection in contracts)

@@ -194,14 +194,14 @@ export default function Maintenance() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 input-client">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 input-client">Maintenance Tracking</h2>
-              <p className="text-gray-600 mt-1 input-client">Track and manage vehicle maintenance records</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 input-client">Maintenance Tracking</h2>
+              <p className="text-gray-600 mt-1 text-sm input-client">Track and manage vehicle maintenance records</p>
             </div>
             
-            <div className="flex gap-3 input-client">
+            <div className="flex gap-3 w-full md:w-auto input-client">
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-900 hover:bg-gray-800 input-client">
+                <Button className="bg-gray-900 hover:bg-gray-800 w-full md:w-auto input-client" size="sm">
                   <Plus className="mr-2 h-4 w-4 input-client" />
                   Add Maintenance Record
                 </Button>

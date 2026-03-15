@@ -751,7 +751,7 @@ export default function FleetManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div>
                       <Label htmlFor="fuelType">Fuel Type</Label>
                       <Select name="fuelType">
@@ -778,7 +778,7 @@ export default function FleetManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div>
                       <Label htmlFor="averageDailyKm">Average Daily KM</Label>
                       <Input id="averageDailyKm" name="averageDailyKm" type="number" min="0" step="1" placeholder="e.g., 50" />
@@ -800,7 +800,7 @@ export default function FleetManagement() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                     <div>
                       <Label htmlFor="operatingClimate">Operating Climate</Label>
                       <Select name="operatingClimate">
@@ -924,7 +924,7 @@ export default function FleetManagement() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                     <div>
                       <span className="text-muted-foreground">Category:</span>
                       <p className="font-medium">{vehicle.category}</p>

@@ -256,7 +256,7 @@ export default function ContractManagement() {
           <p className="text-sm text-muted-foreground mb-4">
             Use these field names when creating fields in the template editor:
           </p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <p className="font-semibold text-sm">Client Information</p>
               <ul className="text-sm space-y-1">

@@ -102,13 +102,13 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Users className="h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Users className="h-6 w-6 sm:h-8 sm:w-8" />
             User Management
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             Manage all users, roles, and permissions
           </p>
         </div>
@@ -118,7 +118,58 @@ export default function UserManagement() {
         </Badge>
       </div>
 
-      <div className="border rounded-lg">
+      {/* Mobile card view */}
+      <div className="block sm:hidden space-y-3">
+        {users?.map((user) => (
+          <div key={user.id} className="border rounded-lg p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="font-medium text-sm">{user.name || user.username}</div>
+              <Select
+                value={user.role || "user"}
+                onValueChange={(value) =>
+                  handleRoleChange(user.id, value as "user" | "admin")
+                }
+              >
+                <SelectTrigger className="w-24 h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="user">
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      User
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="admin">
+                    <div className="flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
+                      Admin
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <div>Username: {user.username}</div>
+              {user.email && <div>Email: {user.email}</div>}
+              {user.phone && <div>Phone: {user.phone}</div>}
+              {user.country && <div>Country: {user.country}</div>}
+              <div>Created: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</div>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleEditClick(user)}>
+                <Edit className="h-3 w-3 mr-1" /> Edit
+              </Button>
+              <Button variant="outline" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDeleteClick(user)}>
+                <Trash2 className="h-3 w-3 mr-1" /> Delete
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop table view */}
+      <div className="border rounded-lg hidden sm:block">
         <Table>
           <TableHeader>
             <TableRow>

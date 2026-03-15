@@ -251,12 +251,12 @@ export default function ProfitLoss() {
       <div className="container mx-auto py-8 max-w-7xl">
       <div id="profit-loss-content">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <DollarSign className="h-8 w-8" />
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+          <DollarSign className="h-6 w-6 sm:h-8 sm:w-8" />
           Profit & Loss Statement
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-1 text-sm">
           Comprehensive financial overview of your car rental business
         </p>
       </div>
@@ -296,7 +296,7 @@ export default function ProfitLoss() {
                 placeholder="Select end date"
               />
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex flex-wrap items-end gap-2">
               <Button onClick={() => handleQuickFilter("month")} variant="outline" size="sm">
                 Last Month
               </Button>
@@ -474,12 +474,12 @@ export default function ProfitLoss() {
       </div>
 
       {/* Export Actions */}
-      <div className="flex justify-end gap-4 mt-6">
-        <Button onClick={handleExportToExcel} variant="outline" className="gap-2">
+      <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6">
+        <Button onClick={handleExportToExcel} variant="outline" className="gap-2 w-full sm:w-auto" size="sm">
           <Download className="h-4 w-4" />
           Export to Excel
         </Button>
-        <Button onClick={handleExportToPDF} variant="outline" className="gap-2">
+        <Button onClick={handleExportToPDF} variant="outline" className="gap-2 w-full sm:w-auto" size="sm">
           <Download className="h-4 w-4" />
           Export to PDF
         </Button>

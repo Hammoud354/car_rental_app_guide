@@ -343,7 +343,7 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 input-client">
-            <div className="grid grid-cols-2 gap-4 input-client">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
               <div className="col-span-2 input-client">
                 <Label htmlFor="companyName">Company Name *</Label>
                 <Input
@@ -382,7 +382,7 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 input-client">
-            <div className="grid grid-cols-2 gap-4 input-client">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
               <div className="col-span-2 input-client">
                 <Label htmlFor="address">Address</Label>
                 <Input

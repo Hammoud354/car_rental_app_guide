@@ -464,7 +464,7 @@ export default function ContractTemplateMapper() {
                         </Button>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
                           <Label className="text-xs">X Position (%)</Label>
                           <Input
@@ -491,7 +491,7 @@ export default function ContractTemplateMapper() {
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
                           <Label className="text-xs">Font Size</Label>
                           <Input

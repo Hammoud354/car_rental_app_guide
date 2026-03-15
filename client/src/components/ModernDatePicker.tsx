@@ -74,8 +74,8 @@ export function ModernDatePicker({
             className
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4 text-gray-400" />
-          {date ? format(date, "PPP") : <span>{placeholder}</span>}
+          <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
+          <span className="truncate">{date ? format(date, "PPP") : placeholder}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent 

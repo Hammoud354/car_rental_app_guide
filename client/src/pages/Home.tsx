@@ -74,21 +74,24 @@ export default function Home() {
             <Car className="h-5 w-5 text-primary" />
             <span className="font-semibold">Car Rental Management</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={handleContactUs}>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <Button variant="ghost" size="sm" onClick={handleContactUs} className="hidden sm:inline-flex">
               <MessageCircle className="h-4 w-4 mr-1.5" />
               Contact
             </Button>
+            <Button variant="ghost" size="icon" onClick={handleContactUs} className="sm:hidden h-8 w-8">
+              <MessageCircle className="h-4 w-4" />
+            </Button>
             <Link href="/signin">
-              <Button variant="outline" size="sm">
-                <LogIn className="h-4 w-4 mr-1.5" />
-                Sign In
+              <Button variant="outline" size="sm" className="px-2 sm:px-3">
+                <LogIn className="h-4 w-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Sign In</span>
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm">
-                <UserPlus className="h-4 w-4 mr-1.5" />
-                Sign Up
+              <Button size="sm" className="px-2 sm:px-3">
+                <UserPlus className="h-4 w-4 sm:mr-1.5" />
+                <span className="hidden sm:inline">Sign Up</span>
               </Button>
             </Link>
           </div>

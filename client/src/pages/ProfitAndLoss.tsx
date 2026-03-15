@@ -490,7 +490,7 @@ export default function ProfitAndLoss() {
           {selectedMonth && (
             <div className="space-y-6">
               {/* Summary Cards */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="p-4 bg-green-50 border border-green-200 rounded">
                   <p className="text-sm text-gray-600 mb-1">Revenue</p>
                   <p className="text-2xl font-bold text-green-600">${selectedMonth.revenue.toFixed(2)}</p>

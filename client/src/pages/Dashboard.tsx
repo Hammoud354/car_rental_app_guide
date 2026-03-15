@@ -207,7 +207,7 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
               <div className="text-3xl font-bold text-red-600">{expired.length}</div>
               <div className="text-sm text-red-700 mt-1">Expired Policies</div>
@@ -390,7 +390,7 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-white rounded-lg border border-red-200">
             <div className="text-3xl font-bold text-red-600">{stats.count}</div>
             <div className="text-sm text-red-700 mt-1">Overdue Contracts</div>

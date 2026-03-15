@@ -213,7 +213,7 @@ export default function VehicleDetails() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Color</p>
                         <p className="font-medium">{vehicle.color}</p>
@@ -341,7 +341,7 @@ export default function VehicleDetails() {
                     )}
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="maintenanceType">Type *</Label>
                         <Select value={maintenanceType} onValueChange={setMaintenanceType}>

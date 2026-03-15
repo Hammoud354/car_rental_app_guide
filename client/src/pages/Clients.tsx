@@ -268,12 +268,12 @@ export default function Clients() {
     <SidebarLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
             <h1 className="text-3xl font-bold">Clients</h1>
-            <p className="text-muted-foreground">Manage your rental clients and their information</p>
+            <p className="text-muted-foreground text-sm">Manage your rental clients and their information</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -500,7 +500,7 @@ export default function Clients() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg">{client.firstName} {client.lastName}</h3>
-                        <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
                           <div>
                             <span className="text-muted-foreground">Phone:</span>
                             <p>{client.phone || "N/A"}</p>
@@ -726,7 +726,7 @@ export default function Clients() {
             </DialogHeader>
             {selectedClient && (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <span className="text-muted-foreground">First Name</span>
                     <p className="font-semibold">{selectedClient.firstName}</p>
