@@ -5845,3 +5845,6 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Fix Maintenance page header button layout for mobile
 - [x] Fix RentalContracts header buttons to wrap on mobile
 - [x] Fix popover width overflow on mobile (vehicle selection in contracts)
+
+## Scrollbar Layout Shift Fix - Mar 15, 2026
+- [x] Fix content width shifting (1080px→1072px) when modals/dialogs/dropdowns open due to scrollbar disappearing
