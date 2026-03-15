@@ -423,31 +423,31 @@ export default function Clients() {
                   </div>
 
                   {/* Driving License */}
-                  <div className="border-t border-gray-700 pt-4">
-                    <h3 className="font-semibold mb-4">Driving License</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                        <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
-                      </div>
-                      <div>
-                        <DateDropdownSelector
-                          id="licenseIssueDate"
-                          label="Issue Date"
-                          value={createLicenseIssueDate}
-                          onChange={setCreateLicenseIssueDate}
-                          maxDate={new Date()}
-                        />
-                      </div>
-                      <div>
-                        <DateDropdownSelector
-                          id="licenseExpiryDate"
-                          label="Expiry Date *"
-                          value={createLicenseExpiryDate}
-                          onChange={setCreateLicenseExpiryDate}
-                          required
-                          minDate={new Date()}
-                        />
+                   <div className="border-t border-gray-700 pt-4">
+                     <h3 className="font-semibold mb-4">Driving License</h3>
+                     <div className="space-y-6">
+                       <div>
+                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
+                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
+                       </div>
+                       <div className="pt-2">
+                         <DateDropdownSelector
+                           id="licenseIssueDate"
+                           label="Issue Date"
+                           value={createLicenseIssueDate}
+                           onChange={setCreateLicenseIssueDate}
+                           maxDate={new Date()}
+                         />
+                       </div>
+                       <div className="pt-2">
+                         <DateDropdownSelector
+                           id="licenseExpiryDate"
+                           label="Expiry Date *"
+                           value={createLicenseExpiryDate}
+                           onChange={setCreateLicenseExpiryDate}
+                           required
+                           minDate={new Date()}
+                         />
                       </div>
                     </div>
                   </div>
@@ -670,31 +670,31 @@ export default function Clients() {
                 </div>
 
                 {/* Driving License */}
-                <div className="border-t border-gray-700 pt-4">
-                  <h3 className="font-semibold mb-4">Driving License</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
-                      <Input id="edit-drivingLicenseNumber" name="drivingLicenseNumber" defaultValue={selectedClient.drivingLicenseNumber} required className="input-client" />
-                    </div>
-                    <div>
-                      <DateDropdownSelector
-                        id="edit-licenseIssueDate"
-                        label="Issue Date"
-                        value={editLicenseIssueDate}
-                        onChange={setEditLicenseIssueDate}
-                        maxDate={new Date()}
-                      />
-                    </div>
-                    <div>
-                      <DateDropdownSelector
-                        id="edit-licenseExpiryDate"
-                        label="Expiry Date *"
-                        value={editLicenseExpiryDate}
-                        onChange={setEditLicenseExpiryDate}
-                        required
-                        minDate={new Date()}
-                      />
+                 <div className="border-t border-gray-700 pt-4">
+                   <h3 className="font-semibold mb-4">Driving License</h3>
+                   <div className="space-y-6">
+                     <div>
+                       <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
+                       <Input id="edit-drivingLicenseNumber" name="drivingLicenseNumber" defaultValue={selectedClient.drivingLicenseNumber} required className="input-client" />
+                     </div>
+                     <div className="pt-2">
+                       <DateDropdownSelector
+                         id="edit-licenseIssueDate"
+                         label="Issue Date"
+                         value={editLicenseIssueDate}
+                         onChange={setEditLicenseIssueDate}
+                         maxDate={new Date()}
+                       />
+                     </div>
+                     <div className="pt-2">
+                       <DateDropdownSelector
+                         id="edit-licenseExpiryDate"
+                         label="Expiry Date *"
+                         value={editLicenseExpiryDate}
+                         onChange={setEditLicenseExpiryDate}
+                         required
+                         minDate={new Date()}
+                       />
                     </div>
                   </div>
                 </div>

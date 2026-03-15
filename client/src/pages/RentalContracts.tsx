@@ -154,6 +154,11 @@ export default function RentalContracts() {
   
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
     onSuccess: (data) => {
+      // Close dialog and reset state first
+      setReturnInspectionOpen(false);
+      setSelectedContractForReturn(null);
+      setReturnKm(0);
+      
       toast.success("Contract marked as completed");
       
       // Show maintenance alert if due
@@ -336,6 +341,10 @@ export default function RentalContracts() {
       clientNationality: formData.get("clientNationality") as string || undefined,
       clientPhone: formData.get("clientPhone") as string || undefined,
       clientAddress: formData.get("clientAddress") as string || undefined,
+      clientPassportNumber: formData.get("clientPassportNumber") as string || undefined,
+      clientPlaceOfBirth: formData.get("clientPlaceOfBirth") as string || undefined,
+      clientDateOfBirth: formData.get("clientDateOfBirth") as string || undefined,
+      clientRegistrationNumber: formData.get("clientRegistrationNumber") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
       licenseIssueDate,
       licenseExpiryDate: licenseExpiryDate!,
@@ -703,6 +712,10 @@ export default function RentalContracts() {
                                       setSelectedNationality(client.nationality || ""); // Fix: Update nationality state
                                       (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
                                       (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
+                                      (document.getElementById("clientPassportNumber") as HTMLInputElement).value = client.passportIdNumber || "";
+                                      (document.getElementById("clientPlaceOfBirth") as HTMLInputElement).value = client.placeOfBirth || "";
+                                      (document.getElementById("clientDateOfBirth") as HTMLInputElement).value = client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : "";
+                                      (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.registrationNumber || "";
                                       (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
                                       setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
                                       setLicenseExpiryDate(new Date(client.licenseExpiryDate));
@@ -790,6 +803,22 @@ export default function RentalContracts() {
                       <div className="col-span-2">
                         <Label htmlFor="clientAddress">Address</Label>
                         <Input id="clientAddress" name="clientAddress" placeholder="Street, City, State, ZIP" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientPassportNumber">Passport/ID Number</Label>
+                        <Input id="clientPassportNumber" name="clientPassportNumber" placeholder="Passport or National ID" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientRegistrationNumber">Registration Number</Label>
+                        <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientDateOfBirth">Date of Birth</Label>
+                        <Input id="clientDateOfBirth" name="clientDateOfBirth" type="date" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientPlaceOfBirth">Place of Birth</Label>
+                        <Input id="clientPlaceOfBirth" name="clientPlaceOfBirth" placeholder="City, Country" className="input-client" />
                       </div>
                     </div>
                   </div>
@@ -1299,6 +1328,30 @@ export default function RentalContracts() {
                         <div className="col-span-2">
                           <div className="text-sm text-muted-foreground">Address</div>
                           <div>{selectedContract.clientAddress}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientPassportNumber && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Passport/ID Number</div>
+                          <div className="font-mono">{selectedContract.clientPassportNumber}</div>
+                        </div>
+                      )}
+                      {(selectedContract as any).clientRegistrationNumber && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Registration Number</div>
+                          <div className="font-mono">{(selectedContract as any).clientRegistrationNumber}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientDateOfBirth && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Date of Birth</div>
+                          <div>{new Date(selectedContract.clientDateOfBirth).toLocaleDateString()}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientPlaceOfBirth && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Place of Birth</div>
+                          <div>{selectedContract.clientPlaceOfBirth}</div>
                         </div>
                       )}
                       <div>
@@ -2071,9 +2124,6 @@ export default function RentalContracts() {
                       contractId: selectedContractForReturn,
                       returnKm 
                     });
-                    setReturnInspectionOpen(false);
-                    setSelectedContractForReturn(null);
-                    setReturnKm(0);
                   }
                 }}
                 disabled={returnKm <= 0 || markAsReturnedMutation.isPending || (() => {

@@ -138,11 +138,34 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
         );
       
       // Calculate effective status:
-      // - If Maintenance or Out of Service, keep that status (takes priority)
+      // - If Maintenance, check if garageExitDate has passed to auto-release
+      // - If Out of Service, keep that status (takes priority)
       // - If has active contracts, show as Rented
       // - Otherwise, show as Available
       let effectiveStatus = vehicle.status;
-      if (vehicle.status === 'Available' && activeContracts.length > 0) {
+      
+      // Auto-release from maintenance if garageExitDate has passed
+      if (vehicle.status === 'Maintenance') {
+        const activeMaintenanceRecords = records.filter(r => {
+          if (r.garageExitDate && new Date(r.garageExitDate) <= now) {
+            return false; // Exit date has passed, no longer in maintenance
+          }
+          if (r.garageEntryDate && !r.garageExitDate) {
+            return true; // Entered garage but no exit date set - still in maintenance
+          }
+          if (r.garageEntryDate && r.garageExitDate && new Date(r.garageExitDate) > now) {
+            return true; // Exit date is in the future - still in maintenance
+          }
+          return false;
+        });
+        
+        if (activeMaintenanceRecords.length === 0) {
+          // All maintenance records have passed exit dates, auto-release vehicle
+          effectiveStatus = activeContracts.length > 0 ? 'Rented' : 'Available';
+          // Update the vehicle status in the database
+          db.update(vehicles).set({ status: 'Available' }).where(eq(vehicles.id, vehicle.id)).catch(() => {});
+        }
+      } else if (vehicle.status === 'Available' && activeContracts.length > 0) {
         effectiveStatus = 'Rented';
       } else if (vehicle.status === 'Rented' && activeContracts.length === 0) {
         effectiveStatus = 'Available';
@@ -275,6 +298,36 @@ export async function deleteVehicle(id: number, userId: number) {
   
   // All users (including super admin) can only delete their own vehicles
   await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
+}
+
+// Remove vehicle from maintenance and set status to Available
+export async function removeVehicleFromMaintenance(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Update vehicle status to Available
+  await db.update(vehicles)
+    .set({ status: 'Available', updatedAt: new Date() })
+    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+  
+  // Set garageExitDate to now for any maintenance records without an exit date
+  const openRecords = await db.select().from(maintenanceRecords)
+    .where(and(
+      eq(maintenanceRecords.vehicleId, vehicleId),
+      eq(maintenanceRecords.userId, userId)
+    ));
+  
+  for (const record of openRecords) {
+    if (record.garageEntryDate && !record.garageExitDate) {
+      await db.update(maintenanceRecords)
+        .set({ garageExitDate: new Date(), updatedAt: new Date() })
+        .where(eq(maintenanceRecords.id, record.id));
+    }
+  }
+  
+  return { success: true };
 }
 
 // Maintenance Records Queries

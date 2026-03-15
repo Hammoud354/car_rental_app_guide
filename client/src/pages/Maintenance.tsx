@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText, Home, Edit, Trash2 } from "lucide-react";
+import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText, Home, Edit, Trash2, CheckCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -15,6 +15,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 
 export default function Maintenance() {
+  const utils = trpc.useUtils();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const [viewingHistory, setViewingHistory] = useState<number | null>(null);
@@ -69,6 +70,17 @@ export default function Maintenance() {
     },
     onError: (error) => {
       toast.error(`Failed to update maintenance record: ${error.message}`);
+    },
+  });
+
+  const removeFromMaintenanceMutation = trpc.fleet.removeFromMaintenance.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle removed from maintenance and marked as Available");
+      // Invalidate vehicle list to refresh statuses
+      utils.fleet.listAvailableForMaintenance.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove vehicle from maintenance");
     },
   });
 
@@ -358,14 +370,31 @@ export default function Maintenance() {
                     )}
                   </div>
 
-                  <Button
-                    variant="outline"
-                    className="w-full input-client"
-                    onClick={() => setViewingHistory(vehicle.id)}
-                  >
-                    <Wrench className="mr-2 h-4 w-4 input-client" />
-                    View Maintenance History
-                  </Button>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      className="w-full input-client"
+                      onClick={() => setViewingHistory(vehicle.id)}
+                    >
+                      <Wrench className="mr-2 h-4 w-4 input-client" />
+                      View Maintenance History
+                    </Button>
+                    {vehicle.status === "Maintenance" && (
+                      <Button
+                        variant="outline"
+                        className="w-full border-green-500 text-green-600 hover:bg-green-50 input-client"
+                        onClick={() => {
+                          if (confirm(`Remove ${vehicle.plateNumber} from maintenance and mark as Available?`)) {
+                            removeFromMaintenanceMutation.mutate({ vehicleId: vehicle.id });
+                          }
+                        }}
+                        disabled={removeFromMaintenanceMutation.isPending}
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        {removeFromMaintenanceMutation.isPending ? "Removing..." : "Remove from Maintenance"}
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}

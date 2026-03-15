@@ -5824,3 +5824,9 @@ Note: Dashboard already has modular structure with OverdueWidget, metric cards, 
 - [x] Make calendar more compact and professional
 - [x] Test on desktop and mobile - Calendar now compact with no excessive white space
 - [x] Completely redesign with zero white space - Professional SaaS-style calendar matching Google Calendar, Calendly, Stripe
+
+## Bug Fixes Batch - Mar 15, 2026
+- [x] Fix driving license date spacing (Issue Date / Expiry Date too close together)
+- [x] Fix contract completion button stuck on 'completing' after contract is completed
+- [x] Add missing client details (passport, registration, DOB, place of birth) to contract form
+- [x] Fix maintenance exit date auto-releasing vehicle + add manual 'Remove from Maintenance' button

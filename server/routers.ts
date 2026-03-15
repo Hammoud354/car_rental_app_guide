@@ -443,6 +443,12 @@ export const appRouter = router({
         return await db.getLastReturnKm(input.vehicleId, ctx.user?.id || 1);
       }),
 
+    removeFromMaintenance: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.removeVehicleFromMaintenance(input.vehicleId, ctx.user?.id || 1);
+      }),
+
     listAvailableForMaintenance: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
