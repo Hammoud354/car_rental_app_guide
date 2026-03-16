@@ -1,24 +1,25 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { 
-  Car, FileText, Users, BarChart3, Wrench, DollarSign, 
-  ArrowRight, MessageCircle, Shield, Zap, Globe, ChevronRight,
-  LogIn, UserPlus, CheckCircle2, Star
+  ArrowRight, MessageCircle, Globe, ChevronRight,
+  LogIn, UserPlus, CheckCircle2, Star, BarChart3, FileText, 
+  Users, DollarSign, Wrench, Car, Clock, TrendingUp,
+  Activity
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useEffect, useRef } from "react";
-import { motion, useInView, useAnimation } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 
 function AnimatedSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const isInView = useInView(ref, { once: true, margin: "-60px" });
   
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
       className={className}
     >
       {children}
@@ -26,168 +27,148 @@ function AnimatedSection({ children, className = "", delay = 0 }: { children: Re
   );
 }
 
-function FloatingShape({ className }: { className: string }) {
-  return (
-    <motion.div
-      className={className}
-      animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
-      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-    />
-  );
-}
-
-function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const ref = useRef(null);
+function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
-  const controls = useAnimation();
-  const nodeRef = useRef<HTMLSpanElement>(null);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (isInView && nodeRef.current) {
-      let start = 0;
-      const duration = 2000;
-      const startTime = Date.now();
-      const animate = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(eased * target);
-        if (nodeRef.current) nodeRef.current.textContent = current + suffix;
-        if (progress < 1) requestAnimationFrame(animate);
-      };
-      animate();
-    }
-  }, [isInView, target, suffix]);
+    if (!isInView) return;
+    let start = 0;
+    const duration = 2000;
+    const startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    animate();
+  }, [isInView, target]);
 
-  return <span ref={(el) => { (ref as any).current = el; nodeRef.current = el; }}>0{suffix}</span>;
+  return <span ref={ref}>{prefix}{count}{suffix}</span>;
 }
 
 const features = [
   {
     icon: Car,
     title: "Fleet Management",
-    description: "Real-time tracking of your entire fleet with availability, location, and condition monitoring.",
-    gradient: "from-blue-500/10 to-cyan-500/10",
-    iconColor: "text-blue-600",
-    borderColor: "border-blue-200"
+    description: "Track every vehicle in real-time — availability, condition, location, and utilization rates at a glance.",
+    accent: "bg-blue-600",
   },
   {
     icon: FileText,
     title: "Smart Contracts",
-    description: "Generate, manage, and track rental contracts with automated workflows and digital signatures.",
-    gradient: "from-violet-500/10 to-purple-500/10",
-    iconColor: "text-violet-600",
-    borderColor: "border-violet-200"
+    description: "Auto-generate rental agreements with digital workflows, amendments, and compliance tracking built in.",
+    accent: "bg-indigo-600",
   },
   {
     icon: Users,
-    title: "Client Portal",
-    description: "Comprehensive client database with rental history, preferences, and document management.",
-    gradient: "from-emerald-500/10 to-green-500/10",
-    iconColor: "text-emerald-600",
-    borderColor: "border-emerald-200"
+    title: "Client Database",
+    description: "Centralized customer profiles with rental history, documents, license verification, and preferences.",
+    accent: "bg-violet-600",
   },
   {
     icon: DollarSign,
     title: "Financial Analytics",
-    description: "Detailed P&L analysis per vehicle, revenue tracking, and profitability dashboards.",
-    gradient: "from-amber-500/10 to-orange-500/10",
-    iconColor: "text-amber-600",
-    borderColor: "border-amber-200"
-  },
-  {
-    icon: BarChart3,
-    title: "Real-Time Insights",
-    description: "Live dashboards showing fleet utilization, revenue trends, and operational KPIs.",
-    gradient: "from-rose-500/10 to-pink-500/10",
-    iconColor: "text-rose-600",
-    borderColor: "border-rose-200"
+    description: "Per-vehicle P&L, revenue forecasting, expense tracking, and profitability dashboards.",
+    accent: "bg-emerald-600",
   },
   {
     icon: Wrench,
-    title: "Maintenance Hub",
-    description: "Schedule services, track repair costs, and get AI-powered maintenance predictions.",
-    gradient: "from-slate-500/10 to-gray-500/10",
-    iconColor: "text-slate-600",
-    borderColor: "border-slate-200"
-  }
+    title: "Maintenance Intelligence",
+    description: "AI-powered service scheduling, cost tracking, and predictive maintenance alerts.",
+    accent: "bg-amber-600",
+  },
+  {
+    icon: BarChart3,
+    title: "Business Intelligence",
+    description: "Live KPIs, fleet utilization trends, seasonal demand patterns, and executive reporting.",
+    accent: "bg-rose-600",
+  },
 ];
 
 const stats = [
-  { value: 500, suffix: "+", label: "Vehicles Managed" },
-  { value: 98, suffix: "%", label: "Uptime Guarantee" },
-  { value: 50, suffix: "+", label: "Agencies Trust Us" },
-  { value: 24, suffix: "/7", label: "Support Available" },
+  { value: 10000, suffix: "+", label: "Vehicles Managed", icon: Car },
+  { value: 99, suffix: ".9%", label: "System Uptime", icon: Activity },
+  { value: 200, suffix: "+", label: "Rental Agencies", icon: Globe },
+  { value: 15, suffix: "M+", prefix: "$", label: "Revenue Tracked", icon: TrendingUp },
 ];
 
 const testimonials = [
   {
-    name: "Ahmad Hassan",
-    role: "Fleet Manager, Dubai Auto Rentals",
-    text: "FleetMaster transformed how we manage our 200+ vehicle fleet. The automation alone saves us 20 hours per week.",
-    rating: 5,
+    name: "Ahmad Al-Hassan",
+    role: "Managing Director",
+    company: "Gulf Auto Rentals, UAE",
+    text: "FleetMaster transformed our operations. We went from spreadsheets to managing 300+ vehicles with complete visibility. Revenue grew 40% in the first year.",
+    avatar: "AH",
   },
   {
     name: "Sarah Mitchell",
-    role: "CEO, EasyRide Lebanon",
-    text: "The P&L tracking per vehicle gave us insights we never had before. We increased profitability by 35% in 6 months.",
-    rating: 5,
+    role: "CEO",
+    company: "DriveEasy Rentals, UK",
+    text: "The per-vehicle P&L tracking alone justified the investment. We identified unprofitable units and optimized our fleet — saving $120K annually.",
+    avatar: "SM",
   },
   {
     name: "Mohammed Al-Rashid",
-    role: "Operations Director, Royal Cars KSA",
-    text: "From contract creation to invoice generation, everything is seamless. The best investment we have made for our agency.",
-    rating: 5,
+    role: "Operations Director",
+    company: "Royal Cars, KSA",
+    text: "From contract generation to invoice automation, everything is seamless. Our team spends 60% less time on paperwork now.",
+    avatar: "MR",
   },
 ];
 
 const plans = [
   {
     name: "Starter",
-    price: "$50",
-    description: "Perfect for small agencies just getting started",
+    price: "49",
+    period: "/month",
+    description: "For small agencies getting started",
     features: [
       "Up to 15 vehicles",
       "Unlimited contracts",
       "Up to 100 clients",
-      "Basic reporting",
+      "Basic analytics",
       "Invoice generation",
-      "WhatsApp integration",
-      "Email support (48h)"
+      "Email support",
     ],
     popular: false,
     cta: "Start Free Trial"
   },
   {
     name: "Professional",
-    price: "$70",
+    price: "79",
+    period: "/month",
     description: "For growing agencies that need more power",
     features: [
       "Up to 50 vehicles",
       "Unlimited clients",
-      "P&L analysis",
-      "Advanced analytics",
-      "Damage inspection",
+      "Advanced P&L analytics",
+      "AI maintenance predictions",
+      "Damage inspection tools",
       "Contract amendments",
-      "Excel export",
-      "Priority support (24h)"
+      "Excel & PDF exports",
+      "Priority support",
     ],
     popular: true,
     cta: "Start Free Trial"
   },
   {
     name: "Enterprise",
-    price: "$85",
-    description: "For large agencies with complex needs",
+    price: "129",
+    period: "/month",
+    description: "For large fleets with complex operations",
     features: [
       "Unlimited vehicles",
-      "Unlimited clients",
-      "Multi-user access",
-      "Custom reports",
+      "Multi-user access & roles",
+      "Custom reporting",
       "API access",
       "White-label option",
+      "WhatsApp integration",
       "Dedicated account manager",
-      "24/7 priority support"
+      "24/7 priority support",
     ],
     popular: false,
     cta: "Contact Sales"
@@ -197,6 +178,7 @@ const plans = [
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && !loading) {
@@ -204,25 +186,30 @@ export default function Home() {
     }
   }, [isAuthenticated, loading, setLocation]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handleContactUs = () => {
     const message = encodeURIComponent(
       "Hello! I'm interested in learning more about FleetMaster.\n\n" +
-      "Please tell me about:\n" +
-      "1. My business name:\n" +
-      "2. Number of vehicles I manage:\n" +
-      "3. Monthly rental volume:\n" +
-      "4. Specific features I need:\n"
+      "Please share:\n" +
+      "1. Business name:\n" +
+      "2. Fleet size:\n" +
+      "3. Features needed:\n"
     );
     window.open(`https://wa.me/96176354131?text=${message}`, "_blank");
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full"
+          className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full"
         />
       </div>
     );
@@ -234,18 +221,34 @@ export default function Home() {
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled 
+            ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-100" 
+            : "bg-transparent"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <Link href="/">
-            <div className="flex items-center gap-2.5 cursor-pointer">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <Car className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-3 cursor-pointer">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-700/30">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                    <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                    <path d="M5 9.5h14" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                FleetMaster
-              </span>
+              <div className="flex flex-col">
+                <span className="text-[17px] font-bold tracking-tight text-gray-900">
+                  Fleet<span className="text-blue-600">Master</span>
+                </span>
+                <span className="text-[10px] font-medium text-gray-400 tracking-widest uppercase -mt-0.5">
+                  Rental Management
+                </span>
+              </div>
             </div>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
@@ -253,21 +256,21 @@ export default function Home() {
               variant="ghost" 
               size="sm" 
               onClick={handleContactUs} 
-              className="hidden md:inline-flex text-gray-600 hover:text-gray-900"
+              className="hidden lg:inline-flex text-gray-500 hover:text-gray-900 text-sm"
             >
               <MessageCircle className="h-4 w-4 mr-1.5" />
               Contact
             </Button>
             <Link href="/signin">
-              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 font-medium text-sm">
                 <LogIn className="h-4 w-4 sm:mr-1.5" />
                 <span className="hidden sm:inline">Sign In</span>
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 font-medium px-4">
-                <UserPlus className="h-4 w-4 sm:mr-1.5" />
-                <span className="hidden sm:inline">Get Started</span>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 font-medium px-5 text-sm">
+                <span>Get Started</span>
+                <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </Button>
             </Link>
           </div>
@@ -275,65 +278,70 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-100/50 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-50 to-violet-50 rounded-full blur-3xl opacity-60" />
+      <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-gradient-to-b from-blue-50/80 via-white to-white rounded-full blur-3xl" />
+          <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-indigo-50/60 to-transparent rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 mb-8"
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50/80 border border-blue-100 mb-6"
             >
-              <Zap className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-700">The #1 Car Rental Management Platform</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+              <span className="text-xs font-semibold text-blue-700 tracking-wide uppercase">Enterprise Fleet Management</span>
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6"
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6"
             >
-              <span className="text-gray-900">Manage Your Fleet</span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 bg-clip-text text-transparent">
-                Like Never Before
-              </span>
+              The Operating System{" "}
+              <br className="hidden sm:block" />
+              for{" "}
+              <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
+                Car Rental
+              </span>{" "}
+              Businesses
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed"
             >
-              The all-in-one platform to streamline your car rental operations. 
-              Track vehicles, manage contracts, and boost profitability with intelligent automation.
+              Manage your fleet, contracts, clients, invoices, and maintenance — 
+              all from one powerful platform built for rental agencies.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6"
             >
               <Link href="/signup">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base font-semibold shadow-xl shadow-blue-600/25 group rounded-xl">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 px-8 h-12 text-base font-semibold group">
                   Start Free Trial
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
               <Link href="/demo">
-                <Button size="lg" variant="outline" className="px-8 py-6 text-base font-semibold border-gray-200 hover:bg-gray-50 group rounded-xl">
-                  <Globe className="mr-2 h-5 w-5 text-gray-400" />
-                  Live Demo
-                  <ChevronRight className="ml-1 h-4 w-4 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="px-8 h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 group"
+                >
+                  <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                  Try Live Demo
+                  <ChevronRight className="h-4 w-4 ml-1 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
             </motion.div>
@@ -341,82 +349,90 @@ export default function Home() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="mt-6 text-sm text-gray-400"
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-xs text-gray-400 flex items-center justify-center gap-4"
             >
-              No credit card required &bull; 14-day free trial &bull; Cancel anytime
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> 14-day free trial</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> No credit card</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Cancel anytime</span>
             </motion.p>
           </div>
 
-          {/* Dashboard preview */}
+          {/* Dashboard Preview */}
           <motion.div
-            initial={{ opacity: 0, y: 60, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="mt-16 relative max-w-5xl mx-auto"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+            className="mt-16 mx-auto max-w-5xl"
           >
-            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-blue-600/20 rounded-2xl blur-2xl" />
-            <div className="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
-              <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                </div>
-                <div className="flex-1 flex justify-center">
-                  <div className="px-4 py-1 bg-white rounded-md border border-gray-200 text-xs text-gray-400">
-                    fleetmaster.app/dashboard
+            <div className="relative rounded-xl border border-gray-200 bg-gradient-to-b from-gray-50 to-white shadow-2xl shadow-gray-200/50 overflow-hidden">
+              <div className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-100/80 border-b border-gray-200">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
+                <div className="flex-1 mx-8">
+                  <div className="h-5 bg-white rounded-md border border-gray-200 max-w-xs mx-auto flex items-center justify-center">
+                    <span className="text-[10px] text-gray-400">app.fleetmaster.io/dashboard</span>
                   </div>
                 </div>
               </div>
-              <div className="p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-blue-50/30">
+              <div className="p-6 sm:p-8">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                   {[
-                    { label: "Total Vehicles", value: "156", change: "+12", color: "blue" },
-                    { label: "Active Rentals", value: "89", change: "+5", color: "emerald" },
-                    { label: "Monthly Revenue", value: "$45.2K", change: "+18%", color: "violet" },
-                    { label: "Utilization", value: "87%", change: "+3%", color: "amber" },
+                    { label: "Total Fleet", value: "127", change: "+12%", color: "text-blue-600", bg: "bg-blue-50" },
+                    { label: "Active Rentals", value: "89", change: "+8%", color: "text-emerald-600", bg: "bg-emerald-50" },
+                    { label: "Monthly Revenue", value: "$48.5K", change: "+23%", color: "text-violet-600", bg: "bg-violet-50" },
+                    { label: "Fleet Utilization", value: "94%", change: "+5%", color: "text-amber-600", bg: "bg-amber-50" },
                   ].map((stat, i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.8 + i * 0.1 }}
-                      className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: 0.7 + i * 0.1 }}
+                      className="bg-white rounded-lg border border-gray-100 p-4"
                     >
-                      <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                      <p className="text-xs text-gray-400 font-medium mb-1">{stat.label}</p>
                       <p className="text-xl font-bold text-gray-900">{stat.value}</p>
-                      <p className="text-xs text-emerald-600 font-medium mt-1">{stat.change}</p>
+                      <p className={`text-xs font-semibold ${stat.color} mt-1`}>{stat.change} this month</p>
                     </motion.div>
                   ))}
                 </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="col-span-2 bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-32">
-                    <p className="text-xs text-gray-500 mb-3">Revenue Trend</p>
-                    <div className="flex items-end gap-1.5 h-16">
-                      {[40, 55, 45, 60, 50, 70, 65, 80, 75, 85, 90, 95].map((h, i) => (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="sm:col-span-2 bg-white rounded-lg border border-gray-100 p-4 h-40">
+                    <p className="text-xs font-semibold text-gray-500 mb-3">Revenue Trend</p>
+                    <div className="flex items-end gap-1.5 h-24">
+                      {[35, 45, 38, 55, 48, 62, 58, 70, 65, 78, 72, 85].map((h, i) => (
                         <motion.div
                           key={i}
                           initial={{ height: 0 }}
                           animate={{ height: `${h}%` }}
-                          transition={{ delay: 1 + i * 0.05, duration: 0.5 }}
-                          className="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-sm"
+                          transition={{ duration: 0.5, delay: 0.9 + i * 0.05 }}
+                          className="flex-1 bg-gradient-to-t from-blue-600 to-blue-400 rounded-sm"
                         />
                       ))}
                     </div>
                   </div>
-                  <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-32">
-                    <p className="text-xs text-gray-500 mb-3">Fleet Status</p>
-                    <div className="space-y-2">
+                  <div className="bg-white rounded-lg border border-gray-100 p-4 h-40">
+                    <p className="text-xs font-semibold text-gray-500 mb-3">Fleet Status</p>
+                    <div className="space-y-2.5 mt-2">
                       {[
-                        { label: "Available", pct: 45, color: "bg-emerald-500" },
-                        { label: "Rented", pct: 42, color: "bg-blue-500" },
-                        { label: "Service", pct: 13, color: "bg-amber-500" },
+                        { label: "Available", pct: 35, color: "bg-emerald-500" },
+                        { label: "Rented", pct: 55, color: "bg-blue-500" },
+                        { label: "Maintenance", pct: 10, color: "bg-amber-500" },
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                          <span className="text-xs text-gray-600 flex-1">{item.label}</span>
-                          <span className="text-xs font-medium text-gray-900">{item.pct}%</span>
+                        <div key={i}>
+                          <div className="flex justify-between text-[10px] text-gray-500 mb-0.5">
+                            <span>{item.label}</span>
+                            <span>{item.pct}%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${item.pct}%` }}
+                              transition={{ duration: 0.8, delay: 1 + i * 0.1 }}
+                              className={`h-full ${item.color} rounded-full`}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -428,48 +444,77 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16 bg-gray-50 border-y border-gray-100">
+      {/* Trusted By Section */}
+      <section className="py-12 border-y border-gray-100 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, i) => (
-              <AnimatedSection key={i} delay={i * 0.1} className="text-center">
-                <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">
-                  <CountUp target={stat.value} suffix={stat.suffix} />
+          <AnimatedSection>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
+              {stats.map((stat, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                    <CountUp target={stat.value} suffix={stat.suffix} prefix={stat.prefix || ""} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1 font-medium">{stat.label}</p>
                 </div>
-                <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
-              </AnimatedSection>
-            ))}
-          </div>
+              ))}
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Features */}
       <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-sm font-medium text-blue-700 mb-4">
-              <Shield className="h-3.5 w-3.5" /> Everything You Need
-            </span>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
-              Powerful Features for
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">Modern Agencies</span>
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">Capabilities</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Everything you need to run a rental business
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Every tool you need to run a world-class car rental operation, all in one platform.
+            <p className="text-gray-500 text-lg">
+              A complete platform that replaces spreadsheets, scattered tools, and manual processes.
             </p>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <AnimatedSection key={i} delay={i * 0.08}>
-                <div className={`group relative p-6 rounded-2xl border ${feature.borderColor} bg-gradient-to-br ${feature.gradient} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 h-full`}>
-                  <div className={`w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className={`h-6 w-6 ${feature.iconColor}`} />
+                <div className="group relative p-6 rounded-xl border border-gray-100 bg-white hover:border-gray-200 hover:shadow-lg hover:shadow-gray-100/50 transition-all duration-300">
+                  <div className={`w-10 h-10 rounded-lg ${feature.accent} flex items-center justify-center mb-4`}>
+                    <feature.icon className="h-5 w-5 text-white" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                  <p className="text-gray-500 text-sm leading-relaxed">{feature.description}</p>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 lg:py-28 bg-gray-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">How It Works</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Up and running in minutes
+            </h2>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { step: "01", title: "Create Your Account", desc: "Sign up, choose your plan, and configure your company profile with currency and VAT settings.", icon: UserPlus },
+              { step: "02", title: "Add Your Fleet", desc: "Import or manually add vehicles, set rates, upload photos, and configure insurance details.", icon: Car },
+              { step: "03", title: "Start Operating", desc: "Create contracts, manage clients, generate invoices, and track profitability in real time.", icon: TrendingUp },
+            ].map((item, i) => (
+              <AnimatedSection key={i} delay={i * 0.15}>
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white border border-gray-200 shadow-sm mb-5">
+                    <item.icon className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="text-xs font-bold text-blue-600 tracking-widest uppercase mb-2">Step {item.step}</div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
                 </div>
               </AnimatedSection>
             ))}
@@ -478,34 +523,32 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gray-50 border-y border-gray-100">
+      <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-              Trusted by Agencies Worldwide
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">Testimonials</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Trusted by rental agencies worldwide
             </h2>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              See what fleet managers are saying about FleetMaster
-            </p>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <AnimatedSection key={i} delay={i * 0.1}>
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: t.rating }).map((_, j) => (
+                <div className="p-6 rounded-xl border border-gray-100 bg-white h-full flex flex-col">
+                  <div className="flex gap-0.5 mb-4">
+                    {Array.from({ length: 5 }).map((_, j) => (
                       <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-1">"{t.text}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
-                      {t.name.charAt(0)}
+                  <p className="text-gray-600 text-sm leading-relaxed flex-1 mb-5">"{t.text}"</p>
+                  <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold">
+                      {t.avatar}
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
-                      <p className="text-xs text-gray-500">{t.role}</p>
+                      <p className="text-sm font-semibold text-gray-900">{t.name}</p>
+                      <p className="text-xs text-gray-400">{t.role}, {t.company}</p>
                     </div>
                   </div>
                 </div>
@@ -516,60 +559,57 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="py-20 lg:py-28">
+      <section className="py-20 lg:py-28 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <AnimatedSection className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
-              Simple, Transparent Pricing
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">Pricing</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Simple, transparent pricing
             </h2>
-            <p className="text-lg text-gray-500 max-w-xl mx-auto">
-              Choose the plan that fits your business. No hidden fees.
+            <p className="text-gray-500 text-lg">
+              Start free for 14 days. No credit card required.
             </p>
           </AnimatedSection>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan, i) => (
               <AnimatedSection key={i} delay={i * 0.1}>
-                <div className={`relative rounded-2xl p-6 h-full flex flex-col ${
+                <div className={`relative rounded-xl border p-6 h-full flex flex-col ${
                   plan.popular 
-                    ? "bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-600/25 scale-[1.02]" 
-                    : "bg-white border border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all"
+                    ? "border-blue-200 bg-white shadow-xl shadow-blue-100/50 ring-1 ring-blue-100" 
+                    : "border-gray-100 bg-white hover:border-gray-200 hover:shadow-md transition-all"
                 }`}>
                   {plan.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="px-4 py-1 bg-amber-400 text-amber-900 text-xs font-bold rounded-full shadow-lg">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full tracking-wide uppercase">
                         Most Popular
                       </span>
                     </div>
                   )}
-                  <div className="mb-6">
-                    <h3 className={`text-lg font-bold mb-1 ${plan.popular ? "text-white" : "text-gray-900"}`}>
-                      {plan.name}
-                    </h3>
-                    <p className={`text-sm mb-4 ${plan.popular ? "text-blue-100" : "text-gray-500"}`}>
-                      {plan.description}
-                    </p>
-                    <div className="flex items-baseline gap-1">
-                      <span className={`text-4xl font-extrabold ${plan.popular ? "text-white" : "text-gray-900"}`}>
-                        {plan.price}
-                      </span>
-                      <span className={`text-sm ${plan.popular ? "text-blue-200" : "text-gray-400"}`}>/month</span>
-                    </div>
+                  <div className="mb-5">
+                    <h3 className="text-lg font-bold text-gray-900">{plan.name}</h3>
+                    <p className="text-sm text-gray-400 mt-0.5">{plan.description}</p>
+                  </div>
+                  <div className="flex items-baseline gap-1 mb-6">
+                    <span className="text-4xl font-extrabold text-gray-900">${plan.price}</span>
+                    <span className="text-sm text-gray-400 font-medium">{plan.period}</span>
                   </div>
                   <ul className="space-y-3 mb-8 flex-1">
-                    {plan.features.map((feature, j) => (
-                      <li key={j} className="flex items-start gap-2.5">
-                        <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${plan.popular ? "text-blue-200" : "text-blue-600"}`} />
-                        <span className={`text-sm ${plan.popular ? "text-blue-50" : "text-gray-600"}`}>{feature}</span>
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-2.5 text-sm text-gray-600">
+                        <CheckCircle2 className="h-4 w-4 text-blue-600 mt-0.5 shrink-0" />
+                        {f}
                       </li>
                     ))}
                   </ul>
-                  <Link href="/signup" className="w-full">
-                    <Button className={`w-full py-5 font-semibold rounded-xl ${
-                      plan.popular 
-                        ? "bg-white text-blue-600 hover:bg-blue-50" 
-                        : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}>
+                  <Link href="/signup">
+                    <Button
+                      className={`w-full h-11 font-semibold ${
+                        plan.popular
+                          ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
+                          : "bg-gray-900 hover:bg-gray-800 text-white"
+                      }`}
+                    >
                       {plan.cta}
                     </Button>
                   </Link>
@@ -581,30 +621,34 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 p-10 sm:p-16 text-center">
-              <div className="absolute inset-0">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+            <div className="relative rounded-2xl bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 p-10 sm:p-16 text-center overflow-hidden">
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-3xl" />
               </div>
-              <div className="relative z-10 max-w-2xl mx-auto">
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6">
-                  Ready to Transform Your Fleet Operations?
+              <div className="relative">
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-4">
+                  Ready to modernize your fleet operations?
                 </h2>
-                <p className="text-lg text-blue-100 mb-10 leading-relaxed">
-                  Join hundreds of agencies worldwide who trust FleetMaster to streamline their operations and maximize profitability.
+                <p className="text-gray-400 text-lg max-w-xl mx-auto mb-8">
+                  Join hundreds of rental agencies already using FleetMaster to save time, reduce costs, and grow revenue.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link href="/signup">
-                    <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-6 text-base font-bold shadow-xl group rounded-xl">
-                      Get Started Free
-                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 text-base font-semibold shadow-lg shadow-blue-600/30">
+                      Start Your Free Trial
+                      <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </Link>
-                  <Button size="lg" variant="outline" onClick={handleContactUs} className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-base font-semibold rounded-xl">
-                    <MessageCircle className="mr-2 h-5 w-5" />
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    onClick={handleContactUs}
+                    className="px-8 h-12 text-base font-medium border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+                  >
                     Talk to Sales
                   </Button>
                 </div>
@@ -615,29 +659,27 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-100 py-12">
+      <footer className="border-t border-gray-100 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
-                <Car className="h-4 w-4 text-white" />
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                </svg>
               </div>
-              <span className="font-bold text-gray-900">FleetMaster</span>
+              <span className="text-sm font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
             </div>
-            <p className="text-sm text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-gray-400">
+              <button onClick={handleContactUs} className="hover:text-gray-600 transition-colors cursor-pointer">Contact</button>
+              <Link href="/signin"><span className="hover:text-gray-600 transition-colors cursor-pointer">Sign In</span></Link>
+              <Link href="/signup"><span className="hover:text-gray-600 transition-colors cursor-pointer">Get Started</span></Link>
+            </div>
+            <p className="text-xs text-gray-400">
               &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
-              <button onClick={handleContactUs} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                Contact
-              </button>
-              <Link href="/demo" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                Demo
-              </Link>
-              <Link href="/signin" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
-                Sign In
-              </Link>
-            </div>
           </div>
         </div>
       </footer>

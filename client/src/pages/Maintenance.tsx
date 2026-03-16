@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -7,11 +6,31 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard, LogOut, FileText, Home, Edit, Trash2, CheckCircle } from "lucide-react";
-import { Link } from "wouter";
-import { useState, useEffect } from "react";
+import { Plus, Wrench, MapPin, Gauge, DollarSign, Car, Edit, Trash2, CheckCircle, Calendar, Search, AlertTriangle, Clock, ChevronRight, Activity } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+
+const MAINTENANCE_TYPES = ["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"] as const;
+
+function getTypeStyle(type: string) {
+  const styles: Record<string, { bg: string; text: string; dot: string }> = {
+    "Routine": { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500" },
+    "Repair": { bg: "bg-red-50", text: "text-red-700", dot: "bg-red-500" },
+    "Inspection": { bg: "bg-emerald-50", text: "text-emerald-700", dot: "bg-emerald-500" },
+    "Emergency": { bg: "bg-orange-50", text: "text-orange-700", dot: "bg-orange-500" },
+    "Oil Change": { bg: "bg-amber-50", text: "text-amber-700", dot: "bg-amber-500" },
+    "Brake Pads Change": { bg: "bg-violet-50", text: "text-violet-700", dot: "bg-violet-500" },
+    "Oil + Filter": { bg: "bg-cyan-50", text: "text-cyan-700", dot: "bg-cyan-500" },
+  };
+  return styles[type] || { bg: "bg-gray-50", text: "text-gray-700", dot: "bg-gray-500" };
+}
+
+function getStatusStyle(status: string) {
+  if (status === "Maintenance") return { bg: "bg-orange-50 border-orange-200", text: "text-orange-700", dot: "bg-orange-500" };
+  if (status === "Out of Service") return { bg: "bg-red-50 border-red-200", text: "text-red-700", dot: "bg-red-500" };
+  return { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700", dot: "bg-emerald-500" };
+}
 
 export default function Maintenance() {
   const utils = trpc.useUtils();
@@ -27,6 +46,8 @@ export default function Maintenance() {
   const [editPerformedAtDate, setEditPerformedAtDate] = useState<Date>();
   const [editGarageEntryDate, setEditGarageEntryDate] = useState<Date>();
   const [editGarageExitDate, setEditGarageExitDate] = useState<Date>();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const { data: vehicles } = trpc.fleet.listAvailableForMaintenance.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
@@ -34,26 +55,43 @@ export default function Maintenance() {
     { enabled: viewingHistory !== null }
   );
   
-  // Query for last return KM when vehicle is selected
   const { data: lastReturnKm } = trpc.fleet.getLastReturnKm.useQuery(
     { vehicleId: selectedVehicleId || 0 },
     { enabled: selectedVehicleId !== null }
   );
   
-  // Auto-fill KM field when lastReturnKm is loaded
   useEffect(() => {
-    if (lastReturnKm) {
-      setAutoFilledKm(lastReturnKm);
-    } else {
-      setAutoFilledKm(null);
-    }
+    setAutoFilledKm(lastReturnKm || null);
   }, [lastReturnKm]);
+
+  const filteredVehicles = useMemo(() => {
+    if (!vehicles) return [];
+    return vehicles.filter(v => {
+      const matchesSearch = searchQuery === "" || 
+        v.plateNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `${v.brand} ${v.model}`.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = statusFilter === "all" || v.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    });
+  }, [vehicles, searchQuery, statusFilter]);
+
+  const summaryStats = useMemo(() => {
+    if (!vehicles) return { total: 0, inMaintenance: 0, available: 0, totalCost: 0 };
+    const inMaintenance = vehicles.filter(v => v.status === "Maintenance").length;
+    const totalCost = vehicles.reduce((sum, v) => sum + (parseFloat((v as any).totalMaintenanceCost || "0")), 0);
+    return { total: vehicles.length, inMaintenance, available: vehicles.length - inMaintenance, totalCost };
+  }, [vehicles]);
 
   const addMaintenanceMutation = trpc.fleet.addMaintenanceRecord.useMutation({
     onSuccess: () => {
       toast.success("Maintenance record added successfully");
       refetchRecords();
+      utils.fleet.listAvailableForMaintenance.invalidate();
       setIsAddDialogOpen(false);
+      setSelectedVehicleId(null);
+      setPerformedAtDate(undefined);
+      setGarageEntryDate(undefined);
+      setGarageExitDate(undefined);
     },
     onError: (error) => {
       toast.error(`Failed to add maintenance record: ${error.message}`);
@@ -62,20 +100,19 @@ export default function Maintenance() {
 
   const updateMaintenanceMutation = trpc.fleet.updateMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Maintenance record updated successfully");
+      toast.success("Maintenance record updated");
       refetchRecords();
       setEditingRecordId(null);
       setEditFormData({});
     },
     onError: (error) => {
-      toast.error(`Failed to update maintenance record: ${error.message}`);
+      toast.error(`Failed to update: ${error.message}`);
     },
   });
 
   const removeFromMaintenanceMutation = trpc.fleet.removeFromMaintenance.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle removed from maintenance and marked as Available");
-      // Invalidate vehicle list to refresh statuses
+      toast.success("Vehicle marked as Available");
       utils.fleet.listAvailableForMaintenance.invalidate();
     },
     onError: (error: any) => {
@@ -85,11 +122,11 @@ export default function Maintenance() {
 
   const deleteMaintenanceMutation = trpc.fleet.deleteMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Maintenance record deleted");
+      toast.success("Record deleted");
       refetchRecords();
     },
     onError: (error) => {
-      toast.error(`Failed to delete maintenance record: ${error.message}`);
+      toast.error(`Failed to delete: ${error.message}`);
     },
   });
 
@@ -107,22 +144,24 @@ export default function Maintenance() {
       garageEntryDate: record.garageEntryDate ? new Date(record.garageEntryDate).toISOString().split('T')[0] : "",
       garageExitDate: record.garageExitDate ? new Date(record.garageExitDate).toISOString().split('T')[0] : "",
     });
+    setEditPerformedAtDate(new Date(record.performedAt));
+    setEditGarageEntryDate(record.garageEntryDate ? new Date(record.garageEntryDate) : undefined);
+    setEditGarageExitDate(record.garageExitDate ? new Date(record.garageExitDate) : undefined);
   };
 
   const handleSaveEdit = () => {
     if (!editingRecordId) return;
-    
     updateMaintenanceMutation.mutate({
       id: editingRecordId,
       maintenanceType: editFormData.maintenanceType,
       description: editFormData.description,
       cost: editFormData.cost || undefined,
-      performedAt: new Date(editFormData.performedAt),
+      performedAt: editPerformedAtDate || new Date(editFormData.performedAt),
       performedBy: editFormData.performedBy || undefined,
       garageLocation: editFormData.garageLocation || undefined,
       mileageAtService: editFormData.mileageAtService ? parseInt(editFormData.mileageAtService) : undefined,
-      garageEntryDate: editFormData.garageEntryDate ? new Date(editFormData.garageEntryDate) : undefined,
-      garageExitDate: editFormData.garageExitDate ? new Date(editFormData.garageExitDate) : undefined,
+      garageEntryDate: editGarageEntryDate || undefined,
+      garageExitDate: editGarageExitDate || undefined,
     });
   };
 
@@ -140,7 +179,6 @@ export default function Maintenance() {
       toast.error("Please select a vehicle");
       return;
     }
-
     if (!performedAtDate) {
       toast.error("Please select a date performed");
       return;
@@ -165,499 +203,454 @@ export default function Maintenance() {
     });
   };
 
-  const getMaintenanceTypeColor = (type: string) => {
-    switch (type) {
-      case "Routine":
-        return "bg-blue-500/10 text-blue-500 border-blue-500/20";
-      case "Repair":
-        return "bg-red-500/10 text-red-500 border-red-500/20";
-      case "Inspection":
-        return "bg-green-500/10 text-green-500 border-green-500/20";
-      case "Emergency":
-        return "bg-orange-500/10 text-orange-500 border-orange-500/20";
-      default:
-        return "";
-    }
-  };
-
-  const navItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/fleet-management", label: "Fleet", icon: Car },
-    { href: "/maintenance", label: "Maintenance", icon: Wrench },
-    { href: "/rental-contracts", label: "Contracts", icon: FileText },
-  ];
+  const viewingVehicle = vehicles?.find(v => v.id === viewingHistory);
 
   return (
     <>
-        <div className="max-w-7xl mx-auto space-y-8 input-client">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 input-client">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 input-client">Maintenance Tracking</h2>
-              <p className="text-gray-600 mt-1 text-sm input-client">Track and manage vehicle maintenance records</p>
-            </div>
-            
-            <div className="flex gap-3 w-full md:w-auto input-client">
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gray-900 hover:bg-gray-800 w-full md:w-auto input-client" size="sm">
-                  <Plus className="mr-2 h-4 w-4 input-client" />
-                  Add Maintenance Record
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto input-client">
-                <DialogHeader>
-                  <DialogTitle>Add Maintenance Record</DialogTitle>
-                  <DialogDescription>Record maintenance work performed on a vehicle.</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleAddMaintenance} className="space-y-4 input-client">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Maintenance</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Track and manage vehicle service records</p>
+          </div>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm" size="sm">
+                <Plus className="mr-1.5 h-4 w-4" />
+                Add Record
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold">New Maintenance Record</DialogTitle>
+                <DialogDescription>Record maintenance work performed on a vehicle.</DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleAddMaintenance} className="space-y-4 mt-2">
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Vehicle *</Label>
+                  <Select onValueChange={(value) => setSelectedVehicleId(parseInt(value))} required>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select a vehicle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vehicles?.map((vehicle) => (
+                        <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
+                          {vehicle.plateNumber} — {vehicle.brand} {vehicle.model}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="vehicleSelect">Select Vehicle *</Label>
-                    <Select 
-                      onValueChange={(value) => {
-                        const vehicleId = parseInt(value);
-                        setSelectedVehicleId(vehicleId);
-                        // Auto-fill will happen via useEffect when lastReturnKm loads
-                      }}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a vehicle" />
+                    <Label className="text-xs font-medium text-gray-700">Type *</Label>
+                    <Select name="maintenanceType" required>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {vehicles?.map((vehicle) => (
-                          <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                            {vehicle.plateNumber} - {vehicle.brand} {vehicle.model}
-                          </SelectItem>
+                        {MAINTENANCE_TYPES.map(t => (
+                          <SelectItem key={t} value={t}>{t}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="maintenanceType">Maintenance Type *</Label>
-                      <Select name="maintenanceType" required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Routine">Routine</SelectItem>
-                          <SelectItem value="Repair">Repair</SelectItem>
-                          <SelectItem value="Inspection">Inspection</SelectItem>
-                          <SelectItem value="Emergency">Emergency</SelectItem>
-                          <SelectItem value="Oil Change">Oil Change</SelectItem>
-                          <SelectItem value="Brake Pads Change">Brake Pads Change</SelectItem>
-                          <SelectItem value="Oil + Filter">Oil + Filter</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Date Performed *</Label>
-                      <ModernDatePicker
-                        date={performedAtDate}
-                        onDateChange={setPerformedAtDate}
-                        placeholder="Select date performed"
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <Label htmlFor="description">Description *</Label>
-                    <Textarea id="description" name="description" rows={3} required placeholder="Describe the maintenance work performed..." />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="garageLocation">Garage Location</Label>
-                      <Input id="garageLocation" name="garageLocation" placeholder="e.g., Downtown Auto Center" className="input-client" />
-                    </div>
-                    <div>
-                      <Label htmlFor="performedBy">Performed By</Label>
-                      <Input id="performedBy" name="performedBy" placeholder="Technician name" className="input-client" />
+                    <Label className="text-xs font-medium text-gray-700">Date Performed *</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder="Select date" />
                     </div>
                   </div>
+                </div>
 
-                  <div className="input-client">
-                    <div>
-                      <Label>Garage Entry Date</Label>
-                      <ModernDatePicker
-                        date={garageEntryDate}
-                        onDateChange={setGarageEntryDate}
-                        placeholder="Select entry date"
-                      />
-                    </div>
-                    <div>
-                      <Label>Garage Exit Date</Label>
-                      <ModernDatePicker
-                        date={garageExitDate}
-                        onDateChange={setGarageExitDate}
-                        placeholder="Select exit date"
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Description *</Label>
+                  <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm" />
+                </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="mileageAtService">
-                        Kilometer Reading
-                        {autoFilledKm && <span className="text-xs text-muted-foreground ml-2 input-client">(Auto-filled from last rental)</span>}
-                      </Label>
-                      <Input 
-                        id="mileageAtService" 
-                        name="mileageAtService" 
-                        type="number" 
-                        min="0" 
-                        placeholder="e.g., 45000"
-                        defaultValue={autoFilledKm || undefined}
-                        key={autoFilledKm || 'empty'}
-                        className="input-client"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="cost">Cost ($)</Label>
-                      <Input id="cost" name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
-                    </div>
-                    <div>
-                      <Label htmlFor="kmDueMaintenance">KM Due for Maintenance</Label>
-                      <Input id="kmDueMaintenance" name="kmDueMaintenance" type="number" min="0" placeholder="e.g., 50000" className="input-client" />
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={addMaintenanceMutation.isPending}>
-                      {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-            </div>
-          </div>
-
-          {/* Vehicle List with Maintenance Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 input-client">
-            {vehicles?.map((vehicle) => (
-              <Card key={vehicle.id} className="bg-white shadow-sm hover:shadow-md transition-shadow input-client">
-                <CardHeader>
-                  <div className="flex justify-between items-start input-client">
-                    <div>
-                      <CardTitle className="text-lg font-bold input-client">{vehicle.plateNumber}</CardTitle>
-                      <p className="text-sm text-gray-600 mt-1 input-client">
-                        {vehicle.brand} {vehicle.model} ({vehicle.year})
-                      </p>
-                    </div>
-                    <Badge className={vehicle.status === "Maintenance" ? "bg-orange-500/10 text-orange-500 border-orange-500/20" : "bg-green-500/10 text-green-500 border-green-500/20"}>
-                      {vehicle.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4 input-client">
-                  <div className="text-sm space-y-2 input-client">
-                    <div className="flex items-center gap-2 text-gray-600 input-client">
-                      <Gauge className="h-4 w-4 input-client" />
-                      <span>Current: {vehicle.mileage || 0} km</span>
-                    </div>
-                    {(vehicle as any).totalMaintenanceCost && parseFloat((vehicle as any).totalMaintenanceCost) > 0 && (
-                      <div className="flex items-center gap-2 text-gray-900 font-semibold input-client">
-                        <span className="text-blue-600 input-client">💰</span>
-                        <span>Total Maintenance: ${(vehicle as any).totalMaintenanceCost}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      variant="outline"
-                      className="w-full input-client"
-                      onClick={() => setViewingHistory(vehicle.id)}
-                    >
-                      <Wrench className="mr-2 h-4 w-4 input-client" />
-                      View Maintenance History
-                    </Button>
-                    {vehicle.status === "Maintenance" && (
-                      <Button
-                        variant="outline"
-                        className="w-full border-green-500 text-green-600 hover:bg-green-50 input-client"
-                        onClick={() => {
-                          if (confirm(`Remove ${vehicle.plateNumber} from maintenance and mark as Available?`)) {
-                            removeFromMaintenanceMutation.mutate({ vehicleId: vehicle.id });
-                          }
-                        }}
-                        disabled={removeFromMaintenanceMutation.isPending}
-                      >
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        {removeFromMaintenanceMutation.isPending ? "Removing..." : "Remove from Maintenance"}
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Edit Maintenance Record Dialog */}
-          {editingRecordId && (
-            <Dialog open={editingRecordId !== null} onOpenChange={() => {
-              setEditingRecordId(null);
-              setEditFormData({});
-            }}>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto input-client">
-                <DialogHeader>
-                  <DialogTitle>Edit Maintenance Record</DialogTitle>
-                  <DialogDescription>Update maintenance record details.</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 input-client">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="edit-maintenanceType">Maintenance Type *</Label>
-                      <Select 
-                        value={editFormData.maintenanceType} 
-                        onValueChange={(value) => setEditFormData({...editFormData, maintenanceType: value})}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Routine">Routine</SelectItem>
-                          <SelectItem value="Repair">Repair</SelectItem>
-                          <SelectItem value="Inspection">Inspection</SelectItem>
-                          <SelectItem value="Emergency">Emergency</SelectItem>
-                          <SelectItem value="Oil Change">Oil Change</SelectItem>
-                          <SelectItem value="Brake Pads Change">Brake Pads Change</SelectItem>
-                          <SelectItem value="Oil + Filter">Oil + Filter</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Date Performed *</Label>
-                      <ModernDatePicker
-                        date={editPerformedAtDate}
-                        onDateChange={setEditPerformedAtDate}
-                        placeholder="Select date performed"
-                      />
-                    </div>
-                  </div>
-
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="edit-description">Description *</Label>
-                    <Textarea 
-                      id="edit-description" 
-                      rows={3} 
-                      value={editFormData.description} 
-                      onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                      placeholder="Describe the maintenance work performed..." 
+                    <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
+                    <Input name="garageLocation" placeholder="e.g., Downtown Auto" className="mt-1 text-sm" />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Performed By</Label>
+                    <Input name="performedBy" placeholder="Technician name" className="mt-1 text-sm" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Garage Exit</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">
+                      KM Reading
+                      {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
+                    </Label>
+                    <Input
+                      name="mileageAtService"
+                      type="number"
+                      min="0"
+                      placeholder="45000"
+                      defaultValue={autoFilledKm || undefined}
+                      key={autoFilledKm || 'empty'}
+                      className="mt-1 text-sm"
                     />
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="edit-garageLocation">Garage Location</Label>
-                      <Input 
-                        id="edit-garageLocation" 
-                        value={editFormData.garageLocation} 
-                        onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})}
-                        placeholder="e.g., Downtown Auto Center" 
-                        className="input-client" 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-performedBy">Performed By</Label>
-                      <Input 
-                        id="edit-performedBy" 
-                        value={editFormData.performedBy} 
-                        onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})}
-                        placeholder="Technician name" 
-                        className="input-client" 
-                      />
-                    </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Cost ($)</Label>
+                    <Input name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1 text-sm" />
                   </div>
-
-                  <div className="input-client">
-                    <div>
-                      <Label>Garage Entry Date</Label>
-                      <ModernDatePicker
-                        date={editGarageEntryDate}
-                        onDateChange={setEditGarageEntryDate}
-                        placeholder="Select entry date"
-                      />
-                    </div>
-                    <div>
-                      <Label>Garage Exit Date</Label>
-                      <ModernDatePicker
-                        date={editGarageExitDate}
-                        onDateChange={setEditGarageExitDate}
-                        placeholder="Select exit date"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 input-client">
-                    <div>
-                      <Label htmlFor="edit-mileageAtService">Kilometer Reading</Label>
-                      <Input 
-                        id="edit-mileageAtService" 
-                        type="number" 
-                        min="0" 
-                        value={editFormData.mileageAtService} 
-                        onChange={(e) => setEditFormData({...editFormData, mileageAtService: e.target.value})}
-                        placeholder="e.g., 45000"
-                        className="input-client"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-cost">Cost ($)</Label>
-                      <Input 
-                        id="edit-cost" 
-                        type="number" 
-                        step="0.01" 
-                        min="0" 
-                        value={editFormData.cost} 
-                        onChange={(e) => setEditFormData({...editFormData, cost: e.target.value})}
-                        placeholder="0.00" 
-                        className="input-client" 
-                      />
-                    </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Next Service KM</Label>
+                    <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 text-sm" />
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => {
-                      setEditingRecordId(null);
-                      setEditFormData({});
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="button" 
-                    onClick={handleSaveEdit}
-                    disabled={updateMaintenanceMutation.isPending}
-                  >
-                    {updateMaintenanceMutation.isPending ? "Saving..." : "Save Changes"}
+
+                <DialogFooter className="pt-2">
+                  <Button type="button" variant="outline" size="sm" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
+                  <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={addMaintenanceMutation.isPending}>
+                    {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
                   </Button>
                 </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
 
-          {/* Maintenance History Dialog */}
-          {viewingHistory && (
-            <Dialog open={viewingHistory !== null} onOpenChange={() => setViewingHistory(null)}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto input-client">
-                <DialogHeader>
-                  <DialogTitle>
-                    Maintenance History - {vehicles?.find(v => v.id === viewingHistory)?.plateNumber}
-                  </DialogTitle>
-                  <DialogDescription>View all maintenance records for this vehicle.</DialogDescription>
-                </DialogHeader>
-                
-                {/* Total Cost Summary */}
-                {maintenanceRecords && maintenanceRecords.length > 0 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 input-client">
-                    <div className="flex items-center justify-between input-client">
-                      <div className="flex items-center gap-2 input-client">
-                        <span className="text-2xl input-client">💰</span>
-                        <span className="text-sm font-medium text-gray-600 input-client">Total Maintenance Cost</span>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { label: "Total Vehicles", value: summaryStats.total, icon: Car, color: "text-blue-600", bg: "bg-blue-50" },
+            { label: "In Maintenance", value: summaryStats.inMaintenance, icon: Wrench, color: "text-orange-600", bg: "bg-orange-50" },
+            { label: "Available", value: summaryStats.available, icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
+            { label: "Total Cost", value: `$${summaryStats.totalCost.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`, icon: DollarSign, color: "text-violet-600", bg: "bg-violet-50" },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white rounded-xl border border-gray-100 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-500">{stat.label}</span>
+                <div className={`w-8 h-8 rounded-lg ${stat.bg} flex items-center justify-center`}>
+                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                </div>
+              </div>
+              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search by plate, brand, or model..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 text-sm h-9"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-44 h-9 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="Available">Available</SelectItem>
+              <SelectItem value="Maintenance">In Maintenance</SelectItem>
+              <SelectItem value="Rented">Rented</SelectItem>
+              <SelectItem value="Out of Service">Out of Service</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Vehicle Grid */}
+        {filteredVehicles.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-100">
+            <Car className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+            <p className="text-sm font-medium text-gray-500">No vehicles found</p>
+            <p className="text-xs text-gray-400 mt-1">Try adjusting your search or filters</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredVehicles.map((vehicle) => {
+              const statusStyle = getStatusStyle(vehicle.status);
+              const totalCost = parseFloat((vehicle as any).totalMaintenanceCost || "0");
+              
+              return (
+                <div key={vehicle.id} className="bg-white rounded-xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all overflow-hidden">
+                  <div className="p-5">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <h3 className="text-base font-bold text-gray-900 truncate">{vehicle.plateNumber}</h3>
+                        </div>
+                        <p className="text-sm text-gray-500">{vehicle.brand} {vehicle.model} ({vehicle.year})</p>
                       </div>
-                      <span className="text-2xl font-bold text-blue-600 input-client">
-                        ${maintenanceRecords.reduce((sum, record) => {
-                          const cost = record.cost ? parseFloat(record.cost.toString()) : 0;
-                          return sum + cost;
-                        }, 0).toFixed(2)}
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusStyle.bg} ${statusStyle.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
+                        {vehicle.status}
                       </span>
                     </div>
-                    <div className="mt-2 text-xs text-gray-500 input-client">
-                      Based on {maintenanceRecords.length} maintenance record{maintenanceRecords.length !== 1 ? 's' : ''}
+
+                    <div className="flex items-center gap-4 text-xs text-gray-500 mb-4">
+                      <span className="flex items-center gap-1">
+                        <Gauge className="h-3.5 w-3.5" />
+                        {(vehicle.mileage || 0).toLocaleString()} km
+                      </span>
+                      {totalCost > 0 && (
+                        <span className="flex items-center gap-1 font-medium text-gray-700">
+                          <DollarSign className="h-3.5 w-3.5" />
+                          ${totalCost.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs h-8"
+                        onClick={() => setViewingHistory(vehicle.id)}
+                      >
+                        <Wrench className="mr-1 h-3.5 w-3.5" />
+                        History
+                      </Button>
+                      {vehicle.status === "Maintenance" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs h-8 border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                          onClick={() => {
+                            if (confirm(`Mark ${vehicle.plateNumber} as Available?`)) {
+                              removeFromMaintenanceMutation.mutate({ vehicleId: vehicle.id });
+                            }
+                          }}
+                          disabled={removeFromMaintenanceMutation.isPending}
+                        >
+                          <CheckCircle className="mr-1 h-3.5 w-3.5" />
+                          {removeFromMaintenanceMutation.isPending ? "..." : "Mark Available"}
+                        </Button>
+                      )}
                     </div>
                   </div>
-                )}
-                
-                <div className="space-y-4 input-client">
-                  {maintenanceRecords && maintenanceRecords.length > 0 ? (
-                    maintenanceRecords.map((record) => (
-                      <Card key={record.id} className="bg-gray-50 input-client">
-                        <CardContent className="pt-6 input-client">
-                          <div className="flex justify-between items-start mb-4 input-client">
-                            <Badge className={getMaintenanceTypeColor(record.maintenanceType)}>
-                              {record.maintenanceType}
-                            </Badge>
-                            <div className="flex items-center gap-2 input-client">
-                              <span className="text-sm text-gray-600 input-client">
-                                {new Date(record.performedAt).toLocaleDateString()}
-                              </span>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleEditRecord(record)}
-                                className="h-8 w-8 p-0 input-client"
-                              >
-                                <Edit className="h-4 w-4 input-client" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleDeleteRecord(record.id)}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 input-client"
-                              >
-                                <Trash2 className="h-4 w-4 input-client" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <p className="text-gray-900 font-medium mb-3 input-client">{record.description}</p>
-
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm input-client">
-                            {record.garageLocation && (
-                              <div className="flex items-center gap-2 text-gray-600 input-client">
-                                <MapPin className="h-4 w-4 input-client" />
-                                <span>{record.garageLocation}</span>
-                              </div>
-                            )}
-                            {record.mileageAtService && (
-                              <div className="flex items-center gap-2 text-gray-600 input-client">
-                                <Gauge className="h-4 w-4 input-client" />
-                                <span>{record.mileageAtService} km</span>
-                              </div>
-                            )}
-                            {record.cost && (
-                              <div className="flex items-center gap-2 text-gray-600 input-client">
-                                <DollarSign className="h-4 w-4 input-client" />
-                                <span>${record.cost}</span>
-                              </div>
-                            )}
-                            {record.performedBy && (
-                              <div className="flex items-center gap-2 text-gray-600 input-client">
-                                <Wrench className="h-4 w-4 input-client" />
-                                <span>{record.performedBy}</span>
-                              </div>
-                            )}
-                            {record.kmDueMaintenance && (
-                              <div className="flex items-center gap-2 text-gray-600 input-client">
-                                <Gauge className="h-4 w-4 input-client" />
-                                <span>Next service at: {record.kmDueMaintenance} km</span>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <div className="text-center py-12 input-client">
-                      <Wrench className="h-12 w-12 mx-auto text-gray-400 mb-4 input-client" />
-                      <p className="text-gray-600 input-client">No maintenance records yet</p>
-                    </div>
-                  )}
                 </div>
-              </DialogContent>
-            </Dialog>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Edit Record Dialog */}
+        {editingRecordId && (
+          <Dialog open={editingRecordId !== null} onOpenChange={() => { setEditingRecordId(null); setEditFormData({}); }}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold">Edit Maintenance Record</DialogTitle>
+                <DialogDescription>Update the record details below.</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 mt-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Type *</Label>
+                    <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {MAINTENANCE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Date Performed *</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={editPerformedAtDate} onDateChange={setEditPerformedAtDate} placeholder="Select date" />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-xs font-medium text-gray-700">Description *</Label>
+                  <Textarea
+                    rows={2}
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                    placeholder="Describe the work performed..."
+                    className="mt-1 text-sm"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
+                    <Input
+                      value={editFormData.garageLocation}
+                      onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})}
+                      placeholder="Downtown Auto Center"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Performed By</Label>
+                    <Input
+                      value={editFormData.performedBy}
+                      onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})}
+                      placeholder="Technician name"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={editGarageEntryDate} onDateChange={setEditGarageEntryDate} placeholder="Entry date" />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Garage Exit</Label>
+                    <div className="mt-1">
+                      <ModernDatePicker date={editGarageExitDate} onDateChange={setEditGarageExitDate} placeholder="Exit date" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">KM Reading</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={editFormData.mileageAtService}
+                      onChange={(e) => setEditFormData({...editFormData, mileageAtService: e.target.value})}
+                      placeholder="45000"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-gray-700">Cost ($)</Label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={editFormData.cost}
+                      onChange={(e) => setEditFormData({...editFormData, cost: e.target.value})}
+                      placeholder="0.00"
+                      className="mt-1 text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter className="pt-2">
+                <Button variant="outline" size="sm" onClick={() => { setEditingRecordId(null); setEditFormData({}); }}>Cancel</Button>
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveEdit} disabled={updateMaintenanceMutation.isPending}>
+                  {updateMaintenanceMutation.isPending ? "Saving..." : "Save Changes"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* History Dialog */}
+        {viewingHistory && (
+          <Dialog open={viewingHistory !== null} onOpenChange={() => setViewingHistory(null)}>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold flex items-center gap-2">
+                  <Wrench className="h-5 w-5 text-gray-400" />
+                  {viewingVehicle?.plateNumber} — {viewingVehicle?.brand} {viewingVehicle?.model}
+                </DialogTitle>
+                <DialogDescription>All maintenance records for this vehicle.</DialogDescription>
+              </DialogHeader>
+
+              {maintenanceRecords && maintenanceRecords.length > 0 && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm font-medium text-gray-600">Total Maintenance Cost</span>
+                    </div>
+                    <span className="text-2xl font-bold text-blue-700">
+                      ${maintenanceRecords.reduce((sum, r) => sum + (r.cost ? parseFloat(r.cost.toString()) : 0), 0).toFixed(2)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">{maintenanceRecords.length} record{maintenanceRecords.length !== 1 ? 's' : ''}</p>
+                </div>
+              )}
+
+              <div className="space-y-3 mt-2">
+                {maintenanceRecords && maintenanceRecords.length > 0 ? (
+                  maintenanceRecords.map((record) => {
+                    const style = getTypeStyle(record.maintenanceType);
+                    return (
+                      <div key={record.id} className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${style.bg} ${style.text}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+                              {record.maintenanceType}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              {new Date(record.performedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button size="sm" variant="ghost" onClick={() => handleEditRecord(record)} className="h-7 w-7 p-0">
+                              <Edit className="h-3.5 w-3.5 text-gray-400" />
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => handleDeleteRecord(record.id)} className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <p className="text-sm text-gray-800 font-medium mb-3">{record.description}</p>
+
+                        <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-gray-500">
+                          {record.garageLocation && (
+                            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{record.garageLocation}</span>
+                          )}
+                          {record.mileageAtService && (
+                            <span className="flex items-center gap-1"><Gauge className="h-3 w-3" />{record.mileageAtService.toLocaleString()} km</span>
+                          )}
+                          {record.cost && (
+                            <span className="flex items-center gap-1 font-medium text-gray-700"><DollarSign className="h-3 w-3" />${record.cost}</span>
+                          )}
+                          {record.performedBy && (
+                            <span className="flex items-center gap-1"><Wrench className="h-3 w-3" />{record.performedBy}</span>
+                          )}
+                          {record.kmDueMaintenance && (
+                            <span className="flex items-center gap-1"><Activity className="h-3 w-3" />Next: {record.kmDueMaintenance.toLocaleString()} km</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="text-center py-12">
+                    <Wrench className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+                    <p className="text-sm font-medium text-gray-500">No maintenance records yet</p>
+                    <p className="text-xs text-gray-400 mt-1">Add a record using the button above</p>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+      </div>
     </>
   );
 }

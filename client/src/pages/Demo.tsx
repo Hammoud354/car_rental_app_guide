@@ -2,54 +2,46 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Clock, AlertTriangle, Loader2, ArrowRight } from "lucide-react";
+import { Clock, Loader2, ArrowRight, Car, FileText, BarChart3, Wrench, DollarSign, CheckCircle2, AlertTriangle } from "lucide-react";
+import { Link } from "wouter";
 
-const DEMO_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+const DEMO_DURATION_MS = 10 * 60 * 1000;
 
 export default function Demo() {
   const [, setLocation] = useLocation();
   const [timeRemaining, setTimeRemaining] = useState(DEMO_DURATION_MS);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   
   const loginDemoMutation = trpc.auth.loginDemo.useMutation();
 
   useEffect(() => {
-    // Start demo session automatically
     handleStartDemo();
   }, []);
 
   useEffect(() => {
+    if (status !== "ready") return;
     if (timeRemaining <= 0) {
-      handleDemoExpired();
+      window.location.href = "/";
       return;
     }
-
     const timer = setInterval(() => {
       setTimeRemaining((prev) => Math.max(0, prev - 1000));
     }, 1000);
-
     return () => clearInterval(timer);
-  }, [timeRemaining]);
+  }, [timeRemaining, status]);
 
   const handleStartDemo = async () => {
-    setIsLoggingIn(true);
+    setStatus("loading");
     try {
       await loginDemoMutation.mutateAsync();
-      // Redirect to dashboard after successful login
+      setStatus("ready");
       setTimeout(() => {
         setLocation("/dashboard");
-      }, 1500);
+      }, 2000);
     } catch (error) {
       console.error("Demo login failed:", error);
-      setIsLoggingIn(false);
+      setStatus("error");
     }
-  };
-
-  const handleDemoExpired = () => {
-    // Logout and redirect to home
-    window.location.href = "/";
   };
 
   const formatTime = (ms: number) => {
@@ -58,123 +50,109 @@ export default function Demo() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const getTimeColor = () => {
-    if (timeRemaining < 60000) return "text-red-600"; // < 1 minute
-    if (timeRemaining < 180000) return "text-orange-600"; // < 3 minutes
-    return "text-green-600";
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-gray-50 p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Clock className="h-8 w-8 text-primary" />
-          </div>
-          <CardTitle className="text-3xl">Welcome to the Demo!</CardTitle>
-          <CardDescription className="text-base mt-2">
-            You're about to experience the full power of our Car Rental Management System
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {isLoggingIn ? (
-            <div className="text-center py-8 space-y-4">
-              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-              <p className="text-lg font-medium">Setting up your demo account...</p>
-              <p className="text-sm text-muted-foreground">
-                Creating dummy data: vehicles, contracts, clients, and reports
-              </p>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white p-4">
+      <div className="w-full max-w-lg">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/">
+            <div className="inline-flex items-center gap-2.5 cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                </svg>
+              </div>
+              <span className="text-xl font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
             </div>
-          ) : (
-            <>
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Demo Mode:</strong> You have full access to explore all features with dummy data.
-                  The demo will automatically end after 10 minutes.
-                </AlertDescription>
-              </Alert>
+          </Link>
+        </div>
 
-              <div className="bg-gray-50 rounded-lg p-6 text-center space-y-2">
-                <p className="text-sm text-muted-foreground">Time Remaining</p>
-                <p className={`text-5xl font-bold font-mono ${getTimeColor()}`}>
+        {status === "error" ? (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 p-10 text-center">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-red-50 flex items-center justify-center">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Demo setup failed</h2>
+            <p className="text-sm text-gray-500 mb-6">Something went wrong. Please try again.</p>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={handleStartDemo} className="bg-blue-600 hover:bg-blue-700 text-white">Retry</Button>
+              <Button variant="outline" onClick={() => setLocation("/")}>Back to Home</Button>
+            </div>
+          </div>
+        ) : status === "loading" ? (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 p-10 text-center">
+            <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-blue-50 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Setting up your demo</h2>
+            <p className="text-sm text-gray-500">Creating sample vehicles, contracts, and analytics data...</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-emerald-50 flex items-center justify-center">
+                <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Demo Ready!</h2>
+              <p className="text-sm text-gray-500 mb-6">Your demo environment is loaded with sample data. Redirecting to dashboard...</p>
+
+              {/* Timer */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100 mb-6">
+                <Clock className={`h-4 w-4 ${timeRemaining < 60000 ? 'text-red-500' : timeRemaining < 180000 ? 'text-orange-500' : 'text-blue-600'}`} />
+                <span className={`text-lg font-bold font-mono ${timeRemaining < 60000 ? 'text-red-600' : timeRemaining < 180000 ? 'text-orange-600' : 'text-gray-900'}`}>
                   {formatTime(timeRemaining)}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {timeRemaining < 60000 && "Demo ending soon!"}
-                </p>
+                </span>
+                <span className="text-xs text-gray-400">remaining</span>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="font-semibold">What you can explore:</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">✓</span>
-                    <span><strong>Fleet Management:</strong> View 10 sample vehicles with complete details</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">✓</span>
-                    <span><strong>Contracts:</strong> Browse active, pending, and completed rental contracts</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">✓</span>
-                    <span><strong>P&L Analysis:</strong> See profitability reports per vehicle</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">✓</span>
-                    <span><strong>Analytics:</strong> Explore real-time dashboards and insights</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-primary">✓</span>
-                    <span><strong>Maintenance:</strong> Track service history and upcoming maintenance</span>
-                  </li>
-                </ul>
+              {/* Features */}
+              <div className="grid grid-cols-2 gap-3 text-left mb-6">
+                {[
+                  { icon: Car, label: "10 Sample Vehicles" },
+                  { icon: FileText, label: "Active Contracts" },
+                  { icon: BarChart3, label: "Analytics Dashboard" },
+                  { icon: DollarSign, label: "P&L Reports" },
+                  { icon: Wrench, label: "Maintenance Tracking" },
+                  { icon: CheckCircle2, label: "Invoice Generation" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs text-gray-600 py-1.5">
+                    <item.icon className="h-3.5 w-3.5 text-blue-600 shrink-0" />
+                    {item.label}
+                  </div>
+                ))}
               </div>
 
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Note:</strong> Demo accounts cannot create, edit, or delete data.
-                  Sign up for a real account to unlock full functionality.
-                </AlertDescription>
-              </Alert>
-
-              <div className="flex gap-3 pt-4">
-                <Button 
-                  className="flex-1" 
-                  size="lg"
+              <div className="flex gap-3">
+                <Button
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-10 font-semibold shadow-md shadow-blue-600/20"
                   onClick={() => setLocation("/dashboard")}
                 >
-                  Continue to Dashboard
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  Go to Dashboard
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg"
+                <Button
+                  variant="outline"
+                  className="h-10"
                   onClick={() => setLocation("/")}
                 >
-                  Back to Home
+                  Exit
                 </Button>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </div>
 
-      {/* Floating Timer (shown when on dashboard) */}
-      {!isLoggingIn && timeRemaining > 0 && (
-        <div className="fixed bottom-4 right-4 bg-background border rounded-lg shadow-lg p-4 min-w-[200px]">
-          <div className="flex items-center gap-3">
-            <Clock className={`h-5 w-5 ${getTimeColor()}`} />
-            <div>
-              <p className="text-xs text-muted-foreground">Demo Time Left</p>
-              <p className={`text-xl font-bold font-mono ${getTimeColor()}`}>
-                {formatTime(timeRemaining)}
-              </p>
+            <div className="px-8 py-4 bg-amber-50 border-t border-amber-100">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                <p className="text-xs text-amber-700">
+                  <strong>Demo mode:</strong> Data is read-only. <button onClick={() => setLocation("/signup")} className="underline font-semibold hover:text-amber-900">Sign up</button> for full access.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

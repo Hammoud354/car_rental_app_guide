@@ -57,6 +57,37 @@ export const appRouter = router({
           maxAge,
         });
 
+        // Auto-create company profile with country settings if it doesn't exist
+        try {
+          const existingProfile = await db.getCompanyProfile(user.id);
+          if (!existingProfile && user.country) {
+            const { getCountryData, countries } = await import("@shared/countries");
+            const { COUNTRY_FINANCIAL_SETTINGS } = await import("@shared/vatRates");
+            
+            const countryCode = user.country;
+            const countryData = getCountryData(countryCode);
+            const countryEntry = countries.find(c => c.code === countryCode);
+            const countryName = countryEntry?.name || countryData?.name || countryCode;
+            const currencyCode = countryData?.currencyCode || "USD";
+            const vatRate = countryData?.vatRate ?? COUNTRY_FINANCIAL_SETTINGS[countryName]?.vatRate ?? 0;
+            const exchangeRate = COUNTRY_FINANCIAL_SETTINGS[countryName]?.exchangeRate ?? 1;
+            
+            await db.upsertCompanyProfile({
+              userId: user.id,
+              companyName: user.name || "My Company",
+              country: countryName,
+              phone: user.phone || undefined,
+              email: user.email || undefined,
+              localCurrencyCode: currencyCode,
+              vatRate: vatRate,
+              exchangeRate: exchangeRate,
+              defaultCurrency: currencyCode === "USD" ? "USD" : "LOCAL",
+            });
+          }
+        } catch (err) {
+          console.error("[login] Failed to auto-create company profile:", err);
+        }
+
         return {
           success: true,
           user: {

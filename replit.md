@@ -28,11 +28,16 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - SidebarLayout wraps authenticated routes at the `App.tsx` level (not per-page)
 - Tailwind CSS v4 with custom theme tokens (primary, secondary, success, danger, warning)
 - Print styles configured for invoices and contracts
+- Landing page: Professional design with FleetMaster branding, blue-600 accent, animated dashboard preview
+- Auth pages (SignIn/SignUp): Split-panel layout with dark branding panel + white form panel
+- Logo: SVG car icon in gradient blue/indigo rounded-xl box, "Fleet**Master**" text with "Master" in blue-600
 
 ## Auth
-- Local authentication with username/password
+- Local authentication with username/password (cookie-based sessions)
 - Admin user: `admin` / `Admin123!` (role: `super_admin`)
-- JWT-based sessions
+- Demo mode: `/demo` route auto-creates demo user with 10-minute session, pre-seeded data via `server/seedDemoData.ts`
+- Auto-country: On first login, company profile is auto-created with country, VAT rate, currency from signup data
+- Country data mapping: `shared/countries.ts` (COUNTRY_VAT_CURRENCY) maps country codes to financial settings
 
 ## Running
 ```

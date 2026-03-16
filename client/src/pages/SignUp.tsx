@@ -3,11 +3,11 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
-import { Loader2, Eye, EyeOff, Phone } from "lucide-react";
+import { Loader2, Eye, EyeOff, Phone, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Link } from "wouter";
 import { countries, getCountryData, COUNTRY_PHONE_DATA } from "@shared/countries";
 
 export default function SignUp() {
@@ -19,7 +19,6 @@ export default function SignUp() {
     email: "",
     fullName: "",
     phone: "",
-    countryCode: "+971",
     country: "AE",
     countryName: "United Arab Emirates",
   });
@@ -31,17 +30,18 @@ export default function SignUp() {
   }, [formData.country]);
 
   const phonePlaceholder = useMemo(() => {
-    const digits = phoneData.phoneDigits;
-    return "X".repeat(digits);
+    return "X".repeat(phoneData.phoneDigits);
   }, [phoneData]);
 
   const signUpMutation = trpc.auth.signUp.useMutation({
     onSuccess: () => {
-      toast.success("Account created successfully! Please sign in with your credentials.");
+      toast.success("Account created! Please sign in.");
       const countryData = getCountryData(formData.country);
       if (countryData) {
         localStorage.setItem('pendingCountryData', JSON.stringify(countryData));
       }
+      localStorage.setItem('signupCountry', formData.country);
+      localStorage.setItem('signupCountryName', formData.countryName);
       setTimeout(() => setLocation("/signin"), 1000);
     },
     onError: (error) => {
@@ -51,19 +51,15 @@ export default function SignUp() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-
     if (formData.password.length < 6) {
       toast.error("Password must be at least 6 characters");
       return;
     }
-
     const fullPhone = `${phoneData.phoneCode} ${formData.phone}`;
-
     signUpMutation.mutate({
       username: formData.username,
       password: formData.password,
@@ -95,60 +91,126 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-violet-50 p-3 sm:p-4">
-      <Card className="w-full max-w-md shadow-xl border-gray-200">
-        <CardHeader className="px-4 sm:px-6 py-4 sm:py-6">
-          <CardTitle className="text-xl sm:text-2xl">Create Account</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">
-            Sign up to get started with FleetMaster
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="username" className="text-xs sm:text-sm">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                value={formData.username}
-                onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                required
-                minLength={3}
-                className="text-sm"
-              />
+    <div className="min-h-screen flex">
+      {/* Left Panel - Branding */}
+      <div className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-gray-900 via-gray-900 to-blue-950 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-20 right-20 w-72 h-72 bg-blue-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 left-10 w-56 h-56 bg-indigo-500/10 rounded-full blur-3xl" />
+        </div>
+        <div className="relative flex flex-col justify-between p-12 w-full">
+          <Link href="/">
+            <div className="flex items-center gap-3 cursor-pointer">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-white">
+                Fleet<span className="text-blue-400">Master</span>
+              </span>
+            </div>
+          </Link>
+          
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-3xl font-extrabold text-white leading-tight mb-3">
+                Start managing your<br />fleet today.
+              </h2>
+              <p className="text-gray-400 text-base leading-relaxed max-w-sm">
+                Create your account and get a 14-day free trial with full access to all features.
+              </p>
+            </div>
+            <div className="space-y-4">
+              {[
+                "Full fleet & contract management",
+                "Automated invoicing & P&L tracking",
+                "AI-powered maintenance predictions",
+                "No credit card required"
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 text-gray-300 text-sm">
+                  <CheckCircle2 className="h-4 w-4 text-blue-400 shrink-0" />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-600">
+            &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-white overflow-y-auto">
+        <div className="w-full max-w-sm py-6">
+          {/* Mobile Logo */}
+          <div className="lg:hidden mb-6 text-center">
+            <Link href="/">
+              <div className="inline-flex items-center gap-2.5 cursor-pointer">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                    <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
+                  </svg>
+                </div>
+                <span className="text-lg font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create your account</h1>
+            <p className="text-sm text-gray-500 mt-1">Get started with your 14-day free trial</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-gray-700">Username</Label>
+                <Input
+                  type="text"
+                  placeholder="username"
+                  value={formData.username}
+                  onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                  required
+                  minLength={3}
+                  className="h-10 text-sm"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-gray-700">Full Name</Label>
+                <Input
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                  required
+                  className="h-10 text-sm"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="fullName" className="text-xs sm:text-sm">Full Name</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-gray-700">Email</Label>
               <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
-                required
-                className="text-sm"
-              />
-            </div>
-
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
-              <Input
-                id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder="you@company.com"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
-                className="text-sm"
+                className="h-10 text-sm"
               />
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="country" className="text-xs sm:text-sm">Country</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-gray-700">Country</Label>
               <Select value={formData.country} onValueChange={handleCountryChange}>
-                <SelectTrigger className="text-sm">
+                <SelectTrigger className="h-10 text-sm">
                   <SelectValue placeholder="Select country" />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
@@ -161,106 +223,102 @@ export default function SignUp() {
               </Select>
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="phone" className="text-xs sm:text-sm">Phone Number</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-gray-700">Phone Number</Label>
               <div className="flex gap-2">
-                <div className="flex items-center gap-1.5 px-3 bg-gray-50 border border-[#1e3a8a] rounded-md text-sm font-medium text-gray-700 whitespace-nowrap min-w-[70px] justify-center" style={{ borderWidth: '1.5px' }}>
-                  <Phone className="h-3.5 w-3.5 text-gray-500" />
+                <div className="flex items-center gap-1.5 px-3 bg-gray-50 border rounded-md text-sm font-medium text-gray-600 whitespace-nowrap min-w-[65px] justify-center h-10" style={{ borderColor: '#1e3a8a', borderWidth: '1.5px' }}>
+                  <Phone className="h-3 w-3 text-gray-400" />
                   {phoneData.phoneCode}
                 </div>
                 <Input
-                  id="phone"
                   type="tel"
                   placeholder={phonePlaceholder}
                   value={formData.phone}
                   onChange={handlePhoneChange}
                   required
                   maxLength={phoneData.phoneDigits}
-                  className="text-sm flex-1"
+                  className="h-10 text-sm flex-1"
                 />
-              </div>
-              <p className="text-xs text-gray-400 mt-0.5">
-                {phoneData.phoneCode} followed by {phoneData.phoneDigits} digits
-              </p>
-            </div>
-
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="password" className="text-xs sm:text-sm">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                  minLength={6}
-                  className="pr-10 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
             </div>
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="confirmPassword" className="text-xs sm:text-sm">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirm your password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  required
-                  minLength={6}
-                  className="pr-10 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-gray-700">Password</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 6 chars"
+                    value={formData.password}
+                    onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    required
+                    minLength={6}
+                    className="h-10 text-sm pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-gray-700">Confirm</Label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Repeat password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                    required
+                    minLength={6}
+                    className="h-10 text-sm pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
               </div>
             </div>
 
             <Button
               type="submit"
-              className="w-full mt-4 sm:mt-6 py-2 sm:py-2.5 text-sm sm:text-base"
+              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md shadow-blue-600/20 mt-2"
               disabled={signUpMutation.isPending}
             >
               {signUpMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating Account...
+                  Creating account...
                 </>
               ) : (
-                "Create Account"
+                <>
+                  Create Account
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
               )}
             </Button>
-
-            <div className="text-center text-xs sm:text-sm text-muted-foreground mt-3 sm:mt-4">
-              Already have an account?{" "}
-              <Button
-                type="button"
-                variant="link"
-                className="p-0 h-auto text-xs sm:text-sm"
-                onClick={() => setLocation("/signin")}
-              >
-                Sign In
-              </Button>
-            </div>
           </form>
-        </CardContent>
-      </Card>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Already have an account?{" "}
+              <button
+                onClick={() => setLocation("/signin")}
+                className="text-blue-600 hover:text-blue-700 font-semibold"
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
