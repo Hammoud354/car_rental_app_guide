@@ -428,6 +428,32 @@
     @apply text-foreground bg-background;
   }
   
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([role="combobox"]),
+  textarea,
+  select:not([data-slot]) {
+    border-color: #1e3a8a !important;
+    border-width: 1.5px !important;
+  }
+  
+  input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="range"]):not([role="combobox"]):focus,
+  textarea:focus,
+  select:not([data-slot]):focus {
+    border-color: #1e40af !important;
+    box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.15) !important;
+  }
+  
+  [role="combobox"],
+  button[data-slot="select-trigger"] {
+    border-color: #1e3a8a !important;
+    border-width: 1.5px !important;
+  }
+  
+  [role="combobox"]:focus,
+  button[data-slot="select-trigger"]:focus {
+    border-color: #1e40af !important;
+    box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.15) !important;
+  }
+  
   label {
     @apply text-sm font-medium text-text-primary;
   }

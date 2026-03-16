@@ -1,10 +1,10 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { UserFilterProvider } from "./contexts/UserFilterContext";
+import SidebarLayout from "./components/SidebarLayout";
 import Landing from "./pages/Landing";
 import Clients from "./pages/Clients";
 import RentalContracts from "./pages/RentalContracts";
@@ -40,67 +40,74 @@ import AIMaintenance from "./pages/AIMaintenance";
 import AdminNumberingManagement from "./pages/AdminNumberingManagement";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import ContractManagement from "./pages/ContractManagement";
-function Router() {
-  // make sure to consider if you need authentication for certain routes
+
+const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password"];
+
+function AppContent() {
+  const [location] = useLocation();
+  const isPublicRoute = PUBLIC_ROUTES.some(route => location === route);
+
+  if (isPublicRoute) {
+    return (
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/demo" component={Demo} />
+        <Route path="/login" component={SignIn} />
+        <Route path="/signin" component={SignIn} />
+        <Route path="/signup" component={SignUp} />
+        <Route path="/register" component={Register} />
+        <Route path="/forgot-password" component={ForgotPassword} />
+        <Route path="/reset-password" component={ResetPassword} />
+      </Switch>
+    );
+  }
+
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/demo" component={Demo} />
-      <Route path="/login" component={SignIn} />
-      <Route path="/signin" component={SignIn} />
-      <Route path="/signup" component={SignUp} />
-      <Route path="/register" component={Register} />
-      <Route path="/forgot-password" component={ForgotPassword} />
-      <Route path="/reset-password" component={ResetPassword} />
-      <Route path="/clients" component={Clients} />
-      <Route path="/rental-contracts" component={RentalContracts} />
-      <Route path="/404" component={NotFound} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/profitability" component={ProfitabilityDashboard} />
-      <Route path="/profit-loss" component={ProfitAndLoss} />
-      <Route path="/maintenance" component={Maintenance} />
-      <Route path="/maintenance-tracking" component={MaintenanceTracking} />
-      <Route path="/ai-maintenance" component={AIMaintenance} />
-      <Route path="/fleet" component={Fleet} />
-      <Route path="/fleet-management" component={FleetManagement} />
-      <Route path="/vehicle/:id" component={VehicleDetails} />
-      <Route path="/booking" component={Booking} />
-      <Route path="/operations" component={Operations} />
-      <Route path="/compliance" component={Compliance} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/whatsapp-settings" component={WhatsAppSettings} />
-      <Route path="/admin/users" component={AdminUsers} />
-      <Route path="/admin/user-management" component={UserManagement} />
-      <Route path="/admin/audit-logs" component={AuditLogs} />
-      <Route path="/admin/numbering" component={AdminNumberingManagement} />
-      <Route path="/subscription-plans" component={SubscriptionPlans} />
-      <Route path="/analysis" component={Analysis} />
-      <Route path="/reservations" component={Reservations} />
-      <Route path="/company-settings" component={CompanySettings} />
-      <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
-      <Route path="/contract-management" component={ContractManagement} />
-      <Route path="/invoices" component={Invoices} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <SidebarLayout>
+      <Switch>
+        <Route path="/clients" component={Clients} />
+        <Route path="/rental-contracts" component={RentalContracts} />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/profitability" component={ProfitabilityDashboard} />
+        <Route path="/profit-loss" component={ProfitAndLoss} />
+        <Route path="/maintenance" component={Maintenance} />
+        <Route path="/maintenance-tracking" component={MaintenanceTracking} />
+        <Route path="/ai-maintenance" component={AIMaintenance} />
+        <Route path="/fleet" component={Fleet} />
+        <Route path="/fleet-management" component={FleetManagement} />
+        <Route path="/vehicle/:id" component={VehicleDetails} />
+        <Route path="/booking" component={Booking} />
+        <Route path="/operations" component={Operations} />
+        <Route path="/compliance" component={Compliance} />
+        <Route path="/settings" component={Settings} />
+        <Route path="/whatsapp-settings" component={WhatsAppSettings} />
+        <Route path="/admin/users" component={AdminUsers} />
+        <Route path="/admin/user-management" component={UserManagement} />
+        <Route path="/admin/audit-logs" component={AuditLogs} />
+        <Route path="/admin/numbering" component={AdminNumberingManagement} />
+        <Route path="/subscription-plans" component={SubscriptionPlans} />
+        <Route path="/analysis" component={Analysis} />
+        <Route path="/reservations" component={Reservations} />
+        <Route path="/company-settings" component={CompanySettings} />
+        <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
+        <Route path="/contract-management" component={ContractManagement} />
+        <Route path="/invoices" component={Invoices} />
+        <Route path="/404" component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </SidebarLayout>
   );
 }
-
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider
         defaultTheme="light"
-        // switchable
       >
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <AppContent />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

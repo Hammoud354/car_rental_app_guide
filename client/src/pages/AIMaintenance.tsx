@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import SidebarLayout from "@/components/SidebarLayout";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -182,7 +181,7 @@ export default function AIMaintenance() {
   }, {}) || {};
 
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -641,6 +640,6 @@ export default function AIMaintenance() {
           </DialogContent>
         </Dialog>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

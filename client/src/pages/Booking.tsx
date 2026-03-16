@@ -1,4 +1,3 @@
-import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Link } from "wouter";
 
 export default function Booking() {
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-8">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-2">
@@ -110,6 +109,6 @@ export default function Booking() {
           </Card>
         </div>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

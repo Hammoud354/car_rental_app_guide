@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
-import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +18,7 @@ import * as XLSX from "xlsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 
 export default function ProfitLoss() {
   const [dateRange, setDateRange] = useState<{
@@ -236,18 +235,18 @@ export default function ProfitLoss() {
 
   if (isLoadingFinancial || isLoadingVehicles || isLoadingMonthly) {
     return (
-      <SidebarLayout>
+      <>
         <div className="flex items-center justify-center min-h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
         </div>
-      </SidebarLayout>
+      </>
     );
   }
 
   const isProfit = (financialData?.profitLoss.netProfit || 0) >= 0;
 
   return (
-    <SidebarLayout>
+    <>
       <div className="container mx-auto py-8 max-w-7xl">
       <div id="profit-loss-content">
       {/* Header */}
@@ -276,7 +275,7 @@ export default function ProfitLoss() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <Label>Start Date</Label>
-              <DatePickerWithYearNav
+              <ModernDatePicker
                 date={startDate}
                 onDateChange={(date) => {
                   setStartDate(date);
@@ -287,7 +286,7 @@ export default function ProfitLoss() {
             </div>
             <div>
               <Label>End Date</Label>
-              <DatePickerWithYearNav
+              <ModernDatePicker
                 date={endDate}
                 onDateChange={(date) => {
                   setEndDate(date);
@@ -485,6 +484,6 @@ export default function ProfitLoss() {
         </Button>
       </div>
     </div>
-    </SidebarLayout>
+    </>
   );
 }

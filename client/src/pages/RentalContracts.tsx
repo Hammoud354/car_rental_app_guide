@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import SidebarLayout from "@/components/SidebarLayout";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { ContractPDFTemplate } from "@/components/ContractPDFTemplate";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -447,7 +446,7 @@ export default function RentalContracts() {
   ];
 
   return (
-    <SidebarLayout>
+    <>
           {showInspection ? (
             <div>
               <div className="mb-6">
@@ -2177,6 +2176,6 @@ export default function RentalContracts() {
           }}
         />
       )}
-    </SidebarLayout>
+    </>
   );
 }

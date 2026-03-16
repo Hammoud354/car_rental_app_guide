@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
 import { TrendingUp, TrendingDown, DollarSign, Percent, ChevronRight, Home } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 import { Link } from "wouter";
 
 interface DetailedBreakdown {
@@ -128,7 +128,7 @@ export default function ProfitAndLoss() {
           <div className="flex gap-4">
             <div>
               <Label className="text-sm font-medium">Start Date</Label>
-              <DatePickerWithYearNav
+              <ModernDatePicker
                 date={startDate}
                 onDateChange={setStartDate}
                 placeholder="Select start date"
@@ -136,7 +136,7 @@ export default function ProfitAndLoss() {
             </div>
             <div>
               <Label className="text-sm font-medium">End Date</Label>
-              <DatePickerWithYearNav
+              <ModernDatePicker
                 date={endDate}
                 onDateChange={setEndDate}
                 placeholder="Select end date"

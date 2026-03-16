@@ -11,8 +11,7 @@ import { Plus, Wrench, Calendar, MapPin, Gauge, DollarSign, Car, LayoutDashboard
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import SidebarLayout from "@/components/SidebarLayout";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 
 export default function Maintenance() {
   const utils = trpc.useUtils();
@@ -189,7 +188,7 @@ export default function Maintenance() {
   ];
 
   return (
-    <SidebarLayout>
+    <>
         <div className="max-w-7xl mx-auto space-y-8 input-client">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 input-client">
@@ -255,7 +254,7 @@ export default function Maintenance() {
                     </div>
                     <div>
                       <Label>Date Performed *</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={performedAtDate}
                         onDateChange={setPerformedAtDate}
                         placeholder="Select date performed"
@@ -282,7 +281,7 @@ export default function Maintenance() {
                   <div className="input-client">
                     <div>
                       <Label>Garage Entry Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={garageEntryDate}
                         onDateChange={setGarageEntryDate}
                         placeholder="Select entry date"
@@ -290,7 +289,7 @@ export default function Maintenance() {
                     </div>
                     <div>
                       <Label>Garage Exit Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={garageExitDate}
                         onDateChange={setGarageExitDate}
                         placeholder="Select exit date"
@@ -435,7 +434,7 @@ export default function Maintenance() {
                     </div>
                     <div>
                       <Label>Date Performed *</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editPerformedAtDate}
                         onDateChange={setEditPerformedAtDate}
                         placeholder="Select date performed"
@@ -480,7 +479,7 @@ export default function Maintenance() {
                   <div className="input-client">
                     <div>
                       <Label>Garage Entry Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editGarageEntryDate}
                         onDateChange={setEditGarageEntryDate}
                         placeholder="Select entry date"
@@ -488,7 +487,7 @@ export default function Maintenance() {
                     </div>
                     <div>
                       <Label>Garage Exit Date</Label>
-                      <DatePickerWithYearNav
+                      <ModernDatePicker
                         date={editGarageExitDate}
                         onDateChange={setEditGarageExitDate}
                         placeholder="Select exit date"
@@ -659,6 +658,6 @@ export default function Maintenance() {
             </Dialog>
           )}
         </div>
-    </SidebarLayout>
+    </>
   );
 }

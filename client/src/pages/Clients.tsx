@@ -1,5 +1,4 @@
 import { useState } from "react";
-import SidebarLayout from "@/components/SidebarLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -13,7 +12,6 @@ import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -265,7 +263,7 @@ export default function Clients() {
   );
 
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
@@ -825,6 +823,6 @@ export default function Clients() {
           </DialogContent>
         </Dialog>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

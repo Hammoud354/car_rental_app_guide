@@ -8,7 +8,6 @@ import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet }
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import SidebarLayout from "@/components/SidebarLayout";
 import { Settings as SettingsIcon, Eye, EyeOff } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
@@ -548,7 +547,7 @@ export default function Dashboard() {
 
 
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-8">
           {/* Header */}
           <div className="flex flex-col gap-4">
@@ -871,6 +870,6 @@ export default function Dashboard() {
             )}
           </div>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

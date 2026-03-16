@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MessageCircle, Save, Loader2, ChevronRight, Info } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import SidebarLayout from "@/components/SidebarLayout";
 
 const templateTypes = [
   {
@@ -133,16 +132,16 @@ export default function WhatsAppSettings() {
 
   if (isLoading) {
     return (
-      <SidebarLayout>
+      <>
         <div className="flex items-center justify-center min-h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
         </div>
-      </SidebarLayout>
+      </>
     );
   }
 
   return (
-    <SidebarLayout>
+    <>
       <div className="container mx-auto py-8 max-w-5xl">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
@@ -237,6 +236,6 @@ export default function WhatsAppSettings() {
           </Card>
         ))}
       </div>
-    </SidebarLayout>
+    </>
   );
 }

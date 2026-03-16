@@ -68,11 +68,12 @@ export function ModernDatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "w-full justify-start text-left font-normal bg-white hover:bg-gray-50 border-gray-200",
+            "w-full justify-start text-left font-normal bg-white hover:bg-gray-50",
             !date && "text-gray-500",
             disabled && "opacity-50 cursor-not-allowed",
             className
           )}
+          style={{ borderColor: '#1e3a8a', borderWidth: '1.5px' }}
         >
           <CalendarIcon className="mr-2 h-4 w-4 shrink-0 text-gray-400" />
           <span className="truncate">{date ? format(date, "PPP") : placeholder}</span>

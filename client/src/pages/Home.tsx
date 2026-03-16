@@ -1,42 +1,203 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { 
   Car, FileText, Users, BarChart3, Wrench, DollarSign, 
-  Clock, Check, ArrowRight, MessageCircle,
-  LogIn, UserPlus
+  ArrowRight, MessageCircle, Shield, Zap, Globe, ChevronRight,
+  LogIn, UserPlus, CheckCircle2, Star
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import { motion, useInView, useAnimation } from "framer-motion";
 
+function AnimatedSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function FloatingShape({ className }: { className: string }) {
+  return (
+    <motion.div
+      className={className}
+      animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
+      transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+    />
+  );
+}
+
+function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true });
+  const controls = useAnimation();
+  const nodeRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (isInView && nodeRef.current) {
+      let start = 0;
+      const duration = 2000;
+      const startTime = Date.now();
+      const animate = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * target);
+        if (nodeRef.current) nodeRef.current.textContent = current + suffix;
+        if (progress < 1) requestAnimationFrame(animate);
+      };
+      animate();
+    }
+  }, [isInView, target, suffix]);
+
+  return <span ref={(el) => { (ref as any).current = el; nodeRef.current = el; }}>0{suffix}</span>;
+}
+
+const features = [
+  {
+    icon: Car,
+    title: "Fleet Management",
+    description: "Real-time tracking of your entire fleet with availability, location, and condition monitoring.",
+    gradient: "from-blue-500/10 to-cyan-500/10",
+    iconColor: "text-blue-600",
+    borderColor: "border-blue-200"
+  },
+  {
+    icon: FileText,
+    title: "Smart Contracts",
+    description: "Generate, manage, and track rental contracts with automated workflows and digital signatures.",
+    gradient: "from-violet-500/10 to-purple-500/10",
+    iconColor: "text-violet-600",
+    borderColor: "border-violet-200"
+  },
+  {
+    icon: Users,
+    title: "Client Portal",
+    description: "Comprehensive client database with rental history, preferences, and document management.",
+    gradient: "from-emerald-500/10 to-green-500/10",
+    iconColor: "text-emerald-600",
+    borderColor: "border-emerald-200"
+  },
+  {
+    icon: DollarSign,
+    title: "Financial Analytics",
+    description: "Detailed P&L analysis per vehicle, revenue tracking, and profitability dashboards.",
+    gradient: "from-amber-500/10 to-orange-500/10",
+    iconColor: "text-amber-600",
+    borderColor: "border-amber-200"
+  },
+  {
+    icon: BarChart3,
+    title: "Real-Time Insights",
+    description: "Live dashboards showing fleet utilization, revenue trends, and operational KPIs.",
+    gradient: "from-rose-500/10 to-pink-500/10",
+    iconColor: "text-rose-600",
+    borderColor: "border-rose-200"
+  },
+  {
+    icon: Wrench,
+    title: "Maintenance Hub",
+    description: "Schedule services, track repair costs, and get AI-powered maintenance predictions.",
+    gradient: "from-slate-500/10 to-gray-500/10",
+    iconColor: "text-slate-600",
+    borderColor: "border-slate-200"
+  }
+];
+
+const stats = [
+  { value: 500, suffix: "+", label: "Vehicles Managed" },
+  { value: 98, suffix: "%", label: "Uptime Guarantee" },
+  { value: 50, suffix: "+", label: "Agencies Trust Us" },
+  { value: 24, suffix: "/7", label: "Support Available" },
+];
+
+const testimonials = [
+  {
+    name: "Ahmad Hassan",
+    role: "Fleet Manager, Dubai Auto Rentals",
+    text: "FleetMaster transformed how we manage our 200+ vehicle fleet. The automation alone saves us 20 hours per week.",
+    rating: 5,
+  },
+  {
+    name: "Sarah Mitchell",
+    role: "CEO, EasyRide Lebanon",
+    text: "The P&L tracking per vehicle gave us insights we never had before. We increased profitability by 35% in 6 months.",
+    rating: 5,
+  },
+  {
+    name: "Mohammed Al-Rashid",
+    role: "Operations Director, Royal Cars KSA",
+    text: "From contract creation to invoice generation, everything is seamless. The best investment we have made for our agency.",
+    rating: 5,
+  },
+];
+
+const plans = [
+  {
+    name: "Starter",
+    price: "$50",
+    description: "Perfect for small agencies just getting started",
+    features: [
+      "Up to 15 vehicles",
+      "Unlimited contracts",
+      "Up to 100 clients",
+      "Basic reporting",
+      "Invoice generation",
+      "WhatsApp integration",
+      "Email support (48h)"
+    ],
+    popular: false,
+    cta: "Start Free Trial"
+  },
+  {
+    name: "Professional",
+    price: "$70",
+    description: "For growing agencies that need more power",
+    features: [
+      "Up to 50 vehicles",
+      "Unlimited clients",
+      "P&L analysis",
+      "Advanced analytics",
+      "Damage inspection",
+      "Contract amendments",
+      "Excel export",
+      "Priority support (24h)"
+    ],
+    popular: true,
+    cta: "Start Free Trial"
+  },
+  {
+    name: "Enterprise",
+    price: "$85",
+    description: "For large agencies with complex needs",
+    features: [
+      "Unlimited vehicles",
+      "Unlimited clients",
+      "Multi-user access",
+      "Custom reports",
+      "API access",
+      "White-label option",
+      "Dedicated account manager",
+      "24/7 priority support"
+    ],
+    popular: false,
+    cta: "Contact Sales"
+  },
+];
 
 export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
-  
-  const fadingTexts = [
-    "Streamline your rental operations with ease",
-    "Track every vehicle, contract, and client in one place",
-    "Make data-driven decisions with real-time analytics",
-    "Built for agencies who demand efficiency and control"
-  ];
 
-  // Enhanced fading text animation with smooth transitions
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(false);
-      setTimeout(() => {
-        setCurrentTextIndex((prev) => (prev + 1) % fadingTexts.length);
-        setIsAnimating(true);
-      }, 500);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (isAuthenticated && !loading) {
       setLocation("/dashboard");
@@ -45,7 +206,7 @@ export default function Home() {
 
   const handleContactUs = () => {
     const message = encodeURIComponent(
-      "Hello! I'm interested in learning more about the Car Rental Management System.\n\n" +
+      "Hello! I'm interested in learning more about FleetMaster.\n\n" +
       "Please tell me about:\n" +
       "1. My business name:\n" +
       "2. Number of vehicles I manage:\n" +
@@ -55,316 +216,429 @@ export default function Home() {
     window.open(`https://wa.me/96176354131?text=${message}`, "_blank");
   };
 
-
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 border-3 border-blue-600 border-t-transparent rounded-full"
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-gray-50">
+    <div className="min-h-screen bg-white overflow-hidden">
       {/* Navigation */}
-      <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="container flex h-14 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Car className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Car Rental Management</span>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
-            <Button variant="ghost" size="sm" onClick={handleContactUs} className="hidden sm:inline-flex">
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
+          <Link href="/">
+            <div className="flex items-center gap-2.5 cursor-pointer">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <Car className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                FleetMaster
+              </span>
+            </div>
+          </Link>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleContactUs} 
+              className="hidden md:inline-flex text-gray-600 hover:text-gray-900"
+            >
               <MessageCircle className="h-4 w-4 mr-1.5" />
               Contact
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleContactUs} className="sm:hidden h-8 w-8">
-              <MessageCircle className="h-4 w-4" />
-            </Button>
             <Link href="/signin">
-              <Button variant="outline" size="sm" className="px-2 sm:px-3">
+              <Button variant="ghost" size="sm" className="text-gray-700 hover:text-gray-900 font-medium">
                 <LogIn className="h-4 w-4 sm:mr-1.5" />
                 <span className="hidden sm:inline">Sign In</span>
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="sm" className="px-2 sm:px-3">
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 font-medium px-4">
                 <UserPlus className="h-4 w-4 sm:mr-1.5" />
-                <span className="hidden sm:inline">Sign Up</span>
+                <span className="hidden sm:inline">Get Started</span>
               </Button>
             </Link>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Hero Section with Enhanced Fading Text */}
-      <section className="container py-10 md:py-12">
-        <div className="mx-auto max-w-4xl text-center space-y-6">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-4 duration-700">
-            Car Rental
-            <br />
-            <span className="text-primary">Management System</span>
-          </h1>
-          
-          {/* Enhanced Fading Text Animation */}
-          <div className="h-20 flex items-center justify-center">
-            <p 
-              className={`text-lg md:text-xl text-muted-foreground max-w-2xl transition-all duration-700 ${
-                isAnimating 
-                  ? 'opacity-100 translate-y-0 scale-100' 
-                  : 'opacity-0 translate-y-4 scale-95'
-              }`}
+      {/* Hero Section */}
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-violet-100/50 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-50 to-violet-50 rounded-full blur-3xl opacity-60" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 mb-8"
             >
-              {fadingTexts[currentTextIndex]}
-            </p>
+              <Zap className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">The #1 Car Rental Management Platform</span>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1 }}
+              className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6"
+            >
+              <span className="text-gray-900">Manage Your Fleet</span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 bg-clip-text text-transparent">
+                Like Never Before
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed"
+            >
+              The all-in-one platform to streamline your car rental operations. 
+              Track vehicles, manage contracts, and boost profitability with intelligent automation.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            >
+              <Link href="/signup">
+                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-base font-semibold shadow-xl shadow-blue-600/25 group rounded-xl">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Link href="/demo">
+                <Button size="lg" variant="outline" className="px-8 py-6 text-base font-semibold border-gray-200 hover:bg-gray-50 group rounded-xl">
+                  <Globe className="mr-2 h-5 w-5 text-gray-400" />
+                  Live Demo
+                  <ChevronRight className="ml-1 h-4 w-4 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className="mt-6 text-sm text-gray-400"
+            >
+              No credit card required &bull; 14-day free trial &bull; Cancel anytime
+            </motion.p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-            <Link href="/demo">
-              <Button size="lg" className="text-base px-6 group">
-                See Demo
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </Link>
-            <Button size="lg" variant="outline" className="text-base px-6" onClick={handleContactUs}>
-              <MessageCircle className="mr-2 h-4 w-4" />
-              Contact Us
-            </Button>
-          </div>
-
-          <p className="text-sm text-muted-foreground animate-in fade-in duration-700 delay-500">
-            <Clock className="inline h-4 w-4 mr-1" />
-            Try our 10-minute demo with full access
-          </p>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="container py-8 md:py-10">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Everything You Need</h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-            Comprehensive tools designed for car rental agencies
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[
-            {
-              icon: Car,
-              title: "Fleet Management",
-              description: "Track all vehicles, availability, and maintenance schedules in one place"
-            },
-            {
-              icon: FileText,
-              title: "Contract Management",
-              description: "Create and track rental contracts with automated notifications"
-            },
-            {
-              icon: Users,
-              title: "Client Database",
-              description: "Maintain comprehensive client records with rental history"
-            },
-            {
-              icon: DollarSign,
-              title: "P&L Analysis",
-              description: "Track profitability per vehicle with detailed revenue and costs"
-            },
-            {
-              icon: BarChart3,
-              title: "Analytics & Insights",
-              description: "Real-time dashboards showing utilization and revenue trends"
-            },
-            {
-              icon: Wrench,
-              title: "Maintenance Tracking",
-              description: "Log repairs, schedule maintenance, and track costs"
-            }
-          ].map((feature, i) => (
-            <Card 
-              key={i} 
-              className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-in fade-in slide-in-from-bottom-4"
-              style={{ animationDelay: `${i * 100}ms` }}
-            >
-              <CardHeader className="pb-2 pt-4">
-                <feature.icon className="h-8 w-8 text-primary mb-1.5" />
-                <CardTitle className="text-base">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-4">
-                <CardDescription className="text-sm">{feature.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section className="container py-8 md:py-10">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">Simple Pricing</h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your business
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Starter Plan */}
-          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col">
-            <CardHeader className="pb-3 pt-5">
-              <CardTitle className="text-lg">Starter</CardTitle>
-              <div className="mt-2">
-                <span className="text-2xl font-bold">$50</span>
-                <span className="text-muted-foreground">/month</span>
+          {/* Dashboard preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 60, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mt-16 relative max-w-5xl mx-auto"
+          >
+            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/20 via-violet-600/20 to-blue-600/20 rounded-2xl blur-2xl" />
+            <div className="relative bg-white rounded-2xl border border-gray-200 shadow-2xl overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 bg-gray-50 border-b border-gray-100">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <div className="px-4 py-1 bg-white rounded-md border border-gray-200 text-xs text-gray-400">
+                    fleetmaster.app/dashboard
+                  </div>
+                </div>
               </div>
-              <CardDescription className="mt-0.5 text-sm">For small agencies</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
-              <ul className="space-y-2.5 flex-1">
-                {[
-                  "Up to 15 vehicles",
-                  "Unlimited contracts",
-                  "Up to 100 clients",
-                  "Basic reporting",
-                  "Invoice generation",
-                  "WhatsApp integration",
-                  "Email support (48h)"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="w-full">
-                <Button className="w-full mt-4" variant="outline">
-                  Get Started
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Professional Plan */}
-          <Card className="border-primary shadow-lg relative animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-            <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary">Most Popular</Badge>
-            <CardHeader className="pb-3 pt-5">
-              <CardTitle className="text-lg">Professional</CardTitle>
-              <div className="mt-2">
-                <span className="text-2xl font-bold">$70</span>
-                <span className="text-muted-foreground">/month</span>
+              <div className="p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-blue-50/30">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                  {[
+                    { label: "Total Vehicles", value: "156", change: "+12", color: "blue" },
+                    { label: "Active Rentals", value: "89", change: "+5", color: "emerald" },
+                    { label: "Monthly Revenue", value: "$45.2K", change: "+18%", color: "violet" },
+                    { label: "Utilization", value: "87%", change: "+3%", color: "amber" },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 + i * 0.1 }}
+                      className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm"
+                    >
+                      <p className="text-xs text-gray-500 mb-1">{stat.label}</p>
+                      <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+                      <p className="text-xs text-emerald-600 font-medium mt-1">{stat.change}</p>
+                    </motion.div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="col-span-2 bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-32">
+                    <p className="text-xs text-gray-500 mb-3">Revenue Trend</p>
+                    <div className="flex items-end gap-1.5 h-16">
+                      {[40, 55, 45, 60, 50, 70, 65, 80, 75, 85, 90, 95].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${h}%` }}
+                          transition={{ delay: 1 + i * 0.05, duration: 0.5 }}
+                          className="flex-1 bg-gradient-to-t from-blue-500 to-blue-400 rounded-sm"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm h-32">
+                    <p className="text-xs text-gray-500 mb-3">Fleet Status</p>
+                    <div className="space-y-2">
+                      {[
+                        { label: "Available", pct: 45, color: "bg-emerald-500" },
+                        { label: "Rented", pct: 42, color: "bg-blue-500" },
+                        { label: "Service", pct: 13, color: "bg-amber-500" },
+                      ].map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                          <span className="text-xs text-gray-600 flex-1">{item.label}</span>
+                          <span className="text-xs font-medium text-gray-900">{item.pct}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <CardDescription className="mt-0.5 text-sm">For growing agencies</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
-              <ul className="space-y-2.5 flex-1">
-                {[
-                  "Up to 50 vehicles",
-                  "Unlimited clients",
-                  "P&L analysis",
-                  "Advanced analytics",
-                  "Damage inspection",
-                  "Contract amendments",
-                  "Excel export",
-                  "Priority support (24h)"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="w-full">
-                <Button className="w-full mt-4">
-                  Get Started
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Enterprise Plan */}
-          <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col delay-200">
-            <CardHeader className="pb-3 pt-5">
-              <CardTitle className="text-lg">Enterprise</CardTitle>
-              <div className="mt-2">
-                <span className="text-2xl font-bold">$85</span>
-                <span className="text-muted-foreground">/month</span>
-              </div>
-              <CardDescription className="mt-0.5 text-sm">For large agencies</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pb-5 flex-1 flex flex-col">
-              <ul className="space-y-2.5 flex-1">
-                {[
-                  "Unlimited vehicles",
-                  "Unlimited clients",
-                  "Multi-user access",
-                  "Custom reports",
-                  "API access",
-                  "White-label option",
-                  "Dedicated account manager",
-                  "24/7 priority support"
-                ].map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="w-full">
-                <Button className="w-full mt-4">
-                  Get Started
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Redesigned CTA Section */}
-      <section className="container py-16 md:py-20">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-background border border-primary/20">
-          <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
-          <div className="relative px-6 py-12 md:py-16 text-center">
-            <div className="mx-auto max-w-2xl space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-2">
-                <span className="text-sm font-medium text-primary">Start Your Journey</span>
-              </div>
-              
-              <h2 className="text-3xl md:text-4xl font-bold">
-                Ready to Transform Your
-                <br />
-                <span className="text-primary">Rental Operations?</span>
-              </h2>
-              
-              <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
-                Join agencies worldwide who trust our platform to streamline their operations and boost profitability
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                <Link href="/demo">
-                  <Button size="lg" className="text-base px-8 group">
-                    Try Demo Now
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-                <Button size="lg" variant="outline" className="text-base px-8" onClick={handleContactUs}>
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Talk to Us
-                </Button>
-              </div>
-              
-              <p className="text-sm text-muted-foreground">
-                No credit card required • 10-minute demo • Full feature access
-              </p>
             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-16 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, i) => (
+              <AnimatedSection key={i} delay={i * 0.1} className="text-center">
+                <div className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">
+                  <CountUp target={stat.value} suffix={stat.suffix} />
+                </div>
+                <p className="text-sm text-gray-500 font-medium">{stat.label}</p>
+              </AnimatedSection>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 lg:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center mb-16">
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-sm font-medium text-blue-700 mb-4">
+              <Shield className="h-3.5 w-3.5" /> Everything You Need
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
+              Powerful Features for
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">Modern Agencies</span>
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              Every tool you need to run a world-class car rental operation, all in one platform.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, i) => (
+              <AnimatedSection key={i} delay={i * 0.08}>
+                <div className={`group relative p-6 rounded-2xl border ${feature.borderColor} bg-gradient-to-br ${feature.gradient} hover:shadow-lg transition-all duration-300 hover:-translate-y-1 h-full`}>
+                  <div className={`w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <feature.icon className={`h-6 w-6 ${feature.iconColor}`} />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-gray-50 border-y border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              Trusted by Agencies Worldwide
+            </h2>
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              See what fleet managers are saying about FleetMaster
+            </p>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <AnimatedSection key={i} delay={i * 0.1}>
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: t.rating }).map((_, j) => (
+                      <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed mb-6 flex-1">"{t.text}"</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center text-white font-bold text-sm">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{t.name}</p>
+                      <p className="text-xs text-gray-500">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-20 lg:py-28">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-lg text-gray-500 max-w-xl mx-auto">
+              Choose the plan that fits your business. No hidden fees.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {plans.map((plan, i) => (
+              <AnimatedSection key={i} delay={i * 0.1}>
+                <div className={`relative rounded-2xl p-6 h-full flex flex-col ${
+                  plan.popular 
+                    ? "bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-600/25 scale-[1.02]" 
+                    : "bg-white border border-gray-200 hover:border-blue-200 hover:shadow-lg transition-all"
+                }`}>
+                  {plan.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                      <span className="px-4 py-1 bg-amber-400 text-amber-900 text-xs font-bold rounded-full shadow-lg">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  <div className="mb-6">
+                    <h3 className={`text-lg font-bold mb-1 ${plan.popular ? "text-white" : "text-gray-900"}`}>
+                      {plan.name}
+                    </h3>
+                    <p className={`text-sm mb-4 ${plan.popular ? "text-blue-100" : "text-gray-500"}`}>
+                      {plan.description}
+                    </p>
+                    <div className="flex items-baseline gap-1">
+                      <span className={`text-4xl font-extrabold ${plan.popular ? "text-white" : "text-gray-900"}`}>
+                        {plan.price}
+                      </span>
+                      <span className={`text-sm ${plan.popular ? "text-blue-200" : "text-gray-400"}`}>/month</span>
+                    </div>
+                  </div>
+                  <ul className="space-y-3 mb-8 flex-1">
+                    {plan.features.map((feature, j) => (
+                      <li key={j} className="flex items-start gap-2.5">
+                        <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${plan.popular ? "text-blue-200" : "text-blue-600"}`} />
+                        <span className={`text-sm ${plan.popular ? "text-blue-50" : "text-gray-600"}`}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/signup" className="w-full">
+                    <Button className={`w-full py-5 font-semibold rounded-xl ${
+                      plan.popular 
+                        ? "bg-white text-blue-600 hover:bg-blue-50" 
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}>
+                      {plan.cta}
+                    </Button>
+                  </Link>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection>
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-violet-700 p-10 sm:p-16 text-center">
+              <div className="absolute inset-0">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+              </div>
+              <div className="relative z-10 max-w-2xl mx-auto">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6">
+                  Ready to Transform Your Fleet Operations?
+                </h2>
+                <p className="text-lg text-blue-100 mb-10 leading-relaxed">
+                  Join hundreds of agencies worldwide who trust FleetMaster to streamline their operations and maximize profitability.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link href="/signup">
+                    <Button size="lg" className="bg-white text-blue-700 hover:bg-blue-50 px-8 py-6 text-base font-bold shadow-xl group rounded-xl">
+                      Get Started Free
+                      <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </Link>
+                  <Button size="lg" variant="outline" onClick={handleContactUs} className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-base font-semibold rounded-xl">
+                    <MessageCircle className="mr-2 h-5 w-5" />
+                    Talk to Sales
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-background py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2026 Car Rental Management System. All rights reserved.</p>
-          <p className="mt-2">Built for agencies who demand efficiency and control.</p>
+      <footer className="bg-gray-50 border-t border-gray-100 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center">
+                <Car className="h-4 w-4 text-white" />
+              </div>
+              <span className="font-bold text-gray-900">FleetMaster</span>
+            </div>
+            <p className="text-sm text-gray-400">
+              &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <button onClick={handleContactUs} className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Contact
+              </button>
+              <Link href="/demo" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Demo
+              </Link>
+              <Link href="/signin" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                Sign In
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

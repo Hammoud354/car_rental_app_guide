@@ -10,7 +10,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
 import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle } from "lucide-react";
-import SidebarLayout from "@/components/SidebarLayout";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -23,7 +22,6 @@ import { useUserFilter } from "@/contexts/UserFilterContext";
 import { SearchableSelect } from "@/components/SearchableSelect";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
 import { exportVehiclesToCSV } from "@shared/csvExport";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
 
 export default function FleetManagement() {
@@ -341,7 +339,7 @@ export default function FleetManagement() {
   };
 
   return (
-    <SidebarLayout>
+    <>
       {/* Subscription Limit Error Modal */}
       <AlertDialog open={subscriptionLimitError.show} onOpenChange={(open) => {
         if (!open) {
@@ -1396,6 +1394,6 @@ export default function FleetManagement() {
           return result;
         }}
       />
-    </SidebarLayout>
+    </>
   );
 }

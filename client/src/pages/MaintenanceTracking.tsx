@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { DatePickerWithYearNav } from "@/components/DatePickerWithYearNav";
+import { ModernDatePicker } from "@/components/ModernDatePicker";
 
 export default function MaintenanceTracking() {
   const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
@@ -241,7 +241,7 @@ export default function MaintenanceTracking() {
               <>
                 <div className="space-y-2 input-client">
                   <Label>Next Maintenance Date</Label>
-                  <DatePickerWithYearNav
+                  <ModernDatePicker
                     date={nextMaintenanceDate}
                     onDateChange={setNextMaintenanceDate}
                     placeholder="Select maintenance date"

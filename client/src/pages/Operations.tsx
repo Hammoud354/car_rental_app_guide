@@ -1,11 +1,10 @@
-import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart, LineChart, PieChart, Activity, ClipboardCheck, AlertTriangle, MapPin, Shield } from "lucide-react";
 
 export default function Operations() {
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-8">
         <div className="flex flex-col gap-2">
           <div className="text-xs font-mono text-primary uppercase tracking-widest">Module 03</div>
@@ -202,6 +201,6 @@ export default function Operations() {
           </TabsContent>
         </Tabs>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

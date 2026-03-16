@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import SidebarLayout from "@/components/SidebarLayout";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
@@ -231,7 +230,7 @@ export default function Invoices() {
   };
 
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-6">
         
         {/* Header */}
@@ -395,6 +394,21 @@ export default function Invoices() {
                     <p className="text-sm font-semibold text-gray-600">BILL TO:</p>
                     <div className="text-base">
                       <p className="font-semibold">{invoiceDetails.clientName}</p>
+                      {invoiceDetails.clientPhone && (
+                        <p className="text-sm text-gray-600">Phone: {invoiceDetails.clientPhone}</p>
+                      )}
+                      {invoiceDetails.clientEmail && (
+                        <p className="text-sm text-gray-600">Email: {invoiceDetails.clientEmail}</p>
+                      )}
+                      {invoiceDetails.clientAddress && (
+                        <p className="text-sm text-gray-600">Address: {invoiceDetails.clientAddress}</p>
+                      )}
+                      {invoiceDetails.clientLicenseNumber && (
+                        <p className="text-sm text-gray-600">License #: {invoiceDetails.clientLicenseNumber}</p>
+                      )}
+                      {invoiceDetails.clientNationality && (
+                        <p className="text-sm text-gray-600">Nationality: {invoiceDetails.clientNationality}</p>
+                      )}
                       {invoiceDetails.contractId && (
                         <p className="text-sm text-gray-600">Contract: {invoiceDetails.contractId}</p>
                       )}
@@ -662,6 +676,6 @@ export default function Invoices() {
           </DialogContent>
         </Dialog>
       </div>
-    </SidebarLayout>
+    </>
   );
 }

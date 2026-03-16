@@ -1,4 +1,3 @@
-import SidebarLayout from "@/components/SidebarLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
@@ -21,7 +20,7 @@ export default function Analysis() {
     : "0";
 
   return (
-    <SidebarLayout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -231,6 +230,6 @@ export default function Analysis() {
           </Card>
         )}
       </div>
-    </SidebarLayout>
+    </>
   );
 }
