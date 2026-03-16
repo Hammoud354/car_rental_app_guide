@@ -20,9 +20,7 @@ import {
 } from "@/components/ui/select";
 import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
+import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 
 export default function Invoices() {
@@ -111,111 +109,19 @@ export default function Invoices() {
 
   const handleExportPDF = async () => {
     try {
-      const element = document.getElementById("invoice-content");
-      if (!element) {
-        console.error("Invoice content element not found");
-        toast.error("Could not find invoice content to export");
-        return;
-      }
-
       toast.info("Generating PDF...");
-      
-      // Open invoice in new window with Tailwind CDN (same as Print Preview)
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      if (!printWindow) {
-        toast.error("Please allow popups to export PDF");
-        return;
+      const success = await exportElementToPDF(
+        "invoice-content",
+        `${invoiceDetails?.invoiceNumber || "invoice"}.pdf`
+      );
+      if (success) {
+        toast.success("PDF exported successfully");
+      } else {
+        toast.error("Could not find invoice content to export");
       }
-      
-      // Write the invoice content to the new window with Tailwind
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Invoice ${invoiceDetails?.invoiceNumber || 'Invoice'}</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-            <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body { font-family: Arial, sans-serif; padding: 32px; background: white; }
-              table { border-collapse: collapse; width: 100%; }
-              th, td { text-align: left; padding: 12px; }
-              thead tr { border-bottom: 2px solid #000; }
-              tbody tr { border-bottom: 1px solid #e5e7eb; }
-              .border-b { border-bottom: 1px solid #e5e7eb; }
-              .border-b-2 { border-bottom: 2px solid #000; }
-              .border-t-2 { border-top: 2px solid #000; }
-            </style>
-          </head>
-          <body>
-            <div id="pdf-content">
-              ${element.innerHTML}
-            </div>
-            <script>
-              // Wait for Tailwind and libraries to load
-              setTimeout(async () => {
-                const content = document.getElementById('pdf-content');
-                const { jsPDF } = window.jspdf;
-                
-                // Capture with html2canvas
-                const canvas = await html2canvas(content, {
-                  scale: 2,
-                  useCORS: true,
-                  logging: false,
-                  backgroundColor: "#ffffff",
-                  windowHeight: content.scrollHeight,
-                  height: content.scrollHeight
-                });
-                
-                // Create PDF
-                const imgData = canvas.toDataURL("image/png");
-                const pdf = new jsPDF({
-                  orientation: "portrait",
-                  unit: "mm",
-                  format: "a4"
-                });
-                
-                const imgWidth = 210;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                const pageHeight = 297;
-                let heightLeft = imgHeight;
-                let position = 0;
-                
-                pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                
-                while (heightLeft >= 0) {
-                  position = heightLeft - imgHeight;
-                  pdf.addPage();
-                  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-                  heightLeft -= pageHeight;
-                }
-                
-                // Save PDF
-                pdf.save("${invoiceDetails?.invoiceNumber || 'invoice'}.pdf");
-                
-                // Show success message and close after delay to ensure download completes
-                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;font-size:18px;color:#10b981;">✓ PDF Downloaded Successfully! This window will close automatically...</div>';
-                setTimeout(() => window.close(), 2000);
-              }, 1500);
-            </script>
-          </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      
-      // Show success message after a delay
-      setTimeout(() => {
-        toast.success("PDF generated successfully");
-      }, 2000);
-      
-      return;
-      toast.success("PDF exported successfully");
     } catch (error) {
       console.error("Error exporting PDF:", error);
-      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      toast.error(`Failed to export PDF: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
@@ -558,57 +464,10 @@ export default function Invoices() {
                 <div className="flex gap-2 justify-end print:hidden flex-wrap">
                   <Button 
                     onClick={() => {
-                      const printContent = document.getElementById('invoice-content');
-                      if (!printContent) {
+                      const success = printElement("invoice-content", `Invoice ${invoiceDetails?.invoiceNumber || ""}`);
+                      if (!success) {
                         toast.error("Invoice content not found");
-                        return;
                       }
-                      
-                      // Create a new window for printing
-                      const printWindow = window.open('', '_blank');
-                      if (!printWindow) {
-                        toast.error("Please allow popups to print");
-                        return;
-                      }
-                      
-                      // Write the invoice content to the new window with styles
-                      printWindow.document.write(`
-                        <!DOCTYPE html>
-                        <html>
-                          <head>
-                            <title>Invoice ${invoiceDetails?.invoiceNumber || 'Invoice'}</title>
-                            <script src="https://cdn.tailwindcss.com"></script>
-                            <style>
-                              * { margin: 0; padding: 0; box-sizing: border-box; }
-                              body { font-family: Arial, sans-serif; padding: 32px; background: white; }
-                              @media print {
-                                body { padding: 0; }
-                                @page { margin: 0.5in; }
-                              }
-                              table { border-collapse: collapse; width: 100%; }
-                              th, td { text-align: left; padding: 12px; }
-                              thead tr { border-bottom: 2px solid #000; }
-                              tbody tr { border-bottom: 1px solid #e5e7eb; }
-                              .border-b { border-bottom: 1px solid #e5e7eb; }
-                              .border-b-2 { border-bottom: 2px solid #000; }
-                              .border-t-2 { border-top: 2px solid #000; }
-                            </style>
-                          </head>
-                          <body>
-                            ${printContent.innerHTML}
-                          </body>
-                        </html>
-                      `);
-                      
-                      printWindow.document.close();
-                      
-                      // Wait for Tailwind CDN and content to load, then print
-                      printWindow.onload = () => {
-                        setTimeout(() => {
-                          printWindow.print();
-                          printWindow.close();
-                        }, 1000);
-                      };
                     }} 
                     variant="outline"
                   >

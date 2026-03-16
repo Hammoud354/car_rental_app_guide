@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import html2pdf from 'html2pdf.js';
+import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
@@ -309,7 +309,6 @@ export default function RentalContracts() {
 
   const uploadPdfMutation = trpc.files.uploadPdf.useMutation();
   const uploadThumbnailMutation = trpc.whatsappTemplates.uploadThumbnail.useMutation();
-  const generatePdfMutation = trpc.contracts.generatePDF.useMutation();
   const { data: whatsappTemplate } = trpc.whatsappTemplates.get.useQuery(
     { templateType: 'contract_created' },
     { enabled: isDetailsDialogOpen && !!selectedContract }
@@ -1573,40 +1572,14 @@ export default function RentalContracts() {
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
-                  onClick={async () => {
+                  onClick={() => {
                     if (!selectedContract) {
                       toast.error("No contract selected");
                       return;
                     }
-                    
-                    try {
-                      toast.info("Generating contract with template for printing...");
-                      
-                      // Call tRPC procedure to generate PDF with custom template
-                      const result = await generatePdfMutation.mutateAsync({
-                        contractId: selectedContract.id
-                      });
-                      
-                      // Convert number array back to Uint8Array
-                      const pdfBytes = new Uint8Array(result.pdfData);
-                      
-                      // Create blob and object URL for preview
-                      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                      const url = URL.createObjectURL(blob);
-                      
-                      // Open in new window for print preview
-                      const printWindow = window.open(url, '_blank');
-                      if (!printWindow) {
-                        toast.error("Please allow popups to print");
-                        URL.revokeObjectURL(url);
-                        return;
-                      }
-                      
-                      // The PDF will open in the browser's print preview
-                      toast.success("Contract template opened for printing");
-                    } catch (error: any) {
-                      console.error("Print error:", error);
-                      toast.error(`Failed to print: ${error.message || 'Unknown error'}`);
+                    const success = printElement("contract-content", `Contract ${selectedContract.contractNumber || selectedContract.id}`);
+                    if (!success) {
+                      toast.error("Contract content not found");
                     }
                   }} 
                   variant="outline"
@@ -1623,38 +1596,26 @@ export default function RentalContracts() {
                     }
                     
                     try {
-                      toast.info("Generating PDF with custom template...");
-                      
-                      // Call tRPC procedure to generate PDF
-                      const result = await generatePdfMutation.mutateAsync({
-                        contractId: selectedContract.id
-                      });
-                      
-                      // Convert number array back to Uint8Array
-                      const pdfBytes = new Uint8Array(result.pdfData);
-                      
-                      // Create blob and download
-                      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                      const url = URL.createObjectURL(blob);
-                      const link = document.createElement('a');
-                      link.href = url;
-                      link.download = result.fileName;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                      URL.revokeObjectURL(url);
-                      
-                      toast.success("PDF generated successfully!");
+                      toast.info("Generating PDF...");
+                      const success = await exportElementToPDF(
+                        "contract-content",
+                        `Contract_${selectedContract.contractNumber || selectedContract.id}.pdf`
+                      );
+                      if (success) {
+                        toast.success("PDF exported successfully!");
+                      } else {
+                        toast.error("Contract content not found");
+                      }
                     } catch (error: any) {
                       console.error("PDF export error:", error);
-                      toast.error(`Failed to export PDF: ${error.message || 'Unknown error'}`);
+                      toast.error(`Failed to export PDF: ${error.message || "Unknown error"}`);
                     }
                   }} 
                   variant="outline"
                   className="h-10 w-full"
                   size="default"
                 >
-                  📄 Export with Custom Template
+                  📄 Export to PDF
                 </Button>
                 <Button 
                   onClick={async () => {
@@ -1802,7 +1763,7 @@ export default function RentalContracts() {
                         // Parse template with actual data
                         const message = parseTemplate(template, {
                           contractNumber: selectedContract.contractNumber,
-                          clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`,
+                          clientName: selectedContract.clientName || "",
                           vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
                           startDate: formatTemplateDate(selectedContract.rentalStartDate),
                           endDate: formatTemplateDate(selectedContract.rentalEndDate),

@@ -28,7 +28,7 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - ModernDatePicker is the standard date picker - all pages use it consistently
 - SidebarLayout wraps authenticated routes at the `App.tsx` level (not per-page)
 - Tailwind CSS v4 with custom theme tokens (primary, secondary, success, danger, warning)
-- Print styles configured for invoices and contracts
+- Print/PDF: `client/src/lib/printUtils.ts` — shared `printElement()` (iframe-based print) and `exportElementToPDF()` (html2canvas+jsPDF) utilities used by Invoices and Contracts pages; no popup windows or external CDN dependencies
 - Landing page: Professional design with FleetMaster branding, blue-600 accent, animated dashboard preview
 - Auth pages (SignIn/SignUp): Split-panel layout with dark branding panel + white form panel
 - Logo: SVG car icon in gradient blue/indigo rounded-xl box, "Fleet**Master**" text with "Master" in blue-600
