@@ -612,7 +612,7 @@ export default function Home() {
                       className={`w-full h-11 font-semibold ${
                         plan.popular
                           ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
-                          : "bg-gray-900 hover:bg-gray-800 text-white"
+                          : "bg-blue-600 hover:bg-blue-700 text-white"
                       }`}
                     >
                       {plan.cta}

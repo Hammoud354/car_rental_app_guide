@@ -518,7 +518,7 @@ export default function RentalContracts() {
               
               <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto" size="sm">
+                <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" size="sm">
                   <Plus className="h-4 w-4 mr-2" />
                   New Contract
                 </Button>
@@ -1254,7 +1254,7 @@ export default function RentalContracts() {
               <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
               <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
-              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-gray-900 hover:bg-gray-800">
+              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Contract
               </Button>
@@ -1972,7 +1972,7 @@ export default function RentalContracts() {
                           newEndDate,
                         });
                       }}
-                      className="bg-gray-900 hover:bg-gray-800"
+                      className="bg-blue-600 hover:bg-blue-700"
                     >
                       Confirm Renewal
                     </Button>

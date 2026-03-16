@@ -69,7 +69,7 @@ export default function Landing() {
                   Sign In
                 </Button>
                 <Button 
-                  className="bg-gray-900 hover:bg-gray-800 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   onClick={() => setLocation("/signup")}
                 >
                   Sign Up
@@ -94,7 +94,7 @@ export default function Landing() {
             </p>
             <Button 
               size="lg" 
-              className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg"
               onClick={() => setLocation("/dashboard")}
             >
               Get Started
@@ -175,7 +175,7 @@ export default function Landing() {
           </p>
           <Button 
             size="lg" 
-            className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-6 text-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg"
             onClick={() => setLocation("/dashboard")}
           >
             Explore Dashboard

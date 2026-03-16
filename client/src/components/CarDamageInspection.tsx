@@ -568,7 +568,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
           <Button 
             type="button" 
             onClick={handleSubmit} 
-            className="bg-black hover:bg-gray-800 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Completing..." : "Complete Contract"}

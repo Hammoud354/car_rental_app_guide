@@ -106,7 +106,7 @@ export default function Reservations() {
             </p>
           </div>
           <Link href="/rental-contracts">
-            <Button className="bg-gray-900 hover:bg-gray-800 w-full sm:w-auto" size="sm">
+            <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" size="sm">
               <Calendar className="h-4 w-4 mr-2" />
               Create New Reservation
             </Button>
