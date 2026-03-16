@@ -24,8 +24,8 @@ export default function Analysis() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Vehicle Analysis</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-2xl font-bold text-gray-900">Vehicle Analysis</h1>
+          <p className="text-sm text-gray-500 mt-0.5">
             Analyze individual vehicle profitability, costs, and performance metrics
           </p>
         </div>

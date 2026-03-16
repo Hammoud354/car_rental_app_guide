@@ -87,22 +87,10 @@ export default function Settings() {
   }
 
   return (
-    <div className="container mx-auto py-8 max-w-4xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-        <Link href="/">
-          <span className="hover:text-foreground cursor-pointer">Overview</span>
-        </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">Settings</span>
-      </div>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Building2 className="h-8 w-8" />
-          Company Settings
-        </h1>
-        <p className="text-gray-600 mt-2">
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Company Settings</h1>
+        <p className="text-sm text-gray-500 mt-0.5">
           Manage your company information that will appear on rental contracts
         </p>
       </div>

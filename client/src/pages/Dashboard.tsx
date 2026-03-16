@@ -4,7 +4,7 @@ import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
 import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
 import { MaintenanceModal } from "@/components/MaintenanceModal";
-import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet, TrendingUp, ChevronRight } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -35,10 +35,8 @@ function ExportToExcelButton() {
 
       const { vehicles = [], contracts = [], clients = [], maintenanceRecords = [], invoices = [] } = result.data || {};
 
-      // Create workbook
       const workbook = XLSX.utils.book_new();
 
-      // Add Fleet sheet
       const fleetData = (vehicles || []).map(v => ({
         "Brand": v.brand,
         "Model": v.model,
@@ -61,7 +59,6 @@ function ExportToExcelButton() {
       const fleetSheet = XLSX.utils.json_to_sheet(fleetData);
       XLSX.utils.book_append_sheet(workbook, fleetSheet, "Fleet");
 
-      // Add Contracts sheet
       const contractsData = (contracts || []).map(c => ({
         "Contract Number": c.contractNumber,
         "Client Name": `${c.clientFirstName || ""} ${c.clientLastName || ""}`.trim(),
@@ -81,7 +78,6 @@ function ExportToExcelButton() {
       const contractsSheet = XLSX.utils.json_to_sheet(contractsData);
       XLSX.utils.book_append_sheet(workbook, contractsSheet, "Contracts");
 
-      // Add Clients sheet
       const clientsData = (clients || []).map(c => ({
         "First Name": c.firstName,
         "Last Name": c.lastName,
@@ -95,7 +91,6 @@ function ExportToExcelButton() {
       const clientsSheet = XLSX.utils.json_to_sheet(clientsData);
       XLSX.utils.book_append_sheet(workbook, clientsSheet, "Clients");
 
-      // Add Maintenance sheet
       const maintenanceData = (maintenanceRecords || []).map(m => ({
         "Vehicle ID": m.vehicleId,
         "Performed At": m.performedAt ? new Date(m.performedAt).toLocaleDateString() : "",
@@ -111,7 +106,6 @@ function ExportToExcelButton() {
       const maintenanceSheet = XLSX.utils.json_to_sheet(maintenanceData);
       XLSX.utils.book_append_sheet(workbook, maintenanceSheet, "Maintenance");
 
-      // Add Invoices sheet
       const invoicesData = (invoices || []).map(i => ({
         "Invoice Number": i.invoiceNumber,
         "Contract ID": i.contractId,
@@ -127,11 +121,9 @@ function ExportToExcelButton() {
       const invoicesSheet = XLSX.utils.json_to_sheet(invoicesData);
       XLSX.utils.book_append_sheet(workbook, invoicesSheet, "Invoices");
 
-      // Generate Excel file
       const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
       const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       
-      // Download file
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -154,17 +146,18 @@ function ExportToExcelButton() {
     <Button
       onClick={handleExport}
       disabled={isExporting}
-      className="bg-green-500 hover:bg-green-600 text-white w-full h-11 whitespace-nowrap text-sm font-medium"
+      variant="outline"
+      size="sm"
     >
       <FileSpreadsheet className="mr-2 h-4 w-4" />
-      {isExporting ? "Exporting..." : "Export to Excel"}
+      {isExporting ? "Exporting..." : "Export Excel"}
     </Button>
   );
 }
 
 function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null }) {
   const { data: expiredVehicles, isLoading: loadingExpired } = trpc.fleet.getExpiredInsurance.useQuery(undefined, {
-    enabled: !filterUserId, // Only load for own data
+    enabled: !filterUserId,
   });
   const { data: expiringVehicles, isLoading: loadingExpiring } = trpc.fleet.getExpiringInsurance.useQuery(
     { daysThreshold: 30 },
@@ -189,86 +182,63 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
   
   return (
     <>
-      <Card className="bg-orange-50 border-orange-200 shadow-md">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-orange-600" />
-              </div>
-              <CardTitle className="text-lg font-semibold text-orange-900">Insurance Expiry Alert</CardTitle>
+      <Card className="border-orange-200 bg-orange-50/50">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-orange-900">Insurance Alerts</h3>
+              <p className="text-xs text-orange-700">{totalIssues} vehicle{totalIssues > 1 ? 's' : ''} need attention</p>
             </div>
             <Link href="/fleet-management">
-              <Button variant="outline" size="sm" className="border-orange-300 text-orange-700 hover:bg-orange-100">
-                View Fleet
+              <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
+                View Fleet <ChevronRight className="ml-1 h-3 w-3" />
               </Button>
             </Link>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
-              <div className="text-3xl font-bold text-red-600">{expired.length}</div>
-              <div className="text-sm text-red-700 mt-1">Expired Policies</div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
+              <div className="text-2xl font-bold text-red-600">{expired.length}</div>
+              <div className="text-xs text-red-700">Expired</div>
             </div>
-            <div className="text-center p-4 bg-white rounded-lg border border-orange-200">
-              <div className="text-3xl font-bold text-yellow-600">{expiring.length}</div>
-              <div className="text-sm text-yellow-700 mt-1">Expiring Soon (30d)</div>
+            <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
+              <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
+              <div className="text-xs text-yellow-700">Expiring (30d)</div>
             </div>
           </div>
           
-          {expired.length > 0 && (
-            <div className="mb-3">
-              <h4 className="text-sm font-semibold text-red-900 mb-2">Expired Insurance:</h4>
-              <div className="space-y-2">
-                {expired.slice(0, 3).map((vehicle: any) => (
-                  <div key={vehicle.id} className="flex items-center justify-between p-2 bg-red-50 rounded border border-red-200">
-                    <div className="flex-1">
-                      <div className="font-medium text-sm text-red-900">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                      <div className="text-xs text-red-700">Expired: {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</div>
-                    </div>
-                    <Button size="sm" variant="outline" className="border-red-300 text-red-700" onClick={() => handleRenewClick(vehicle)}>
-                      Renew Now
-                    </Button>
+          <div className="space-y-2">
+            {expired.slice(0, 2).map((vehicle: any) => (
+              <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                  <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</div>
+                </div>
+                <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                  Renew
+                </Button>
+              </div>
+            ))}
+            {expiring.slice(0, 2).map((vehicle: any) => {
+              const daysLeft = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+              return (
+                <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                    <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
                   </div>
-                ))}
-                {expired.length > 3 && (
-                  <p className="text-xs text-red-700 text-center">+{expired.length - 3} more expired</p>
-                )}
-              </div>
-            </div>
-          )}
-          
-          {expiring.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-yellow-900 mb-2">Expiring Soon:</h4>
-              <div className="space-y-2">
-                {expiring.slice(0, 3).map((vehicle: any) => {
-                  const daysLeft = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                  return (
-                    <div key={vehicle.id} className="flex items-center justify-between p-2 bg-yellow-50 rounded border border-yellow-200">
-                      <div className="flex-1">
-                        <div className="font-medium text-sm text-yellow-900">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                        <div className="text-xs text-yellow-700">{daysLeft} days remaining</div>
-                      </div>
-                      <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700" onClick={() => handleRenewClick(vehicle)}>
-                        Renew
-                      </Button>
-                    </div>
-                  );
-                })}
-                {expiring.length > 3 && (
-                  <p className="text-xs text-yellow-700 text-center">+{expiring.length - 3} more expiring</p>
-                )}
-              </div>
-            </div>
-          )}
-          
-          <div className="mt-4 p-3 bg-orange-100 rounded-lg flex items-start gap-2">
-            <Clock className="h-5 w-5 text-orange-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-orange-800">
-              <strong>Action Required:</strong> {totalIssues} vehicle{totalIssues > 1 ? 's' : ''} {totalIssues > 1 ? 'need' : 'needs'} insurance renewal. Renew policies to maintain legal compliance and coverage.
-            </p>
+                  <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                    Renew
+                  </Button>
+                </div>
+              );
+            })}
+            {(expired.length + expiring.length) > 4 && (
+              <p className="text-xs text-orange-600 text-center pt-1">+{(expired.length + expiring.length) - 4} more vehicles need attention</p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -300,66 +270,46 @@ function ContractExpiryWidget({ filterUserId }: { filterUserId: number | null })
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
   
-  const getUrgencyColor = (daysRemaining: number) => {
-    if (daysRemaining <= 1) return { bg: 'bg-red-50', border: 'border-red-200', text: 'text-red-900', badge: 'bg-red-100 text-red-800' };
-    if (daysRemaining <= 2) return { bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-900', badge: 'bg-orange-100 text-orange-800' };
-    return { bg: 'bg-yellow-50', border: 'border-yellow-200', text: 'text-yellow-900', badge: 'bg-yellow-100 text-yellow-800' };
-  };
-  
   return (
-    <Card className="bg-blue-50 border-blue-200 shadow-md">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Clock className="h-5 w-5 text-blue-600" />
-            </div>
-            <CardTitle className="text-lg font-semibold text-blue-900">Contracts Expiring Soon</CardTitle>
+    <Card className="border-blue-200 bg-blue-50/50">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Clock className="h-4 w-4 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-blue-900">Contracts Expiring Soon</h3>
+            <p className="text-xs text-blue-700">{expiringContracts.length} contract{expiringContracts.length > 1 ? 's' : ''} within 3 days</p>
           </div>
           <Link href="/rental-contracts">
-            <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
-              View All
+            <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
+              View All <ChevronRight className="ml-1 h-3 w-3" />
             </Button>
           </Link>
         </div>
-      </CardHeader>
-      <CardContent>
         <div className="space-y-2">
           {expiringContracts.map((contract: any) => {
             const daysRemaining = getDaysRemaining(contract.rentalEndDate);
-            const colors = getUrgencyColor(daysRemaining);
+            const isUrgent = daysRemaining <= 1;
             return (
-              <div key={contract.id} className={`flex items-center justify-between p-3 ${colors.bg} rounded-lg border ${colors.border}`}>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold ${colors.text}">{contract.contractNumber}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${colors.badge}`}>
-                      {daysRemaining === 0 ? 'Expires Today' : daysRemaining === 1 ? '1 day left' : `${daysRemaining} days left`}
+              <div key={contract.id} className={`flex items-center justify-between p-2.5 rounded-lg border ${isUrgent ? 'bg-red-50 border-red-200' : 'bg-white border-blue-200'}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-xs">{contract.contractNumber}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isUrgent ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {daysRemaining === 0 ? 'Today' : `${daysRemaining}d left`}
                     </span>
                   </div>
-                  <div className="text-sm ${colors.text}">
-                    Client: {contract.clientFirstName} {contract.clientLastName}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    End Date: {new Date(contract.rentalEndDate).toLocaleDateString()}
+                  <div className="text-[11px] text-gray-600 truncate">
+                    {contract.clientFirstName} {contract.clientLastName}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Link href={`/rental-contracts?contract=${contract.id}`}>
-                    <Button size="sm" variant="outline" className={`border-${daysRemaining <= 1 ? 'red' : daysRemaining <= 2 ? 'orange' : 'yellow'}-300`}>
-                      View
-                    </Button>
-                  </Link>
-                </div>
+                <Link href={`/rental-contracts?contract=${contract.id}`}>
+                  <Button size="sm" variant="ghost" className="text-xs h-7">View</Button>
+                </Link>
               </div>
             );
           })}
-        </div>
-        <div className="mt-4 p-3 bg-blue-100 rounded-lg flex items-start gap-2">
-          <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-blue-800">
-            <strong>Reminder:</strong> {expiringContracts.length} contract{expiringContracts.length > 1 ? 's' : ''} expiring within 3 days. Contact clients to arrange returns or extensions.
-          </p>
         </div>
       </CardContent>
     </Card>
@@ -372,42 +322,35 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   if (isLoading || !stats || stats.count === 0) return null;
   
   return (
-    <Card className="bg-red-50 border-red-200 shadow-md">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-red-600" />
-            </div>
-            <CardTitle className="text-lg font-semibold text-red-900">Overdue Contracts Alert</CardTitle>
+    <Card className="border-red-200 bg-red-50/50">
+      <CardContent className="pt-5 pb-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-red-100 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-red-900">Overdue Contracts</h3>
+            <p className="text-xs text-red-700">Action required - contact clients immediately</p>
           </div>
           <Link href="/rental-contracts">
-            <Button variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-100">
-              View All
+            <Button variant="ghost" size="sm" className="text-red-700 hover:text-red-900 hover:bg-red-100">
+              View All <ChevronRight className="ml-1 h-3 w-3" />
             </Button>
           </Link>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
-            <div className="text-3xl font-bold text-red-600">{stats.count}</div>
-            <div className="text-sm text-red-700 mt-1">Overdue Contracts</div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+            <div className="text-2xl font-bold text-red-600">{stats.count}</div>
+            <div className="text-xs text-red-700">Overdue</div>
           </div>
-          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
-            <div className="text-3xl font-bold text-red-600">${stats.totalLateFees}</div>
-            <div className="text-sm text-red-700 mt-1">Total Late Fees</div>
+          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+            <div className="text-2xl font-bold text-red-600">${stats.totalLateFees}</div>
+            <div className="text-xs text-red-700">Late Fees</div>
           </div>
-          <div className="text-center p-4 bg-white rounded-lg border border-red-200">
-            <div className="text-3xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
-            <div className="text-sm text-red-700 mt-1">Avg Days Overdue</div>
+          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+            <div className="text-2xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
+            <div className="text-xs text-red-700">Avg Days</div>
           </div>
-        </div>
-        <div className="mt-4 p-3 bg-red-100 rounded-lg flex items-start gap-2">
-          <Clock className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-red-800">
-            <strong>Action Required:</strong> {stats.count} contract{stats.count > 1 ? 's' : ''} {stats.count > 1 ? 'are' : 'is'} overdue. Contact clients immediately to arrange returns and collect late fees.
-          </p>
         </div>
       </CardContent>
     </Card>
@@ -419,20 +362,19 @@ function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: numb
 
   return (
     <>
-      <Card 
-        className="bg-card shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+      <div 
+        className="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-all hover:border-gray-300" 
         onClick={() => setIsModalOpen(true)}
       >
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">In Maintenance</CardTitle>
-          <div className="p-2 bg-red-100 rounded-lg">
-            <Wrench className="h-5 w-5 text-red-600" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">In Maintenance</span>
+          <div className="p-2 bg-red-50 rounded-lg">
+            <Wrench className="h-4 w-4 text-red-500" />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-foreground">{maintenanceCount}</div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="text-3xl font-bold text-gray-900">{maintenanceCount}</div>
+        <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+      </div>
       <MaintenanceModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
   );
@@ -443,20 +385,19 @@ function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCou
 
   return (
     <>
-      <Card 
-        className="bg-card shadow-sm cursor-pointer hover:shadow-md transition-shadow" 
+      <div 
+        className="bg-white rounded-xl border border-gray-200 p-5 cursor-pointer hover:shadow-md transition-all hover:border-gray-300" 
         onClick={() => setIsModalOpen(true)}
       >
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">Expiring Docs</CardTitle>
-          <div className="p-2 bg-yellow-100 rounded-lg">
-            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Expiring Docs</span>
+          <div className="p-2 bg-amber-50 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-amber-500" />
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-3xl font-bold text-foreground">{expiringDocsCount}</div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="text-3xl font-bold text-gray-900">{expiringDocsCount}</div>
+        <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+      </div>
       <ExpiringDocumentsModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
   );
@@ -465,7 +406,6 @@ function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCou
 export default function Dashboard() {
   const { user } = useAuth();
   
-  // Widget visibility state
   const [widgetVisibility, setWidgetVisibility] = useState({
     totalFleet: true,
     totalRevenue: true,
@@ -489,7 +429,6 @@ export default function Dashboard() {
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const selectPlanMutation = trpc.subscription.selectPlan.useMutation();
 
-  // Auto-activate subscription plan if one was selected before signup
   useEffect(() => {
     const selectedPlanId = localStorage.getItem('selectedSubscriptionPlanId');
     if (selectedPlanId && user) {
@@ -506,7 +445,6 @@ export default function Dashboard() {
     }
   }, [user]);
 
-  // Invalidate all queries when selectedUserId changes to force refetch with new filter
   useEffect(() => {
     if (isSuperAdmin) {
       utils.fleet.list.invalidate();
@@ -515,7 +453,6 @@ export default function Dashboard() {
     }
   }, [selectedUserId, isSuperAdmin, utils]);
 
-  // Calculate metrics from real data
   const totalFleet = vehicles?.length || 0;
   const inMaintenance = vehicles?.filter(v => v.status === "Maintenance").length || 0;
   const expiringDocs = vehicles?.filter(v => {
@@ -527,16 +464,13 @@ export default function Dashboard() {
     );
   }).length || 0;
 
-  // Use actual revenue from contracts
   const actualRevenue = contractStats?.totalRevenue || 0;
   const revenueThisMonth = contractStats?.revenueThisMonth || 0;
 
-  // Fleet status counts
   const available = vehicles?.filter(v => v.status === "Available").length || 0;
   const rented = vehicles?.filter(v => v.status === "Rented").length || 0;
   const maintenance = vehicles?.filter(v => v.status === "Maintenance").length || 0;
 
-  // Fleet composition by category
   const categories = vehicles?.reduce((acc, v) => {
     acc[v.category] = (acc[v.category] || 0) + 1;
     return acc;
@@ -544,332 +478,215 @@ export default function Dashboard() {
 
   const maxCategoryCount = Math.max(...Object.values(categories), 1);
 
-
+  const categoryColors = ['bg-blue-500', 'bg-indigo-500', 'bg-violet-500', 'bg-cyan-500', 'bg-teal-500', 'bg-emerald-500'];
 
   return (
-    <>
-      <div className="space-y-8">
-          {/* Header */}
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900 mb-2">Dashboard Overview</h2>
-              <p className="text-base sm:text-lg text-gray-600">Welcome back. Here's what's happening today.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              {/* Settings and Admin Controls Group */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="lg" className="whitespace-nowrap w-full sm:w-auto h-11 text-base">
-                      <SettingsIcon className="mr-2 h-5 w-5" />
-                      Customize
-                    </Button>
-                  </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Dashboard Widgets</DialogTitle>
-                    <DialogDescription>
-                      Toggle widgets on or off to customize your dashboard view
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="totalFleet" className="flex items-center gap-2">
-                        <Car className="h-4 w-4" />
-                        Total Fleet
-                      </Label>
-                      <Switch
-                        id="totalFleet"
-                        checked={widgetVisibility.totalFleet}
-                        onCheckedChange={() => toggleWidget('totalFleet')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="totalRevenue" className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4" />
-                        Total Revenue
-                      </Label>
-                      <Switch
-                        id="totalRevenue"
-                        checked={widgetVisibility.totalRevenue}
-                        onCheckedChange={() => toggleWidget('totalRevenue')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="inMaintenance" className="flex items-center gap-2">
-                        <Wrench className="h-4 w-4" />
-                        In Maintenance
-                      </Label>
-                      <Switch
-                        id="inMaintenance"
-                        checked={widgetVisibility.inMaintenance}
-                        onCheckedChange={() => toggleWidget('inMaintenance')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="expiringDocs" className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        Expiring Documents
-                      </Label>
-                      <Switch
-                        id="expiringDocs"
-                        checked={widgetVisibility.expiringDocs}
-                        onCheckedChange={() => toggleWidget('expiringDocs')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="overdueAlert" className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        Overdue Contracts Alert
-                      </Label>
-                      <Switch
-                        id="overdueAlert"
-                        checked={widgetVisibility.overdueAlert}
-                        onCheckedChange={() => toggleWidget('overdueAlert')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="contractExpiryAlert" className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        Contract Expiry Alert
-                      </Label>
-                      <Switch
-                        id="contractExpiryAlert"
-                        checked={widgetVisibility.contractExpiryAlert}
-                        onCheckedChange={() => toggleWidget('contractExpiryAlert')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="insuranceAlert" className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4" />
-                        Insurance Expiry Alert
-                      </Label>
-                      <Switch
-                        id="insuranceAlert"
-                        checked={widgetVisibility.insuranceAlert}
-                        onCheckedChange={() => toggleWidget('insuranceAlert')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="fleetStatus" className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        Fleet Status Chart
-                      </Label>
-                      <Switch
-                        id="fleetStatus"
-                        checked={widgetVisibility.fleetStatus}
-                        onCheckedChange={() => toggleWidget('fleetStatus')}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="fleetComposition" className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        Fleet Composition
-                      </Label>
-                      <Switch
-                        id="fleetComposition"
-                        checked={widgetVisibility.fleetComposition}
-                        onCheckedChange={() => toggleWidget('fleetComposition')}
-                      />
-                    </div>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Welcome back{user?.name ? `, ${user.name}` : ''}. Here's your fleet overview.</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {isSuperAdmin && allUsers && allUsers.length > 0 && (
+            <Select
+              value={selectedUserId === null ? "all" : selectedUserId.toString()}
+              onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
+            >
+              <SelectTrigger className="w-[160px] h-9 text-sm">
+                <Users className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
+                <SelectValue placeholder="All Users" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                {allUsers && Array.isArray(allUsers) && allUsers.map((u) => (
+                  <SelectItem key={u.id} value={u.id.toString()}>
+                    {u.name || u.username || u.email || `User ${u.id}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <SettingsIcon className="mr-1.5 h-3.5 w-3.5" />
+                Customize
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Dashboard Widgets</DialogTitle>
+                <DialogDescription>Toggle widgets to customize your dashboard view</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                {[
+                  { id: 'totalFleet' as const, icon: Car, label: 'Total Fleet' },
+                  { id: 'totalRevenue' as const, icon: DollarSign, label: 'Total Revenue' },
+                  { id: 'inMaintenance' as const, icon: Wrench, label: 'In Maintenance' },
+                  { id: 'expiringDocs' as const, icon: AlertTriangle, label: 'Expiring Documents' },
+                  { id: 'overdueAlert' as const, icon: Clock, label: 'Overdue Contracts Alert' },
+                  { id: 'contractExpiryAlert' as const, icon: Clock, label: 'Contract Expiry Alert' },
+                  { id: 'insuranceAlert' as const, icon: AlertTriangle, label: 'Insurance Expiry Alert' },
+                  { id: 'fleetStatus' as const, icon: Eye, label: 'Fleet Status Chart' },
+                  { id: 'fleetComposition' as const, icon: Eye, label: 'Fleet Composition' },
+                ].map(({ id, icon: Icon, label }) => (
+                  <div key={id} className="flex items-center justify-between">
+                    <Label htmlFor={id} className="flex items-center gap-2">
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </Label>
+                    <Switch id={id} checked={widgetVisibility[id]} onCheckedChange={() => toggleWidget(id)} />
                   </div>
-                </DialogContent>
-              </Dialog>
-                {isSuperAdmin && allUsers && allUsers.length > 0 && (
-                  <div className="flex items-center gap-2 w-full sm:w-auto flex-1 sm:flex-none">
-                    <Users className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                    <Select
-                      value={selectedUserId === null ? "all" : selectedUserId.toString()}
-                      onValueChange={(value) => setSelectedUserId(value === "all" ? null : parseInt(value, 10))}
-                    >
-                      <SelectTrigger className="w-full sm:w-[200px] h-11 text-base">
-                        <SelectValue placeholder="Select user" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Users</SelectItem>
-                        {allUsers && Array.isArray(allUsers) && allUsers.map((u) => (
-                          <SelectItem key={u.id} value={u.id.toString()}>
-                            {u.name || u.username || u.email || `User ${u.id}`}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                ))}
               </div>
-              
-              {/* Action Buttons Group */}
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full">
-                <div className="flex-1">
-                  <ExportToExcelButton />
-                </div>
-                {user?.role === "super_admin" && (
-                  <Link href="/admin/users" className="flex-1">
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-white w-full h-11 whitespace-nowrap text-sm font-medium">
-                      <Crown className="mr-2 h-4 w-4" />
-                      Admin Panel
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
+            </DialogContent>
+          </Dialog>
 
-          {/* Overdue Contracts Alert Widget */}
-          {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
+          <ExportToExcelButton />
 
-          {/* Contract Expiry Alert Widget */}
-          {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
-
-          {/* Insurance Expiry Alert Widget */}
-          {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
-
-          {/* Subscription Status Widget */}
-          {!selectedUserId && <SubscriptionStatusCard />}
-
-          {/* Metric Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {widgetVisibility.totalFleet && (
-            <Card className="bg-card shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Fleet</CardTitle>
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Car className="h-5 w-5 text-primary" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">{totalFleet}</div>
-              </CardContent>
-            </Card>
-            )}
-
-            {widgetVisibility.totalRevenue && (
-
-            <Card className="bg-card shadow-sm">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <DollarSign className="h-5 w-5 text-green-600" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">${actualRevenue.toFixed(2)}</div>
-                <p className="text-xs text-muted-foreground mt-1">This month: ${revenueThisMonth.toFixed(2)}</p>
-              </CardContent>
-            </Card>
-            )}
-
-            {widgetVisibility.inMaintenance && (
-              <MaintenanceCardWithModal maintenanceCount={inMaintenance} />
-            )}
-
-            {widgetVisibility.expiringDocs && (
-              <ExpiringDocumentsCardWithModal expiringDocsCount={expiringDocs} />
-            )}
-          </div>
-
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Fleet Status */}
-            {widgetVisibility.fleetStatus && (
-            <Card className="bg-card shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-foreground">Fleet Status</CardTitle>
-                <p className="text-sm text-muted-foreground">Current availability of vehicles</p>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center space-y-6">
-                  {/* Simple donut chart representation */}
-                  <div className="relative w-48 h-48">
-                    <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                      {/* Available (green) */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#10b981"
-                        strokeWidth="20"
-                        strokeDasharray={`${(available / totalFleet) * 251.2} 251.2`}
-                        strokeDashoffset="0"
-                      />
-                      {/* Rented (blue) */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#3b82f6"
-                        strokeWidth="20"
-                        strokeDasharray={`${(rented / totalFleet) * 251.2} 251.2`}
-                        strokeDashoffset={`-${(available / totalFleet) * 251.2}`}
-                      />
-                      {/* Maintenance (red) */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        fill="none"
-                        stroke="#ef4444"
-                        strokeWidth="20"
-                        strokeDasharray={`${(maintenance / totalFleet) * 251.2} 251.2`}
-                        strokeDashoffset={`-${((available + rented) / totalFleet) * 251.2}`}
-                      />
-                    </svg>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">Available</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-primary rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">Rented</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span className="text-sm text-muted-foreground">Maintenance</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            )}
-
-            {/* Fleet Composition */}
-            {widgetVisibility.fleetComposition && (
-            <Card className="bg-card shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold text-foreground">Fleet Composition</CardTitle>
-                <p className="text-sm text-muted-foreground">Distribution by vehicle category</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(categories).map(([category, count]) => (
-                    <div key={category} className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">{category}</span>
-                        <span className="font-medium text-foreground">{count}</span>
-                      </div>
-                        <div className="w-full bg-secondary rounded-full h-3">
-                          <div
-                            className="bg-primary h-3 rounded-full transition-all"
-                          style={{ width: `${(count / maxCategoryCount) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  ))}
-                  {Object.keys(categories).length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">No vehicles in fleet yet</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-            )}
-          </div>
+          {user?.role === "super_admin" && (
+            <Link href="/admin/users">
+              <Button size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50">
+                <Crown className="mr-1.5 h-3.5 w-3.5" />
+                Admin
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
-    </>
+
+      {!selectedUserId && <SubscriptionStatusCard />}
+
+      {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
+      {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
+      {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {widgetVisibility.totalFleet && (
+          <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Fleet</span>
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Car className="h-4 w-4 text-blue-500" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">{totalFleet}</div>
+            <p className="text-xs text-gray-400 mt-1">{available} available</p>
+          </div>
+        )}
+
+        {widgetVisibility.totalRevenue && (
+          <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Revenue</span>
+              <div className="p-2 bg-emerald-50 rounded-lg">
+                <DollarSign className="h-4 w-4 text-emerald-500" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-gray-900">${actualRevenue.toFixed(2)}</div>
+            <p className="text-xs text-gray-400 mt-1">This month: ${revenueThisMonth.toFixed(2)}</p>
+          </div>
+        )}
+
+        {widgetVisibility.inMaintenance && (
+          <MaintenanceCardWithModal maintenanceCount={inMaintenance} />
+        )}
+
+        {widgetVisibility.expiringDocs && (
+          <ExpiringDocumentsCardWithModal expiringDocsCount={expiringDocs} />
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {widgetVisibility.fleetStatus && (
+          <Card className="shadow-none border border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold text-gray-900">Fleet Status</CardTitle>
+              <p className="text-xs text-gray-500">Current availability of vehicles</p>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col items-center space-y-5">
+                <div className="relative w-40 h-40">
+                  {totalFleet > 0 ? (
+                    <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#10b981" strokeWidth="18"
+                        strokeDasharray={`${(available / totalFleet) * 251.2} 251.2`} strokeDashoffset="0" />
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" strokeWidth="18"
+                        strokeDasharray={`${(rented / totalFleet) * 251.2} 251.2`}
+                        strokeDashoffset={`-${(available / totalFleet) * 251.2}`} />
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" strokeWidth="18"
+                        strokeDasharray={`${(maintenance / totalFleet) * 251.2} 251.2`}
+                        strokeDashoffset={`-${((available + rented) / totalFleet) * 251.2}`} />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="40" fill="none" stroke="#e5e7eb" strokeWidth="18" />
+                    </svg>
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <span className="text-2xl font-bold text-gray-900">{totalFleet}</span>
+                      <span className="block text-[10px] text-gray-500">Total</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
+                    <span className="text-xs text-gray-600">Available ({available})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
+                    <span className="text-xs text-gray-600">Rented ({rented})</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                    <span className="text-xs text-gray-600">Maintenance ({maintenance})</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {widgetVisibility.fleetComposition && (
+          <Card className="shadow-none border border-gray-200">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-semibold text-gray-900">Fleet Composition</CardTitle>
+              <p className="text-xs text-gray-500">Distribution by vehicle category</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Object.entries(categories).map(([category, count], i) => (
+                  <div key={category} className="space-y-1.5">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{category}</span>
+                      <span className="font-semibold text-gray-900">{count}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div
+                        className={`${categoryColors[i % categoryColors.length]} h-2 rounded-full transition-all`}
+                        style={{ width: `${(count / maxCategoryCount) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+                {Object.keys(categories).length === 0 && (
+                  <div className="text-center py-8">
+                    <Car className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-400">No vehicles in fleet yet</p>
+                    <Link href="/fleet-management">
+                      <Button variant="outline" size="sm" className="mt-3">Add Your First Vehicle</Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
   );
 }

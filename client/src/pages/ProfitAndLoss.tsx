@@ -112,19 +112,13 @@ export default function ProfitAndLoss() {
 
   return (
     <div className="w-full bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        {/* Breadcrumb Navigation */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Link href="/dashboard" className="flex items-center gap-1 hover:text-primary transition-colors">
-            <Home className="h-4 w-4" />
-            <span>Dashboard</span>
-          </Link>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
-          <span className="text-foreground font-medium">Profit & Loss</span>
-        </div>
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-foreground">Profit & Loss</h1>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Profit & Loss</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Track revenue, expenses, and profitability</p>
+          </div>
           <div className="flex gap-4">
             <div>
               <Label className="text-sm font-medium">Start Date</Label>

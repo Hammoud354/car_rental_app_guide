@@ -31,6 +31,16 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Landing page: Professional design with FleetMaster branding, blue-600 accent, animated dashboard preview
 - Auth pages (SignIn/SignUp): Split-panel layout with dark branding panel + white form panel
 - Logo: SVG car icon in gradient blue/indigo rounded-xl box, "Fleet**Master**" text with "Master" in blue-600
+- **Consistent page headers**: `<h1 className="text-2xl font-bold text-gray-900">` + `<p className="text-sm text-gray-500 mt-0.5">` subtitle
+- **Stat cards**: white div with `rounded-xl border border-gray-200 p-5`, icon in colored bg `rounded-lg p-2`
+- **Alert widgets**: `border-[color]-200 bg-[color]-50/50`, compact with ChevronRight link
+- **Button sizing**: `size="sm"` for header action buttons; icons use `h-3.5 w-3.5 mr-1.5`
+- **Sidebar**: Car icon, `from-blue-600 to-indigo-700` gradient, "FleetMaster" branding
+
+## Business Logic
+- Invoice tax calculation uses company profile VAT rate (not hardcoded)
+- Invoice numbering uses MAX(invoice_number) with collision fallback
+- Late fee default: 150% of daily rate per day late (configurable per contract)
 
 ## Auth
 - Local authentication with username/password (cookie-based sessions)

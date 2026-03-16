@@ -186,11 +186,11 @@ export default function AIMaintenance() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-primary" />
-              AI-Powered Maintenance
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              AI Maintenance
             </h1>
-            <p className="text-muted-foreground mt-1">
+            <p className="text-sm text-gray-500 mt-0.5">
               Intelligent maintenance scheduling with priority classification
             </p>
           </div>

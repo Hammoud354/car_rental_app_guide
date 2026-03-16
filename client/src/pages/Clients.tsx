@@ -265,13 +265,12 @@ export default function Clients() {
   return (
     <>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Clients</h1>
-            <p className="text-muted-foreground text-sm">Manage your rental clients and their information</p>
+            <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Manage your rental clients and their information</p>
           </div>
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 flex-wrap">
             <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">

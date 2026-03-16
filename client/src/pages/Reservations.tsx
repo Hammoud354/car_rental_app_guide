@@ -100,8 +100,8 @@ export default function Reservations() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Reservations Calendar</h1>
-            <p className="text-gray-600 mt-1 text-sm">
+            <h1 className="text-2xl font-bold text-gray-900">Reservations Calendar</h1>
+            <p className="text-sm text-gray-500 mt-0.5">
               View upcoming rental reservations and vehicle availability
             </p>
           </div>

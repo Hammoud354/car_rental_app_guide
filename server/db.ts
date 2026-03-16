@@ -1839,9 +1839,15 @@ export async function generateInvoiceForContract(contractId: number, userId: num
     return existingInvoice;
   }
   
-  // Generate invoice number
-  const invoiceCount = await db.select({ count: sql<number>`count(*)` }).from(invoices);
-  const invoiceNumber = `INV-${String(invoiceCount[0].count + 1).padStart(5, "0")}`;
+  // Generate invoice number using max existing number to avoid collisions
+  const maxInvoice = await db.select({ maxNum: sql<string>`MAX(invoice_number)` }).from(invoices);
+  const lastNum = maxInvoice[0]?.maxNum ? parseInt(maxInvoice[0].maxNum.replace('INV-', '')) || 0 : 0;
+  let invoiceNumber = `INV-${String(lastNum + 1).padStart(5, "0")}`;
+  // Fallback: if the number already exists (edge case), append timestamp
+  const existing = await db.select({ id: invoices.id }).from(invoices).where(sql`invoice_number = ${invoiceNumber}`).limit(1);
+  if (existing.length > 0) {
+    invoiceNumber = `INV-${String(lastNum + 2).padStart(5, "0")}`;
+  }
   
   // Calculate line items
   const lineItems: { description: string; quantity: number; unitPrice: number; amount: number }[] = [];
@@ -1894,7 +1900,9 @@ export async function generateInvoiceForContract(contractId: number, userId: num
   
   // Calculate totals
   const subtotal = lineItems.reduce((sum, item) => sum + item.amount, 0);
-  const taxRate = 0.11; // 11% tax
+  const companyProfile = await getCompanyProfile(userId);
+  const vatRatePercent = companyProfile?.vatRate ? parseFloat(companyProfile.vatRate.toString()) : 0;
+  const taxRate = vatRatePercent / 100;
   const taxAmount = subtotal * taxRate;
   const totalAmount = subtotal + taxAmount;
   
@@ -2057,8 +2065,10 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
   // Calculate subtotal
   const subtotal = lineItems.reduce((sum, item) => sum + parseFloat(item.amount), 0);
   
-  // Calculate tax (11%)
-  const taxRate = 0.11;
+  // Calculate tax using company profile VAT rate
+  const companyProfile = await getCompanyProfile(userId);
+  const vatRatePercent = companyProfile?.vatRate ? parseFloat(companyProfile.vatRate.toString()) : 0;
+  const taxRate = vatRatePercent / 100;
   const taxAmount = subtotal * taxRate;
   
   // Calculate total

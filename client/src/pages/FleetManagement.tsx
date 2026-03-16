@@ -377,41 +377,78 @@ export default function FleetManagement() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="container py-8">
-      <div className="space-y-8">
+      <div className="space-y-6">
         
-        {/* Populate Car Makers Alert */}
         {!carMakers || carMakers.length === 0 ? (
-          <Card className="bg-orange-500/5 border-orange-500/20">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-semibold text-orange-600 mb-1">No Car Makers Found</h3>
-                  <p className="text-sm text-muted-foreground">
-                    You need to populate car makers and models before adding vehicles.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => populateMakersMutation.mutate({ country: "Lebanon" })}
-                  className="whitespace-nowrap"
-                  disabled={populateMakersMutation.isPending}
-                >
-                  {populateMakersMutation.isPending ? "Populating..." : "Populate Car Makers"}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-between gap-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div>
+              <h3 className="font-semibold text-amber-800 text-sm">No Car Makers Found</h3>
+              <p className="text-xs text-amber-600 mt-0.5">Populate car makers and models before adding vehicles.</p>
+            </div>
+            <Button
+              onClick={() => populateMakersMutation.mutate({ country: "Lebanon" })}
+              size="sm"
+              disabled={populateMakersMutation.isPending}
+            >
+              {populateMakersMutation.isPending ? "Populating..." : "Populate Car Makers"}
+            </Button>
+          </div>
         ) : null}
         
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">Fleet Operations</div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Fleet Management</h1>
-            <p className="text-muted-foreground mt-2">Manage your vehicle inventory and track maintenance</p>
+            <h1 className="text-2xl font-bold text-gray-900">Fleet Management</h1>
+            <p className="text-sm text-gray-500 mt-0.5">Manage your vehicle inventory and track maintenance</p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-2 sm:items-start">
-            {/* Primary Action Button */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href="/maintenance">
+              <Button variant="outline" size="sm">
+                <Wrench className="mr-1.5 h-3.5 w-3.5" />
+                Maintenance
+              </Button>
+            </Link>
+            <BulkImportDialog
+              open={isImportDialogOpen}
+              onOpenChange={setIsImportDialogOpen}
+              type="vehicles"
+              onImport={async (data) => {
+                const results = await Promise.all(
+                  data.map(async (vehicle) => {
+                    try {
+                      await createMutation.mutateAsync(vehicle);
+                      return { success: true };
+                    } catch (error: any) {
+                      return { success: false, error: error.message };
+                    }
+                  })
+                );
+                utils.fleet.list.invalidate();
+                return { results };
+              }}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsImportDialogOpen(true)}
+            >
+              <Upload className="mr-1.5 h-3.5 w-3.5" />
+              Import
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (vehicles && vehicles.length > 0) {
+                  exportVehiclesToCSV(vehicles);
+                } else {
+                  toast.error("No vehicles to export");
+                }
+              }}
+            >
+              <Download className="mr-1.5 h-3.5 w-3.5" />
+              Export
+            </Button>
             <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
               setIsAddDialogOpen(open);
               if (!open) {
@@ -421,7 +458,7 @@ export default function FleetManagement() {
             }}>
               <DialogTrigger asChild>
                 <Button 
-                  className="font-mono bg-gray-900 hover:bg-gray-800 whitespace-nowrap"
+                  size="sm"
                   onClick={async (e) => {
                     e.preventDefault();
                     try {
@@ -448,13 +485,13 @@ export default function FleetManagement() {
                     }
                   }}
                 >
-                  <Plus className="mr-2 h-4 w-4" />
-                  ADD VEHICLE
+                  <Plus className="mr-1.5 h-3.5 w-3.5" />
+                  Add Vehicle
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
-                <DialogTitle className="font-mono">Add New Vehicle</DialogTitle>
+                <DialogTitle>Add New Vehicle</DialogTitle>
                 <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddVehicle} className="space-y-4">
@@ -848,42 +885,11 @@ export default function FleetManagement() {
             </DialogContent>
           </Dialog>
           
-          {/* Secondary Action Buttons */}
-          <div className="flex flex-wrap gap-2">
-            <Link href="/maintenance-tracking">
-              <Button variant="outline" className="whitespace-nowrap">
-                <Wrench className="h-4 w-4 mr-2" />
-                Maintenance
-              </Button>
-            </Link>
-            
-            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)} className="whitespace-nowrap">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                if (!vehicles || vehicles.length === 0) {
-                  toast.error("No vehicles to export");
-                  return;
-                }
-                exportVehiclesToCSV(vehicles);
-                toast.success(`Exported ${vehicles.length} vehicles`);
-              }}
-              className="whitespace-nowrap"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-          </div>
           </div>
         </div>
 
-        {/* Search Bar */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
             placeholder="Search by plate number or model..."
@@ -894,7 +900,7 @@ export default function FleetManagement() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
@@ -903,107 +909,94 @@ export default function FleetManagement() {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <p className="mt-4 text-muted-foreground">Loading vehicles...</p>
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-sm text-gray-500">Loading vehicles...</p>
           </div>
         ) : filteredVehicles && filteredVehicles.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredVehicles.map((vehicle) => (
-              <Card key={vehicle.id} className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
+              <div key={vehicle.id} className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-3">
                     <div>
-                      <CardTitle className="text-lg font-mono">{vehicle.plateNumber}</CardTitle>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <h3 className="text-base font-bold text-gray-900">{vehicle.plateNumber}</h3>
+                      <p className="text-sm text-gray-500">
                         {vehicle.brand} {vehicle.model} ({vehicle.year})
                       </p>
                     </div>
                     <Badge className={getStatusColor(vehicle.status)}>{vehicle.status}</Badge>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
                     <div>
-                      <span className="text-muted-foreground">Category:</span>
-                      <p className="font-medium">{vehicle.category}</p>
+                      <span className="text-xs text-gray-400">Category</span>
+                      <p className="font-medium text-gray-700">{vehicle.category}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Color:</span>
-                      <p className="font-medium">{vehicle.color}</p>
+                      <span className="text-xs text-gray-400">Color</span>
+                      <p className="font-medium text-gray-700">{vehicle.color}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Daily Rate:</span>
-                      <p className="font-medium">${vehicle.dailyRate}</p>
+                      <span className="text-xs text-gray-400">Daily Rate</span>
+                      <p className="font-medium text-gray-700">${vehicle.dailyRate}</p>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Mileage:</span>
-                      <p className="font-medium">{vehicle.mileage || 0} mi</p>
+                      <span className="text-xs text-gray-400">Mileage</span>
+                      <p className="font-medium text-gray-700">{vehicle.mileage || 0} km</p>
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-2 border-t border-border/50">
-                    <Link href={`/vehicle/${vehicle.id}`}>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full"
-                      >
-                        <Car className="mr-2 h-3 w-3" />
-                        View Details
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                    <Link href={`/vehicle/${vehicle.id}`} className="flex-1">
+                      <Button size="sm" variant="outline" className="w-full text-xs">
+                        <Car className="mr-1.5 h-3 w-3" />
+                        Details
                       </Button>
                     </Link>
-                  </div>
-                  <div className="flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1"
+                      className="flex-1 text-xs"
                       onClick={() => {
                         setSelectedVehicle(vehicle);
                         setIsEditDialogOpen(true);
                       }}
                     >
-                      <Edit className="mr-2 h-3 w-3" />
+                      <Edit className="mr-1.5 h-3 w-3" />
                       Edit
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
-                      className="flex-1"
+                      className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50"
                       onClick={() => handleDeleteVehicle(vehicle.id)}
                       disabled={deleteMutation.isPending}
                     >
-                      <Trash2 className="mr-2 h-3 w-3" />
-                      Delete
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
         ) : searchQuery ? (
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-            <CardContent className="py-12 text-center">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-bold mb-2">No Results Found</h3>
-              <p className="text-muted-foreground mb-6">No vehicles match your search query "{searchQuery}"</p>
-              <Button onClick={() => setSearchQuery("")} variant="outline">
-                Clear Search
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+            <Search className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+            <h3 className="text-base font-semibold text-gray-700 mb-1">No Results Found</h3>
+            <p className="text-sm text-gray-400 mb-4">No vehicles match "{searchQuery}"</p>
+            <Button onClick={() => setSearchQuery("")} variant="outline" size="sm">
+              Clear Search
+            </Button>
+          </div>
         ) : (
-          <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-            <CardContent className="py-12 text-center">
-              <Wrench className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-bold mb-2">No Vehicles Yet</h3>
-              <p className="text-muted-foreground mb-6">Start by adding your first vehicle to the fleet.</p>
-              <Button onClick={() => setIsAddDialogOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add First Vehicle
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+            <Car className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+            <h3 className="text-base font-semibold text-gray-700 mb-1">No Vehicles Yet</h3>
+            <p className="text-sm text-gray-400 mb-4">Start by adding your first vehicle to the fleet.</p>
+            <Button onClick={() => setIsAddDialogOpen(true)} size="sm">
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              Add First Vehicle
+            </Button>
+          </div>
         )}
 
         {/* Edit Dialog */}
@@ -1011,7 +1004,7 @@ export default function FleetManagement() {
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
-                <DialogTitle className="font-mono">Edit Vehicle</DialogTitle>
+                <DialogTitle>Edit Vehicle</DialogTitle>
                 <DialogDescription>Update vehicle information below.</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleEditVehicle} className="space-y-4">
@@ -1269,7 +1262,6 @@ export default function FleetManagement() {
           </Dialog>
         )}
       </div>
-      </div>
       
       {/* Custom Maker Dialog */}
       <Dialog open={isCustomMakerDialogOpen} onOpenChange={setIsCustomMakerDialogOpen}>
@@ -1380,20 +1372,6 @@ export default function FleetManagement() {
         </DialogContent>
       </Dialog>
       
-      {/* Bulk Import Dialog */}
-      <BulkImportDialog
-        open={isImportDialogOpen}
-        onOpenChange={setIsImportDialogOpen}
-        type="vehicles"
-        onImport={async (vehicles) => {
-          const result = await utils.client.bulkImport.importVehicles.mutate({ vehicles });
-          if (result.results.some(r => r.success)) {
-            await utils.fleet.list.invalidate();
-            toast.success(`Imported ${result.results.filter(r => r.success).length} vehicles`);
-          }
-          return result;
-        }}
-      />
     </>
   );
 }

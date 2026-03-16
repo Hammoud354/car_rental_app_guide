@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { 
-  Building2, BarChart3, FileText, Wrench, Users, User, LogOut, 
+  BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
   PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X
 } from "lucide-react";
@@ -118,13 +118,13 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
     <div className="min-h-screen bg-[#fbfbfd] flex relative">
       {/* Mobile Header with Hamburger Menu */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-50 shadow-sm">
-        <Link href="/">
+        <Link href="/dashboard">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#1e40af] flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-md">
+              <Car className="h-4 w-4 text-white" />
             </div>
             <span className="text-sm font-bold text-gray-900">
-              {companyProfile?.companyName || "Car Rental"}
+              {companyProfile?.companyName || (<>Fleet<span className="text-blue-600">Master</span></>)}
             </span>
           </div>
         </Link>
@@ -170,20 +170,20 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               <PanelLeftClose className="h-4 w-4 text-gray-600" />
             )}
           </button>
-          <Link href="/">
+          <Link href="/dashboard">
             <div className={cn(
               "flex items-center cursor-pointer group",
               isCollapsed ? "justify-center" : "gap-3"
             )}>
-              <div className="w-10 h-10 rounded-lg bg-[#1e40af] flex items-center justify-center group-hover:bg-[#1e3a8a] transition-colors shadow-md">
-                <Building2 className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center group-hover:from-blue-700 group-hover:to-indigo-800 transition-all shadow-md">
+                <Car className="h-5 w-5 text-white" />
               </div>
               {!isCollapsed && (
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-gray-900">
-                    {companyProfile?.companyName || "Car Rental"}
+                    {companyProfile?.companyName || (<>Fleet<span className="text-blue-600">Master</span></>)}
                   </span>
-                  <span className="text-xs text-gray-500 font-medium">Management System</span>
+                  <span className="text-[10px] text-gray-400 font-semibold tracking-widest uppercase">Rental Management</span>
                 </div>
               )}
             </div>
