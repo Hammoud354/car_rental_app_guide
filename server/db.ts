@@ -687,7 +687,7 @@ export async function updateOverdueContracts() {
       const vehicle = await db.select().from(vehicles).where(eq(vehicles.id, contract.vehicleId)).limit(1);
       const vehicleInfo = vehicle[0] ? `${vehicle[0].brand} ${vehicle[0].model} (${vehicle[0].plateNumber})` : `Vehicle ID ${contract.vehicleId}`;
       
-      const notificationMessage = `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientFirstName} ${contract.clientLastName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`;
+      const notificationMessage = `Contract ${contract.contractNumber} is now overdue by ${daysOverdue} day(s).\n\nClient: ${contract.clientName}\nVehicle: ${vehicleInfo}\nReturn Date: ${new Date(contract.rentalEndDate).toLocaleDateString()}\nLate Fee: $${lateFee}\n\nAction Required: Contact client immediately to arrange vehicle return.`;
       
       // Send in-app notification
       await notifyOwner({
@@ -697,7 +697,7 @@ export async function updateOverdueContracts() {
       
       // Send WhatsApp notification
       await sendWhatsApp({
-        message: `🚨 *RENTAL OVERDUE ALERT*\n\n📋 Contract: ${contract.contractNumber}\n👤 Client: ${contract.clientFirstName} ${contract.clientLastName}\n🚗 Vehicle: ${vehicleInfo}\n⏰ Days Overdue: ${daysOverdue}\n💰 Late Fee: $${lateFee}\n\n⚠️ *Action Required:* Contact client immediately to arrange vehicle return!`
+        message: `🚨 *RENTAL OVERDUE ALERT*\n\n📋 Contract: ${contract.contractNumber}\n👤 Client: ${contract.clientName}\n🚗 Vehicle: ${vehicleInfo}\n⏰ Days Overdue: ${daysOverdue}\n💰 Late Fee: $${lateFee}\n\n⚠️ *Action Required:* Contact client immediately to arrange vehicle return!`
       });
     }
     
@@ -1548,8 +1548,7 @@ export async function getFutureReservations(month: number, year: number, userId:
     vehicleId: rentalContracts.vehicleId,
     rentalStartDate: rentalContracts.rentalStartDate,
     rentalEndDate: rentalContracts.rentalEndDate,
-    clientFirstName: rentalContracts.clientFirstName,
-    clientLastName: rentalContracts.clientLastName,
+    clientName: rentalContracts.clientName,
     clientPhone: rentalContracts.clientPhone,
     status: rentalContracts.status,
     finalAmount: rentalContracts.finalAmount,
@@ -1589,7 +1588,7 @@ export async function getFutureReservations(month: number, year: number, userId:
       vehicleId: contract.vehicleId,
       rentalStartDate: contract.rentalStartDate,
       rentalEndDate: contract.rentalEndDate,
-      clientName: `${contract.clientFirstName} ${contract.clientLastName}`,
+      clientName: contract.clientName || "Unknown",
       clientPhone: contract.clientPhone || "N/A",
       status: contract.status,
       totalCost: contract.finalAmount ? parseFloat(contract.finalAmount as string) : 0,
@@ -1602,7 +1601,7 @@ export async function getFutureReservations(month: number, year: number, userId:
         id: c.id,
         startDate: c.rentalStartDate,
         endDate: c.rentalEndDate,
-        clientName: `${c.clientFirstName} ${c.clientLastName}`,
+        clientName: c.clientName || "Unknown",
       })),
     };
   });
@@ -2136,7 +2135,7 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
   return {
     ...invoice,
     lineItems,
-    clientName: contract ? `${contract.clientFirstName} ${contract.clientLastName}` : 'Client',
+    clientName: contract?.clientName || 'Client',
     clientPhone: contract?.clientPhone || '',
     ...clientDetails,
   };

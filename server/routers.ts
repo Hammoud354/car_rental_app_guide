@@ -696,7 +696,7 @@ export const appRouter = router({
       .input(z.object({
         vehicleId: z.number(),
         clientFirstName: z.string().min(1).max(100),
-        clientLastName: z.string().min(1).max(100),
+        clientLastName: z.string().max(100).optional(),
         clientNationality: z.string().max(100).optional(),
         clientPhone: z.string().max(20).optional(),
         clientAddress: z.string().optional(),
@@ -750,18 +750,16 @@ export const appRouter = router({
         
         // If client doesn't exist, create new client record
         if (!client) {
+          const fullName = input.clientLastName 
+            ? `${input.clientFirstName} ${input.clientLastName}` 
+            : input.clientFirstName;
           client = await db.createClient({
             userId,
-            firstName: input.clientFirstName,
-            lastName: input.clientLastName,
-            fatherName: `${input.clientFirstName} ${input.clientLastName}`,
-            motherFullName: `${input.clientFirstName} ${input.clientLastName}`,
+            name: fullName,
             nationality: input.clientNationality,
             phone: input.clientPhone,
             address: input.clientAddress,
-            drivingLicenseNumber: input.drivingLicenseNumber,
-            licenseIssueDate: input.licenseIssueDate,
-            licenseExpiryDate: input.licenseExpiryDate,
+            driverLicenseNumber: input.drivingLicenseNumber,
           });
         }
         
@@ -783,21 +781,18 @@ export const appRouter = router({
         // Get vehicle details for contract snapshot
         const vehicle = await db.getVehicleById(input.vehicleId, userId);
         
+        const clientFullName = input.clientLastName 
+          ? `${input.clientFirstName} ${input.clientLastName}` 
+          : input.clientFirstName;
         const contract = await db.createRentalContract({
           userId,
           vehicleId: input.vehicleId,
           clientId: client.id,
-          clientFirstName: input.clientFirstName,
-          clientLastName: input.clientLastName,
+          clientName: clientFullName,
           clientNationality: input.clientNationality || null,
           clientPhone: input.clientPhone || null,
           clientAddress: input.clientAddress || null,
-          clientDateOfBirth: client.dateOfBirth || null,
-          clientPassportNumber: client.passportIdNumber || null,
-          clientPlaceOfBirth: client.placeOfBirth || null,
-          drivingLicenseNumber: input.drivingLicenseNumber,
-          licenseIssueDate: input.licenseIssueDate || null,
-          licenseExpiryDate: input.licenseExpiryDate,
+          clientDriverLicense: input.drivingLicenseNumber,
           rentalStartDate: input.rentalStartDate,
           rentalEndDate: input.rentalEndDate,
           rentalDays: input.rentalDays,
