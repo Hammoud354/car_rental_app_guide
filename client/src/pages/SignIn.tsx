@@ -188,11 +188,11 @@ export default function SignIn() {
           <div className="mt-6 pt-6 border-t border-gray-100">
             <button
               onClick={() => setLocation("/demo")}
-              className="w-full flex items-center justify-center gap-2 h-11 rounded-md border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+              className="w-full flex items-center justify-center gap-2 h-11 rounded-md bg-red-800 hover:bg-red-900 text-white text-sm font-bold shadow-lg shadow-red-900/30 transition-colors"
             >
               <Clock className="h-4 w-4" />
               Try Live Demo
-              <span className="text-xs text-gray-400">(10 min trial)</span>
+              <span className="text-xs text-red-200">(10 min trial)</span>
             </button>
           </div>
 

@@ -342,7 +342,7 @@ export default function Home() {
               <Link href="/demo">
                 <Button 
                   size="lg" 
-                  className="bg-red-700 hover:bg-red-800 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-700/25 group"
+                  className="bg-red-800 hover:bg-red-900 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-900/30 group"
                 >
                   <Clock className="h-4 w-4 mr-2" />
                   Try Live Demo
@@ -651,7 +651,7 @@ export default function Home() {
                   <Link href="/demo">
                     <Button 
                       size="lg" 
-                      className="bg-red-700 hover:bg-red-600 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-700/30"
+                      className="bg-red-800 hover:bg-red-900 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-900/30"
                     >
                       Try Live Demo
                     </Button>
