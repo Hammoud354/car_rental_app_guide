@@ -607,7 +607,7 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/signup">
+                  <Link href="/subscription-plans">
                     <Button
                       className={`w-full h-11 font-semibold ${
                         plan.popular

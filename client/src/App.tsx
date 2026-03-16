@@ -41,7 +41,7 @@ import AdminNumberingManagement from "./pages/AdminNumberingManagement";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import ContractManagement from "./pages/ContractManagement";
 
-const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password"];
+const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans"];
 
 function AppContent() {
   const [location] = useLocation();
@@ -58,6 +58,7 @@ function AppContent() {
         <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/subscription-plans" component={SubscriptionPlans} />
       </Switch>
     );
   }
