@@ -98,12 +98,10 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <UserFilterProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
-        </UserFilterProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
