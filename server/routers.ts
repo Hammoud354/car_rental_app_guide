@@ -172,14 +172,14 @@ export const appRouter = router({
           username: 'demo@system',
           password: hashedPassword,
           name: 'Demo User',
-          email: 'demo@example.com',
-          phone: '+96176354131',
-          country: 'Lebanon',
+          email: 'demo@fleetmaster.com',
+          phone: '+1-555-0100',
+          country: 'US',
         });
-        
-        // Populate demo data for new demo user
-        await seedDemoData(demoUser.id);
       }
+      
+      // Always ensure demo data exists
+      await seedDemoData(demoUser.id);
       
       // Create session cookie with 10-minute expiration
       const cookieOptions = getSessionCookieOptions(ctx.req);
@@ -301,9 +301,10 @@ export const appRouter = router({
         const database = await db.getDb();
         if (!database) return 0;
         const result = await database.execute(
-          sql`SELECT COUNT(*) as count FROM vehicles WHERE userId = ${userId}`
+          sql`SELECT COUNT(*) as count FROM vehicles WHERE "userId" = ${userId}`
         ) as any;
-        return result && result.length > 0 && result[0]?.length > 0 ? result[0][0].count : 0;
+        const rows = result?.rows || (Array.isArray(result) && result[0]) || [];
+        return rows.length > 0 ? Number(rows[0].count) : 0;
       }),
     
     getById: publicProcedure
@@ -1061,9 +1062,10 @@ export const appRouter = router({
         const database = await db.getDb();
         if (!database) return 0;
         const result = await database.execute(
-          sql`SELECT COUNT(*) as count FROM clients WHERE userId = ${userId}`
+          sql`SELECT COUNT(*) as count FROM clients WHERE "userId" = ${userId}`
         ) as any;
-        return result && result.length > 0 && result[0]?.length > 0 ? result[0][0].count : 0;
+        const rows = result?.rows || (Array.isArray(result) && result[0]) || [];
+        return rows.length > 0 ? Number(rows[0].count) : 0;
       }),
     
     getById: publicProcedure
@@ -1574,7 +1576,7 @@ export const appRouter = router({
         if (!dbInstance) throw new Error('Database not available');
         
         await dbInstance.execute(
-          sql`UPDATE users SET isInternal = ${input.isInternal} WHERE id = ${input.userId}`
+          sql`UPDATE users SET "isInternal" = ${input.isInternal} WHERE id = ${input.userId}`
         );
         
         return { success: true, userId: input.userId, isInternal: input.isInternal };

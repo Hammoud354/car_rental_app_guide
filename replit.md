@@ -13,6 +13,7 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - `server/_core/index.ts` - Main server entry point
 - `server/db.ts` - Database operations and queries
 - `server/routers.ts` - tRPC API routes
+- `server/seedDemoData.ts` - Demo data seeder (vehicles, clients, contracts, invoices, maintenance, company profile)
 - `server/carData.ts` - Global car makers/models data (70+ brands, country-specific lists)
 - `client/src/App.tsx` - Main app with route definitions and SidebarLayout wrapper
 - `client/src/pages/Home.tsx` - Landing page with framer-motion animations
@@ -36,16 +37,26 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - **Alert widgets**: `border-[color]-200 bg-[color]-50/50`, compact with ChevronRight link
 - **Button sizing**: `size="sm"` for header action buttons; icons use `h-3.5 w-3.5 mr-1.5`
 - **Sidebar**: Car icon, `from-blue-600 to-indigo-700` gradient, "FleetMaster" branding
+- **Landing page buttons**: "Sign In" (outlined), "Get Started" (blue solid), "Try Live Demo" (bg-red-700 font-bold)
+
+## Database Notes (CRITICAL)
+- **PostgreSQL requires quoted identifiers** for camelCase column/table names in raw SQL
+- All raw SQL must use `"tableName"` and `"columnName"` (e.g., `"userId"`, `"subscriptionTiers"`, `"invoiceNumber"`)
+- Drizzle `db.execute()` returns `{ rows: [...] }` object, NOT `result[0][0]` — access via `result.rows[0]`
+- All insert operations use `.returning({ id: table.id })` for PostgreSQL (NOT MySQL `insertId`)
+- Schema column `subscriptionTiers.tierName` (not `name`) — all SQL must reference `"tierName"`
+- `isInternal` and `openId` columns added to users table via raw SQL (drizzle push has interactive prompt issues)
 
 ## Business Logic
 - Invoice tax calculation uses company profile VAT rate (not hardcoded)
-- Invoice numbering uses MAX(invoice_number) with collision fallback
+- Invoice numbering uses MAX("invoiceNumber") with collision fallback
 - Late fee default: 150% of daily rate per day late (configurable per contract)
 
 ## Auth
 - Local authentication with username/password (cookie-based sessions)
 - Admin user: `admin` / `Admin123!` (role: `super_admin`)
 - Demo mode: `/demo` route auto-creates demo user with 10-minute session, pre-seeded data via `server/seedDemoData.ts`
+- Demo data: 10 vehicles, 6 clients, 6 contracts (incl. 1 overdue), 3 invoices with line items, 4 maintenance records, 1 company profile, 1 damage mark
 - Auto-country: On first login, company profile is auto-created with country, VAT rate, currency from signup data
 - Country data mapping: `shared/countries.ts` (COUNTRY_VAT_CURRENCY) maps country codes to financial settings
 

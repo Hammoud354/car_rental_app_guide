@@ -80,7 +80,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -275,9 +276,8 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (vehicle.nextMaintenanceDate) insertData.nextMaintenanceDate = vehicle.nextMaintenanceDate;
   if (vehicle.nextMaintenanceKm !== undefined && vehicle.nextMaintenanceKm !== null) insertData.nextMaintenanceKm = vehicle.nextMaintenanceKm;
   
-  const result = await db.insert(vehicles).values(insertData);
-  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
-  const created = await db.select().from(vehicles).where(eq(vehicles.id, insertId)).limit(1);
+  const [inserted] = await db.insert(vehicles).values(insertData).returning({ id: vehicles.id });
+  const created = await db.select().from(vehicles).where(eq(vehicles.id, inserted.id)).limit(1);
   if (created.length === 0) {
     throw new Error("Failed to retrieve created vehicle");
   }
@@ -347,9 +347,8 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
   if (!db) {
     throw new Error("Database not available");
   }
-  const result = await db.insert(maintenanceRecords).values(record);
-  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
-  const created = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, insertId)).limit(1);
+  const [inserted] = await db.insert(maintenanceRecords).values(record).returning({ id: maintenanceRecords.id });
+  const created = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, inserted.id)).limit(1);
   if (created.length === 0) {
     throw new Error("Failed to retrieve created maintenance record");
   }
@@ -407,9 +406,8 @@ export async function createRentalContract(contract: InsertRentalContract) {
   if (!db) {
     throw new Error("Database not available");
   }
-  const result = await db.insert(rentalContracts).values(contract);
-  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
-  const created = await db.select().from(rentalContracts).where(eq(rentalContracts.id, insertId)).limit(1);
+  const [inserted] = await db.insert(rentalContracts).values(contract).returning({ id: rentalContracts.id });
+  const created = await db.select().from(rentalContracts).where(eq(rentalContracts.id, inserted.id)).limit(1);
   if (created.length === 0) {
     throw new Error("Failed to retrieve created contract");
   }
@@ -834,10 +832,9 @@ export async function createClient(client: InsertClient): Promise<Client> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  const result = await db.insert(clients).values(client);
-  const insertId = Number(result[0].insertId);
+  const [inserted] = await db.insert(clients).values(client).returning({ id: clients.id });
   
-  const created = await db.select().from(clients).where(eq(clients.id, insertId)).limit(1);
+  const created = await db.select().from(clients).where(eq(clients.id, inserted.id)).limit(1);
   if (!created[0]) throw new Error("Failed to retrieve created client");
   
   return created[0];
@@ -1365,14 +1362,14 @@ export async function populateCarMakersForCountry(country: string, userId: numbe
   
   // Insert makers and their models FOR THIS USER
   for (const maker of carData) {
-    const makerResult = await db.insert(carMakers).values({
+    const [makerResult] = await db.insert(carMakers).values({
       name: maker.name,
       country: maker.country,
       isCustom: false,
-      userId: userId, // CRITICAL: Assign to specific user
-    });
+      userId: userId,
+    }).returning({ id: carMakers.id });
     
-    const makerId = Number(makerResult[0].insertId);
+    const makerId = makerResult.id;
     
     // Insert models for this maker FOR THIS USER
     for (const modelName of maker.popularModels) {
@@ -1803,10 +1800,10 @@ export async function upsertCompanyProfile(data: {
       exchangeRate: data.exchangeRate ? data.exchangeRate.toString() : "1.0000",
       vatRate: data.vatRate ? data.vatRate.toString() : "11.00",
     };
-    const [result] = await db
+    await db
       .insert(companyProfiles)
       .values([createData])
-      .$returningId();
+      .returning({ id: companyProfiles.id });
     
     return await getCompanyProfile(data.userId);
   }
@@ -1840,11 +1837,10 @@ export async function generateInvoiceForContract(contractId: number, userId: num
   }
   
   // Generate invoice number using max existing number to avoid collisions
-  const maxInvoice = await db.select({ maxNum: sql<string>`MAX(invoice_number)` }).from(invoices);
+  const maxInvoice = await db.select({ maxNum: sql<string>`MAX("invoiceNumber")` }).from(invoices);
   const lastNum = maxInvoice[0]?.maxNum ? parseInt(maxInvoice[0].maxNum.replace('INV-', '')) || 0 : 0;
   let invoiceNumber = `INV-${String(lastNum + 1).padStart(5, "0")}`;
-  // Fallback: if the number already exists (edge case), append timestamp
-  const existing = await db.select({ id: invoices.id }).from(invoices).where(sql`invoice_number = ${invoiceNumber}`).limit(1);
+  const existing = await db.select({ id: invoices.id }).from(invoices).where(sql`"invoiceNumber" = ${invoiceNumber}`).limit(1);
   if (existing.length > 0) {
     invoiceNumber = `INV-${String(lastNum + 2).padStart(5, "0")}`;
   }
@@ -1922,11 +1918,12 @@ export async function generateInvoiceForContract(contractId: number, userId: num
       paymentStatus: "pending",
     };
   
-  const invoiceResult = await db
+  const [invoiceResult] = await db
     .insert(invoices)
-    .values(invoiceValues);
+    .values(invoiceValues)
+    .returning({ id: invoices.id });
   
-  const invoiceId = Number((invoiceResult as any)[0]?.insertId || (invoiceResult as any).insertId);
+  const invoiceId = invoiceResult.id;
   
   // Create line items
   for (const item of lineItems) {
@@ -2083,15 +2080,15 @@ export async function autoGenerateInvoice(contractId: number, userId: number) {
     userId,
     contractId,
     invoiceNumber,
-    invoiceDate: sql`CURDATE()`,
-    dueDate: sql`DATE_ADD(CURDATE(), INTERVAL 30 DAY)`,
+    invoiceDate: new Date().toISOString().split('T')[0],
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     subtotal: subtotal.toFixed(2),
     taxAmount: taxAmount.toFixed(2),
     totalAmount: totalAmount.toFixed(2),
     paymentStatus: 'pending',
-  });
+  }).returning({ id: invoices.id });
   
-  const invoiceId = Number(invoiceResult.insertId);
+  const invoiceId = invoiceResult.id;
   
   // Insert line items
   for (const item of lineItems) {
@@ -2244,13 +2241,12 @@ export async function addNationality(userId: number, nationality: string) {
     return existing[0]; // Already exists, return it
   }
   
-  // Insert new nationality
   const [result] = await db.insert(nationalities).values({
     userId,
     nationality,
-  });
+  }).returning({ id: nationalities.id });
   
-  return { id: Number(result.insertId), userId, nationality, createdAt: new Date() };
+  return { id: result.id, userId, nationality, createdAt: new Date() };
 }
 
 
@@ -2265,10 +2261,9 @@ export async function addVehicleImage(image: InsertVehicleImage) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(vehicleImages).values(image);
-  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+  const [inserted] = await db.insert(vehicleImages).values(image).returning({ id: vehicleImages.id });
   
-  return await db.select().from(vehicleImages).where(eq(vehicleImages.id, insertId)).limit(1).then(rows => rows[0]);
+  return await db.select().from(vehicleImages).where(eq(vehicleImages.id, inserted.id)).limit(1).then(rows => rows[0]);
 }
 
 /**
@@ -2561,19 +2556,17 @@ export async function upsertWhatsappTemplate(
     return { ...existing[0], messageTemplate, isActive };
   } else {
     // Insert new template
-    const result = await db
+    const [inserted] = await db
       .insert(whatsappTemplates)
       .values({
         userId,
         templateType,
         messageTemplate,
         isActive,
-      });
-
-    const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
+      }).returning({ id: whatsappTemplates.id });
     
     return {
-      id: insertId,
+      id: inserted.id,
       userId,
       templateType,
       messageTemplate,
@@ -2627,9 +2620,8 @@ export async function createMaintenanceTask(task: InsertMaintenanceTask) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const result = await db.insert(maintenanceTasks).values(task);
-  const insertId = Number((result as any)[0]?.insertId || (result as any).insertId);
-  const created = await db.select().from(maintenanceTasks).where(eq(maintenanceTasks.id, insertId)).limit(1);
+  const [inserted] = await db.insert(maintenanceTasks).values(task).returning({ id: maintenanceTasks.id });
+  const created = await db.select().from(maintenanceTasks).where(eq(maintenanceTasks.id, inserted.id)).limit(1);
   
   if (created.length === 0) {
     throw new Error("Failed to retrieve created maintenance task");
@@ -3101,9 +3093,10 @@ export async function initializeSubscriptionTiers() {
   try {
     // Check if tiers already exist using raw SQL
     const existing = await db.execute(
-      sql`SELECT id FROM subscriptionTiers LIMIT 1`
+      sql`SELECT id FROM "subscriptionTiers" LIMIT 1`
     ) as any;
-    if (existing.length > 0) {
+    const existingRows = existing?.rows || (Array.isArray(existing) && existing[0]) || [];
+    if (existingRows.length > 0) {
       console.log("[Subscription] Tiers already initialized");
       return;
     }
@@ -3111,7 +3104,7 @@ export async function initializeSubscriptionTiers() {
     // Insert default subscription tiers
     const tiersData: Array<any> = [
       {
-        name: "starter",
+        tierName: "starter",
         displayName: "Starter",
         description: "For small agencies",
         monthlyPrice: "50" as any,
@@ -3138,7 +3131,7 @@ export async function initializeSubscriptionTiers() {
         },
       },
       {
-        name: "professional",
+        tierName: "professional",
         displayName: "Professional",
         description: "For growing agencies",
         monthlyPrice: "70" as any,
@@ -3165,7 +3158,7 @@ export async function initializeSubscriptionTiers() {
         },
       },
       {
-        name: "enterprise",
+        tierName: "enterprise",
         displayName: "Enterprise",
         description: "For large agencies",
         monthlyPrice: "85" as any,
@@ -3196,8 +3189,8 @@ export async function initializeSubscriptionTiers() {
     // Insert using raw SQL to avoid column naming issues
     for (const tier of tiersData) {
       await db.execute(
-        sql`INSERT INTO subscriptionTiers (name, displayName, description, monthlyPrice, maxVehicles, maxClients, maxUsers, features) 
-            VALUES (${tier.name}, ${tier.displayName}, ${tier.description}, ${tier.monthlyPrice}, ${tier.maxVehicles}, ${tier.maxClients}, ${tier.maxUsers}, ${JSON.stringify(tier.features)})`
+        sql`INSERT INTO "subscriptionTiers" ("tierName", "displayName", description, "monthlyPrice", "maxVehicles", "maxClients", "maxUsers", features) 
+            VALUES (${tier.tierName}, ${tier.displayName}, ${tier.description}, ${tier.monthlyPrice}, ${tier.maxVehicles}, ${tier.maxClients}, ${tier.maxUsers}, ${JSON.stringify(tier.features)})`
       );
     }
 
@@ -3213,9 +3206,10 @@ export async function getSubscriptionTier(tierId: number) {
 
   try {
     const result = await db.execute(
-      sql`SELECT * FROM subscriptionTiers WHERE id = ${tierId} LIMIT 1`
+      sql`SELECT * FROM "subscriptionTiers" WHERE id = ${tierId} LIMIT 1`
     ) as any;
-    return result && result.length > 0 ? result[0] : null;
+    const rows = result?.rows || (Array.isArray(result) && result[0]) || [];
+    return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     console.error("Error fetching subscription tier:", error);
     return null;
@@ -3228,9 +3222,10 @@ export async function getSubscriptionTierByName(tierName: string) {
 
   try {
     const result = await db.execute(
-      sql`SELECT * FROM subscriptionTiers WHERE name = ${tierName} LIMIT 1`
+      sql`SELECT * FROM "subscriptionTiers" WHERE "tierName" = ${tierName} LIMIT 1`
     ) as any;
-    return result && result.length > 0 ? result[0] : null;
+    const rows = result?.rows || (Array.isArray(result) && result[0]) || [];
+    return rows.length > 0 ? rows[0] : null;
   } catch (error) {
     console.error("Error fetching subscription tier by name:", error);
     return null;
@@ -3244,10 +3239,11 @@ export async function getUserSubscription(userId: number) {
   try {
     // Check if user is super admin or internal (bypasses subscription limits)
     const userResult = await db.execute(
-      sql`SELECT role, isInternal FROM users WHERE id = ${userId} LIMIT 1`
+      sql`SELECT role, "isInternal" FROM users WHERE id = ${userId} LIMIT 1`
     );
-    const userRole = (userResult as any)?.[0]?.[0]?.role ?? 'user';
-    const isInternal = (userResult as any)?.[0]?.[0]?.isInternal ?? false;
+    const userRows = (userResult as any)?.rows || (Array.isArray(userResult) && (userResult as any)[0]) || [];
+    const userRole = userRows.length > 0 ? userRows[0].role : 'user';
+    const isInternal = userRows.length > 0 ? userRows[0].isInternal : false;
     const isSuperAdmin = userRole === 'super_admin';
     
     // If user is super admin or internal, return unlimited tier
@@ -3273,14 +3269,13 @@ export async function getUserSubscription(userId: number) {
       };
     }
     
-    // Use raw SQL query to avoid column name mapping issues
     const result = await db.execute(
-      sql`SELECT us.*, st.* FROM userSubscriptions us INNER JOIN subscriptionTiers st ON us.tierId = st.id WHERE us.userId = ${userId} LIMIT 1`
+      sql`SELECT us.*, st.* FROM "userSubscriptions" us INNER JOIN "subscriptionTiers" st ON us."tierId" = st.id WHERE us."userId" = ${userId} LIMIT 1`
     );
     
-    // Extract the actual rows from the result
-    if (Array.isArray(result) && result.length > 0 && Array.isArray(result[0]) && result[0].length > 0) {
-      const row = result[0][0];
+    const rows = (result as any)?.rows || (Array.isArray(result) && result[0]) || [];
+    if (rows.length > 0) {
+      const row = rows[0];
       // Structure the response with nested tier object
       let features = {};
       try {
@@ -3291,7 +3286,7 @@ export async function getUserSubscription(userId: number) {
       }
       const tierData = {
         id: row.tierId,
-        name: row.name,
+        name: row.tierName,
         displayName: row.displayName,
         description: row.description,
         monthlyPrice: row.monthlyPrice,
@@ -3433,14 +3428,11 @@ export async function getAllSubscriptionTiers() {
   try {
     // Use raw SQL query to avoid column name mapping issues
     const result = await db.execute(
-      sql`SELECT * FROM subscriptionTiers ORDER BY monthlyPrice ASC`
+      sql`SELECT * FROM "subscriptionTiers" ORDER BY "monthlyPrice" ASC`
     );
     
-    // Extract the actual rows from the result
-    if (Array.isArray(result) && result.length > 0) {
-      return result[0] as unknown as any[];
-    }
-    return [];
+    const rows = (result as any)?.rows || (Array.isArray(result) && result[0]) || [];
+    return rows as any[];
   } catch (error) {
     console.error("Error fetching all subscription tiers:", error);
     return [];
@@ -3535,7 +3527,7 @@ export async function createContractTemplate(data: {
 
   const { contractTemplates } = await import("../drizzle/schema");
   
-  const result = await db.insert(contractTemplates).values({
+  const [inserted] = await db.insert(contractTemplates).values({
     userId: data.userId,
     templateName: data.templateName,
     templateUrl: data.templateUrl,
@@ -3543,9 +3535,9 @@ export async function createContractTemplate(data: {
     templateWidth: data.templateWidth,
     templateHeight: data.templateHeight,
     isActive: true,
-  });
+  }).returning({ id: contractTemplates.id });
 
-  return { insertId: result[0]?.insertId || 0 };
+  return { insertId: inserted.id };
 }
 
 export async function getContractTemplate(userId: number) {

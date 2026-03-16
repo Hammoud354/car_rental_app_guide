@@ -135,7 +135,7 @@ const plans = [
       "Email support",
     ],
     popular: false,
-    cta: "Start Free Trial"
+    cta: "Get Started"
   },
   {
     name: "Professional",
@@ -153,7 +153,7 @@ const plans = [
       "Priority support",
     ],
     popular: true,
-    cta: "Start Free Trial"
+    cta: "Get Started"
   },
   {
     name: "Enterprise",
@@ -327,21 +327,26 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.3 }}
               className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6"
             >
+              <Link href="/signin">
+                <Button variant="outline" size="lg" className="px-8 h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 group">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
               <Link href="/signup">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 px-8 h-12 text-base font-semibold group">
-                  Start Free Trial
+                  Get Started
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
               <Link href="/demo">
                 <Button 
-                  variant="outline" 
                   size="lg" 
-                  className="px-8 h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 group"
+                  className="bg-red-700 hover:bg-red-800 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-700/25 group"
                 >
-                  <Clock className="h-4 w-4 mr-2 text-gray-400" />
+                  <Clock className="h-4 w-4 mr-2" />
                   Try Live Demo
-                  <ChevronRight className="h-4 w-4 ml-1 text-gray-400 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
             </motion.div>
@@ -352,8 +357,8 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="text-xs text-gray-400 flex items-center justify-center gap-4"
             >
-              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> 14-day free trial</span>
-              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> No credit card</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Free demo available</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> No credit card required</span>
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Cancel anytime</span>
             </motion.p>
           </div>
@@ -639,18 +644,18 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link href="/signup">
                     <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 text-base font-semibold shadow-lg shadow-blue-600/30">
-                      Start Your Free Trial
+                      Get Started
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </Link>
-                  <Button 
-                    variant="outline" 
-                    size="lg" 
-                    onClick={handleContactUs}
-                    className="px-8 h-12 text-base font-medium border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
-                  >
-                    Talk to Sales
-                  </Button>
+                  <Link href="/demo">
+                    <Button 
+                      size="lg" 
+                      className="bg-red-700 hover:bg-red-600 text-white px-8 h-12 text-base font-bold shadow-lg shadow-red-700/30"
+                    >
+                      Try Live Demo
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>

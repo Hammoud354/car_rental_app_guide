@@ -115,14 +115,13 @@ export async function registerUser(input: RegisterInput) {
     loginMethod: "password",
     role: "user",
     lastSignedIn: new Date(),
-  });
+  }).returning({ id: users.id });
 
-  // Generate token
-  const token = await generateToken(newUser.insertId, usernameLower);
+  const token = await generateToken(newUser.id, usernameLower);
 
   return {
     user: {
-      id: newUser.insertId,
+      id: newUser.id,
       username: usernameLower,
       name: input.name,
       email: input.email,

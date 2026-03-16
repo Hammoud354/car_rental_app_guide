@@ -27,7 +27,7 @@ export async function createContractAmendment(
     previousValues: JSON.stringify(previousValues),
     newValues: JSON.stringify(newValues),
     amountDifference: amountDifference.toFixed(2),
-  }).$returningId();
+  }).returning({ id: contractAmendments.id });
 
   return amendment;
 }
