@@ -48,6 +48,7 @@ export default function Maintenance() {
   const [editGarageExitDate, setEditGarageExitDate] = useState<Date>();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [markInMaintenance, setMarkInMaintenance] = useState(true);
 
   const { data: vehicles } = trpc.fleet.listAvailableForMaintenance.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
@@ -92,6 +93,7 @@ export default function Maintenance() {
       setPerformedAtDate(undefined);
       setGarageEntryDate(undefined);
       setGarageExitDate(undefined);
+      setMarkInMaintenance(true);
     },
     onError: (error) => {
       toast.error(`Failed to add maintenance record: ${error.message}`);
@@ -107,6 +109,16 @@ export default function Maintenance() {
     },
     onError: (error) => {
       toast.error(`Failed to update: ${error.message}`);
+    },
+  });
+
+  const sendToMaintenanceMutation = trpc.fleet.sendToMaintenance.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      utils.fleet.listAvailableForMaintenance.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send vehicle to maintenance");
     },
   });
 
@@ -200,6 +212,7 @@ export default function Maintenance() {
       kmDueMaintenance: kmDueMaintenance && kmDueMaintenance.trim() ? parseInt(kmDueMaintenance) : undefined,
       garageEntryDate: garageEntryDate || undefined,
       garageExitDate: garageExitDate || undefined,
+      markInMaintenance,
     });
   };
 
@@ -322,6 +335,23 @@ export default function Maintenance() {
                   </div>
                 </div>
 
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={markInMaintenance}
+                      onChange={(e) => setMarkInMaintenance(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
+                    />
+                    <div>
+                      <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
+                      <p className="text-xs text-orange-600 mt-0.5">
+                        Block this vehicle from being rented until maintenance is complete
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
                 <DialogFooter className="pt-2">
                   <Button type="button" variant="outline" size="sm" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
                   <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={addMaintenanceMutation.isPending}>
@@ -430,7 +460,7 @@ export default function Maintenance() {
                         <Wrench className="mr-1 h-3.5 w-3.5" />
                         History
                       </Button>
-                      {vehicle.status === "Maintenance" && (
+                      {vehicle.status === "Maintenance" ? (
                         <Button
                           variant="outline"
                           size="sm"
@@ -445,7 +475,22 @@ export default function Maintenance() {
                           <CheckCircle className="mr-1 h-3.5 w-3.5" />
                           {removeFromMaintenanceMutation.isPending ? "..." : "Mark Available"}
                         </Button>
-                      )}
+                      ) : vehicle.status === "Available" ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs h-8 border-orange-200 text-orange-700 hover:bg-orange-50"
+                          onClick={() => {
+                            if (confirm(`Send ${vehicle.plateNumber} to maintenance? This will block it from being rented.`)) {
+                              sendToMaintenanceMutation.mutate({ vehicleId: vehicle.id });
+                            }
+                          }}
+                          disabled={sendToMaintenanceMutation.isPending}
+                        >
+                          <AlertTriangle className="mr-1 h-3.5 w-3.5" />
+                          {sendToMaintenanceMutation.isPending ? "..." : "Send to Garage"}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </div>

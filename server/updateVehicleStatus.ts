@@ -61,7 +61,15 @@ export async function updateVehicleStatus(vehicleId: number): Promise<string> {
     return "Maintenance";
   }
 
-  // No active contracts or maintenance - vehicle is available
+  // No active contracts or maintenance records — check current status before resetting
+  const currentVehicle = await db.select({ status: vehicles.status }).from(vehicles).where(eq(vehicles.id, vehicleId)).limit(1);
+  const currentStatus = currentVehicle[0]?.status;
+  
+  // Preserve manually-set statuses (Maintenance set via toggle, Out of Service)
+  if (currentStatus === "Maintenance" || currentStatus === "Out of Service") {
+    return currentStatus;
+  }
+  
   await db
     .update(vehicles)
     .set({ status: "Available" })

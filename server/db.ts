@@ -332,6 +332,27 @@ export async function removeVehicleFromMaintenance(vehicleId: number, userId: nu
   return { success: true };
 }
 
+export async function sendVehicleToMaintenance(vehicleId: number, userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const vehicle = await db.select().from(vehicles).where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId))).limit(1);
+  if (vehicle.length === 0) {
+    throw new Error("Vehicle not found");
+  }
+  if (vehicle[0].status === "Rented") {
+    throw new Error("Cannot send a rented vehicle to maintenance. Complete or cancel the active contract first.");
+  }
+  
+  await db.update(vehicles)
+    .set({ status: 'Maintenance', updatedAt: new Date() })
+    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+  
+  return { success: true };
+}
+
 // Maintenance Records Queries
 export async function getMaintenanceRecordsByVehicleId(vehicleId: number, userId: number) {
   const db = await getDb();
@@ -342,16 +363,32 @@ export async function getMaintenanceRecordsByVehicleId(vehicleId: number, userId
   return await db.select().from(maintenanceRecords).where(and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId)));
 }
 
-export async function createMaintenanceRecord(record: InsertMaintenanceRecord) {
+export async function createMaintenanceRecord(record: InsertMaintenanceRecord & { markInMaintenance?: boolean }) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
-  const [inserted] = await db.insert(maintenanceRecords).values(record).returning({ id: maintenanceRecords.id });
+  
+  const shouldMarkMaintenance = record.markInMaintenance || (record.garageEntryDate && !record.garageExitDate);
+  const { markInMaintenance, ...insertData } = record;
+  
+  const [inserted] = await db.insert(maintenanceRecords).values(insertData).returning({ id: maintenanceRecords.id });
   const created = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, inserted.id)).limit(1);
   if (created.length === 0) {
     throw new Error("Failed to retrieve created maintenance record");
   }
+  
+  if (shouldMarkMaintenance && record.vehicleId && record.userId) {
+    const vehicle = await db.select().from(vehicles).where(
+      and(eq(vehicles.id, record.vehicleId), eq(vehicles.userId, record.userId))
+    ).limit(1);
+    if (vehicle.length > 0 && vehicle[0].status !== "Rented" && vehicle[0].status !== "Out of Service") {
+      await db.update(vehicles)
+        .set({ status: 'Maintenance', updatedAt: new Date() })
+        .where(and(eq(vehicles.id, record.vehicleId), eq(vehicles.userId, record.userId)));
+    }
+  }
+  
   return created[0];
 }
 

@@ -433,6 +433,7 @@ export const appRouter = router({
         kmDueMaintenance: z.number().int().optional(),
         garageEntryDate: z.date().optional(),
         garageExitDate: z.date().optional(),
+        markInMaintenance: z.boolean().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         return await db.createMaintenanceRecord({ ...input, userId: ctx.user?.id || 1 });
@@ -473,6 +474,12 @@ export const appRouter = router({
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {
         return await db.getLastReturnKm(input.vehicleId, ctx.user?.id || 1);
+      }),
+
+    sendToMaintenance: publicProcedure
+      .input(z.object({ vehicleId: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.sendVehicleToMaintenance(input.vehicleId, ctx.user?.id || 1);
       }),
 
     removeFromMaintenance: publicProcedure
@@ -739,6 +746,18 @@ export const appRouter = router({
         } else {
           userId = ctx.user.id;
         }
+        // Verify vehicle exists and belongs to user
+        const vehicleData = await db.getVehicleById(input.vehicleId, userId);
+        if (!vehicleData) {
+          throw new Error("Vehicle not found or you do not have access to this vehicle.");
+        }
+        if (vehicleData.status === "Maintenance") {
+          throw new Error("Vehicle is currently in maintenance and cannot be rented. Remove it from maintenance first.");
+        }
+        if (vehicleData.status === "Out of Service") {
+          throw new Error("Vehicle is out of service and cannot be rented.");
+        }
+        
         // Check if vehicle already has an active contract
         const activeContracts = await db.getActiveContractsByVehicleId(input.vehicleId, userId);
         if (activeContracts && activeContracts.length > 0) {

@@ -323,6 +323,26 @@ export default function FleetManagement() {
     }
   };
 
+  const sendToMaintenanceMutation = trpc.fleet.sendToMaintenance.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      utils.fleet.list.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send vehicle to maintenance");
+    },
+  });
+
+  const removeFromMaintenanceMutation = trpc.fleet.removeFromMaintenance.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle marked as Available");
+      utils.fleet.list.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove vehicle from maintenance");
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":
@@ -964,6 +984,37 @@ export default function FleetManagement() {
                       <Edit className="mr-1.5 h-3 w-3" />
                       Edit
                     </Button>
+                    {vehicle.status === "Available" ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200"
+                        onClick={() => {
+                          if (confirm(`Send ${vehicle.plateNumber} to maintenance? This will block it from being rented.`)) {
+                            sendToMaintenanceMutation.mutate({ vehicleId: vehicle.id });
+                          }
+                        }}
+                        disabled={sendToMaintenanceMutation.isPending}
+                        title="Send to Maintenance"
+                      >
+                        <Wrench className="h-3 w-3" />
+                      </Button>
+                    ) : vehicle.status === "Maintenance" ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 border-emerald-200"
+                        onClick={() => {
+                          if (confirm(`Mark ${vehicle.plateNumber} as Available?`)) {
+                            removeFromMaintenanceMutation.mutate({ vehicleId: vehicle.id });
+                          }
+                        }}
+                        disabled={removeFromMaintenanceMutation.isPending}
+                        title="Remove from Maintenance"
+                      >
+                        <Wrench className="h-3 w-3" />
+                      </Button>
+                    ) : null}
                     <Button
                       size="sm"
                       variant="outline"

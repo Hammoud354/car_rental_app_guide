@@ -47,6 +47,16 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Schema column `subscriptionTiers.tierName` (not `name`) — all SQL must reference `"tierName"`
 - `isInternal` and `openId` columns added to users table via raw SQL (drizzle push has interactive prompt issues)
 
+## Maintenance Logic
+- Vehicle status enum: `Available`, `Rented`, `Maintenance`, `Out of Service`
+- **Send to Maintenance**: Sets vehicle status to `Maintenance`, blocking rentals (via `fleet.sendToMaintenance` route)
+- **Remove from Maintenance**: Sets status back to `Available`, closes open garage records (via `fleet.removeFromMaintenance` route)
+- **Auto-status sync**: Adding a maintenance record with "Vehicle is in the garage" checkbox (or garage entry date without exit) auto-sets vehicle to `Maintenance`
+- **Status precedence**: `updateVehicleStatus()` preserves manually-set `Maintenance` and `Out of Service` statuses; only auto-resets to `Available` if status was not explicitly set
+- **Server-side enforcement**: Contract creation rejects vehicles with `Maintenance` or `Out of Service` status; also verifies vehicle exists and belongs to user
+- Maintenance toggle buttons on both Fleet Management and Maintenance pages
+- Tenant-scoped: All maintenance status changes verify vehicle ownership via userId
+
 ## Business Logic
 - Invoice tax calculation uses company profile VAT rate (not hardcoded)
 - Invoice numbering uses MAX("invoiceNumber") with collision fallback
