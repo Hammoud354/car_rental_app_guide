@@ -101,8 +101,8 @@ export const appRouter = router({
     signUp: publicProcedure
       .input(z.object({
         username: z.string().min(3),
-        password: z.string().min(3),
-        name: z.string(),
+        password: z.string().min(6),
+        name: z.string().min(1),
         email: z.string().email(),
         phone: z.string(),
         country: z.string(),
@@ -111,43 +111,54 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const bcrypt = await import('bcrypt');
         
-        // Convert username to lowercase for case-insensitive comparison
-        const usernameLower = input.username.toLowerCase();
+        const usernameLower = input.username.toLowerCase().trim();
+        const emailLower = input.email.toLowerCase().trim();
         
-        // Check if username already exists (case-insensitive)
         const existingUser = await db.getUserByUsername(usernameLower);
         if (existingUser) {
           throw new Error('Username already exists');
         }
 
-        // Hash password
+        const existingEmail = await db.getUserByEmail(emailLower);
+        if (existingEmail) {
+          throw new Error('Email already registered');
+        }
+
         const hashedPassword = await bcrypt.hash(input.password, 10);
 
-        // Create new user
-        const newUser = await db.createUser({
-          username: usernameLower,
-          password: hashedPassword,
-          name: input.name,
-          email: input.email,
-          phone: input.phone,
-          country: input.country,
-        });
+        let newUser;
+        try {
+          newUser = await db.createUser({
+            username: usernameLower,
+            password: hashedPassword,
+            name: input.name.trim(),
+            email: emailLower,
+            phone: input.phone.trim(),
+            country: input.country,
+          });
+        } catch (error: any) {
+          if (error.message?.includes('unique') || error.code === '23505') {
+            throw new Error('Username or email already exists');
+          }
+          console.error('User creation failed:', error);
+          throw new Error('Failed to create account. Please try again.');
+        }
 
-        // Note: Country data will be auto-populated in company settings on first login
-        // via the Dashboard component using the country from user profile
-
-        // Populate car makers and models for the user's country
         try {
           await db.populateCarMakersForCountry(input.country, newUser.id);
         } catch (error) {
           console.error('Failed to populate car makers:', error);
-          // Continue even if population fails
         }
 
-        // Do NOT auto-login after signup - user must explicitly log in
         return {
           success: true,
-          user: newUser,
+          user: {
+            id: newUser.id,
+            username: newUser.username,
+            name: newUser.name,
+            email: newUser.email,
+            role: newUser.role,
+          },
         };
       }),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -1606,16 +1617,28 @@ export const appRouter = router({
         country: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const existingUser = await db.getUserByUsername(input.username);
+        const bcrypt = await import('bcrypt');
+
+        const usernameLower = input.username.toLowerCase().trim();
+        const emailLower = input.email.toLowerCase().trim();
+
+        const existingUser = await db.getUserByUsername(usernameLower);
         if (existingUser) {
           throw new Error("Username already exists");
         }
+
+        const existingEmail = await db.getUserByEmail(emailLower);
+        if (existingEmail) {
+          throw new Error("Email already registered");
+        }
+
+        const hashedPassword = await bcrypt.hash(input.password, 10);
         
         const newUser = await db.createUser({
-          username: input.username,
-          password: input.password,
+          username: usernameLower,
+          password: hashedPassword,
           name: input.name || input.username,
-          email: input.email,
+          email: emailLower,
           phone: input.phone || "",
           country: input.country || "",
         });
