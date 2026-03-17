@@ -88,6 +88,17 @@ export const appRouter = router({
           console.error("[login] Failed to auto-create company profile:", err);
         }
 
+        // Auto-assign Starter plan if the user has no active subscription
+        try {
+          await db.initializeSubscriptionTiers();
+          const existingSub = await db.getUserSubscription(user.id);
+          if (!existingSub) {
+            await db.createUserSubscription(user.id, 1, "Auto-assigned Starter plan on first login");
+          }
+        } catch (err) {
+          console.error("[login] Failed to auto-assign subscription:", err);
+        }
+
         return {
           success: true,
           user: {
@@ -148,6 +159,17 @@ export const appRouter = router({
           await db.populateCarMakersForCountry(input.country, newUser.id);
         } catch (error) {
           console.error('Failed to populate car makers:', error);
+        }
+
+        // Auto-assign Starter plan so the user has an active subscription on first login
+        try {
+          await db.initializeSubscriptionTiers();
+          const existingSub = await db.getUserSubscription(newUser.id);
+          if (!existingSub) {
+            await db.createUserSubscription(newUser.id, 1, "Auto-assigned Starter plan on sign-up");
+          }
+        } catch (error) {
+          console.error('Failed to auto-assign subscription on sign-up:', error);
         }
 
         return {
@@ -1717,6 +1739,17 @@ export const appRouter = router({
             name: input.name,
           },
         });
+
+        // Auto-assign Starter plan to admin-created users
+        try {
+          await db.initializeSubscriptionTiers();
+          const existingSub = await db.getUserSubscription(newUser.id);
+          if (!existingSub) {
+            await db.createUserSubscription(newUser.id, 1, "Auto-assigned Starter plan on admin user creation");
+          }
+        } catch (error) {
+          console.error('Failed to auto-assign subscription for admin-created user:', error);
+        }
         
         return newUser;
       }),
