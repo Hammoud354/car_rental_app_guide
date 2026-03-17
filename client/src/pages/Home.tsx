@@ -5,7 +5,7 @@ import {
   ArrowRight, MessageCircle, Globe, ChevronRight,
   LogIn, UserPlus, CheckCircle2, Star, BarChart3, FileText, 
   Users, DollarSign, Wrench, Car, Clock, TrendingUp,
-  Activity
+  Activity, Rocket
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
@@ -343,6 +343,25 @@ export default function Home() {
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> No credit card required</span>
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Cancel anytime</span>
             </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.5, type: "spring", stiffness: 200, damping: 15 }}
+              className="flex flex-col items-center mt-10"
+            >
+              <Link href="/demo" className="liquid-glass-btn" aria-label="Launch Demo">
+                <Rocket className="h-8 w-8 glass-icon" />
+              </Link>
+              <motion.span
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.8 }}
+                className="mt-3 text-xs font-semibold tracking-wider uppercase text-purple-500/80"
+              >
+                Launch Demo
+              </motion.span>
+            </motion.div>
           </div>
 
           {/* Dashboard Preview */}
