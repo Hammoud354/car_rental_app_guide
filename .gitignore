@@ -105,3 +105,6 @@ temp/
 *.db
 *.sqlite
 *.sqlite3
+
+# Agent query cache (may contain sensitive query result data)
+.manus/db/
