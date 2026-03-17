@@ -33,6 +33,7 @@ import Invoices from "./pages/Invoices";
 import AdminUsers from "./pages/AdminUsers";
 import AuditLogs from "./pages/AuditLogs";
 import UserManagement from "./pages/UserManagement";
+import MyProfile from "./pages/MyProfile";
 import ProfitAndLoss from "./pages/ProfitAndLoss";
 import Demo from "./pages/Demo";
 import Home from "./pages/Home";
@@ -89,6 +90,7 @@ function AppContent() {
         <Route path="/analysis" component={Analysis} />
         <Route path="/reservations" component={Reservations} />
         <Route path="/company-settings" component={CompanySettings} />
+        <Route path="/my-profile" component={MyProfile} />
         <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
         <Route path="/contract-management" component={ContractManagement} />
         <Route path="/invoices" component={Invoices} />

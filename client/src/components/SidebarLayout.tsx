@@ -269,6 +269,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                   User ID: {user.id}
                 </div>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setLocation("/my-profile")}>
+                  <User className="h-4 w-4 mr-2" />
+                  My Profile
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setLocation("/company-settings")}>
                   <Settings className="h-4 w-4 mr-2" />
                   Company Settings

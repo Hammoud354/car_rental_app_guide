@@ -57,6 +57,13 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Maintenance toggle buttons on both Fleet Management and Maintenance pages
 - Tenant-scoped: All maintenance status changes verify vehicle ownership via userId
 
+## User Profile
+- **My Profile page** (`/my-profile`): Users can view/edit name, email, phone, country and change password
+- Accessible via sidebar dropdown → "My Profile"
+- Email uniqueness enforced (checked against other users)
+- Password change requires current password verification
+- Username is read-only (cannot be changed after registration)
+
 ## AI Maintenance Integration
 - **Dashboard Maintenance Alerts**: `aiMaintenance.getMaintenanceAlerts` route aggregates alerts from AI tasks, vehicle insurance, and scheduled maintenance; categorized as Critical/Needs Attention/Can Wait
 - **Send Task to Maintenance**: `aiMaintenance.sendTaskToMaintenance` route creates a maintenance record, sends vehicle to garage, and completes the AI task

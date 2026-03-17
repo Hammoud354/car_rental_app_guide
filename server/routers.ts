@@ -294,6 +294,66 @@ export const appRouter = router({
         
         return { success: true, message: 'Password has been reset successfully' };
       }),
+    getMyProfile: protectedProcedure.query(async ({ ctx }) => {
+      const user = await db.getUserById(ctx.user.id);
+      if (!user) throw new Error("User not found");
+      return {
+        id: user.id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        country: user.country,
+        role: user.role,
+        createdAt: user.createdAt,
+        lastSignedIn: user.lastSignedIn,
+      };
+    }),
+    updateMyProfile: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string(),
+        country: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const emailLower = input.email.toLowerCase().trim();
+
+        const existingEmail = await db.getUserByEmail(emailLower);
+        if (existingEmail && existingEmail.id !== ctx.user.id) {
+          throw new Error("Email already used by another account");
+        }
+
+        await db.updateUser(ctx.user.id, {
+          name: input.name.trim(),
+          email: emailLower,
+          phone: input.phone.trim(),
+          country: input.country,
+        });
+
+        return { success: true };
+      }),
+    changePassword: protectedProcedure
+      .input(z.object({
+        currentPassword: z.string(),
+        newPassword: z.string().min(6),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const bcrypt = await import('bcrypt');
+
+        const user = await db.getUserById(ctx.user.id);
+        if (!user || !user.password) throw new Error("User not found");
+
+        const isValid = await bcrypt.compare(input.currentPassword, user.password);
+        if (!isValid) {
+          throw new Error("Current password is incorrect");
+        }
+
+        const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+        await db.updateUserPassword(ctx.user.id, hashedPassword);
+
+        return { success: true };
+      }),
   }),
 
   // Fleet Management Router
