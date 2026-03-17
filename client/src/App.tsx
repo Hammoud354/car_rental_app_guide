@@ -39,6 +39,7 @@ import Demo from "./pages/Demo";
 import Home from "./pages/Home";
 import AIMaintenance from "./pages/AIMaintenance";
 import AdminNumberingManagement from "./pages/AdminNumberingManagement";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import ContractManagement from "./pages/ContractManagement";
 
@@ -86,6 +87,7 @@ function AppContent() {
         <Route path="/admin/user-management" component={UserManagement} />
         <Route path="/admin/audit-logs" component={AuditLogs} />
         <Route path="/admin/numbering" component={AdminNumberingManagement} />
+        <Route path="/admin/analytics" component={AdminAnalytics} />
         <Route path="/subscription-plans" component={SubscriptionPlans} />
         <Route path="/analysis" component={Analysis} />
         <Route path="/reservations" component={Reservations} />

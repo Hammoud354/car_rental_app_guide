@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown
 } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
@@ -108,6 +108,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       label: "admin",
       displayLabel: "ADMIN",
       items: [
+        { href: "/admin/analytics", label: "CEO Dashboard", icon: Crown },
         { href: "/admin/numbering", label: "Numbering Management", icon: FileText },
         { href: "/admin/user-management", label: "User Management", icon: Users },
         { href: "/admin/audit-logs", label: "Audit Logs", icon: FileText },
