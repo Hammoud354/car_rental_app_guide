@@ -359,7 +359,7 @@ export default function Home() {
                 <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
                 <div className="flex-1 mx-8">
                   <div className="h-5 bg-white rounded-md border border-gray-200 max-w-xs mx-auto flex items-center justify-center">
-                    <span className="text-[10px] text-gray-400">app.fleetmaster.io/dashboard</span>
+                    <span className="text-[10px] text-gray-500 font-semibold tracking-wide">FleetMaster</span>
                   </div>
                 </div>
               </div>
