@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus } from "lucide-react";
+import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus, KeyRound, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
@@ -53,9 +53,18 @@ export default function AdminUsers() {
     password: "",
   });
   const [passwordError, setPasswordError] = useState("");
+  const [resetPasswordUserId, setResetPasswordUserId] = useState<number | null>(null);
+  const [resetPasswordUsername, setResetPasswordUsername] = useState("");
+  const [newResetPassword, setNewResetPassword] = useState("");
+  const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false);
 
   // Fetch all users
   const { data: users, isLoading } = trpc.admin.listUsers.useQuery(undefined, {
+    enabled: user?.role === "super_admin",
+  });
+
+  // Fetch subscription info
+  const { data: subscriptions } = trpc.admin.getUserSubscriptions.useQuery(undefined, {
     enabled: user?.role === "super_admin",
   });
 
@@ -89,6 +98,19 @@ export default function AdminUsers() {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to toggle internal flag");
+    },
+  });
+
+  // Reset password mutation
+  const resetPasswordMutation = trpc.admin.resetUserPassword.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      setResetPasswordDialogOpen(false);
+      setNewResetPassword("");
+      setResetPasswordUserId(null);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to reset password");
     },
   });
 
@@ -128,6 +150,20 @@ export default function AdminUsers() {
 
   const handleToggleInternal = (userId: number, currentValue: boolean) => {
     toggleInternalMutation.mutate({ userId, isInternal: !currentValue });
+  };
+
+  const handleResetPassword = () => {
+    if (!resetPasswordUserId || !newResetPassword) return;
+    if (newResetPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    resetPasswordMutation.mutate({ userId: resetPasswordUserId, newPassword: newResetPassword });
+  };
+
+  const getSubscriptionForUser = (userId: number) => {
+    if (!subscriptions) return null;
+    return (subscriptions as any[]).find((s: any) => s.userId === userId);
   };
 
   const handleAddUser = () => {
@@ -364,6 +400,7 @@ export default function AdminUsers() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
+                    <TableHead>Subscription</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-center">
                       <TooltipProvider>
@@ -412,6 +449,23 @@ export default function AdminUsers() {
                         )}
                       </TableCell>
                       <TableCell>
+                        {(() => {
+                          if (u.role === 'super_admin') return <Badge className="bg-yellow-100 text-yellow-800"><Crown className="h-3 w-3 mr-1" />Unlimited</Badge>;
+                          if (u.isInternal) return <Badge className="bg-blue-100 text-blue-800"><Zap className="h-3 w-3 mr-1" />Internal</Badge>;
+                          const sub = getSubscriptionForUser(u.id);
+                          if (!sub || !sub.tierDisplayName) return <Badge variant="outline" className="text-gray-500">No Plan</Badge>;
+                          return (
+                            <div className="flex flex-col gap-0.5">
+                              <Badge className={sub.subStatus === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                                <CreditCard className="h-3 w-3 mr-1" />
+                                {sub.tierDisplayName}
+                              </Badge>
+                              <span className="text-[10px] text-gray-400">{sub.subStatus} · ${sub.monthlyPrice}/mo</span>
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell>
                         {new Date(u.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-center">
@@ -453,14 +507,35 @@ export default function AdminUsers() {
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           {u.role !== "super_admin" && (
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteUser(u.id, u.username)}
-                              disabled={deleteUserMutation.isPending}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setResetPasswordUserId(u.id);
+                                        setResetPasswordUsername(u.username);
+                                        setNewResetPassword("");
+                                        setResetPasswordDialogOpen(true);
+                                      }}
+                                    >
+                                      <KeyRound className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent><p>Reset Password</p></TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteUser(u.id, u.username)}
+                                disabled={deleteUserMutation.isPending}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
                           )}
                         </div>
                       </TableCell>
@@ -472,6 +547,44 @@ export default function AdminUsers() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={resetPasswordDialogOpen} onOpenChange={setResetPasswordDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-orange-500" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription>
+              Set a new password for <strong>{resetPasswordUsername}</strong>. The user will need to use this new password to sign in.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="resetPassword">New Password</Label>
+              <Input
+                id="resetPassword"
+                type="password"
+                placeholder="Enter new password (min 6 characters)"
+                value={newResetPassword}
+                onChange={(e) => setNewResetPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button variant="outline" onClick={() => setResetPasswordDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleResetPassword}
+              disabled={resetPasswordMutation.isPending || !newResetPassword || newResetPassword.length < 6}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              {resetPasswordMutation.isPending ? "Resetting..." : "Reset Password"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

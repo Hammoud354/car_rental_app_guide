@@ -78,7 +78,8 @@ Full-stack car rental management application built with Express + React/Vite, tR
 
 ## Auth
 - Local authentication with username/password (cookie-based sessions)
-- Admin user: `admin` / `Admin123!` (role: `super_admin`)
+- Super Admin: `superadmin` (role: `super_admin`) — full system access, can manage users/passwords/subscriptions
+- Special user: `dimarentacar` (isInternal: true, bypasses subscription limits)
 - Demo mode: `/demo` route auto-creates demo user with 10-minute session, pre-seeded data via `server/seedDemoData.ts`
 - Demo data: 10 vehicles (with insurance expiry dates), 6 clients, 6 contracts (incl. 1 overdue), 3 invoices with line items, 4 maintenance records, 7 AI maintenance tasks (2 critical overdue, 2 upcoming, 3 can-wait), 1 company profile, 1 damage mark
 - Page title: "Fleet Master" (browser tab)

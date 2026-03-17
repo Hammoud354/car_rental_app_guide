@@ -1719,7 +1719,54 @@ export const appRouter = router({
         });
         
         return newUser;
-      })
+      }),
+
+    resetUserPassword: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+        newPassword: z.string().min(6, "Password must be at least 6 characters"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const bcrypt = await import('bcrypt');
+        const targetUser = await db.getUserById(input.userId);
+        if (!targetUser) throw new Error("User not found");
+        if (targetUser.role === 'super_admin' && targetUser.id !== ctx.user.id) {
+          throw new Error("Cannot reset another super admin's password");
+        }
+
+        const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+        await db.updateUserPassword(input.userId, hashedPassword);
+
+        await db.createAuditLog({
+          actorId: ctx.user.id,
+          actorUsername: ctx.user.username,
+          actorRole: ctx.user.role,
+          action: "password_reset",
+          targetUserId: input.userId,
+          targetUsername: targetUser.username,
+          details: `Password reset by super admin for user: ${targetUser.username}`,
+        });
+
+        return { success: true, message: `Password reset for ${targetUser.username}` };
+      }),
+
+    getUserSubscriptions: superAdminProcedure
+      .query(async () => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new Error('Database not available');
+
+        const result = await dbInstance.execute(
+          sql`SELECT u.id as "userId", u.username, u.name, 
+              us."tierId", us.status as "subStatus", us."startDate", us."renewalDate",
+              st."tierName", st."displayName" as "tierDisplayName", st."monthlyPrice"
+            FROM users u
+            LEFT JOIN "userSubscriptions" us ON u.id = us."userId"
+            LEFT JOIN "subscriptionTiers" st ON us."tierId" = st.id
+            WHERE u.role != 'super_admin'
+            ORDER BY u.id`
+        );
+        return (result as any).rows || [];
+      }),
   }),
 
   // Excel Export Router
