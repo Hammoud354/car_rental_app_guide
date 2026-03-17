@@ -42,4 +42,6 @@ localPort = 5002
 externalPort = 3002
 
 [deployment]
-deploymentTarget = "cloudrun"
+deploymentTarget = "autoscale"
+run = ["node", "--import", "tsx", "server/_core/index.ts"]
+build = ["npm", "run", "build"]
