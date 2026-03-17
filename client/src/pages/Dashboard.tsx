@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import * as XLSX from "xlsx";
+import { generateExcelBuffer, downloadExcel } from "@/lib/excelUtils";
 
 function ExportToExcelButton() {
   const [isExporting, setIsExporting] = useState(false);
@@ -34,8 +34,6 @@ function ExportToExcelButton() {
       }
 
       const { vehicles = [], contracts = [], clients = [], maintenanceRecords = [], invoices = [] } = result.data || {};
-
-      const workbook = XLSX.utils.book_new();
 
       const fleetData = (vehicles || []).map(v => ({
         "Brand": v.brand,
@@ -56,8 +54,6 @@ function ExportToExcelButton() {
         "Purchase Cost": v.purchaseCost || "",
         "Registration Expiry": v.registrationExpiryDate ? new Date(v.registrationExpiryDate).toLocaleDateString() : "",
       }));
-      const fleetSheet = XLSX.utils.json_to_sheet(fleetData);
-      XLSX.utils.book_append_sheet(workbook, fleetSheet, "Fleet");
 
       const contractsData = (contracts || []).map(c => ({
         "Contract Number": c.contractNumber,
@@ -75,8 +71,6 @@ function ExportToExcelButton() {
         "Pickup KM": c.pickupKm || "",
         "Return KM": c.returnKm || "",
       }));
-      const contractsSheet = XLSX.utils.json_to_sheet(contractsData);
-      XLSX.utils.book_append_sheet(workbook, contractsSheet, "Contracts");
 
       const clientsData = (clients || []).map(c => ({
         "First Name": c.firstName,
@@ -88,8 +82,6 @@ function ExportToExcelButton() {
         "License Expiry": c.licenseExpiryDate ? new Date(c.licenseExpiryDate).toLocaleDateString() : "",
         "Address": c.address || "",
       }));
-      const clientsSheet = XLSX.utils.json_to_sheet(clientsData);
-      XLSX.utils.book_append_sheet(workbook, clientsSheet, "Clients");
 
       const maintenanceData = (maintenanceRecords || []).map(m => ({
         "Vehicle ID": m.vehicleId,
@@ -103,8 +95,6 @@ function ExportToExcelButton() {
         "Garage Entry Date": m.garageEntryDate ? new Date(m.garageEntryDate).toLocaleDateString() : "",
         "Garage Exit Date": m.garageExitDate ? new Date(m.garageExitDate).toLocaleDateString() : "",
       }));
-      const maintenanceSheet = XLSX.utils.json_to_sheet(maintenanceData);
-      XLSX.utils.book_append_sheet(workbook, maintenanceSheet, "Maintenance");
 
       const invoicesData = (invoices || []).map(i => ({
         "Invoice Number": i.invoiceNumber,
@@ -118,20 +108,15 @@ function ExportToExcelButton() {
         "Payment Method": i.paymentMethod || "",
         "Paid At": i.paidAt ? new Date(i.paidAt).toLocaleDateString() : "",
       }));
-      const invoicesSheet = XLSX.utils.json_to_sheet(invoicesData);
-      XLSX.utils.book_append_sheet(workbook, invoicesSheet, "Invoices");
 
-      const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-      const blob = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `CarRentalData_${new Date().toISOString().split("T")[0]}.xlsx`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const buffer = await generateExcelBuffer([
+        { name: "Fleet", type: "json", data: fleetData },
+        { name: "Contracts", type: "json", data: contractsData },
+        { name: "Clients", type: "json", data: clientsData },
+        { name: "Maintenance", type: "json", data: maintenanceData },
+        { name: "Invoices", type: "json", data: invoicesData },
+      ]);
+      downloadExcel(buffer, `CarRentalData_${new Date().toISOString().split("T")[0]}.xlsx`);
 
       toast.success("Excel file downloaded successfully!");
     } catch (error) {

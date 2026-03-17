@@ -14,6 +14,7 @@ import {
   FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { generateExcelBuffer, downloadExcel } from "@/lib/excelUtils";
 import { useState } from "react";
 import {
   Dialog,
@@ -87,7 +88,6 @@ export default function ProfitabilityDashboard() {
                 const { toast } = await import('sonner');
                 toast.info("Generating Excel file...");
                 
-                const XLSX = await import('xlsx');
                 const result = await exportQuery.refetch();
                 
                 if (!result.data || result.data.length === 0) {
@@ -95,7 +95,6 @@ export default function ProfitabilityDashboard() {
                   return;
                 }
                 
-                // Prepare data for Excel
                 const excelData = result.data.map((v: any) => ({
                   'Plate Number': v.plateNumber,
                   'Brand': v.brand,
@@ -109,30 +108,15 @@ export default function ProfitabilityDashboard() {
                   'Number of Rentals': v.rentalCount
                 }));
                 
-                // Create workbook
-                const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(excelData);
-                
-                // Set column widths
-                ws['!cols'] = [
-                  { wch: 15 }, { wch: 12 }, { wch: 12 }, { wch: 6 },
-                  { wch: 15 }, { wch: 18 }, { wch: 15 }, { wch: 12 },
-                  { wch: 14 }, { wch: 18 }
-                ];
-                
-                XLSX.utils.book_append_sheet(wb, ws, 'Profitability Report');
-                
-                // Generate and download
-                const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-                const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `profitability-report-${new Date().toISOString().split('T')[0]}.xlsx`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                const excelBuffer = await generateExcelBuffer([
+                  {
+                    name: 'Profitability Report',
+                    type: 'json',
+                    data: excelData,
+                    columnWidths: [15, 12, 12, 6, 15, 18, 15, 12, 14, 18],
+                  },
+                ]);
+                downloadExcel(excelBuffer, `profitability-report-${new Date().toISOString().split('T')[0]}.xlsx`);
                 
                 toast.success("Excel file downloaded successfully!");
               } catch (error: any) {

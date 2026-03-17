@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, DollarSign, TrendingUp, TrendingDown, Download, Calendar } from "lucide-react";
 import { Link } from "wouter";
-import * as XLSX from "xlsx";
+import { generateExcelBuffer, downloadExcel } from "@/lib/excelUtils";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
@@ -61,16 +61,12 @@ export default function ProfitLoss() {
     return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
   };
 
-  const handleExportToExcel = () => {
+  const handleExportToExcel = async () => {
     if (!financialData || !vehicleProfitability || !monthlyData) {
       alert("No data available to export");
       return;
     }
 
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-
-    // Sheet 1: Financial Overview
     const overviewData = [
       ["Profit & Loss Statement"],
       ["Generated:", new Date().toLocaleDateString()],
@@ -92,11 +88,7 @@ export default function ProfitLoss() {
       ["Fleet Purchase Costs", financialData.assets.vehiclePurchaseCosts],
       ["Total Vehicles", financialData.assets.totalVehicles],
     ];
-    const ws1 = XLSX.utils.aoa_to_sheet(overviewData);
-    XLSX.utils.book_append_sheet(wb, ws1, "Financial Overview");
 
-    // Sheet 2: Vehicle Profitability
-    const vehicleHeaders = [["Plate Number", "Brand", "Model", "Year", "Revenue", "Maintenance", "Insurance", "Total Expenses", "Net Profit", "ROI (%)", "Contracts"]];
     const vehicleRows = vehicleProfitability.map(v => [
       v.plateNumber,
       v.brand,
@@ -110,23 +102,32 @@ export default function ProfitLoss() {
       v.roi,
       v.contractCount,
     ]);
-    const ws2 = XLSX.utils.aoa_to_sheet([...vehicleHeaders, ...vehicleRows]);
-    XLSX.utils.book_append_sheet(wb, ws2, "Vehicle Profitability");
 
-    // Sheet 3: Monthly Data
-    const monthlyHeaders = [["Month", "Revenue", "Expenses", "Net"]];
     const monthlyRows = monthlyData.map(m => [
       m.monthName,
       m.revenue,
       m.expenses,
       m.revenue - m.expenses,
     ]);
-    const ws3 = XLSX.utils.aoa_to_sheet([...monthlyHeaders, ...monthlyRows]);
-    XLSX.utils.book_append_sheet(wb, ws3, "Monthly Performance");
 
-    // Save file
     const dateStr = new Date().toISOString().split("T")[0];
-    XLSX.writeFile(wb, `ProfitLoss_Report_${dateStr}.xlsx`);
+    const buffer = await generateExcelBuffer([
+      { name: "Financial Overview", type: "aoa", data: overviewData },
+      {
+        name: "Vehicle Profitability",
+        type: "aoa",
+        data: [
+          ["Plate Number", "Brand", "Model", "Year", "Revenue", "Maintenance", "Insurance", "Total Expenses", "Net Profit", "ROI (%)", "Contracts"],
+          ...vehicleRows,
+        ],
+      },
+      {
+        name: "Monthly Performance",
+        type: "aoa",
+        data: [["Month", "Revenue", "Expenses", "Net"], ...monthlyRows],
+      },
+    ]);
+    downloadExcel(buffer, `ProfitLoss_Report_${dateStr}.xlsx`);
   };
 
   const handleExportToPDF = async () => {

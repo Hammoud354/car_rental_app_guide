@@ -99,3 +99,4 @@ Server runs on port 5000, Vite dev server proxied through it.
 - lucide-react (icons)
 - recharts (charts)
 - sonner (toast notifications)
+- exceljs (Excel export — replaced xlsx@0.18.5 due to critical CVEs)
