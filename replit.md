@@ -31,12 +31,12 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Print/PDF: `client/src/lib/printUtils.ts` — shared `printElement()` (iframe-based print) and `exportElementToPDF()` (html2canvas+jsPDF) utilities used by Invoices and Contracts pages; no popup windows or external CDN dependencies
 - Landing page: Professional design with FleetMaster branding, blue-600 accent, animated dashboard preview
 - Auth pages (SignIn/SignUp): Split-panel layout with dark branding panel + white form panel
-- Logo: SVG car icon in gradient blue/indigo rounded-xl box, "Fleet**Master**" text with "Master" in blue-600
+- Logo: Animated pure-text "FleetMaster" branding (AnimatedLogo component), no icon; "Fleet" in dark + "Master" in blue-600, CSS slide-in animation
 - **Consistent page headers**: `<h1 className="text-2xl font-bold text-gray-900">` + `<p className="text-sm text-gray-500 mt-0.5">` subtitle
 - **Stat cards**: white div with `rounded-xl border border-gray-200 p-5`, icon in colored bg `rounded-lg p-2`
 - **Alert widgets**: `border-[color]-200 bg-[color]-50/50`, compact with ChevronRight link
 - **Button sizing**: `size="sm"` for header action buttons; icons use `h-3.5 w-3.5 mr-1.5`
-- **Sidebar**: Car icon, `from-blue-600 to-indigo-700` gradient, "FleetMaster" branding
+- **Sidebar**: AnimatedLogo "FleetMaster" branding (no icon), "FM" when collapsed
 - **Landing page buttons**: "Sign In" (outlined), "Get Started" (blue solid), "Try Live Demo" (bg-red-700 font-bold)
 
 ## Database Notes (CRITICAL)
@@ -57,6 +57,13 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Maintenance toggle buttons on both Fleet Management and Maintenance pages
 - Tenant-scoped: All maintenance status changes verify vehicle ownership via userId
 
+## AI Maintenance Integration
+- **Dashboard Maintenance Alerts**: `aiMaintenance.getMaintenanceAlerts` route aggregates alerts from AI tasks, vehicle insurance, and scheduled maintenance; categorized as Critical/Needs Attention/Can Wait
+- **Send Task to Maintenance**: `aiMaintenance.sendTaskToMaintenance` route creates a maintenance record, sends vehicle to garage, and completes the AI task
+- **AI task status enum**: `Pending`, `Completed`, `Skipped` (no "Overdue" — overdue is determined by comparing triggerDate to now)
+- **Trigger types**: `Mileage`, `Time`, `Both` (matching the triggerType DB enum)
+- **Priority levels**: `Critical`, `Important`, `Recommended`, `Optional`
+
 ## Business Logic
 - Invoice tax calculation uses company profile VAT rate (not hardcoded)
 - Invoice numbering uses MAX("invoiceNumber") with collision fallback
@@ -66,7 +73,8 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - Local authentication with username/password (cookie-based sessions)
 - Admin user: `admin` / `Admin123!` (role: `super_admin`)
 - Demo mode: `/demo` route auto-creates demo user with 10-minute session, pre-seeded data via `server/seedDemoData.ts`
-- Demo data: 10 vehicles, 6 clients, 6 contracts (incl. 1 overdue), 3 invoices with line items, 4 maintenance records, 1 company profile, 1 damage mark
+- Demo data: 10 vehicles (with insurance expiry dates), 6 clients, 6 contracts (incl. 1 overdue), 3 invoices with line items, 4 maintenance records, 7 AI maintenance tasks (2 critical overdue, 2 upcoming, 3 can-wait), 1 company profile, 1 damage mark
+- Page title: "Fleet Master" (browser tab)
 - Auto-country: On first login, company profile is auto-created with country, VAT rate, currency from signup data
 - Country data mapping: `shared/countries.ts` (COUNTRY_VAT_CURRENCY) maps country codes to financial settings
 

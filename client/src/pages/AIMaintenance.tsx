@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter } from "lucide-react";
+import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter, Wrench } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -81,7 +81,20 @@ export default function AIMaintenance() {
     },
   });
 
-  // Delete task mutation
+  const sendToMaintenance = trpc.aiMaintenance.sendTaskToMaintenance.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle sent to garage and maintenance record created");
+      utils.aiMaintenance.getAllTasks.invalidate();
+      utils.aiMaintenance.getTasksByVehicle.invalidate();
+      utils.fleet.list.invalidate();
+    },
+    onError: (error) => {
+      toast.error("Failed to send to maintenance", {
+        description: error.message,
+      });
+    },
+  });
+
   const deleteTask = trpc.aiMaintenance.deleteTask.useMutation({
     onSuccess: () => {
       toast.success("Task deleted");
@@ -467,6 +480,14 @@ export default function AIMaintenance() {
                                     >
                                       <CheckCircle2 className="h-4 w-4" />
                                     </Button>
+                                    <Button
+                                      size="sm"
+                                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                                      onClick={() => sendToMaintenance.mutate({ taskId: task.id })}
+                                      disabled={sendToMaintenance.isPending}
+                                    >
+                                      <Wrench className="h-4 w-4" />
+                                    </Button>
                                   </>
                                 )}
                                 <Button
@@ -572,6 +593,14 @@ export default function AIMaintenance() {
                                 onClick={() => handleCompleteTask(task.id)}
                               >
                                 <CheckCircle2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
+                                onClick={() => sendToMaintenance.mutate({ taskId: task.id })}
+                                disabled={sendToMaintenance.isPending}
+                              >
+                                <Wrench className="h-4 w-4 mr-1" /> Garage
                               </Button>
                             </>
                           )}

@@ -3,6 +3,7 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff, ArrowRight, Clock } from "lucide-react";
@@ -43,18 +44,7 @@ export default function SignIn() {
         </div>
         <div className="relative flex flex-col justify-between p-12 w-full">
           <Link href="/">
-            <div className="flex items-center gap-3 cursor-pointer">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                </svg>
-              </div>
-              <span className="text-lg font-bold text-white">
-                Fleet<span className="text-blue-400">Master</span>
-              </span>
-            </div>
+            <AnimatedLogo size="lg" darkBg />
           </Link>
           
           <div className="space-y-6">
@@ -89,16 +79,7 @@ export default function SignIn() {
           {/* Mobile Logo */}
           <div className="lg:hidden mb-8 text-center">
             <Link href="/">
-              <div className="inline-flex items-center gap-2.5 cursor-pointer">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                    <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                  </svg>
-                </div>
-                <span className="text-lg font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
-              </div>
+              <AnimatedLogo size="lg" />
             </Link>
           </div>
 

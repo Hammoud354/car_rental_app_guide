@@ -357,6 +357,72 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   );
 }
 
+function MaintenanceAlertsWidget() {
+  const { data: alertData, isLoading } = trpc.aiMaintenance.getMaintenanceAlerts.useQuery();
+  
+  if (isLoading || !alertData || alertData.summary.total === 0) return null;
+
+  const levelConfig = {
+    critical: { bg: "bg-red-50", border: "border-red-200", badge: "bg-red-600", text: "text-red-800", icon: "text-red-600", label: "Critical" },
+    attention: { bg: "bg-amber-50", border: "border-amber-200", badge: "bg-amber-500", text: "text-amber-800", icon: "text-amber-600", label: "Needs Attention" },
+    canwait: { bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-500", text: "text-blue-800", icon: "text-blue-600", label: "Can Wait" },
+  };
+
+  return (
+    <Card className="shadow-none border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <Wrench className="h-5 w-5 text-orange-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-orange-900">Maintenance Alerts</h3>
+            <p className="text-xs text-orange-700">{alertData.summary.total} item{alertData.summary.total !== 1 ? "s" : ""} requiring attention</p>
+          </div>
+          <div className="flex gap-2">
+            {alertData.summary.critical > 0 && (
+              <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{alertData.summary.critical} Critical</span>
+            )}
+            {alertData.summary.attention > 0 && (
+              <span className="px-2 py-0.5 text-xs font-bold text-white bg-amber-500 rounded-full">{alertData.summary.attention} Attention</span>
+            )}
+            {alertData.summary.canwait > 0 && (
+              <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">{alertData.summary.canwait} Later</span>
+            )}
+          </div>
+          <Link href="/ai-maintenance">
+            <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
+              View All <ChevronRight className="ml-1 h-3 w-3" />
+            </Button>
+          </Link>
+        </div>
+        <div className="space-y-2 max-h-48 overflow-y-auto">
+          {alertData.alerts.slice(0, 6).map((alert) => {
+            const config = levelConfig[alert.level];
+            return (
+              <div key={alert.id} className={`flex items-center gap-3 p-2.5 rounded-lg ${config.bg} ${config.border} border`}>
+                <AlertTriangle className={`h-4 w-4 shrink-0 ${config.icon}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold ${config.text}`}>{alert.title}</span>
+                    <span className={`px-1.5 py-0.5 text-[10px] font-bold text-white rounded ${config.badge}`}>{config.label}</span>
+                  </div>
+                  <p className="text-xs text-gray-600 truncate">{alert.vehicleName} ({alert.plateNumber}) - {alert.description}</p>
+                </div>
+                <Link href="/maintenance">
+                  <Button variant="ghost" size="sm" className="h-7 text-xs">
+                    <Wrench className="h-3 w-3 mr-1" /> Fix
+                  </Button>
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: number }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -562,6 +628,8 @@ export default function Dashboard() {
       {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
       {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
       {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
+
+      <MaintenanceAlertsWidget />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {widgetVisibility.totalFleet && (

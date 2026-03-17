@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
+import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { Clock, Loader2, ArrowRight, Car, FileText, BarChart3, Wrench, DollarSign, CheckCircle2, AlertTriangle } from "lucide-react";
 import { Link } from "wouter";
 
@@ -56,16 +57,7 @@ export default function Demo() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">
-            <div className="inline-flex items-center gap-2.5 cursor-pointer">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                </svg>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
-            </div>
+            <AnimatedLogo size="lg" showSubtext />
           </Link>
         </div>
 

@@ -2304,7 +2304,7 @@ export const appRouter = router({
           estimatedDuration: z.number().optional(),
           triggerMileage: z.number().optional(),
           triggerDate: z.date().optional(),
-          status: z.enum(["Pending", "Overdue", "Completed", "Skipped", "Dismissed"]).optional(),
+          status: z.enum(["Pending", "Completed", "Skipped"]).optional(),
           userOverridden: z.boolean().optional(),
           overrideNotes: z.string().optional(),
         }),
@@ -2332,6 +2332,233 @@ export const appRouter = router({
       .input(z.object({ taskId: z.number() }))
       .mutation(async ({ input, ctx }) => {
         return await db.deleteMaintenanceTask(input.taskId, ctx.user.id);
+      }),
+
+    getMaintenanceAlerts: protectedProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user.id;
+        const allTasks = await db.getAllMaintenanceTasks(userId);
+        const allVehicles = await db.getAllVehicles(userId);
+        const now = new Date();
+
+        const alerts: Array<{
+          id: string;
+          level: "critical" | "attention" | "canwait";
+          title: string;
+          description: string;
+          vehicleId: number;
+          vehicleName: string;
+          plateNumber: string;
+          taskId?: number;
+          type: "overdue" | "upcoming" | "mileage" | "insurance";
+        }> = [];
+
+        for (const task of allTasks) {
+          if (task.status === "Completed" || task.status === "Skipped") continue;
+          const vehicle = allVehicles.find((v: any) => v.id === task.vehicleId);
+          if (!vehicle) continue;
+          const vehicleName = `${vehicle.brand} ${vehicle.model}`;
+
+          if (task.triggerDate && new Date(task.triggerDate) < now) {
+            alerts.push({
+              id: `task-${task.id}`,
+              level: task.priority === "Critical" ? "critical" : "attention",
+              title: task.taskName,
+              description: `Overdue ${task.priority?.toLowerCase()} task: ${task.description || task.taskName}`,
+              vehicleId: vehicle.id,
+              vehicleName,
+              plateNumber: vehicle.plateNumber,
+              taskId: task.id,
+              type: "overdue",
+            });
+          } else if (task.triggerDate) {
+            const daysUntil = Math.ceil((new Date(task.triggerDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysUntil <= 7) {
+              alerts.push({
+                id: `task-${task.id}`,
+                level: task.priority === "Critical" ? "critical" : "attention",
+                title: task.taskName,
+                description: `Due in ${daysUntil} day${daysUntil !== 1 ? "s" : ""} - ${task.description || task.taskName}`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                taskId: task.id,
+                type: "upcoming",
+              });
+            } else if (daysUntil <= 30) {
+              alerts.push({
+                id: `task-${task.id}`,
+                level: "canwait",
+                title: task.taskName,
+                description: `Due in ${daysUntil} days - ${task.description || task.taskName}`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                taskId: task.id,
+                type: "upcoming",
+              });
+            }
+          }
+
+          if (task.triggerMileage && vehicle.mileage) {
+            const kmLeft = task.triggerMileage - vehicle.mileage;
+            if (kmLeft <= 0) {
+              alerts.push({
+                id: `task-mileage-${task.id}`,
+                level: task.priority === "Critical" ? "critical" : "attention",
+                title: `${task.taskName} - Mileage exceeded`,
+                description: `Service due at ${task.triggerMileage?.toLocaleString()} km, current: ${vehicle.mileage?.toLocaleString()} km`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                taskId: task.id,
+                type: "mileage",
+              });
+            } else if (kmLeft <= 1000) {
+              alerts.push({
+                id: `task-mileage-${task.id}`,
+                level: "canwait",
+                title: `${task.taskName} - ${kmLeft} km remaining`,
+                description: `Service due at ${task.triggerMileage?.toLocaleString()} km, current: ${vehicle.mileage?.toLocaleString()} km`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                taskId: task.id,
+                type: "mileage",
+              });
+            }
+          }
+        }
+
+        for (const vehicle of allVehicles) {
+          const vehicleName = `${vehicle.brand} ${vehicle.model}`;
+          if (vehicle.insuranceExpiryDate) {
+            const daysUntilExpiry = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysUntilExpiry <= 0) {
+              alerts.push({
+                id: `insurance-${vehicle.id}`,
+                level: "critical",
+                title: "Insurance Expired",
+                description: `Insurance expired ${Math.abs(daysUntilExpiry)} days ago`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                type: "insurance",
+              });
+            } else if (daysUntilExpiry <= 14) {
+              alerts.push({
+                id: `insurance-${vehicle.id}`,
+                level: "attention",
+                title: "Insurance Expiring Soon",
+                description: `Insurance expires in ${daysUntilExpiry} days`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                type: "insurance",
+              });
+            }
+          }
+
+          if (vehicle.nextMaintenanceDate) {
+            const daysUntil = Math.ceil((new Date(vehicle.nextMaintenanceDate).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysUntil <= 0) {
+              const existingAlert = alerts.find(a => a.vehicleId === vehicle.id && a.type === "overdue");
+              if (!existingAlert) {
+                alerts.push({
+                  id: `next-maint-${vehicle.id}`,
+                  level: "critical",
+                  title: "Scheduled Maintenance Overdue",
+                  description: `Was due ${Math.abs(daysUntil)} days ago`,
+                  vehicleId: vehicle.id,
+                  vehicleName,
+                  plateNumber: vehicle.plateNumber,
+                  type: "overdue",
+                });
+              }
+            } else if (daysUntil <= 7) {
+              alerts.push({
+                id: `next-maint-${vehicle.id}`,
+                level: "attention",
+                title: "Scheduled Maintenance Coming Up",
+                description: `Due in ${daysUntil} days`,
+                vehicleId: vehicle.id,
+                vehicleName,
+                plateNumber: vehicle.plateNumber,
+                type: "upcoming",
+              });
+            }
+          }
+        }
+
+        alerts.sort((a, b) => {
+          const levelOrder = { critical: 0, attention: 1, canwait: 2 };
+          return levelOrder[a.level] - levelOrder[b.level];
+        });
+
+        return {
+          alerts,
+          summary: {
+            critical: alerts.filter(a => a.level === "critical").length,
+            attention: alerts.filter(a => a.level === "attention").length,
+            canwait: alerts.filter(a => a.level === "canwait").length,
+            total: alerts.length,
+          },
+        };
+      }),
+
+    sendTaskToMaintenance: protectedProcedure
+      .input(z.object({
+        taskId: z.number(),
+        garageLocation: z.string().optional(),
+        performedBy: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user.id;
+        const task = (await db.getAllMaintenanceTasks(userId)).find((t: any) => t.id === input.taskId);
+        if (!task) throw new Error("Task not found");
+
+        const vehicle = (await db.getAllVehicles(userId)).find((v: any) => v.id === task.vehicleId);
+        if (!vehicle) throw new Error("Vehicle not found");
+
+        const categoryToType: Record<string, string> = {
+          "Engine": "Routine",
+          "Brakes": "Brake Pads Change",
+          "Tires": "Routine",
+          "HVAC": "Routine",
+          "Transmission": "Inspection",
+          "Electrical": "Inspection",
+          "Cooling": "Routine",
+          "Oil": "Oil Change",
+        };
+        const maintenanceType = categoryToType[task.category || ""] || "Routine";
+
+        let record;
+        try {
+          record = await db.createMaintenanceRecord({
+            userId,
+            vehicleId: task.vehicleId,
+            maintenanceType: maintenanceType as any,
+            description: `[AI Task] ${task.taskName}: ${task.description || ""}`,
+            cost: task.estimatedCost || "0",
+            performedAt: new Date(),
+            performedBy: input.performedBy || "Pending",
+            garageLocation: input.garageLocation || undefined,
+            mileageAtService: vehicle.mileage || undefined,
+            garageEntryDate: new Date(),
+          });
+
+          await db.sendVehicleToMaintenance(task.vehicleId, userId);
+
+          await db.completeMaintenanceTask(input.taskId, userId, {
+            maintenanceRecordId: record.id,
+            completedMileage: vehicle.mileage || undefined,
+            actualCost: task.estimatedCost || undefined,
+          });
+        } catch (error) {
+          throw new Error(`Failed to create maintenance record: ${error instanceof Error ? error.message : "Unknown error"}`);
+        }
+
+        return { record, vehicleId: task.vehicleId };
       }),
 
     // Insurance Policy Management

@@ -1,5 +1,6 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { 
   ArrowRight, MessageCircle, Globe, ChevronRight,
   LogIn, UserPlus, CheckCircle2, Star, BarChart3, FileText, 
@@ -230,26 +231,7 @@ export default function Home() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
           <Link href="/">
-            <div className="flex items-center gap-3 cursor-pointer">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 flex items-center justify-center shadow-lg shadow-blue-700/30">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                    <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                    <path d="M5 9.5h14" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                </div>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[17px] font-bold tracking-tight text-gray-900">
-                  Fleet<span className="text-blue-600">Master</span>
-                </span>
-                <span className="text-[10px] font-medium text-gray-400 tracking-widest uppercase -mt-0.5">
-                  Rental Management
-                </span>
-              </div>
-            </div>
+            <AnimatedLogo size="md" showSubtext />
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <Button 
@@ -667,16 +649,7 @@ export default function Home() {
       <footer className="border-t border-gray-100 py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M5 17h1a2 2 0 002-2V9.5L5.5 6H2v9a2 2 0 002 2h1zm0 0a2 2 0 002 2h10a2 2 0 002-2m-14 0V9m14 8h1a2 2 0 002-2V9.5L18.5 6h-13M19 17a2 2 0 01-2 2m2-2V9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <circle cx="7" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                  <circle cx="17" cy="17" r="2" stroke="white" strokeWidth="1.5"/>
-                </svg>
-              </div>
-              <span className="text-sm font-bold text-gray-900">Fleet<span className="text-blue-600">Master</span></span>
-            </div>
+            <AnimatedLogo size="sm" />
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <button onClick={handleContactUs} className="hover:text-gray-600 transition-colors cursor-pointer">Contact</button>
               <Link href="/signin"><span className="hover:text-gray-600 transition-colors cursor-pointer">Sign In</span></Link>
