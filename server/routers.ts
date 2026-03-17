@@ -1774,26 +1774,26 @@ export const appRouter = router({
             COUNT(*) FILTER (WHERE "lastSignedIn" > NOW() - INTERVAL '7 days') as active_7d,
             COUNT(*) FILTER (WHERE "lastSignedIn" > NOW() - INTERVAL '30 days') as active_30d,
             COUNT(*) FILTER (WHERE "createdAt" > NOW() - INTERVAL '30 days') as new_30d
-          FROM users WHERE role != 'super_admin'`),
+          FROM users WHERE role != 'super_admin' AND username != 'demo@system'`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COUNT(*) FILTER (WHERE status = 'Available') as available,
             COUNT(*) FILTER (WHERE status = 'Rented') as rented,
             COUNT(*) FILTER (WHERE status = 'Maintenance') as in_maintenance,
             COUNT(*) FILTER (WHERE status = 'Out of Service') as out_of_service
-          FROM vehicles`),
-          dbInstance.execute(sql`SELECT COUNT(*) as total FROM clients`),
+          FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
+          dbInstance.execute(sql`SELECT COUNT(*) as total FROM clients WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COALESCE(SUM("totalAmount"), 0) as total_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'paid' THEN "totalAmount" ELSE 0 END), 0) as paid_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'pending' THEN "totalAmount" ELSE 0 END), 0) as pending_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'overdue' THEN "totalAmount" ELSE 0 END), 0) as overdue_revenue
-          FROM invoices`),
+          FROM invoices WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COALESCE(SUM(cost), 0) as total_cost
-          FROM "maintenanceRecords"`),
+          FROM "maintenanceRecords" WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
           dbInstance.execute(sql`SELECT 
             COALESCE(st."displayName", 'No Plan') as plan_name,
             COUNT(u.id) as user_count,
@@ -1801,25 +1801,25 @@ export const appRouter = router({
           FROM users u
           LEFT JOIN "userSubscriptions" us ON u.id = us."userId"
           LEFT JOIN "subscriptionTiers" st ON us."tierId" = st.id
-          WHERE u.role != 'super_admin'
+          WHERE u.role != 'super_admin' AND u.username != 'demo@system'
           GROUP BY st."displayName", st."monthlyPrice"
           ORDER BY user_count DESC`),
           dbInstance.execute(sql`SELECT id, username, name, email, "createdAt", "lastSignedIn"
-          FROM users WHERE role != 'super_admin'
+          FROM users WHERE role != 'super_admin' AND username != 'demo@system'
           ORDER BY "createdAt" DESC LIMIT 10`),
-          dbInstance.execute(sql`SELECT status, COUNT(*) as count FROM vehicles GROUP BY status ORDER BY count DESC`),
+          dbInstance.execute(sql`SELECT status, COUNT(*) as count FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system') GROUP BY status ORDER BY count DESC`),
           dbInstance.execute(sql`SELECT 
             u.id, u.username, u.name,
             (SELECT COUNT(*) FROM vehicles v WHERE v."userId" = u.id) as vehicles,
             (SELECT COUNT(*) FROM clients c WHERE c."userId" = u.id) as clients,
             (SELECT COUNT(*) FROM invoices i WHERE i."userId" = u.id) as invoices,
             (SELECT COALESCE(SUM(i."totalAmount"), 0) FROM invoices i WHERE i."userId" = u.id) as revenue
-          FROM users u WHERE u.role != 'super_admin'
+          FROM users u WHERE u.role != 'super_admin' AND u.username != 'demo@system'
           ORDER BY revenue DESC LIMIT 10`),
           dbInstance.execute(sql`SELECT 
             TO_CHAR("createdAt", 'YYYY-MM') as month,
             COUNT(*) as signups
-          FROM users WHERE role != 'super_admin'
+          FROM users WHERE role != 'super_admin' AND username != 'demo@system'
           GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
           ORDER BY month DESC LIMIT 12`),
         ]);
