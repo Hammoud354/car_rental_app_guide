@@ -136,7 +136,7 @@ const plans = [
       "Email support",
     ],
     popular: false,
-    cta: "Get Started"
+    cta: "Sign Up"
   },
   {
     name: "Professional",
@@ -154,7 +154,7 @@ const plans = [
       "Priority support",
     ],
     popular: true,
-    cta: "Get Started"
+    cta: "Sign Up"
   },
   {
     name: "Enterprise",
@@ -244,14 +244,14 @@ export default function Home() {
               Contact
             </Button>
             <Link href="/signin">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900 font-medium text-sm">
+              <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm shadow-md shadow-emerald-700/20 px-5">
                 <LogIn className="h-4 w-4 sm:mr-1.5" />
                 <span className="hidden sm:inline">Sign In</span>
               </Button>
             </Link>
             <Link href="/signup">
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 font-medium px-5 text-sm">
-                <span>Get Started</span>
+                <span>Sign Up</span>
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </Button>
             </Link>
@@ -310,14 +310,14 @@ export default function Home() {
               className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6"
             >
               <Link href="/signin">
-                <Button variant="outline" size="lg" className="px-8 h-12 text-base font-medium border-gray-200 text-gray-700 hover:bg-gray-50 group">
+                <Button size="lg" className="bg-emerald-700 hover:bg-emerald-800 text-white px-8 h-12 text-base font-semibold shadow-lg shadow-emerald-700/25 group">
                   <LogIn className="h-4 w-4 mr-2" />
                   Sign In
                 </Button>
               </Link>
               <Link href="/signup">
                 <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 px-8 h-12 text-base font-semibold group">
-                  Get Started
+                  Sign Up
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
@@ -626,7 +626,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link href="/signup">
                     <Button size="lg" className="bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 text-base font-semibold shadow-lg shadow-blue-600/30">
-                      Get Started
+                      Sign Up
                       <ArrowRight className="h-4 w-4 ml-2" />
                     </Button>
                   </Link>
@@ -653,7 +653,7 @@ export default function Home() {
             <div className="flex items-center gap-6 text-sm text-gray-400">
               <button onClick={handleContactUs} className="hover:text-gray-600 transition-colors cursor-pointer">Contact</button>
               <Link href="/signin"><span className="hover:text-gray-600 transition-colors cursor-pointer">Sign In</span></Link>
-              <Link href="/signup"><span className="hover:text-gray-600 transition-colors cursor-pointer">Get Started</span></Link>
+              <Link href="/signup"><span className="hover:text-gray-600 transition-colors cursor-pointer">Sign Up</span></Link>
             </div>
             <p className="text-xs text-gray-400">
               &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
