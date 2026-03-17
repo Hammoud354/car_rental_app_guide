@@ -253,6 +253,12 @@ Return ONLY valid JSON matching this schema:
   "totalEstimatedAnnualCost": number
 }`;
 
+  const hasApiKey = !!process.env.OPENAI_API_KEY;
+  
+  if (!hasApiKey) {
+    return generateRuleBasedSchedule(vehicle, usage, dataAssessment, currentMileage, vehicleAge, kmSinceLastMaintenance);
+  }
+
   try {
     const response = await invokeLLM({
       messages: [
@@ -314,4 +320,99 @@ Return ONLY valid JSON matching this schema:
     console.error("AI maintenance generation error:", error);
     throw new Error(`Failed to generate maintenance schedule: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
+}
+
+function generateRuleBasedSchedule(
+  vehicle: Vehicle,
+  usage: VehicleUsageData,
+  dataAssessment: { quality: string; insights: string },
+  currentMileage: number,
+  vehicleAge: number,
+  kmSinceLastMaintenance: number
+): MaintenanceSchedule {
+  const tasks: MaintenanceTaskRecommendation[] = [];
+  const now = new Date();
+
+  const intervals: Array<{
+    taskName: string;
+    description: string;
+    category: string;
+    intervalKm: number;
+    intervalMonths: number;
+    priority: "Critical" | "Important" | "Recommended" | "Optional";
+    cost: number;
+    duration: number;
+  }> = [
+    { taskName: "Oil Change", description: "Replace engine oil and reset service interval", category: "Engine", intervalKm: 5000, intervalMonths: 6, priority: "Critical", cost: 80, duration: 30 },
+    { taskName: "Oil Filter Replacement", description: "Replace oil filter to ensure clean oil circulation", category: "Engine", intervalKm: 5000, intervalMonths: 6, priority: "Critical", cost: 25, duration: 15 },
+    { taskName: "Air Filter Replacement", description: "Replace engine air filter for optimal air-fuel mixture", category: "Engine", intervalKm: 15000, intervalMonths: 12, priority: "Important", cost: 35, duration: 15 },
+    { taskName: "Brake Inspection", description: "Inspect brake pads, rotors, and fluid levels", category: "Brakes", intervalKm: 20000, intervalMonths: 12, priority: "Critical", cost: 50, duration: 30 },
+    { taskName: "Brake Pads Replacement", description: "Replace front and rear brake pads", category: "Brakes", intervalKm: 50000, intervalMonths: 36, priority: "Critical", cost: 250, duration: 90 },
+    { taskName: "Tire Rotation", description: "Rotate tires for even wear distribution", category: "Tires", intervalKm: 10000, intervalMonths: 6, priority: "Important", cost: 40, duration: 30 },
+    { taskName: "Tire Condition Check", description: "Check tread depth, pressure, and sidewall condition", category: "Tires", intervalKm: 15000, intervalMonths: 6, priority: "Important", cost: 20, duration: 20 },
+    { taskName: "Coolant Flush", description: "Flush and replace engine coolant", category: "Engine", intervalKm: 50000, intervalMonths: 24, priority: "Recommended", cost: 120, duration: 45 },
+    { taskName: "Transmission Fluid Change", description: "Replace transmission fluid for smooth shifting", category: "Transmission", intervalKm: 60000, intervalMonths: 48, priority: "Important", cost: 200, duration: 60 },
+    { taskName: "Battery Inspection", description: "Test battery health, clean terminals, check charge", category: "Electrical", intervalKm: 25000, intervalMonths: 12, priority: "Recommended", cost: 30, duration: 15 },
+    { taskName: "Cabin Air Filter", description: "Replace cabin air filter for clean interior air", category: "Interior", intervalKm: 20000, intervalMonths: 12, priority: "Optional", cost: 30, duration: 10 },
+    { taskName: "Serpentine Belt Inspection", description: "Check belt condition and tension", category: "Engine", intervalKm: 40000, intervalMonths: 36, priority: "Recommended", cost: 15, duration: 10 },
+    { taskName: "Spark Plug Replacement", description: "Replace spark plugs for optimal combustion", category: "Engine", intervalKm: 60000, intervalMonths: 48, priority: "Important", cost: 120, duration: 45 },
+    { taskName: "Wheel Alignment Check", description: "Check and adjust wheel alignment", category: "Suspension", intervalKm: 20000, intervalMonths: 12, priority: "Recommended", cost: 80, duration: 45 },
+    { taskName: "Windshield Wiper Replacement", description: "Replace worn wiper blades", category: "Safety", intervalKm: 20000, intervalMonths: 12, priority: "Optional", cost: 25, duration: 10 },
+  ];
+
+  const usageIntensity = usage.averageKmPerDay > 100 ? "high" : usage.averageKmPerDay > 50 ? "moderate" : "low";
+  const costMultiplier = vehicle.category === "Luxury" || vehicle.category === "Sports" ? 1.5 : vehicle.category === "SUV" ? 1.2 : 1.0;
+  const lastServiceKm = usage.lastMaintenanceKm || 0;
+
+  for (const item of intervals) {
+    const adjustedIntervalKm = usageIntensity === "high" ? Math.round(item.intervalKm * 0.8) : item.intervalKm;
+    const kmSinceLastForThisTask = currentMileage - lastServiceKm;
+    const nextDueKm = Math.ceil(currentMileage / adjustedIntervalKm) * adjustedIntervalKm;
+    const triggerMileage = nextDueKm <= currentMileage ? nextDueKm + adjustedIntervalKm : nextDueKm;
+
+    const monthsUntilDue = Math.max(1, Math.round((triggerMileage - currentMileage) / Math.max(usage.averageKmPerDay * 30, 500)));
+    const triggerDate = new Date(now);
+    triggerDate.setMonth(triggerDate.getMonth() + monthsUntilDue);
+
+    let priority = item.priority;
+    if (triggerMileage - currentMileage < adjustedIntervalKm * 0.2) {
+      if (priority === "Recommended") priority = "Important";
+      if (priority === "Optional") priority = "Recommended";
+    }
+
+    const adjustedCost = Math.round(item.cost * costMultiplier);
+
+    tasks.push({
+      taskName: item.taskName,
+      description: `${item.description}. ${vehicle.brand} ${vehicle.model} at ${currentMileage.toLocaleString()} km.`,
+      priority,
+      category: item.category,
+      estimatedCost: adjustedCost,
+      estimatedDuration: item.duration,
+      triggerType: "Both",
+      triggerMileage,
+      triggerDate,
+      intervalMileage: adjustedIntervalKm,
+      intervalMonths: item.intervalMonths,
+      aiReasoning: `Standard maintenance interval: every ${adjustedIntervalKm.toLocaleString()} km${usageIntensity === "high" ? " (reduced for high usage)" : ""}. Vehicle age: ${vehicleAge} years. Usage: ${Math.round(usage.averageKmPerDay)} km/day (${usageIntensity}).`,
+    });
+  }
+
+  tasks.sort((a, b) => {
+    const priorityOrder = { Critical: 0, Important: 1, Recommended: 2, Optional: 3 };
+    return (priorityOrder[a.priority] - priorityOrder[b.priority]) || ((a.triggerMileage || 0) - (b.triggerMileage || 0));
+  });
+
+  const totalAnnualCost = tasks.reduce((sum, t) => {
+    const intervalsPerYear = t.intervalMileage ? Math.max(usage.averageKmPerDay * 365, 10000) / t.intervalMileage : 1;
+    return sum + t.estimatedCost * Math.min(intervalsPerYear, 4);
+  }, 0);
+
+  return {
+    tasks,
+    summary: `Generated ${tasks.length} maintenance tasks for ${vehicle.brand} ${vehicle.model} (${currentMileage.toLocaleString()} km, ${vehicleAge} yr). Usage: ${Math.round(usage.averageKmPerDay)} km/day (${usageIntensity}).`,
+    totalEstimatedAnnualCost: Math.round(totalAnnualCost),
+    dataQuality: dataAssessment.quality as any,
+    dataInsights: dataAssessment.insights,
+  };
 }
