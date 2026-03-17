@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -107,6 +107,40 @@ export default function AIMaintenance() {
       });
     },
   });
+
+  const autoGenTriggeredRef = useRef<Set<number>>(new Set());
+  const [autoGenQueue, setAutoGenQueue] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (!vehicles || !allTasks || vehicles.length === 0) return;
+
+    const vehiclesWithoutTasks = vehicles.filter((v: any) => {
+      const hasTasks = allTasks.some((t: any) => t.vehicleId === v.id);
+      return !hasTasks && !autoGenTriggeredRef.current.has(v.id);
+    });
+
+    if (vehiclesWithoutTasks.length > 0) {
+      const newIds = vehiclesWithoutTasks.map((v: any) => v.id);
+      newIds.forEach((id: number) => autoGenTriggeredRef.current.add(id));
+      setAutoGenQueue(newIds);
+    }
+  }, [vehicles, allTasks]);
+
+  useEffect(() => {
+    if (autoGenQueue.length === 0 || generateSchedule.isPending) return;
+
+    const nextId = autoGenQueue[0];
+    setIsGenerating(true);
+    generateSchedule.mutate({ vehicleId: nextId }, {
+      onSettled: () => {
+        setAutoGenQueue(prev => {
+          const remaining = prev.slice(1);
+          if (remaining.length === 0) setIsGenerating(false);
+          return remaining;
+        });
+      },
+    });
+  }, [autoGenQueue, generateSchedule.isPending]);
 
   const handleGenerateSchedule = (vehicleId: number) => {
     setIsGenerating(true);
