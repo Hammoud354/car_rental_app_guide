@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { format, isToday } from "date-fns";
+import { useState, useRef, useEffect } from "react";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -37,13 +37,20 @@ export function ModernDatePicker({
   const [month, setMonth] = useState<Date>(date || new Date());
   const [isOpen, setIsOpen] = useState(false);
   const [showYearPicker, setShowYearPicker] = useState(false);
+  const yearGridRef = useRef<HTMLDivElement>(null);
+  const selectedYearRef = useRef<HTMLButtonElement>(null);
 
-  // Generate year array from minYear to maxYear
   const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
-  
+
   const currentYear = month.getFullYear();
   const currentMonth = month.getMonth();
   const currentMonthName = monthNames[currentMonth];
+
+  useEffect(() => {
+    if (showYearPicker && selectedYearRef.current && yearGridRef.current) {
+      selectedYearRef.current.scrollIntoView({ block: "center", behavior: "auto" });
+    }
+  }, [showYearPicker]);
 
   const handleYearChange = (year: number) => {
     const newDate = new Date(year, currentMonth, 1);
@@ -62,7 +69,7 @@ export function ModernDatePicker({
   };
 
   return (
-    <Popover open={isOpen && !disabled} onOpenChange={setIsOpen}>
+    <Popover open={isOpen && !disabled} onOpenChange={(open) => { setIsOpen(open); if (!open) setShowYearPicker(false); }}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -79,12 +86,11 @@ export function ModernDatePicker({
           <span className="truncate">{date ? format(date, "PPP") : placeholder}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent 
-        className="w-auto p-0 border border-gray-300 shadow-md rounded-lg overflow-visible bg-white" 
+      <PopoverContent
+        className="w-auto p-0 border border-gray-300 shadow-md rounded-lg overflow-visible bg-white"
         align="start"
       >
         {showYearPicker ? (
-          // Year Picker View
           <div className="flex flex-col gap-2 p-3">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-semibold text-gray-900">Select Year</h3>
@@ -95,10 +101,15 @@ export function ModernDatePicker({
                 ×
               </button>
             </div>
-            <div className="grid grid-cols-4 gap-2 max-h-[300px] overflow-y-auto">
+            <div
+              ref={yearGridRef}
+              className="grid grid-cols-4 gap-2 overflow-y-scroll"
+              style={{ maxHeight: "260px", WebkitOverflowScrolling: "touch" }}
+            >
               {years.map((year) => (
                 <button
                   key={year}
+                  ref={currentYear === year ? selectedYearRef : null}
                   onClick={() => handleYearChange(year)}
                   className={cn(
                     "px-3 py-2 text-sm font-medium rounded transition-colors",
@@ -113,9 +124,7 @@ export function ModernDatePicker({
             </div>
           </div>
         ) : (
-          // Calendar View
           <>
-            {/* Compact Header with Year and Month Selection */}
             <div className="flex items-center justify-between gap-1 px-2 py-2 border-b border-gray-200 bg-gray-50">
               <Button
                 variant="ghost"
@@ -134,7 +143,7 @@ export function ModernDatePicker({
                 >
                   {currentYear}
                 </button>
-                
+
                 <span className="text-xs font-semibold text-gray-900 px-1 truncate">
                   {currentMonthName}
                 </span>
@@ -151,7 +160,6 @@ export function ModernDatePicker({
               </Button>
             </div>
 
-            {/* Compact Calendar Grid - No Extra Padding */}
             <div className="px-2 py-2">
               <Calendar
                 mode="single"
