@@ -1100,6 +1100,33 @@ export async function getUserByUsername(username: string) {
   return result[0];
 }
 
+export async function seedSuperAdmin() {
+  const db = await getDb();
+  if (!db) return;
+
+  try {
+    const existing = await db.select().from(users).where(eq(users.username, 'superadmin')).limit(1);
+    if (existing.length > 0) return;
+
+    const bcrypt = await import('bcrypt');
+    const hashedPassword = await bcrypt.hash('Superadmin2026!', 10);
+
+    await db.insert(users).values({
+      username: 'superadmin',
+      password: hashedPassword,
+      name: 'Superadmin',
+      email: 'superadmin@admin.local',
+      role: 'super_admin',
+      loginMethod: 'password',
+      lastSignedIn: new Date(),
+    });
+
+    console.log('[Startup] Super admin user created successfully');
+  } catch (err) {
+    console.error('[Startup] Failed to seed super admin:', err);
+  }
+}
+
 export async function getUserById(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
