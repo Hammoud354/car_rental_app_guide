@@ -361,9 +361,8 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
-        // Super Admin can filter by specific user, otherwise show own vehicles
-        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
-        return await db.getAllVehicles(targetUserId, input?.filterUserId);
+        const userId = ctx.user?.id || 1;
+        return await db.getAllVehicles(userId, input?.filterUserId);
       }),
     
     getVehicleCount: protectedProcedure
@@ -562,8 +561,8 @@ export const appRouter = router({
     listAvailableForMaintenance: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
-        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
-        return await db.getAvailableVehiclesForMaintenance(targetUserId, input?.filterUserId);
+        const userId = ctx.user?.id || 1;
+        return await db.getAvailableVehiclesForMaintenance(userId, input?.filterUserId);
       }),
 
     // Vehicle Images
