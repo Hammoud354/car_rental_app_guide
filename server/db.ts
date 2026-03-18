@@ -309,17 +309,22 @@ export async function removeVehicleFromMaintenance(vehicleId: number, userId: nu
     throw new Error("Database not available");
   }
   
+  const isAdmin = await isSuperAdmin(userId);
+  const vehicleWhere = isAdmin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  const recordsWhere = isAdmin
+    ? eq(maintenanceRecords.vehicleId, vehicleId)
+    : and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId));
+  
   // Update vehicle status to Available
   await db.update(vehicles)
     .set({ status: 'Available', updatedAt: new Date() })
-    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+    .where(vehicleWhere);
   
   // Set garageExitDate to now for any maintenance records without an exit date
   const openRecords = await db.select().from(maintenanceRecords)
-    .where(and(
-      eq(maintenanceRecords.vehicleId, vehicleId),
-      eq(maintenanceRecords.userId, userId)
-    ));
+    .where(recordsWhere);
   
   for (const record of openRecords) {
     if (record.garageEntryDate && !record.garageExitDate) {
@@ -338,7 +343,12 @@ export async function sendVehicleToMaintenance(vehicleId: number, userId: number
     throw new Error("Database not available");
   }
   
-  const vehicle = await db.select().from(vehicles).where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId))).limit(1);
+  const isAdmin = await isSuperAdmin(userId);
+  const whereCondition = isAdmin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  
+  const vehicle = await db.select().from(vehicles).where(whereCondition).limit(1);
   if (vehicle.length === 0) {
     throw new Error("Vehicle not found");
   }
@@ -348,7 +358,7 @@ export async function sendVehicleToMaintenance(vehicleId: number, userId: number
   
   await db.update(vehicles)
     .set({ status: 'Maintenance', updatedAt: new Date() })
-    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+    .where(eq(vehicles.id, vehicleId));
   
   return { success: true };
 }

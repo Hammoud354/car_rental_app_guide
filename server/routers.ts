@@ -1189,13 +1189,9 @@ export const appRouter = router({
         
         const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
         
-        // Super Admin must provide targetUserId, regular users use their own ID
         let userId: number;
         if (isAdmin) {
-          if (!input.targetUserId || input.targetUserId === 0) {
-            throw new Error("Super Admin must select a specific user to create client for");
-          }
-          userId = input.targetUserId;
+          userId = (input.targetUserId && input.targetUserId !== 0) ? input.targetUserId : (ctx.user?.id || 1);
         } else {
           userId = ctx.user?.id || 1;
         }
