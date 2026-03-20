@@ -8,7 +8,9 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, getUserById, createUserSubscription, getAllSubscriptionTiers } from "../db";
+import { createPayTabsPayment, isPaymentApproved, parseCartId, buildCartId } from "./paytabs";
+import { COOKIE_NAME } from "@shared/const";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -73,6 +75,81 @@ async function startServer() {
     }
   });
   
+  // PayTabs: Create payment page
+  app.post("/api/paytabs/create-payment", async (req, res) => {
+    try {
+      const sessionCookie = req.cookies?.[COOKIE_NAME];
+      if (!sessionCookie?.startsWith("user-")) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+      const userId = parseInt(sessionCookie.replace("user-", ""), 10);
+      if (isNaN(userId)) return res.status(401).json({ error: "Unauthorized" });
+
+      const user = await getUserById(userId);
+      if (!user) return res.status(401).json({ error: "User not found" });
+
+      const { tierId } = req.body;
+      if (!tierId) return res.status(400).json({ error: "tierId is required" });
+
+      await initializeSubscriptionTiers();
+      const tiers = await getAllSubscriptionTiers();
+      const tier = tiers.find((t) => t.id === tierId);
+      if (!tier) return res.status(404).json({ error: "Plan not found" });
+
+      const baseUrl =
+        process.env.VITE_APP_URL ||
+        `${req.protocol}://${req.get("host")}`;
+
+      const cartId = buildCartId(tierId, userId);
+
+      const payment = await createPayTabsPayment({
+        cartId,
+        cartDescription: `${tier.displayName} Plan - Monthly Subscription`,
+        amount: parseFloat(tier.price),
+        currency: "USD",
+        callbackUrl: `${baseUrl}/api/paytabs/callback`,
+        returnUrl: `${baseUrl}/payment-return`,
+        customerName: user.name || user.username,
+        customerEmail: user.email || `${user.username}@user.local`,
+        customerPhone: user.phone || undefined,
+      });
+
+      res.json({ redirect: payment.redirect, tran_ref: payment.tran_ref });
+    } catch (err: any) {
+      console.error("[PayTabs] create-payment error:", err);
+      res.status(500).json({ error: err.message || "Failed to create payment" });
+    }
+  });
+
+  // PayTabs: Server-to-server callback (webhook)
+  app.post("/api/paytabs/callback", async (req, res) => {
+    try {
+      const payload = req.body;
+      console.log("[PayTabs] Callback received:", JSON.stringify(payload));
+
+      if (!isPaymentApproved(payload)) {
+        console.log("[PayTabs] Payment not approved:", payload?.payment_result);
+        return res.status(200).json({ status: "declined" });
+      }
+
+      const parsed = parseCartId(payload.cart_id);
+      if (!parsed) {
+        console.error("[PayTabs] Could not parse cart_id:", payload.cart_id);
+        return res.status(400).json({ error: "Invalid cart_id" });
+      }
+
+      const { userId, tierId } = parsed;
+      await initializeSubscriptionTiers();
+      await createUserSubscription(userId, tierId, `PayTabs payment approved — ref: ${payload.tran_ref}`);
+
+      console.log(`[PayTabs] Subscription activated: user=${userId} tier=${tierId}`);
+      res.status(200).json({ status: "ok" });
+    } catch (err: any) {
+      console.error("[PayTabs] callback error:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // tRPC API
   app.use(
     "/api/trpc",
