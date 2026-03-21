@@ -49,6 +49,10 @@ export default function CompanySettings() {
 
   useEffect(() => {
     if (profile) {
+      const derivedCurrencyCode = profile.country
+        ? getCurrencyCodeForCountry(profile.country) || profile.localCurrencyCode || "USD"
+        : profile.localCurrencyCode || "USD";
+
       setFormData({
         companyName: profile.companyName || "",
         registrationNumber: profile.registrationNumber || "",
@@ -63,7 +67,7 @@ export default function CompanySettings() {
         contractTemplateUrl: profile.contractTemplateUrl || "",
         defaultCurrency: (profile.defaultCurrency as "USD" | "LOCAL") || "USD",
         exchangeRate: profile.exchangeRate?.toString() || "1.0000",
-        localCurrencyCode: profile.localCurrencyCode || "LBP",
+        localCurrencyCode: derivedCurrencyCode,
         vatRate: profile.vatRate?.toString() || "11",
       });
       if (profile.logoUrl) {
@@ -557,8 +561,13 @@ export default function CompanySettings() {
                   onChange={(e) => setFormData({ ...formData, defaultCurrency: e.target.value as any })}
                   className="w-full px-3 py-2 border border-border rounded-md bg-background"
                 >
-                  <option value="USD">USD</option>
-                  <option value="LOCAL">{formData.localCurrencyCode || 'Local Currency'}</option>
+                  <option value="USD">USD — US Dollar</option>
+                  {formData.localCurrencyCode && formData.localCurrencyCode !== "USD" && (
+                    <option value="LOCAL">{formData.localCurrencyCode} — Local Currency</option>
+                  )}
+                  {(!formData.localCurrencyCode || formData.localCurrencyCode === "USD") && (
+                    <option value="LOCAL">Local Currency</option>
+                  )}
                 </select>
               </div>
               <div>
