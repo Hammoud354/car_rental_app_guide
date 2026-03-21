@@ -188,7 +188,25 @@ export default function Clients() {
   };
 
   const handleEditClick = (client: any) => {
-    setSelectedClient(client);
+    // Split name into first/last for the form
+    const nameParts = (client.name || "").trim().split(" ");
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    // Map DB column names → form field names
+    const adapted = {
+      ...client,
+      firstName,
+      lastName,
+      fatherName: client.fatherName || "",
+      motherFullName: client.motherFullName || "",
+      placeOfBirth: client.placeOfBirth || "",
+      drivingLicenseNumber: client.driverLicenseNumber || "",
+      passportIdNumber: client.passportNumber || "",
+      registrationNumber: client.idNumber || "",
+    };
+
+    setSelectedClient(adapted);
     setEditLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
     setEditLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
     setEditDateOfBirth(client.dateOfBirth ? new Date(client.dateOfBirth) : undefined);
@@ -257,9 +275,9 @@ export default function Clients() {
   };
 
   const filteredClients = clients.filter((client) =>
-    `${client.firstName} ${client.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (client.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.drivingLicenseNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+    (client.driverLicenseNumber || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -496,7 +514,7 @@ export default function Clients() {
                   <CardContent className="pt-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{client.firstName} {client.lastName}</h3>
+                        <h3 className="font-semibold text-lg">{client.name}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
                           <div>
                             <span className="text-muted-foreground">Phone:</span>
@@ -504,12 +522,12 @@ export default function Clients() {
                           </div>
                           <div>
                             <span className="text-muted-foreground">License:</span>
-                            <p>{client.drivingLicenseNumber}</p>
+                            <p>{client.driverLicenseNumber || "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-muted-foreground">License Expiry:</span>
                             <p className={licenseStatus.color}>
-                              {new Date(client.licenseExpiryDate).toLocaleDateString()}
+                              {client.licenseExpiryDate ? new Date(client.licenseExpiryDate).toLocaleDateString() : "N/A"}
                               {licenseStatus.message && ` - ${licenseStatus.message}`}
                             </p>
                           </div>
@@ -524,7 +542,15 @@ export default function Clients() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            setSelectedClient(client);
+                            const nameParts = (client.name || "").trim().split(" ");
+                            setSelectedClient({
+                              ...client,
+                              firstName: nameParts[0] || "",
+                              lastName: nameParts.slice(1).join(" ") || "",
+                              drivingLicenseNumber: client.driverLicenseNumber || "",
+                              passportIdNumber: client.passportNumber || "",
+                              registrationNumber: client.idNumber || "",
+                            });
                             setIsDetailsDialogOpen(true);
                           }}
                         >
@@ -782,7 +808,7 @@ export default function Clients() {
                   </div>
                   <div>
                     <span className="text-muted-foreground">License Expiry Date</span>
-                    <p className="font-semibold">{new Date(selectedClient.licenseExpiryDate).toLocaleDateString()}</p>
+                    <p className="font-semibold">{selectedClient.licenseExpiryDate ? new Date(selectedClient.licenseExpiryDate).toLocaleDateString() : "N/A"}</p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Notes</span>

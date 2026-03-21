@@ -1242,14 +1242,20 @@ export const appRouter = router({
 
         return await db.createClient({
           name,
+          fatherName: fatherName || undefined,
+          motherFullName: motherFullName || undefined,
           phone: rest.phone,
           email: rest.email,
           nationality: rest.nationality,
           address: rest.address,
-          notes: rest.notes ? `${rest.notes}${fatherName ? `\nFather: ${fatherName}` : ""}${motherFullName ? `\nMother: ${motherFullName}` : ""}` : (fatherName || motherFullName ? `${fatherName ? `Father: ${fatherName}` : ""}${motherFullName ? `\nMother: ${motherFullName}` : ""}`.trim() : undefined),
-          driverLicenseNumber: drivingLicenseNumber,
-          passportNumber: passportIdNumber,
-          idNumber: registrationNumber,
+          notes: rest.notes || undefined,
+          dateOfBirth: dateOfBirthDate,
+          placeOfBirth: rest.placeOfBirth || undefined,
+          driverLicenseNumber: drivingLicenseNumber || undefined,
+          licenseIssueDate: licenseIssueDate || undefined,
+          licenseExpiryDate: licenseExpiryDate || undefined,
+          passportNumber: passportIdNumber || undefined,
+          idNumber: registrationNumber || undefined,
           userId,
         });
       }),
@@ -1291,29 +1297,32 @@ export const appRouter = router({
         } = input;
 
         // Build the mapped update object with only schema-valid columns
-        const finalUpdates: Record<string, any> = { ...rest };
+        const finalUpdates: Record<string, any> = {
+          phone: rest.phone,
+          email: rest.email,
+          nationality: rest.nationality,
+          address: rest.address,
+          notes: rest.notes,
+          placeOfBirth: rest.placeOfBirth,
+        };
+
         if (firstName !== undefined || lastName !== undefined) {
           const existing = await db.getClientById(id, ctx.user?.id || 1);
           const parts = (existing?.name || "").split(" ");
           finalUpdates.name = `${firstName ?? parts[0] ?? ""} ${lastName ?? parts.slice(1).join(" ") ?? ""}`.trim();
         }
+        if (fatherName !== undefined) finalUpdates.fatherName = fatherName;
+        if (motherFullName !== undefined) finalUpdates.motherFullName = motherFullName;
         if (drivingLicenseNumber !== undefined) finalUpdates.driverLicenseNumber = drivingLicenseNumber;
         if (passportIdNumber !== undefined) finalUpdates.passportNumber = passportIdNumber;
         if (registrationNumber !== undefined) finalUpdates.idNumber = registrationNumber;
         if (dateOfBirth) finalUpdates.dateOfBirth = new Date(dateOfBirth);
-
-        // Preserve fatherName / motherFullName in notes if present
-        if (fatherName || motherFullName) {
-          const existingNotes = rest.notes || "";
-          const extra = [fatherName ? `Father: ${fatherName}` : "", motherFullName ? `Mother: ${motherFullName}` : ""].filter(Boolean).join("\n");
-          finalUpdates.notes = existingNotes ? `${existingNotes}\n${extra}` : extra;
-        }
-
-        // Validate license expiry date
+        if (licenseIssueDate) finalUpdates.licenseIssueDate = licenseIssueDate;
         if (licenseExpiryDate) {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
           if (licenseExpiryDate < today) throw new Error('License expiry date must be in the future');
+          finalUpdates.licenseExpiryDate = licenseExpiryDate;
         }
 
         const result = await db.updateClient(id, ctx.user?.id || 1, finalUpdates);
