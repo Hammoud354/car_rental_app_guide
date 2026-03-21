@@ -41,6 +41,7 @@ export default function FleetManagement() {
     garage: "",
     type: "",
     mileage: "",
+    nextKm: "",
     notes: "",
   });
   const [maintenanceEntryDate, setMaintenanceEntryDate] = useState<Date>(new Date());
@@ -361,7 +362,7 @@ export default function FleetManagement() {
       utils.fleet.list.invalidate();
       setIsMaintenanceDialogOpen(false);
       setMaintenanceVehicle(null);
-      setMaintenanceForm({ garage: "", type: "", mileage: "", notes: "" });
+      setMaintenanceForm({ garage: "", type: "", mileage: "", nextKm: "", notes: "" });
       setMaintenanceEntryDate(new Date());
       setMaintenanceExitDate(undefined);
     },
@@ -476,15 +477,27 @@ export default function FleetManagement() {
               </Select>
             </div>
 
-            <div>
-              <Label htmlFor="maint-mileage">Current Mileage (km)</Label>
-              <Input
-                id="maint-mileage"
-                type="number"
-                placeholder="e.g. 45000"
-                value={maintenanceForm.mileage}
-                onChange={(e) => setMaintenanceForm(f => ({ ...f, mileage: e.target.value }))}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="maint-mileage">Current Mileage (km)</Label>
+                <Input
+                  id="maint-mileage"
+                  type="number"
+                  placeholder="e.g. 45000"
+                  value={maintenanceForm.mileage}
+                  onChange={(e) => setMaintenanceForm(f => ({ ...f, mileage: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="maint-next-km">Next Maintenance at (km)</Label>
+                <Input
+                  id="maint-next-km"
+                  type="number"
+                  placeholder="e.g. 50000"
+                  value={maintenanceForm.nextKm}
+                  onChange={(e) => setMaintenanceForm(f => ({ ...f, nextKm: e.target.value }))}
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -534,6 +547,7 @@ export default function FleetManagement() {
                   description: maintenanceForm.notes.trim() || maintenanceForm.type,
                   garageLocation: maintenanceForm.garage.trim(),
                   mileageAtService: maintenanceForm.mileage ? parseInt(maintenanceForm.mileage) : undefined,
+                  kmDueMaintenance: maintenanceForm.nextKm ? parseInt(maintenanceForm.nextKm) : undefined,
                   garageEntryDate: maintenanceEntryDate,
                   garageExitDate: maintenanceExitDate,
                   performedAt: maintenanceEntryDate,

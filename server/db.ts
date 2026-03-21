@@ -378,13 +378,20 @@ export async function createMaintenanceRecord(record: InsertMaintenanceRecord & 
     throw new Error("Failed to retrieve created maintenance record");
   }
   
-  if (shouldMarkMaintenance && record.vehicleId && record.userId) {
+  if ((shouldMarkMaintenance || record.kmDueMaintenance) && record.vehicleId && record.userId) {
     const vehicle = await db.select().from(vehicles).where(
       and(eq(vehicles.id, record.vehicleId), eq(vehicles.userId, record.userId))
     ).limit(1);
-    if (vehicle.length > 0 && vehicle[0].status !== "Rented" && vehicle[0].status !== "Out of Service") {
+    if (vehicle.length > 0) {
+      const vehicleUpdates: Record<string, any> = { updatedAt: new Date() };
+      if (shouldMarkMaintenance && vehicle[0].status !== "Rented" && vehicle[0].status !== "Out of Service") {
+        vehicleUpdates.status = 'Maintenance';
+      }
+      if (record.kmDueMaintenance) {
+        vehicleUpdates.nextMaintenanceKm = record.kmDueMaintenance;
+      }
       await db.update(vehicles)
-        .set({ status: 'Maintenance', updatedAt: new Date() })
+        .set(vehicleUpdates)
         .where(and(eq(vehicles.id, record.vehicleId), eq(vehicles.userId, record.userId)));
     }
   }

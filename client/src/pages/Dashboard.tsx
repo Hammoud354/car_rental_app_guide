@@ -342,6 +342,72 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   );
 }
 
+function KmMaintenanceAlertsWidget({ vehicles }: { vehicles: any[] }) {
+  const alerts = vehicles
+    .filter(v => v.nextMaintenanceKm != null && v.mileage != null)
+    .map(v => ({
+      ...v,
+      kmLeft: v.nextMaintenanceKm - v.mileage,
+    }))
+    .filter(v => v.kmLeft <= 1000)
+    .sort((a, b) => a.kmLeft - b.kmLeft);
+
+  if (alerts.length === 0) return null;
+
+  return (
+    <Card className="shadow-none border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 bg-orange-100 rounded-lg">
+            <Wrench className="h-5 w-5 text-orange-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-orange-900">Upcoming Maintenance by Mileage</h3>
+            <p className="text-xs text-orange-700">{alerts.length} vehicle{alerts.length !== 1 ? "s" : ""} approaching scheduled service</p>
+          </div>
+          <Link href="/fleet-management">
+            <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
+              View Fleet <ChevronRight className="ml-1 h-3 w-3" />
+            </Button>
+          </Link>
+        </div>
+        <div className="space-y-2">
+          {alerts.map(v => {
+            const isOverdue = v.kmLeft <= 0;
+            const isCritical = v.kmLeft <= 200 && !isOverdue;
+            const bg = isOverdue ? "bg-red-50 border-red-200" : isCritical ? "bg-amber-50 border-amber-200" : "bg-yellow-50 border-yellow-200";
+            const textColor = isOverdue ? "text-red-800" : isCritical ? "text-amber-800" : "text-yellow-800";
+            const iconColor = isOverdue ? "text-red-600" : isCritical ? "text-amber-600" : "text-yellow-600";
+            const badge = isOverdue
+              ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded">OVERDUE</span>
+              : isCritical
+              ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-amber-500 rounded">SOON</span>
+              : <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-yellow-500 rounded">UPCOMING</span>;
+            return (
+              <div key={v.id} className={`flex items-center gap-3 p-2.5 rounded-lg border ${bg}`}>
+                <AlertTriangle className={`h-4 w-4 shrink-0 ${iconColor}`} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs font-semibold ${textColor}`}>
+                      {v.plateNumber} — {v.brand} {v.model}
+                    </span>
+                    {badge}
+                  </div>
+                  <p className="text-xs text-gray-600">
+                    {isOverdue
+                      ? `Overdue by ${Math.abs(v.kmLeft).toLocaleString()} km (due at ${v.nextMaintenanceKm.toLocaleString()} km, current: ${v.mileage.toLocaleString()} km)`
+                      : `Next maintenance due in ${v.kmLeft.toLocaleString()} km (at ${v.nextMaintenanceKm.toLocaleString()} km)`}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function MaintenanceAlertsWidget() {
   const { data: alertData, isLoading } = trpc.aiMaintenance.getMaintenanceAlerts.useQuery();
   
@@ -615,6 +681,7 @@ export default function Dashboard() {
       {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
 
       <MaintenanceAlertsWidget />
+      <KmMaintenanceAlertsWidget vehicles={vehicles || []} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {widgetVisibility.totalFleet && (
