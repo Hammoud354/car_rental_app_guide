@@ -905,7 +905,7 @@ export async function getClientByLicenseNumber(licenseNumber: string, userId: nu
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(clients).where(and(eq(clients.drivingLicenseNumber, licenseNumber), eq(clients.userId, userId))).limit(1);
+  const result = await db.select().from(clients).where(and(eq(clients.driverLicenseNumber, licenseNumber), eq(clients.userId, userId))).limit(1);
   return result[0];
 }
 
