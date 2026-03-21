@@ -91,6 +91,17 @@ export default function CompanySettings() {
     }
   };
 
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
   const handleTemplateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -105,16 +116,15 @@ export default function CompanySettings() {
       };
       reader.readAsDataURL(file);
 
-      // Upload to S3 immediately
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
+      // Upload to S3 immediately using base64
+      const base64 = await toBase64(file);
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop();
       const fileName = `contract-template-${timestamp}.${fileExtension}`;
       
       const { url } = await uploadLogoMutation.mutateAsync({
         fileName,
-        fileData: Array.from(buffer),
+        fileData: base64,
         contentType: file.type,
       });
 
@@ -153,18 +163,17 @@ export default function CompanySettings() {
 
     try {
       setUploading(true);
-      const arrayBuffer = await logoFile.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
+      const base64 = await toBase64(logoFile);
       
       // Generate unique filename
       const timestamp = Date.now();
       const fileExtension = logoFile.name.split('.').pop();
       const fileName = `company-logo-${timestamp}.${fileExtension}`;
       
-      // Upload to S3 using tRPC mutation
+      // Upload via tRPC mutation using base64
       const { url } = await uploadLogoMutation.mutateAsync({
         fileName,
-        fileData: Array.from(buffer),
+        fileData: base64,
         contentType: logoFile.type,
       });
       
@@ -189,18 +198,17 @@ export default function CompanySettings() {
 
     try {
       setUploading(true);
-      const arrayBuffer = await templateFile.arrayBuffer();
-      const buffer = new Uint8Array(arrayBuffer);
+      const base64 = await toBase64(templateFile);
       
       // Generate unique filename
       const timestamp = Date.now();
       const fileExtension = templateFile.name.split('.').pop();
       const fileName = `contract-template-${timestamp}.${fileExtension}`;
       
-      // Upload to S3 using tRPC mutation (reuse uploadLogo mutation)
+      // Upload via tRPC mutation using base64
       const { url } = await uploadLogoMutation.mutateAsync({
         fileName,
-        fileData: Array.from(buffer),
+        fileData: base64,
         contentType: templateFile.type,
       });
       

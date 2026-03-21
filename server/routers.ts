@@ -1543,12 +1543,12 @@ export const appRouter = router({
     uploadLogo: protectedProcedure
       .input(z.object({
         fileName: z.string(),
-        fileData: z.array(z.number()), // Uint8Array as number array
+        fileData: z.string(), // base64-encoded file content
         contentType: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { storagePut } = await import("./storage");
-        const buffer = new Uint8Array(input.fileData);
+        const buffer = Buffer.from(input.fileData, "base64");
         const { url } = await storagePut(input.fileName, buffer, input.contentType);
         return { url };
       }),
