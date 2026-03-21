@@ -149,8 +149,7 @@ export default function CompanySettings() {
     return formData.contractTemplateUrl || null;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
 
     try {
       // Upload logo if changed
