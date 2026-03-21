@@ -44,6 +44,7 @@ export default function FleetManagement() {
     notes: "",
   });
   const [maintenanceEntryDate, setMaintenanceEntryDate] = useState<Date>(new Date());
+  const [maintenanceExitDate, setMaintenanceExitDate] = useState<Date | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
   const [subscriptionLimitError, setSubscriptionLimitError] = useState<{ show: boolean; message: string; limit?: number; current?: number }>({ show: false, message: "" });
   
@@ -362,6 +363,7 @@ export default function FleetManagement() {
       setMaintenanceVehicle(null);
       setMaintenanceForm({ garage: "", type: "", mileage: "", notes: "" });
       setMaintenanceEntryDate(new Date());
+      setMaintenanceExitDate(undefined);
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to send vehicle to maintenance");
@@ -485,13 +487,24 @@ export default function FleetManagement() {
               />
             </div>
 
-            <div>
-              <Label>Entry Date</Label>
-              <ModernDatePicker
-                value={maintenanceEntryDate}
-                onChange={(d) => d && setMaintenanceEntryDate(d)}
-                maxYear={new Date().getFullYear() + 1}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Entry Date *</Label>
+                <ModernDatePicker
+                  date={maintenanceEntryDate}
+                  onDateChange={(d) => d && setMaintenanceEntryDate(d)}
+                  maxYear={new Date().getFullYear() + 2}
+                />
+              </div>
+              <div>
+                <Label>Expected Exit Date</Label>
+                <ModernDatePicker
+                  date={maintenanceExitDate}
+                  onDateChange={(d) => setMaintenanceExitDate(d)}
+                  placeholder="Optional"
+                  maxYear={new Date().getFullYear() + 2}
+                />
+              </div>
             </div>
 
             <div>
@@ -522,6 +535,7 @@ export default function FleetManagement() {
                   garageLocation: maintenanceForm.garage.trim(),
                   mileageAtService: maintenanceForm.mileage ? parseInt(maintenanceForm.mileage) : undefined,
                   garageEntryDate: maintenanceEntryDate,
+                  garageExitDate: maintenanceExitDate,
                   performedAt: maintenanceEntryDate,
                   markInMaintenance: true,
                 });
