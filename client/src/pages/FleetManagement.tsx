@@ -33,6 +33,17 @@ export default function FleetManagement() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+
+  // Send to Maintenance dialog
+  const [isMaintenanceDialogOpen, setIsMaintenanceDialogOpen] = useState(false);
+  const [maintenanceVehicle, setMaintenanceVehicle] = useState<any>(null);
+  const [maintenanceForm, setMaintenanceForm] = useState({
+    garage: "",
+    type: "",
+    mileage: "",
+    notes: "",
+  });
+  const [maintenanceEntryDate, setMaintenanceEntryDate] = useState<Date>(new Date());
   const [searchQuery, setSearchQuery] = useState("");
   const [subscriptionLimitError, setSubscriptionLimitError] = useState<{ show: boolean; message: string; limit?: number; current?: number }>({ show: false, message: "" });
   
@@ -343,6 +354,20 @@ export default function FleetManagement() {
     },
   });
 
+  const addMaintenanceRecordMutation = trpc.fleet.addMaintenanceRecord.useMutation({
+    onSuccess: () => {
+      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      utils.fleet.list.invalidate();
+      setIsMaintenanceDialogOpen(false);
+      setMaintenanceVehicle(null);
+      setMaintenanceForm({ garage: "", type: "", mileage: "", notes: "" });
+      setMaintenanceEntryDate(new Date());
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to send vehicle to maintenance");
+    },
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":
@@ -396,6 +421,117 @@ export default function FleetManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Send to Maintenance Dialog */}
+      <Dialog open={isMaintenanceDialogOpen} onOpenChange={(open) => {
+        if (!open) {
+          setIsMaintenanceDialogOpen(false);
+          setMaintenanceVehicle(null);
+        }
+      }}>
+        <DialogContent className="max-w-md w-[95vw]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wrench className="h-5 w-5 text-orange-500" />
+              Send to Maintenance
+            </DialogTitle>
+            <DialogDescription>
+              {maintenanceVehicle && (
+                <span className="font-semibold text-foreground">
+                  {maintenanceVehicle.plateNumber} — {maintenanceVehicle.brand} {maintenanceVehicle.model}
+                </span>
+              )}
+              <br />
+              Fill in the maintenance details. The vehicle will be blocked from new contracts.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div>
+              <Label htmlFor="maint-garage">Garage / Workshop *</Label>
+              <Input
+                id="maint-garage"
+                placeholder="e.g. Al Baraka Garage"
+                value={maintenanceForm.garage}
+                onChange={(e) => setMaintenanceForm(f => ({ ...f, garage: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="maint-type">Maintenance Type *</Label>
+              <Select
+                value={maintenanceForm.type}
+                onValueChange={(val) => setMaintenanceForm(f => ({ ...f, type: val }))}
+              >
+                <SelectTrigger id="maint-type">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"].map(t => (
+                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="maint-mileage">Current Mileage (km)</Label>
+              <Input
+                id="maint-mileage"
+                type="number"
+                placeholder="e.g. 45000"
+                value={maintenanceForm.mileage}
+                onChange={(e) => setMaintenanceForm(f => ({ ...f, mileage: e.target.value }))}
+              />
+            </div>
+
+            <div>
+              <Label>Entry Date</Label>
+              <ModernDatePicker
+                value={maintenanceEntryDate}
+                onChange={(d) => d && setMaintenanceEntryDate(d)}
+                maxYear={new Date().getFullYear() + 1}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="maint-notes">Notes (optional)</Label>
+              <Textarea
+                id="maint-notes"
+                placeholder="Describe the issue or work to be done..."
+                rows={3}
+                value={maintenanceForm.notes}
+                onChange={(e) => setMaintenanceForm(f => ({ ...f, notes: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setIsMaintenanceDialogOpen(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button
+              className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={!maintenanceForm.garage.trim() || !maintenanceForm.type || addMaintenanceRecordMutation.isPending}
+              onClick={() => {
+                if (!maintenanceVehicle) return;
+                addMaintenanceRecordMutation.mutate({
+                  vehicleId: maintenanceVehicle.id,
+                  maintenanceType: maintenanceForm.type as any,
+                  description: maintenanceForm.notes.trim() || maintenanceForm.type,
+                  garageLocation: maintenanceForm.garage.trim(),
+                  mileageAtService: maintenanceForm.mileage ? parseInt(maintenanceForm.mileage) : undefined,
+                  garageEntryDate: maintenanceEntryDate,
+                  performedAt: maintenanceEntryDate,
+                  markInMaintenance: true,
+                });
+              }}
+            >
+              {addMaintenanceRecordMutation.isPending ? "Sending..." : "Confirm & Send to Garage"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="space-y-6">
         
@@ -990,11 +1126,11 @@ export default function FleetManagement() {
                         variant="outline"
                         className="text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200"
                         onClick={() => {
-                          if (confirm(`Send ${vehicle.plateNumber} to maintenance? This will block it from being rented.`)) {
-                            sendToMaintenanceMutation.mutate({ vehicleId: vehicle.id });
-                          }
+                          setMaintenanceVehicle(vehicle);
+                          setMaintenanceForm({ garage: "", type: "", mileage: vehicle.mileage?.toString() || "", notes: "" });
+                          setMaintenanceEntryDate(new Date());
+                          setIsMaintenanceDialogOpen(true);
                         }}
-                        disabled={sendToMaintenanceMutation.isPending}
                         title="Send to Maintenance"
                       >
                         <Wrench className="h-3 w-3" />

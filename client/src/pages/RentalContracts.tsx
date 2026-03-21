@@ -569,34 +569,16 @@ export default function RentalContracts() {
                             <CommandList>
                               <CommandEmpty>No vehicle found.</CommandEmpty>
                               <CommandGroup>
-                                {vehicles.map((vehicle) => {
-                                  const statusColors = {
-                                    Available: "text-green-600",
-                                    Rented: "text-red-600",
-                                    Maintenance: "text-yellow-600",
-                                    "Out of Service": "text-gray-500"
-                                  };
-                                  const statusEmoji = {
-                                    Available: "🟢",
-                                    Rented: "🔴",
-                                    Maintenance: "🟡",
-                                    "Out of Service": "⚫"
-                                  };
-                                  const isDisabled = vehicle.status !== "Available";
+                                {vehicles.filter(v => v.status === "Available").map((vehicle) => {
                                   return (
                                     <CommandItem
                                       key={vehicle.id}
                                       value={`${vehicle.plateNumber} ${vehicle.brand} ${vehicle.model}`}
                                       onSelect={() => {
-                                        if (!isDisabled) {
-                                          setSelectedVehicleId(vehicle.id.toString());
-                                          // Auto-fill vehicle model
-                                          (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
-                                          setVehicleComboboxOpen(false);
-                                        }
+                                        setSelectedVehicleId(vehicle.id.toString());
+                                        (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
+                                        setVehicleComboboxOpen(false);
                                       }}
-                                      disabled={isDisabled}
-                                      className={isDisabled ? "opacity-50 cursor-not-allowed" : ""}
                                     >
                                       <Check
                                         className={`mr-2 h-4 w-4 ${
@@ -604,12 +586,10 @@ export default function RentalContracts() {
                                         }`}
                                       />
                                       <span className="flex items-center gap-2 flex-1">
-                                        <span>{statusEmoji[vehicle.status]}</span>
+                                        <span>🟢</span>
                                         <span className="font-semibold">{vehicle.plateNumber}</span>
                                         <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
-                                        <span className={`text-xs font-semibold ${statusColors[vehicle.status]}`}>
-                                          [{vehicle.status}]
-                                        </span>
+                                        <span className="text-xs font-semibold text-green-600">[Available]</span>
                                       </span>
                                     </CommandItem>
                                   );
