@@ -527,9 +527,9 @@ export default function RentalContracts() {
                   <DialogTitle>Create Rental Contract</DialogTitle>
                   <DialogDescription>Fill in the contract details to create a new rental agreement.</DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                   {/* Vehicle Selection */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                       <Label htmlFor="vehiclePlateNumber">Plate Number *</Label>
                       <input type="hidden" name="vehicleId" value={selectedVehicleId} required />
@@ -619,7 +619,7 @@ export default function RentalContracts() {
                   </div>
 
                   {/* Client Information */}
-                  <div className="border-t pt-4">
+                  <div className="border-t pt-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="font-semibold">Client Information</h3>
                       <Button 
@@ -719,7 +719,7 @@ export default function RentalContracts() {
                         </PopoverContent>
                       </Popover>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
                         <Label htmlFor="clientFirstName">First Name *</Label>
                         <Input id="clientFirstName" name="clientFirstName" required className="input-client" />
@@ -808,9 +808,9 @@ export default function RentalContracts() {
                   </div>
 
                   {/* Driving License */}
-                  <div className="border-t pt-4">
-                    <h3 className="font-semibold mb-4">Driving License</h3>
-                    <div className="space-y-4">
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-5">Driving License</h3>
+                    <div className="space-y-5">
                       <div>
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
@@ -834,9 +834,9 @@ export default function RentalContracts() {
                   </div>
 
                   {/* Rental Period */}
-                  <div className="border-t mt-4 pt-6">
-                    <h3 className="font-semibold mb-4">Rental Period</h3>
-                    <div className="space-y-4">
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-5">Rental Period</h3>
+                    <div className="space-y-5">
                       <div>
                         <DateDropdownSelector
                           id="rentalStartDate"
@@ -849,7 +849,7 @@ export default function RentalContracts() {
                           You can select any date, including past dates
                         </p>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                           <Label htmlFor="rentalDays">Number of Rental Days *</Label>
                           <Input
@@ -880,9 +880,9 @@ export default function RentalContracts() {
                   </div>
 
                   {/* Pricing */}
-                  <div className="border-t pt-4">
-                    <h3 className="font-semibold mb-4">Vehicle Inspection</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-5">Vehicle Inspection</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
                       <div>
                         <Label htmlFor="pickupKm">Pickup Odometer (KM) *</Label>
                         <Input
@@ -994,8 +994,8 @@ export default function RentalContracts() {
                   </div>
 
                   {/* Insurance, Deposit, and Fuel Policy */}
-                  <div className="border-t pt-4">
-                    <h3 className="font-semibold mb-4">Additional Options</h3>
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-5">Additional Options</h3>
                     <InsuranceDepositSelector
                       rentalDays={rentalDays}
                       onInsuranceChange={(pkg, cost, dailyRate) => {
