@@ -489,7 +489,7 @@ export default function FleetManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="maint-next-km">Next Maintenance at (km)</Label>
+                <Label htmlFor="maint-next-km">Next Maintenance at (km) <span className="text-muted-foreground font-normal text-xs">(optional)</span></Label>
                 <Input
                   id="maint-next-km"
                   type="number"
