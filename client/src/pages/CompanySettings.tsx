@@ -79,151 +79,74 @@ export default function CompanySettings() {
     }
   }, [profile]);
 
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setLogoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const toBase64 = (file: File): Promise<string> =>
+  const readFileAsDataUrl = (file: File): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result.split(",")[1]);
-      };
+      reader.onload = () => resolve(reader.result as string);
       reader.onerror = reject;
       reader.readAsDataURL(file);
     });
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Logo must be under 2MB.", variant: "destructive" });
+      return;
+    }
+
+    const dataUrl = await readFileAsDataUrl(file);
+    setLogoFile(file);
+    setLogoPreview(dataUrl);
+    setFormData(prev => ({ ...prev, logoUrl: dataUrl }));
+  };
 
   const handleTemplateChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Contract template must be under 5MB.", variant: "destructive" });
+      return;
+    }
+
     try {
       setUploading(true);
-      
-      // Show preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setTemplatePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      // Upload to S3 immediately using base64
-      const base64 = await toBase64(file);
-      const timestamp = Date.now();
-      const fileExtension = file.name.split('.').pop();
-      const fileName = `contract-template-${timestamp}.${fileExtension}`;
-      
-      const { url } = await uploadLogoMutation.mutateAsync({
-        fileName,
-        fileData: base64,
-        contentType: file.type,
-      });
+      const dataUrl = await readFileAsDataUrl(file);
+      setTemplateFile(file);
+      setTemplatePreview(dataUrl);
 
       // Save to database immediately
-      // Ensure companyName is not empty (required field)
       const companyName = formData.companyName?.trim() || 'My Company';
       const updateData: any = {
         ...formData,
         companyName,
-        contractTemplateUrl: url,
+        contractTemplateUrl: dataUrl,
         exchangeRate: parseFloat(formData.exchangeRate) || 1,
         vatRate: parseFloat(formData.vatRate) || 11,
       };
       await updateProfile.mutateAsync(updateData);
-
+      setFormData(prev => ({ ...prev, contractTemplateUrl: dataUrl }));
       await refetch();
 
-      toast({
-        title: "Success",
-        description: "Contract template uploaded successfully!",
-      });
+      toast({ title: "Success", description: "Contract template uploaded successfully!" });
     } catch (error) {
       console.error('Template upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload template. Please try again.",
-        variant: "destructive",
-      });
+      toast({ title: "Upload Failed", description: "Failed to save template. Please try again.", variant: "destructive" });
     } finally {
       setUploading(false);
     }
   };
 
   const uploadLogo = async (): Promise<string | null> => {
-    if (!logoFile) return formData.logoUrl || null;
-
-    try {
-      setUploading(true);
-      const base64 = await toBase64(logoFile);
-      
-      // Generate unique filename
-      const timestamp = Date.now();
-      const fileExtension = logoFile.name.split('.').pop();
-      const fileName = `company-logo-${timestamp}.${fileExtension}`;
-      
-      // Upload via tRPC mutation using base64
-      const { url } = await uploadLogoMutation.mutateAsync({
-        fileName,
-        fileData: base64,
-        contentType: logoFile.type,
-      });
-      
-      return url;
-    } catch (error) {
-      console.error('Logo upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload logo. Please try again.",
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setUploading(false);
-    }
+    // Logo data URL is already stored in formData.logoUrl when the file was selected
+    return formData.logoUrl || null;
   };
 
   const uploadTemplate = async (): Promise<string | null> => {
-    if (!templateFile) {
-      return formData.contractTemplateUrl || null;
-    }
-
-    try {
-      setUploading(true);
-      const base64 = await toBase64(templateFile);
-      
-      // Generate unique filename
-      const timestamp = Date.now();
-      const fileExtension = templateFile.name.split('.').pop();
-      const fileName = `contract-template-${timestamp}.${fileExtension}`;
-      
-      // Upload via tRPC mutation using base64
-      const { url } = await uploadLogoMutation.mutateAsync({
-        fileName,
-        fileData: base64,
-        contentType: templateFile.type,
-      });
-      
-      return url;
-    } catch (error) {
-      console.error('Template upload error:', error);
-      toast({
-        title: "Upload Failed",
-        description: "Failed to upload template. Please try again.",
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setUploading(false);
-    }
+    // Template data URL is already stored in formData.contractTemplateUrl when the file was selected
+    return formData.contractTemplateUrl || null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
