@@ -122,7 +122,7 @@ export function DateDropdownSelector({
       <Label htmlFor={id}>
         {label} {required && <span className="text-red-500">*</span>}
       </Label>
-      <div className={yearOnly ? "grid grid-cols-1 gap-2" : "grid grid-cols-3 gap-2"}>
+      <div className={yearOnly ? "grid grid-cols-1 gap-2" : "grid gap-2"} style={yearOnly ? {} : { gridTemplateColumns: "2fr 3fr 1.5fr" }}>
         {/* Year Selector */}
         <Select
           value={selectedYear?.toString()}
