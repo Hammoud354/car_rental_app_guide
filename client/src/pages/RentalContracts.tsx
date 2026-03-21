@@ -810,37 +810,33 @@ export default function RentalContracts() {
                   {/* Driving License */}
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-4">Driving License</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="col-span-2">
+                    <div className="space-y-4">
+                      <div>
                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                       </div>
-                      <div>
-                        <DateDropdownSelector
-                          id="licenseIssueDate"
-                          label="Issue Date"
-                          value={licenseIssueDate}
-                          onChange={setLicenseIssueDate}
-                          maxDate={new Date()} // Only allow current or past dates
-                        />
-                      </div>
-                      <div>
-                        <DateDropdownSelector
-                          id="licenseExpiryDate"
-                          label="Expiry Date"
-                          value={licenseExpiryDate}
-                          onChange={setLicenseExpiryDate}
-                          minDate={new Date()} // Minimum: today (future dates only)
-                          required
-                        />
-                      </div>
+                      <DateDropdownSelector
+                        id="licenseIssueDate"
+                        label="Issue Date"
+                        value={licenseIssueDate}
+                        onChange={setLicenseIssueDate}
+                        maxDate={new Date()}
+                      />
+                      <DateDropdownSelector
+                        id="licenseExpiryDate"
+                        label="Expiry Date *"
+                        value={licenseExpiryDate}
+                        onChange={setLicenseExpiryDate}
+                        minDate={new Date()}
+                        required
+                      />
                     </div>
                   </div>
 
                   {/* Rental Period */}
                   <div className="border-t mt-4 pt-6">
                     <h3 className="font-semibold mb-4">Rental Period</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div>
                         <DateDropdownSelector
                           id="rentalStartDate"
@@ -853,30 +849,32 @@ export default function RentalContracts() {
                           You can select any date, including past dates
                         </p>
                       </div>
-                      <div>
-                        <Label htmlFor="rentalDays">Number of Rental Days *</Label>
-                        <Input
-                          id="rentalDays"
-                          name="rentalDays"
-                          type="number"
-                          min="1"
-                          value={rentalDays}
-                          onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
-                          className="mt-1 input-client"
-                          required
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          End date will be calculated automatically
-                        </p>
-                      </div>
-                      <div className="col-span-2">
-                        <Label>End Date (Auto-calculated)</Label>
-                        <Input
-                          type="text"
-                          value={rentalEndDate ? rentalEndDate.toLocaleDateString() : ""}
-                          readOnly
-                          className="bg-gray-50 input-client"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="rentalDays">Number of Rental Days *</Label>
+                          <Input
+                            id="rentalDays"
+                            name="rentalDays"
+                            type="number"
+                            min="1"
+                            value={rentalDays}
+                            onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
+                            className="mt-1 input-client"
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            End date will be calculated automatically
+                          </p>
+                        </div>
+                        <div>
+                          <Label>End Date (Auto-calculated)</Label>
+                          <Input
+                            type="text"
+                            value={rentalEndDate ? rentalEndDate.toLocaleDateString() : ""}
+                            readOnly
+                            className="mt-1 bg-gray-50 input-client"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
