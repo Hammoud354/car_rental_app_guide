@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
@@ -55,205 +54,404 @@ const VIEW_LABELS: Record<CarView, string> = {
   right: "Right Side",
 };
 
-/* ─── SVG Drawings ─────────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   SVG DRAWINGS — clean modern sedan
+───────────────────────────────────────────────────── */
 
-function FrontCarSVG() {
+function FrontSVG() {
   return (
-    <svg viewBox="0 0 400 280" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 500 340" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="bodyGradF" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#d6d6d6" />
-          <stop offset="100%" stopColor="#a8a8a8" />
+        <linearGradient id="fBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e2e6ea" />
+          <stop offset="60%" stopColor="#c8cdd4" />
+          <stop offset="100%" stopColor="#b0b6be" />
         </linearGradient>
-        <linearGradient id="glassF" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#b8e0ff" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#78b4e0" stopOpacity="0.9" />
+        <linearGradient id="fGlass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d0eaf8" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#89bfe0" stopOpacity="0.9" />
         </linearGradient>
+        <linearGradient id="fHL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#fffbe6" />
+          <stop offset="100%" stopColor="#ffe680" />
+        </linearGradient>
+        <linearGradient id="fWheel" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3a3a3a" />
+          <stop offset="100%" stopColor="#111" />
+        </linearGradient>
+        <radialGradient id="fWheelFace" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#555" />
+          <stop offset="70%" stopColor="#2a2a2a" />
+          <stop offset="100%" stopColor="#111" />
+        </radialGradient>
+        <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+          <feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.18" />
+        </filter>
       </defs>
-      {/* Road / base line */}
-      <rect x="40" y="248" width="320" height="6" rx="3" fill="#ccc" />
+
+      {/* Ground shadow */}
+      <ellipse cx="250" cy="316" rx="185" ry="10" fill="#0002" />
+
       {/* Main body */}
-      <path d="M 80 248 L 68 200 L 72 160 L 100 130 L 145 118 L 170 100 L 230 100 L 255 118 L 300 130 L 328 160 L 332 200 L 320 248 Z" fill="url(#bodyGradF)" stroke="#555" strokeWidth="2.5" />
-      {/* Roof / cabin silhouette */}
-      <path d="M 155 100 L 170 72 L 230 72 L 245 100 Z" fill="#bbb" stroke="#555" strokeWidth="2" />
+      <path
+        d="M 95 305
+           L 82 270 L 78 235 L 82 210
+           L 95 195 L 115 185 L 140 178
+           L 170 168 L 185 148 L 200 132
+           L 250 128 L 300 132 L 315 148
+           L 330 168 L 360 178 L 385 185
+           L 405 195 L 418 210 L 422 235
+           L 418 270 L 405 305 Z"
+        fill="url(#fBody)" stroke="#8a9099" strokeWidth="2" filter="url(#shadow)"
+      />
+      {/* Roof / upper cabin taper */}
+      <path
+        d="M 186 148 L 200 120 L 250 112 L 300 120 L 314 148
+           L 295 145 L 250 142 L 205 145 Z"
+        fill="#d0d5da" stroke="#8a9099" strokeWidth="1.5"
+      />
       {/* Windshield */}
-      <path d="M 158 100 L 172 76 L 228 76 L 242 100 Z" fill="url(#glassF)" stroke="#666" strokeWidth="1.5" />
-      {/* Hood crease */}
-      <line x1="200" y1="130" x2="200" y2="200" stroke="#bbb" strokeWidth="1" strokeDasharray="4,4" />
-      {/* Front bumper */}
-      <path d="M 72 220 Q 200 240 328 220 L 320 248 Q 200 255 80 248 Z" fill="#b0b0b0" stroke="#666" strokeWidth="1.5" />
-      {/* Grille */}
-      <rect x="160" y="190" width="80" height="28" rx="6" fill="#2c2c2c" stroke="#555" strokeWidth="1.5" />
-      <rect x="165" y="194" width="70" height="20" rx="4" fill="#1a1a1a" />
-      {[175, 185, 195, 205, 215, 225].map(x => (
-        <line key={x} x1={x} y1="194" x2={x} y2="214" stroke="#444" strokeWidth="1" />
+      <path
+        d="M 190 146 L 204 120 L 250 113 L 296 120 L 310 146
+           L 290 144 L 250 141 L 210 144 Z"
+        fill="url(#fGlass)" stroke="#6a8fa8" strokeWidth="1.5"
+      />
+
+      {/* Hood panel */}
+      <path
+        d="M 115 185 L 140 178 L 170 168 L 185 148
+           L 205 145 L 250 142 L 295 145 L 315 148
+           L 330 168 L 360 178 L 385 185
+           L 405 195 L 250 198 Z"
+        fill="#cdd1d7" stroke="#9aa0a8" strokeWidth="1.5"
+      />
+      {/* Hood center crease */}
+      <line x1="250" y1="142" x2="250" y2="198" stroke="#b0b5bc" strokeWidth="1" strokeDasharray="5,4" />
+
+      {/* Left headlight assembly */}
+      <path d="M 98 222 L 98 248 L 158 245 L 168 222 Z" fill="#ddd" stroke="#8a9099" strokeWidth="1.5" />
+      <path d="M 102 225 L 102 244 L 155 242 L 163 225 Z" fill="url(#fHL)" opacity="0.9" />
+      {/* DRL strip left */}
+      <rect x="104" y="225" width="57" height="5" rx="2" fill="#fff" opacity="0.7" />
+      {/* Left fog light */}
+      <ellipse cx="118" cy="272" rx="16" ry="8" fill="#fffde0" stroke="#ccc" strokeWidth="1" />
+
+      {/* Right headlight assembly */}
+      <path d="M 402 222 L 402 248 L 342 245 L 332 222 Z" fill="#ddd" stroke="#8a9099" strokeWidth="1.5" />
+      <path d="M 398 225 L 398 244 L 345 242 L 337 225 Z" fill="url(#fHL)" opacity="0.9" />
+      {/* DRL strip right */}
+      <rect x="339" y="225" width="57" height="5" rx="2" fill="#fff" opacity="0.7" />
+      {/* Right fog light */}
+      <ellipse cx="382" cy="272" rx="16" ry="8" fill="#fffde0" stroke="#ccc" strokeWidth="1" />
+
+      {/* Bumper lower */}
+      <path d="M 85 268 Q 250 290 415 268 L 410 305 Q 250 315 90 305 Z"
+        fill="#bec3ca" stroke="#8a9099" strokeWidth="1.5" />
+
+      {/* Grille surround */}
+      <rect x="180" y="238" width="140" height="38" rx="8" fill="#2a2d32" stroke="#1a1c20" strokeWidth="1.5" />
+      {/* Grille mesh */}
+      {[188, 198, 208, 218, 228, 238, 248, 258, 268, 278, 288, 298, 308].map(x => (
+        <line key={x} x1={x} y1="240" x2={x} y2="274" stroke="#3d4148" strokeWidth="0.8" />
       ))}
-      {/* Left headlight */}
-      <path d="M 82 165 L 96 152 L 148 155 L 148 180 L 82 180 Z" fill="#fffde0" stroke="#888" strokeWidth="1.5" />
-      <path d="M 90 158 L 100 155 L 144 158 L 144 175 L 90 175 Z" fill="#fff8b0" opacity="0.7" />
-      {/* Right headlight */}
-      <path d="M 318 165 L 304 152 L 252 155 L 252 180 L 318 180 Z" fill="#fffde0" stroke="#888" strokeWidth="1.5" />
-      <path d="M 310 158 L 300 155 L 256 158 L 256 175 L 310 175 Z" fill="#fff8b0" opacity="0.7" />
-      {/* Wheels */}
-      <ellipse cx="96" cy="248" rx="38" ry="14" fill="#1a1a1a" stroke="#111" strokeWidth="2" />
-      <ellipse cx="96" cy="248" rx="25" ry="9" fill="#333" />
-      <ellipse cx="96" cy="248" rx="10" ry="4" fill="#555" />
-      <ellipse cx="304" cy="248" rx="38" ry="14" fill="#1a1a1a" stroke="#111" strokeWidth="2" />
-      <ellipse cx="304" cy="248" rx="25" ry="9" fill="#333" />
-      <ellipse cx="304" cy="248" rx="10" ry="4" fill="#555" />
-      {/* Hood line */}
-      <line x1="100" y1="130" x2="300" y2="130" stroke="#999" strokeWidth="1.5" />
+      {[244, 252, 260, 268].map(y => (
+        <line key={y} x1="182" y1={y} x2="318" y2={y} stroke="#3d4148" strokeWidth="0.8" />
+      ))}
+      {/* Badge / emblem */}
+      <circle cx="250" cy="234" r="10" fill="#ddd" stroke="#aaa" strokeWidth="1.5" />
+      <circle cx="250" cy="234" r="7" fill="#bbb" stroke="#999" strokeWidth="1" />
+
+      {/* Left wheel */}
+      <ellipse cx="118" cy="305" rx="46" ry="18" fill="url(#fWheel)" stroke="#111" strokeWidth="2" />
+      <ellipse cx="118" cy="305" rx="33" ry="12" fill="url(#fWheelFace)" />
+      <ellipse cx="118" cy="305" rx="14" ry="5" fill="#666" />
+      {[0,60,120,180,240,300].map(d=>{const r=d*Math.PI/180;return <line key={d} x1={118+15*Math.cos(r)} y1={305+6*Math.sin(r)} x2={118+32*Math.cos(r)} y2={305+12*Math.sin(r)} stroke="#777" strokeWidth="2"/>;}) }
+
+      {/* Right wheel */}
+      <ellipse cx="382" cy="305" rx="46" ry="18" fill="url(#fWheel)" stroke="#111" strokeWidth="2" />
+      <ellipse cx="382" cy="305" rx="33" ry="12" fill="url(#fWheelFace)" />
+      <ellipse cx="382" cy="305" rx="14" ry="5" fill="#666" />
+      {[0,60,120,180,240,300].map(d=>{const r=d*Math.PI/180;return <line key={d} x1={382+15*Math.cos(r)} y1={305+6*Math.sin(r)} x2={382+32*Math.cos(r)} y2={305+12*Math.sin(r)} stroke="#777" strokeWidth="2"/>;}) }
+
       {/* Label */}
-      <text x="200" y="24" textAnchor="middle" fill="#333" fontSize="15" fontWeight="700">FRONT</text>
-      <text x="200" y="40" textAnchor="middle" fill="#888" fontSize="10">↑</text>
+      <text x="250" y="22" textAnchor="middle" fill="#444" fontSize="16" fontWeight="700" fontFamily="sans-serif">FRONT</text>
     </svg>
   );
 }
 
-function RearCarSVG() {
+function RearSVG() {
   return (
-    <svg viewBox="0 0 400 280" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 500 340" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="bodyGradR" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#d6d6d6" />
-          <stop offset="100%" stopColor="#a8a8a8" />
+        <linearGradient id="rBody" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e2e6ea" />
+          <stop offset="60%" stopColor="#c8cdd4" />
+          <stop offset="100%" stopColor="#b0b6be" />
         </linearGradient>
-        <linearGradient id="glassR" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#b8e0ff" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#78b4e0" stopOpacity="0.9" />
+        <linearGradient id="rGlass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#d0eaf8" stopOpacity="0.95" />
+          <stop offset="100%" stopColor="#89bfe0" stopOpacity="0.9" />
         </linearGradient>
+        <linearGradient id="rTL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#dd1111" />
+          <stop offset="100%" stopColor="#ff3333" />
+        </linearGradient>
+        <filter id="rshadow" x="-10%" y="-10%" width="120%" height="130%">
+          <feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.18" />
+        </filter>
       </defs>
-      <rect x="40" y="248" width="320" height="6" rx="3" fill="#ccc" />
+
+      <ellipse cx="250" cy="316" rx="185" ry="10" fill="#0002" />
+
       {/* Main body */}
-      <path d="M 80 248 L 68 200 L 72 160 L 100 130 L 145 118 L 170 100 L 230 100 L 255 118 L 300 130 L 328 160 L 332 200 L 320 248 Z" fill="url(#bodyGradR)" stroke="#555" strokeWidth="2.5" />
+      <path
+        d="M 95 305 L 82 270 L 78 235 L 82 210
+           L 95 195 L 115 185 L 140 178
+           L 170 168 L 185 148 L 200 132
+           L 250 128 L 300 132 L 315 148
+           L 330 168 L 360 178 L 385 185
+           L 405 195 L 418 210 L 422 235
+           L 418 270 L 405 305 Z"
+        fill="url(#rBody)" stroke="#8a9099" strokeWidth="2" filter="url(#rshadow)"
+      />
       {/* Roof */}
-      <path d="M 155 100 L 170 72 L 230 72 L 245 100 Z" fill="#bbb" stroke="#555" strokeWidth="2" />
+      <path
+        d="M 186 148 L 200 120 L 250 112 L 300 120 L 314 148
+           L 295 145 L 250 142 L 205 145 Z"
+        fill="#d0d5da" stroke="#8a9099" strokeWidth="1.5"
+      />
       {/* Rear windshield */}
-      <path d="M 158 100 L 172 76 L 228 76 L 242 100 Z" fill="url(#glassR)" stroke="#666" strokeWidth="1.5" />
+      <path
+        d="M 190 146 L 204 120 L 250 113 L 296 120 L 310 146
+           L 290 144 L 250 141 L 210 144 Z"
+        fill="url(#rGlass)" stroke="#6a8fa8" strokeWidth="1.5"
+      />
+
       {/* Trunk lid */}
-      <path d="M 110 130 L 290 130 L 295 160 L 105 160 Z" fill="#c8c8c8" stroke="#888" strokeWidth="1.5" />
-      <line x1="200" y1="130" x2="200" y2="160" stroke="#bbb" strokeWidth="1" strokeDasharray="4,4" />
-      {/* Rear bumper */}
-      <path d="M 75 220 Q 200 238 325 220 L 320 248 Q 200 255 80 248 Z" fill="#b0b0b0" stroke="#666" strokeWidth="1.5" />
+      <path
+        d="M 175 148 L 185 148 L 205 145 L 250 142 L 295 145
+           L 315 148 L 325 168 L 360 178
+           L 385 185 L 400 192 L 250 196 L 100 192
+           L 115 185 L 140 178 L 175 168 Z"
+        fill="#cdd1d7" stroke="#9aa0a8" strokeWidth="1.5"
+      />
+      <line x1="250" y1="142" x2="250" y2="196" stroke="#b0b5bc" strokeWidth="1" strokeDasharray="5,4" />
+
+      {/* Left taillight — wide slim */}
+      <path d="M 82 210 L 82 265 L 130 262 L 140 210 Z" fill="#c01010" stroke="#800000" strokeWidth="1.5" />
+      <path d="M 87 214 L 87 260 L 127 258 L 136 214 Z" fill="url(#rTL)" opacity="0.85" />
+      {/* Brake inner strip */}
+      <rect x="89" y="216" width="44" height="6" rx="2" fill="#ff6666" opacity="0.8" />
+
+      {/* Right taillight — wide slim */}
+      <path d="M 418 210 L 418 265 L 370 262 L 360 210 Z" fill="#c01010" stroke="#800000" strokeWidth="1.5" />
+      <path d="M 413 214 L 413 260 L 373 258 L 364 214 Z" fill="url(#rTL)" opacity="0.85" />
+      <rect x="367" y="216" width="44" height="6" rx="2" fill="#ff6666" opacity="0.8" />
+
+      {/* Bumper */}
+      <path d="M 85 268 Q 250 290 415 268 L 410 305 Q 250 315 90 305 Z"
+        fill="#bec3ca" stroke="#8a9099" strokeWidth="1.5" />
+
+      {/* Diffuser */}
+      <rect x="180" y="278" width="140" height="18" rx="4" fill="#2a2d32" stroke="#1a1c20" strokeWidth="1" />
+      {[188,200,212,224,236,248,260,272,284,296,308].map(x=>(
+        <line key={x} x1={x} y1="279" x2={x} y2="295" stroke="#3d4148" strokeWidth="0.8"/>
+      ))}
+
       {/* License plate */}
-      <rect x="162" y="224" width="76" height="20" rx="3" fill="#f5f5dc" stroke="#888" strokeWidth="1.5" />
-      <text x="200" y="237" textAnchor="middle" fill="#333" fontSize="9" fontWeight="600">PLATE</text>
-      {/* Left taillight */}
-      <path d="M 82 162 L 82 210 L 118 210 L 130 162 Z" fill="#cc2200" stroke="#880000" strokeWidth="1.5" />
-      <path d="M 88 166 L 88 206 L 115 206 L 126 166 Z" fill="#ee4422" opacity="0.7" />
-      {/* Right taillight */}
-      <path d="M 318 162 L 318 210 L 282 210 L 270 162 Z" fill="#cc2200" stroke="#880000" strokeWidth="1.5" />
-      <path d="M 312 166 L 312 206 L 285 206 L 274 166 Z" fill="#ee4422" opacity="0.7" />
+      <rect x="205" y="258" width="90" height="22" rx="3" fill="#f5f5dc" stroke="#aaa" strokeWidth="1.5" />
+      <text x="250" y="273" textAnchor="middle" fill="#333" fontSize="9" fontWeight="600" fontFamily="sans-serif">LICENSE PLATE</text>
+
       {/* Exhaust */}
-      <ellipse cx="160" cy="250" rx="8" ry="5" fill="#444" stroke="#222" strokeWidth="1.5" />
-      <ellipse cx="240" cy="250" rx="8" ry="5" fill="#444" stroke="#222" strokeWidth="1.5" />
-      {/* Wheels */}
-      <ellipse cx="96" cy="248" rx="38" ry="14" fill="#1a1a1a" stroke="#111" strokeWidth="2" />
-      <ellipse cx="96" cy="248" rx="25" ry="9" fill="#333" />
-      <ellipse cx="96" cy="248" rx="10" ry="4" fill="#555" />
-      <ellipse cx="304" cy="248" rx="38" ry="14" fill="#1a1a1a" stroke="#111" strokeWidth="2" />
-      <ellipse cx="304" cy="248" rx="25" ry="9" fill="#333" />
-      <ellipse cx="304" cy="248" rx="10" ry="4" fill="#555" />
-      <text x="200" y="24" textAnchor="middle" fill="#333" fontSize="15" fontWeight="700">REAR</text>
-      <text x="200" y="40" textAnchor="middle" fill="#888" fontSize="10">↓</text>
+      <ellipse cx="185" cy="302" rx="9" ry="5" fill="#333" stroke="#1a1a1a" strokeWidth="1.5" />
+      <ellipse cx="315" cy="302" rx="9" ry="5" fill="#333" stroke="#1a1a1a" strokeWidth="1.5" />
+
+      {/* Left wheel */}
+      <ellipse cx="118" cy="305" rx="46" ry="18" fill="#222" stroke="#111" strokeWidth="2" />
+      <ellipse cx="118" cy="305" rx="33" ry="12" fill="#333" />
+      <ellipse cx="118" cy="305" rx="14" ry="5" fill="#555" />
+      {[0,60,120,180,240,300].map(d=>{const r=d*Math.PI/180;return <line key={d} x1={118+15*Math.cos(r)} y1={305+6*Math.sin(r)} x2={118+32*Math.cos(r)} y2={305+12*Math.sin(r)} stroke="#666" strokeWidth="2"/>;}) }
+
+      {/* Right wheel */}
+      <ellipse cx="382" cy="305" rx="46" ry="18" fill="#222" stroke="#111" strokeWidth="2" />
+      <ellipse cx="382" cy="305" rx="33" ry="12" fill="#333" />
+      <ellipse cx="382" cy="305" rx="14" ry="5" fill="#555" />
+      {[0,60,120,180,240,300].map(d=>{const r=d*Math.PI/180;return <line key={d} x1={382+15*Math.cos(r)} y1={305+6*Math.sin(r)} x2={382+32*Math.cos(r)} y2={305+12*Math.sin(r)} stroke="#666" strokeWidth="2"/>;}) }
+
+      <text x="250" y="22" textAnchor="middle" fill="#444" fontSize="16" fontWeight="700" fontFamily="sans-serif">REAR</text>
     </svg>
   );
 }
 
-function SideCarSVG({ flip = false }: { flip?: boolean }) {
-  const transform = flip ? "scale(-1,1) translate(-600,0)" : undefined;
+function SideSVG({ label }: { label: string }) {
+  const flip = label === "RIGHT SIDE";
+  const sx = flip ? -1 : 1;
+  const tx = flip ? -700 : 0;
   return (
-    <svg viewBox="0 0 600 260" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 700 300" className="w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id={`bodyGradS${flip ? "R" : "L"}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#d8d8d8" />
-          <stop offset="100%" stopColor="#aaaaaa" />
+        <linearGradient id={`sBody${label}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e2e6ea" />
+          <stop offset="55%" stopColor="#c9cdd4" />
+          <stop offset="100%" stopColor="#adb3bc" />
         </linearGradient>
-        <linearGradient id={`glassS${flip ? "R" : "L"}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#c4e8ff" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#80c0e8" stopOpacity="0.85" />
+        <linearGradient id={`sGlass${label}`} x1="0" y1="0" x2="0.3" y2="1">
+          <stop offset="0%" stopColor="#cce8f8" stopOpacity="0.92" />
+          <stop offset="100%" stopColor="#7ab8dc" stopOpacity="0.85" />
         </linearGradient>
+        <linearGradient id={`sWh${label}`} cx="50%" cy="35%" r="65%">
+          <stop offset="0%" stopColor="#444" />
+          <stop offset="100%" stopColor="#111" />
+        </linearGradient>
+        <filter id={`ss${label}`}>
+          <feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.15" />
+        </filter>
       </defs>
-      <g transform={transform}>
-        {/* Ground */}
-        <rect x="30" y="226" width="540" height="5" rx="2" fill="#ccc" />
-        {/* Main car body */}
+
+      {/* Ground line */}
+      <rect x="30" y="262" width="640" height="4" rx="2" fill="#ccc" />
+      {/* Ground shadow */}
+      <ellipse cx="350" cy="268" rx="290" ry="8" fill="#0001" />
+
+      <g transform={`scale(${sx},1) translate(${tx},0)`}>
+        {/* ── Body silhouette – modern sedan ── */}
         <path
-          d="M 60 225 L 55 195 L 60 170 L 80 150
-             L 140 130 L 180 90 L 240 72 L 370 72
-             L 420 80 L 460 100 L 490 120 L 520 145
-             L 540 170 L 548 195 L 545 225 Z"
-          fill={`url(#bodyGradS${flip ? "R" : "L"})`}
-          stroke="#555"
-          strokeWidth="2.5"
+          d="M 68 262
+             C 68 262 55 258 52 245 C 50 232 55 218 62 210
+             C 68 202 80 198 95 196
+             L 110 188 L 130 180 L 160 174
+             L 190 166 L 215 148 L 230 126
+             L 255 108 L 310 98 L 380 96
+             L 430 98 L 470 106 L 500 118
+             L 525 135 L 545 155 L 562 172
+             L 580 184 L 600 192 L 620 200
+             L 638 212 C 645 220 648 232 646 246
+             C 644 256 638 262 630 262 Z"
+          fill={`url(#sBody${label})`} stroke="#8a9099" strokeWidth="2.5" filter={`url(#ss${label})`}
         />
-        {/* Windshield */}
-        <path d="M 185 92 L 242 74 L 310 74 L 310 120 L 188 120 Z" fill={`url(#glassS${flip ? "R" : "L"})`} stroke="#666" strokeWidth="1.5" />
-        {/* Rear window */}
-        <path d="M 310 74 L 368 74 L 410 90 L 420 120 L 310 120 Z" fill={`url(#glassS${flip ? "R" : "L"})`} stroke="#666" strokeWidth="1.5" />
-        {/* Roof */}
-        <path d="M 183 90 L 240 70 L 370 70 L 412 88 L 310 120 L 188 120 Z" fill="#c0c0c0" stroke="#666" strokeWidth="1.5" />
-        {/* Door 1 */}
-        <path d="M 188 122 L 306 122 L 306 200 L 192 200 Z" fill="none" stroke="#888" strokeWidth="1.5" />
-        <circle cx="302" cy="165" r="5" fill="#aaa" stroke="#888" strokeWidth="1" />
-        {/* Door 2 */}
-        <path d="M 310 122 L 418 122 L 416 200 L 312 200 Z" fill="none" stroke="#888" strokeWidth="1.5" />
-        <circle cx="315" cy="165" r="5" fill="#aaa" stroke="#888" strokeWidth="1" />
-        {/* Hood */}
-        <path d="M 62 170 L 80 150 L 140 130 L 183 120 L 188 150 L 72 170 Z" fill="#c8c8c8" stroke="#888" strokeWidth="1.5" />
-        {/* Hood crease */}
-        <line x1="75" y1="168" x2="186" y2="140" stroke="#bbb" strokeWidth="1" />
-        {/* Trunk */}
-        <path d="M 418 120 L 460 100 L 490 120 L 520 145 L 540 170 L 545 195 L 420 200 Z" fill="#c8c8c8" stroke="#888" strokeWidth="1.5" />
-        {/* Front bumper */}
-        <path d="M 57 195 L 68 185 L 76 190 L 76 225 L 57 225 Z" fill="#b0b0b0" stroke="#777" strokeWidth="1.5" />
-        {/* Rear bumper */}
-        <path d="M 543 195 L 548 188 L 556 195 L 556 225 L 543 225 Z" fill="#b0b0b0" stroke="#777" strokeWidth="1.5" />
-        {/* Front headlight */}
-        <path d="M 62 168 L 62 185 L 82 185 L 86 168 Z" fill="#fffde0" stroke="#888" strokeWidth="1.5" />
-        {/* Rear taillight */}
-        <path d="M 540 165 L 540 195 L 522 195 L 518 165 Z" fill="#cc2200" stroke="#880000" strokeWidth="1.5" />
-        {/* Side mirror */}
-        <path d="M 180 128 L 165 136 L 165 148 L 180 148 Z" fill="#999" stroke="#777" strokeWidth="1.5" />
-        {/* Front wheel */}
-        <circle cx="145" cy="226" r="38" fill="#1a1a1a" stroke="#111" strokeWidth="3" />
-        <circle cx="145" cy="226" r="27" fill="#333" stroke="#555" strokeWidth="2" />
-        <circle cx="145" cy="226" r="13" fill="#555" />
-        {[0, 60, 120, 180, 240, 300].map(deg => {
-          const r = Math.PI * deg / 180;
-          return <line key={deg} x1={145 + 14 * Math.cos(r)} y1={226 + 14 * Math.sin(r)} x2={145 + 26 * Math.cos(r)} y2={226 + 26 * Math.sin(r)} stroke="#666" strokeWidth="2" />;
-        })}
-        {/* Rear wheel */}
-        <circle cx="460" cy="226" r="38" fill="#1a1a1a" stroke="#111" strokeWidth="3" />
-        <circle cx="460" cy="226" r="27" fill="#333" stroke="#555" strokeWidth="2" />
-        <circle cx="460" cy="226" r="13" fill="#555" />
-        {[0, 60, 120, 180, 240, 300].map(deg => {
-          const r = Math.PI * deg / 180;
-          return <line key={deg} x1={460 + 14 * Math.cos(r)} y1={226 + 14 * Math.sin(r)} x2={460 + 26 * Math.cos(r)} y2={226 + 26 * Math.sin(r)} stroke="#666" strokeWidth="2" />;
-        })}
+
+        {/* ── Roof ── */}
+        <path
+          d="M 228 126 L 255 105 L 310 95 L 380 93 L 430 95
+             L 470 105 L 500 118 L 525 135 L 545 158
+             L 490 152 L 430 148 L 380 147 L 310 147
+             L 260 149 L 232 153 Z"
+          fill="#d2d6db" stroke="#8a9099" strokeWidth="1.5"
+        />
+        {/* Roof highlight strip */}
+        <path d="M 240 120 C 300 108 420 108 510 125 C 440 118 310 118 240 120 Z" fill="#e8eaec" opacity="0.6" />
+
+        {/* ── Windshield ── */}
+        <path
+          d="M 232 153 L 260 149 L 310 147 L 230 127 L 215 148 Z"
+          fill={`url(#sGlass${label})`} stroke="#6a8fa8" strokeWidth="1.5"
+        />
+        {/* Windshield glare */}
+        <path d="M 234 151 L 257 148 L 252 134 L 230 133 Z" fill="#e0f3ff" opacity="0.4" />
+
+        {/* ── Rear window ── */}
+        <path
+          d="M 490 152 L 545 158 L 525 135 L 500 118 L 470 105 L 430 95 L 430 148 Z"
+          fill={`url(#sGlass${label})`} stroke="#6a8fa8" strokeWidth="1.5"
+        />
+
+        {/* ── Door 1 (front) ── */}
+        <path
+          d="M 260 149 L 310 147 L 310 230 L 258 232 Z"
+          fill="none" stroke="#9aa0a8" strokeWidth="1.5"
+        />
+        {/* Door 1 window */}
+        <path d="M 263 151 L 308 149 L 308 185 L 261 187 Z" fill={`url(#sGlass${label})`} stroke="#6a8fa8" strokeWidth="1" opacity="0.7" />
+        {/* Door handle 1 */}
+        <rect x="285" y="212" width="20" height="6" rx="3" fill="#aaa" stroke="#888" strokeWidth="1" />
+
+        {/* ── Door 2 (rear) ── */}
+        <path
+          d="M 312 147 L 430 148 L 430 230 L 312 230 Z"
+          fill="none" stroke="#9aa0a8" strokeWidth="1.5"
+        />
+        {/* Door 2 window */}
+        <path d="M 314 149 L 428 150 L 428 186 L 314 185 Z" fill={`url(#sGlass${label})`} stroke="#6a8fa8" strokeWidth="1" opacity="0.7" />
+        {/* Door handle 2 */}
+        <rect x="358" y="212" width="20" height="6" rx="3" fill="#aaa" stroke="#888" strokeWidth="1" />
+
+        {/* ── Hood ── */}
+        <path
+          d="M 95 196 L 110 188 L 130 180 L 160 174 L 190 166
+             L 215 148 L 232 153 L 260 149 L 258 232
+             L 112 232 C 90 228 78 215 68 202 Z"
+          fill="#ccd0d6" stroke="#9aa0a8" strokeWidth="1.5"
+        />
+        {/* Hood highlight */}
+        <path d="M 180 172 C 200 162 220 155 258 151 L 255 156 C 220 160 196 168 178 178 Z" fill="#dde0e4" opacity="0.5" />
+
+        {/* ── Trunk / boot ── */}
+        <path
+          d="M 430 148 L 490 152 L 545 158 L 562 172
+             L 580 184 L 600 192 L 620 200
+             L 638 212 L 636 230 L 432 230 Z"
+          fill="#ccd0d6" stroke="#9aa0a8" strokeWidth="1.5"
+        />
+
+        {/* ── Rocker / sill ── */}
+        <rect x="112" y="230" width="520" height="12" rx="3" fill="#b8bdc4" stroke="#8a9099" strokeWidth="1" />
+
+        {/* ── Front bumper ── */}
+        <path d="M 52 244 C 52 244 60 228 75 224 L 95 224 L 112 230 L 112 262 L 60 262 C 55 258 52 252 52 244 Z"
+          fill="#bec3ca" stroke="#8a9099" strokeWidth="1.5" />
+        {/* Front light bar */}
+        <rect x="62" y="224" width="26" height="14" rx="3" fill="#fffbe6" stroke="#ccc" strokeWidth="1" />
+        <rect x="64" y="226" width="22" height="5" rx="1.5" fill="#fff" opacity="0.7" />
+
+        {/* ── Rear bumper ── */}
+        <path d="M 638 212 C 645 220 648 232 646 246 C 644 256 638 262 630 262 L 584 262 L 584 230 L 620 228 L 635 214 Z"
+          fill="#bec3ca" stroke="#8a9099" strokeWidth="1.5" />
+        {/* Taillight */}
+        <rect x="612" y="220" width="24" height="30" rx="3" fill="#c00" stroke="#800" strokeWidth="1.5" />
+        <rect x="614" y="222" width="20" height="12" rx="2" fill="#ff3333" opacity="0.85" />
         {/* Exhaust */}
-        <ellipse cx="540" cy="224" rx="7" ry="4" fill="#333" stroke="#111" strokeWidth="1" />
+        <ellipse cx="600" cy="260" rx="8" ry="5" fill="#2a2a2a" stroke="#111" strokeWidth="1.5" />
+
+        {/* ── Side mirror ── */}
+        <path d="M 220 170 L 205 178 L 205 192 L 222 192 L 225 178 Z" fill="#aab0b8" stroke="#888" strokeWidth="1.5" />
+
+        {/* ── Front wheel ── */}
+        <circle cx="168" cy="262" r="48" fill="#111" stroke="#0d0d0d" strokeWidth="3" />
+        <circle cx="168" cy="262" r="36" fill="#2a2a2a" />
+        <circle cx="168" cy="262" r="20" fill="#444" />
+        <circle cx="168" cy="262" r="8" fill="#555" />
+        {[0,51.4,102.9,154.3,205.7,257.1,308.6].map(d=>{const r=d*Math.PI/180; return <line key={d} x1={168+21*Math.cos(r)} y1={262+21*Math.sin(r)} x2={168+35*Math.cos(r)} y2={262+35*Math.sin(r)} stroke="#666" strokeWidth="2.5"/>;})}
+
+        {/* ── Rear wheel ── */}
+        <circle cx="530" cy="262" r="48" fill="#111" stroke="#0d0d0d" strokeWidth="3" />
+        <circle cx="530" cy="262" r="36" fill="#2a2a2a" />
+        <circle cx="530" cy="262" r="20" fill="#444" />
+        <circle cx="530" cy="262" r="8" fill="#555" />
+        {[0,51.4,102.9,154.3,205.7,257.1,308.6].map(d=>{const r=d*Math.PI/180; return <line key={d} x1={530+21*Math.cos(r)} y1={262+21*Math.sin(r)} x2={530+35*Math.cos(r)} y2={262+35*Math.sin(r)} stroke="#666" strokeWidth="2.5"/>;})}
       </g>
-      <text x="300" y="18" textAnchor="middle" fill="#333" fontSize="14" fontWeight="700">
-        {flip ? "RIGHT SIDE" : "LEFT SIDE"}
-      </text>
+
+      <text x="350" y="22" textAnchor="middle" fill="#444" fontSize="15" fontWeight="700" fontFamily="sans-serif">{label}</text>
     </svg>
   );
 }
 
-/* ─── Panel Component ───────────────────────────────── */
+/* ─────────────────────────────────────────────────────
+   Panel + Main Component (unchanged logic)
+───────────────────────────────────────────────────── */
+
 interface ViewPanelProps {
   view: CarView;
   marks: DamageMark[];
   selectedMark: string | null;
+  allMarks: DamageMark[];
   onPanelClick: (view: CarView, x: number, y: number) => void;
-  onMarkClick: (id: string, description: string, e: React.MouseEvent) => void;
+  onMarkClick: (id: string, description: string) => void;
 }
 
-function ViewPanel({ view, marks, selectedMark, onPanelClick, onMarkClick }: ViewPanelProps) {
+function ViewPanel({ view, marks, selectedMark, allMarks, onPanelClick, onMarkClick }: ViewPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
   const viewMarks = marks.filter(m => m.view === view);
-  const allMarks = marks;
+  const isWide = view === "left" || view === "right";
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
@@ -264,44 +462,38 @@ function ViewPanel({ view, marks, selectedMark, onPanelClick, onMarkClick }: Vie
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="text-xs font-semibold text-center text-muted-foreground uppercase tracking-wide">
-        {VIEW_LABELS[view]}
-      </div>
-      <div
-        ref={ref}
-        className="relative w-full bg-gradient-to-b from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl cursor-crosshair overflow-hidden shadow-inner"
-        style={{ aspectRatio: view === "left" || view === "right" ? "600/260" : "400/280" }}
-        onClick={handleClick}
-      >
-        {view === "front" && <FrontCarSVG />}
-        {view === "rear" && <RearCarSVG />}
-        {view === "left" && <SideCarSVG flip={false} />}
-        {view === "right" && <SideCarSVG flip={true} />}
+    <div
+      ref={ref}
+      className="relative bg-gradient-to-b from-slate-50 to-slate-100 border border-slate-200 rounded-xl cursor-crosshair overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      style={{ aspectRatio: isWide ? "700/300" : "500/340" }}
+      onClick={handleClick}
+    >
+      {view === "front" && <FrontSVG />}
+      {view === "rear" && <RearSVG />}
+      {view === "left" && <SideSVG label="LEFT SIDE" />}
+      {view === "right" && <SideSVG label="RIGHT SIDE" />}
 
-        {viewMarks.map((mark) => {
-          const globalIndex = allMarks.findIndex(m => m.id === mark.id) + 1;
-          return (
-            <div
-              key={mark.id}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer text-white font-bold text-[10px] transition-all shadow-md ${
-                selectedMark === mark.id
-                  ? "bg-red-600 border-red-800 scale-125 ring-2 ring-red-300"
-                  : "bg-red-500 border-red-700 hover:scale-110"
-              }`}
-              style={{ left: `${mark.x}%`, top: `${mark.y}%` }}
-              onClick={(e) => { e.stopPropagation(); onMarkClick(mark.id, mark.description, e); }}
-            >
-              {globalIndex}
-            </div>
-          );
-        })}
-      </div>
+      {viewMarks.map((mark) => {
+        const globalIndex = allMarks.findIndex(m => m.id === mark.id) + 1;
+        return (
+          <div
+            key={mark.id}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 flex items-center justify-center cursor-pointer text-white font-bold text-[10px] transition-all shadow-lg ${
+              selectedMark === mark.id
+                ? "bg-red-600 border-red-800 scale-125 ring-2 ring-red-300"
+                : "bg-red-500 border-red-700 hover:scale-110"
+            }`}
+            style={{ left: `${mark.x}%`, top: `${mark.y}%` }}
+            onClick={(e) => { e.stopPropagation(); onMarkClick(mark.id, mark.description); }}
+          >
+            {globalIndex}
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-/* ─── Main Component ────────────────────────────────── */
 export default function CarDamageInspection({ onComplete, onCancel, onBack, contractData }: CarDamageInspectionProps) {
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
@@ -310,18 +502,14 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePanelClick = (view: CarView, x: number, y: number) => {
-    if (selectedMark) {
-      setSelectedMark(null);
-      setMarkDescription("");
-      return;
-    }
+    if (selectedMark) { setSelectedMark(null); setMarkDescription(""); return; }
     const newMark: DamageMark = { id: `mark-${Date.now()}`, x, y, view, description: "" };
     setDamageMarks(prev => [...prev, newMark]);
     setSelectedMark(newMark.id);
     setMarkDescription("");
   };
 
-  const handleMarkClick = (id: string, description: string, e: React.MouseEvent) => {
+  const handleMarkClick = (id: string, description: string) => {
     setSelectedMark(id);
     setMarkDescription(description);
   };
@@ -329,8 +517,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const handleSaveDescription = () => {
     if (!selectedMark) return;
     setDamageMarks(prev => prev.map(m => m.id === selectedMark ? { ...m, description: markDescription } : m));
-    setSelectedMark(null);
-    setMarkDescription("");
+    setSelectedMark(null); setMarkDescription("");
   };
 
   const handleDeleteMark = (id: string) => {
@@ -341,13 +528,11 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const handleSubmit = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    try { onComplete(damageMarks, "", fuelLevel); }
-    catch { setIsSubmitting(false); }
+    try { onComplete(damageMarks, "", fuelLevel); } catch { setIsSubmitting(false); }
   };
 
   return (
     <div className="space-y-6">
-      {/* Contract Details */}
       {contractData && (
         <Card className="print:shadow-none">
           <CardHeader>
@@ -382,53 +567,52 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
                 <div><Label className="text-sm text-gray-600">Rental Days</Label><p className="font-medium">{contractData.rentalDays} days</p></div>
               </div>
             </div>
-            {(contractData.insurancePackage || contractData.depositAmount || contractData.fuelPolicy) && (
+            {(contractData.insurancePackage && contractData.insurancePackage !== "None") || (contractData.depositAmount && contractData.depositAmount > 0) || contractData.fuelPolicy ? (
               <div>
                 <h3 className="font-semibold text-lg mb-3 border-b pb-2">Additional Options</h3>
                 <div className="space-y-3">
                   {contractData.insurancePackage && contractData.insurancePackage !== "None" && (
-                    <div><Label className="text-sm text-gray-600">Insurance Package</Label><p className="font-medium">{contractData.insurancePackage}</p>{contractData.insuranceCost && <p className="text-sm text-gray-500">Total: ${contractData.insuranceCost.toFixed(2)}</p>}</div>
+                    <div><Label className="text-sm text-gray-600">Insurance</Label><p className="font-medium">{contractData.insurancePackage}{contractData.insuranceCost ? ` — $${contractData.insuranceCost.toFixed(2)}` : ""}</p></div>
                   )}
-                  {contractData.depositAmount && contractData.depositAmount > 0 && (
+                  {contractData.depositAmount && contractData.depositAmount > 0 ? (
                     <div><Label className="text-sm text-gray-600">Security Deposit</Label><p className="font-medium">${contractData.depositAmount.toFixed(2)}</p></div>
-                  )}
-                  {contractData.fuelPolicy && (
-                    <div><Label className="text-sm text-gray-600">Fuel Policy</Label><p className="font-medium">{contractData.fuelPolicy}</p></div>
-                  )}
+                  ) : null}
+                  {contractData.fuelPolicy && <div><Label className="text-sm text-gray-600">Fuel Policy</Label><p className="font-medium">{contractData.fuelPolicy}</p></div>}
                 </div>
               </div>
-            )}
+            ) : null}
             <div>
-              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Pricing Details</h3>
+              <h3 className="font-semibold text-lg mb-3 border-b pb-2">Pricing</h3>
               <div className="space-y-2">
                 <div className="flex justify-between"><Label className="text-sm text-gray-600">Daily Rate</Label><p className="font-medium">${contractData.dailyRate.toFixed(2)}</p></div>
                 <div className="flex justify-between"><Label className="text-sm text-gray-600">Total ({contractData.rentalDays} days)</Label><p className="font-medium">${contractData.totalAmount.toFixed(2)}</p></div>
                 {contractData.discount > 0 && <div className="flex justify-between"><Label className="text-sm text-gray-600">Discount</Label><p className="font-medium text-green-600">-${contractData.discount.toFixed(2)}</p></div>}
-                <div className="flex justify-between border-t pt-2 mt-2"><Label className="text-base font-semibold">Final Amount</Label><p className="text-lg font-bold text-primary">${contractData.finalAmount.toFixed(2)}</p></div>
+                <div className="flex justify-between border-t pt-2"><Label className="font-semibold">Final Amount</Label><p className="text-lg font-bold text-primary">${contractData.finalAmount.toFixed(2)}</p></div>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* 4-Panel Vehicle Damage Inspection */}
+      {/* 4-panel inspection */}
       <Card>
         <CardHeader>
           <CardTitle>Vehicle Condition Inspection</CardTitle>
-          <p className="text-sm text-muted-foreground">Click on any panel to mark existing damage. Click a marker to add a description.</p>
+          <p className="text-sm text-muted-foreground">Click on any panel to mark existing damage. Click a marker to edit its description.</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* 2×2 grid of car views */}
+          {/* Top row: Front / Rear */}
           <div className="grid grid-cols-2 gap-4">
-            {(["front", "rear", "left", "right"] as CarView[]).map(view => (
-              <ViewPanel
-                key={view}
-                view={view}
-                marks={damageMarks}
-                selectedMark={selectedMark}
-                onPanelClick={handlePanelClick}
-                onMarkClick={handleMarkClick}
-              />
+            {(["front", "rear"] as CarView[]).map(view => (
+              <ViewPanel key={view} view={view} marks={damageMarks} selectedMark={selectedMark}
+                allMarks={damageMarks} onPanelClick={handlePanelClick} onMarkClick={handleMarkClick} />
+            ))}
+          </div>
+          {/* Bottom row: Left Side / Right Side (wider aspect) */}
+          <div className="grid grid-cols-2 gap-4">
+            {(["left", "right"] as CarView[]).map(view => (
+              <ViewPanel key={view} view={view} marks={damageMarks} selectedMark={selectedMark}
+                allMarks={damageMarks} onPanelClick={handlePanelClick} onMarkClick={handleMarkClick} />
             ))}
           </div>
 
@@ -436,18 +620,13 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
           {selectedMark && (
             <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800">
               <Label className="text-sm font-medium">
-                Describe damage #{damageMarks.findIndex(m => m.id === selectedMark) + 1}
+                Damage #{damageMarks.findIndex(m => m.id === selectedMark) + 1}
                 {" — "}
-                <span className="text-muted-foreground capitalize">{damageMarks.find(m => m.id === selectedMark)?.view} view</span>
+                <span className="text-muted-foreground">{VIEW_LABELS[damageMarks.find(m => m.id === selectedMark)?.view ?? "front"]}</span>
               </Label>
               <div className="flex gap-2 mt-2">
-                <Textarea
-                  value={markDescription}
-                  onChange={(e) => setMarkDescription(e.target.value)}
-                  placeholder="e.g., Small scratch on door, Dent on bumper..."
-                  className="flex-1"
-                  rows={2}
-                />
+                <Textarea value={markDescription} onChange={(e) => setMarkDescription(e.target.value)}
+                  placeholder="e.g., Scratch on door panel, dent on bumper..." className="flex-1" rows={2} />
                 <Button type="button" onClick={handleSaveDescription}>Save</Button>
               </div>
             </div>
@@ -460,15 +639,12 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
               <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
                 {damageMarks.map((mark, index) => (
                   <div key={mark.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg border">
-                    <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">
-                      {index + 1}
-                    </div>
+                    <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">{index + 1}</div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium capitalize">{VIEW_LABELS[mark.view]}</div>
+                      <div className="text-sm font-medium">{VIEW_LABELS[mark.view]}</div>
                       {mark.description
                         ? <div className="text-xs text-muted-foreground truncate">{mark.description}</div>
-                        : <div className="text-xs text-muted-foreground italic">No description</div>
-                      }
+                        : <div className="text-xs text-muted-foreground italic">No description added</div>}
                     </div>
                     <Button type="button" variant="ghost" size="sm" onClick={() => handleDeleteMark(mark.id)}>
                       <Trash2 className="h-4 w-4 text-red-500" />
@@ -485,34 +661,22 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
       <Card>
         <CardHeader>
           <CardTitle>Fuel Level at Rental Start</CardTitle>
-          <p className="text-sm text-gray-600">Select the current fuel level in the vehicle</p>
+          <p className="text-sm text-gray-600">Select the current fuel level</p>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              {["Empty", "1/4", "1/2", "3/4", "Full"].map((level) => (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => setFuelLevel(level)}
-                  className={`flex-1 py-3 px-2 rounded-lg border-2 text-sm transition-all ${
-                    fuelLevel === level
-                      ? "border-primary bg-primary/10 font-semibold"
-                      : "border-gray-300 hover:border-gray-400"
-                  }`}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-            <div className="relative h-10 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
-              <div
-                className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-500 to-green-500 transition-all duration-300"
-                style={{ width: fuelLevel === "Empty" ? "0%" : fuelLevel === "1/4" ? "25%" : fuelLevel === "1/2" ? "50%" : fuelLevel === "3/4" ? "75%" : "100%" }}
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-sm font-semibold text-gray-700 drop-shadow">{fuelLevel}</span>
-              </div>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2">
+            {["Empty", "1/4", "1/2", "3/4", "Full"].map((level) => (
+              <button key={level} type="button" onClick={() => setFuelLevel(level)}
+                className={`flex-1 py-3 px-2 rounded-lg border-2 text-sm transition-all ${fuelLevel === level ? "border-primary bg-primary/10 font-semibold" : "border-gray-300 hover:border-gray-400"}`}>
+                {level}
+              </button>
+            ))}
+          </div>
+          <div className="relative h-10 bg-gray-200 rounded-lg overflow-hidden border-2 border-gray-300">
+            <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-orange-500 to-green-500 transition-all duration-300"
+              style={{ width: fuelLevel === "Empty" ? "0%" : fuelLevel === "1/4" ? "25%" : fuelLevel === "1/2" ? "50%" : fuelLevel === "3/4" ? "75%" : "100%" }} />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-sm font-semibold text-gray-700 drop-shadow">{fuelLevel}</span>
             </div>
           </div>
         </CardContent>
@@ -522,7 +686,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
       <Card>
         <CardHeader>
           <CardTitle>Client Signature</CardTitle>
-          <p className="text-sm text-gray-600">This contract will be printed for the client to sign with pen</p>
+          <p className="text-sm text-gray-600">This contract will be printed for the client to sign</p>
         </CardHeader>
         <CardContent>
           <div className="border-2 border-gray-300 rounded-lg bg-white p-8 space-y-6">
@@ -533,14 +697,8 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Date:</Label>
-                <div className="border-b-2 border-gray-400 h-10" />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Agent Signature:</Label>
-                <div className="border-b-2 border-gray-400 h-10" />
-              </div>
+              <div className="space-y-2"><Label className="text-sm font-medium">Date:</Label><div className="border-b-2 border-gray-400 h-10" /></div>
+              <div className="space-y-2"><Label className="text-sm font-medium">Agent Signature:</Label><div className="border-b-2 border-gray-400 h-10" /></div>
             </div>
           </div>
         </CardContent>
@@ -548,9 +706,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
 
       {/* Actions */}
       <div className="flex gap-3 justify-end">
-        {onBack && (
-          <Button type="button" variant="outline" onClick={onBack}>Back</Button>
-        )}
+        {onBack && <Button type="button" variant="outline" onClick={onBack}>Back</Button>}
         <Button type="button" variant="outline" onClick={onCancel}>Cancel</Button>
         <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Complete Inspection"}
