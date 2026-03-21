@@ -645,7 +645,7 @@ export default function RentalContracts() {
                             {selectedClientId
                               ? (() => {
                                   const client = clients.find((c) => c.id.toString() === selectedClientId);
-                                  return client ? `${client.firstName} ${client.lastName} - ${client.drivingLicenseNumber}` : "Choose a client...";
+                                  return client ? `${client.name} - ${client.driverLicenseNumber || "No license"}` : "Choose a client...";
                                 })()
                               : "Choose a client or type to search..."}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -676,29 +676,32 @@ export default function RentalContracts() {
                                   <Plus className="mr-2 h-4 w-4" />
                                   Add New Client
                                 </CommandItem>
-                                {clients.map((client) => (
+                                {clients.map((client) => {
+                                  const nameParts = (client.name || "").trim().split(" ");
+                                  const firstName = nameParts[0] || "";
+                                  const lastName = nameParts.slice(1).join(" ") || "";
+                                  return (
                                   <CommandItem
                                     key={client.id}
-                                    value={`${client.firstName} ${client.lastName} ${client.drivingLicenseNumber}`}
+                                    value={`${client.name} ${client.driverLicenseNumber || ""}`}
                                     onSelect={() => {
-                                      const value = client.id.toString();
-                                      setSelectedClientId(value);
+                                      setSelectedClientId(client.id.toString());
                                       setClientComboboxOpen(false);
                                       // Auto-fill form fields
-                                      (document.getElementById("clientFirstName") as HTMLInputElement).value = client.firstName;
-                                      (document.getElementById("clientLastName") as HTMLInputElement).value = client.lastName;
+                                      (document.getElementById("clientFirstName") as HTMLInputElement).value = firstName;
+                                      (document.getElementById("clientLastName") as HTMLInputElement).value = lastName;
                                       (document.getElementById("clientMotherFullName") as HTMLInputElement).value = client.motherFullName || "";
                                       (document.getElementById("clientFatherFullName") as HTMLInputElement).value = client.fatherName || "";
-                                      setSelectedNationality(client.nationality || ""); // Fix: Update nationality state
+                                      setSelectedNationality(client.nationality || "");
                                       (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
                                       (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
-                                      (document.getElementById("clientPassportNumber") as HTMLInputElement).value = client.passportIdNumber || "";
+                                      (document.getElementById("clientPassportNumber") as HTMLInputElement).value = client.passportNumber || "";
                                       (document.getElementById("clientPlaceOfBirth") as HTMLInputElement).value = client.placeOfBirth || "";
                                       (document.getElementById("clientDateOfBirth") as HTMLInputElement).value = client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : "";
-                                      (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.registrationNumber || "";
-                                      (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.drivingLicenseNumber;
+                                      (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.idNumber || "";
+                                      (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.driverLicenseNumber || "";
                                       setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
-                                      setLicenseExpiryDate(new Date(client.licenseExpiryDate));
+                                      setLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
                                     }}
                                   >
                                     <Check
@@ -706,9 +709,10 @@ export default function RentalContracts() {
                                         selectedClientId === client.id.toString() ? "opacity-100" : "opacity-0"
                                       }`}
                                     />
-                                    {client.firstName} {client.lastName} - {client.drivingLicenseNumber}
+                                    {client.name} - {client.driverLicenseNumber || "No license"}
                                   </CommandItem>
-                                ))}
+                                  );
+                                })}
                               </CommandGroup>
                             </CommandList>
                           </Command>
