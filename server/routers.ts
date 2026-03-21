@@ -1222,10 +1222,36 @@ export const appRouter = router({
           userId = ctx.user?.id || 1;
         }
         
-        const { targetUserId: _, dateOfBirth, ...clientData } = input;
-        // Convert dateOfBirth string to Date if provided
+        const {
+          targetUserId: _,
+          dateOfBirth,
+          firstName,
+          lastName,
+          fatherName,
+          motherFullName,
+          drivingLicenseNumber,
+          passportIdNumber,
+          registrationNumber,
+          licenseIssueDate,
+          licenseExpiryDate,
+          ...rest
+        } = input;
+
+        const name = `${firstName} ${lastName}`.trim();
         const dateOfBirthDate = dateOfBirth ? new Date(dateOfBirth) : undefined;
-        return await db.createClient({ ...clientData, dateOfBirth: dateOfBirthDate, userId });
+
+        return await db.createClient({
+          name,
+          phone: rest.phone,
+          email: rest.email,
+          nationality: rest.nationality,
+          address: rest.address,
+          notes: rest.notes ? `${rest.notes}${fatherName ? `\nFather: ${fatherName}` : ""}${motherFullName ? `\nMother: ${motherFullName}` : ""}` : (fatherName || motherFullName ? `${fatherName ? `Father: ${fatherName}` : ""}${motherFullName ? `\nMother: ${motherFullName}` : ""}`.trim() : undefined),
+          driverLicenseNumber: drivingLicenseNumber,
+          passportNumber: passportIdNumber,
+          idNumber: registrationNumber,
+          userId,
+        });
       }),
     
     update: publicProcedure
@@ -1249,24 +1275,48 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const { id, dateOfBirth, ...updates } = input;
-        console.log('[Router] clients.update called with:', { id, updates, userId: ctx.user?.id || 1 });
-        
-        // Convert dateOfBirth string to Date if provided
-        const dateOfBirthDate = dateOfBirth ? new Date(dateOfBirth) : undefined;
-        const finalUpdates = { ...updates, ...(dateOfBirthDate !== undefined ? { dateOfBirth: dateOfBirthDate } : {}) };
-        
-        // Validate license expiry date is in the future if provided
-        if (finalUpdates.licenseExpiryDate) {
-          const today = new Date();
-          today.setHours(0, 0, 0, 0); // Reset time to start of day
-          if (finalUpdates.licenseExpiryDate < today) {
-            throw new Error('License expiry date must be in the future');
-          }
+        const {
+          id,
+          dateOfBirth,
+          firstName,
+          lastName,
+          fatherName,
+          motherFullName,
+          drivingLicenseNumber,
+          passportIdNumber,
+          registrationNumber,
+          licenseIssueDate,
+          licenseExpiryDate,
+          ...rest
+        } = input;
+
+        // Build the mapped update object with only schema-valid columns
+        const finalUpdates: Record<string, any> = { ...rest };
+        if (firstName !== undefined || lastName !== undefined) {
+          const existing = await db.getClientById(id, ctx.user?.id || 1);
+          const parts = (existing?.name || "").split(" ");
+          finalUpdates.name = `${firstName ?? parts[0] ?? ""} ${lastName ?? parts.slice(1).join(" ") ?? ""}`.trim();
         }
-        
+        if (drivingLicenseNumber !== undefined) finalUpdates.driverLicenseNumber = drivingLicenseNumber;
+        if (passportIdNumber !== undefined) finalUpdates.passportNumber = passportIdNumber;
+        if (registrationNumber !== undefined) finalUpdates.idNumber = registrationNumber;
+        if (dateOfBirth) finalUpdates.dateOfBirth = new Date(dateOfBirth);
+
+        // Preserve fatherName / motherFullName in notes if present
+        if (fatherName || motherFullName) {
+          const existingNotes = rest.notes || "";
+          const extra = [fatherName ? `Father: ${fatherName}` : "", motherFullName ? `Mother: ${motherFullName}` : ""].filter(Boolean).join("\n");
+          finalUpdates.notes = existingNotes ? `${existingNotes}\n${extra}` : extra;
+        }
+
+        // Validate license expiry date
+        if (licenseExpiryDate) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (licenseExpiryDate < today) throw new Error('License expiry date must be in the future');
+        }
+
         const result = await db.updateClient(id, ctx.user?.id || 1, finalUpdates);
-        console.log('[Router] clients.update result:', result);
         return result;
       }),
     

@@ -103,8 +103,9 @@ export function ModernDatePicker({
             </div>
             <div
               ref={yearGridRef}
-              className="grid grid-cols-4 gap-2 overflow-y-scroll"
+              className="grid grid-cols-4 gap-2 overflow-y-auto"
               style={{ maxHeight: "260px", WebkitOverflowScrolling: "touch" }}
+              onWheel={(e) => e.stopPropagation()}
             >
               {years.map((year) => (
                 <button
