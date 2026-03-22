@@ -29,9 +29,13 @@ export function DateDropdownSelector({
   yearOnly = false,
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
+  const selectedYearValue = value?.getFullYear();
   const minYear = minDate ? minDate.getFullYear() : (yearOnly ? 1950 : 1990);
   const maxYear = maxDate ? maxDate.getFullYear() : (yearOnly ? 2050 : currentYear + 50);
-  const years = Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i);
+  // Always include the currently-set year in the list even when it falls outside min/max
+  const actualMinYear = selectedYearValue !== undefined ? Math.min(selectedYearValue, minYear) : minYear;
+  const actualMaxYear = selectedYearValue !== undefined ? Math.max(selectedYearValue, maxYear) : maxYear;
+  const years = Array.from({ length: actualMaxYear - actualMinYear + 1 }, (_, i) => actualMinYear + i);
   const months = [
     { value: 0, label: "January" },
     { value: 1, label: "February" },
