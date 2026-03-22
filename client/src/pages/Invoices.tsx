@@ -53,30 +53,49 @@ export default function Invoices() {
     if (isSendingWhatsApp) return;
 
     setIsSendingWhatsApp(true);
+    let offscreen: HTMLDivElement | null = null;
     try {
       toast.info("Generating invoice PDF… Please wait");
 
-      const element = document.getElementById("invoice-content");
-      if (!element) { toast.error("Invoice content not found"); setIsSendingWhatsApp(false); return; }
+      const source = document.getElementById("invoice-content");
+      if (!source) { toast.error("Invoice content not found"); return; }
 
-      // Temporarily expand for full capture
-      const originalOverflow = element.style.overflow;
-      const originalHeight = element.style.height;
-      const originalMaxHeight = element.style.maxHeight;
-      element.style.overflow = "visible";
-      element.style.height = "auto";
-      element.style.maxHeight = "none";
+      // Clone into an off-screen container so the full height is captured,
+      // not just the visible portion of the scrollable modal.
+      offscreen = document.createElement("div");
+      offscreen.style.cssText = [
+        "position:fixed",
+        "left:-9999px",
+        "top:0",
+        "width:794px",       // A4 at 96dpi
+        "height:auto",
+        "overflow:visible",
+        "background:#ffffff",
+        "z-index:-1",
+        "font-family:inherit",
+      ].join(";");
 
-      let canvas: HTMLCanvasElement;
-      try {
-        canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" });
-      } finally {
-        element.style.overflow = originalOverflow;
-        element.style.height = originalHeight;
-        element.style.maxHeight = originalMaxHeight;
-      }
+      const clone = source.cloneNode(true) as HTMLElement;
+      clone.style.cssText = "width:794px;height:auto;overflow:visible;background:#ffffff;padding:32px;box-sizing:border-box;";
+      offscreen.appendChild(clone);
+      document.body.appendChild(offscreen);
 
-      const imgData = canvas.toDataURL("image/png");
+      // Brief pause so styles settle
+      await new Promise(r => setTimeout(r, 120));
+
+      const canvas = await html2canvas(offscreen, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        width: 794,
+        height: offscreen.scrollHeight,
+        windowWidth: 794,
+      });
+
+      document.body.removeChild(offscreen);
+      offscreen = null;
+
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       const pdfW = pdf.internal.pageSize.getWidth() - 20;
       const pdfH = pdf.internal.pageSize.getHeight() - 20;
@@ -84,38 +103,34 @@ export default function Invoices() {
       const scaledH = canvas.height * ratio;
 
       if (scaledH <= pdfH) {
-        pdf.addImage(imgData, "PNG", 10, 10, canvas.width * ratio, scaledH);
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 10, 10, canvas.width * ratio, scaledH);
       } else {
         let yPos = 0;
         while (yPos < canvas.height) {
           if (yPos > 0) pdf.addPage();
           const sliceH = Math.min(canvas.height - yPos, pdfH / ratio);
-          const sliceCanvas = document.createElement("canvas");
-          sliceCanvas.width = canvas.width;
-          sliceCanvas.height = sliceH;
-          sliceCanvas.getContext("2d")!.drawImage(canvas, 0, yPos, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-          pdf.addImage(sliceCanvas.toDataURL("image/png"), "PNG", 10, 10, canvas.width * ratio, sliceH * ratio);
+          const slice = document.createElement("canvas");
+          slice.width = canvas.width;
+          slice.height = sliceH;
+          slice.getContext("2d")!.drawImage(canvas, 0, yPos, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+          pdf.addImage(slice.toDataURL("image/png"), "PNG", 10, 10, canvas.width * ratio, sliceH * ratio);
           yPos += sliceH;
         }
       }
 
-      // Download the PDF directly to the device
-      const filename = `Invoice-${invoiceDetails.invoiceNumber}.pdf`;
-      pdf.save(filename);
+      pdf.save(`Invoice-${invoiceDetails.invoiceNumber}.pdf`);
 
-      // Open WhatsApp with invoice details — user attaches the downloaded PDF
       const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, "");
       const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       const message = `Hello,\n\nPlease find attached the invoice PDF for your rental.\n\n📄 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} USD (${localAmount} ${localCurrencyCode})\n📋 Status: ${invoiceDetails.paymentStatus.toUpperCase()}\n\n(PDF has been downloaded to your device — please attach it to this message)`;
 
-      toast.success("PDF downloaded! Opening WhatsApp to send…");
-      setTimeout(() => {
-        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
-      }, 800);
+      toast.success("PDF downloaded! Opening WhatsApp…");
+      setTimeout(() => window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank"), 800);
     } catch (err: any) {
       console.error("WhatsApp PDF error:", err);
       toast.error(`Failed to generate PDF: ${err.message || "Unknown error"}`);
     } finally {
+      if (offscreen && document.body.contains(offscreen)) document.body.removeChild(offscreen);
       setIsSendingWhatsApp(false);
     }
   };
