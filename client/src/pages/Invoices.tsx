@@ -22,6 +22,8 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 export default function Invoices() {
   const { user } = useAuth();
@@ -42,6 +44,79 @@ export default function Invoices() {
       window.history.replaceState({}, '', '/invoices');
     }
   }, []);
+
+  const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
+  const uploadPdfMutation = trpc.files.uploadPdf.useMutation();
+
+  const handleWhatsAppPdf = async () => {
+    if (!invoiceDetails) { toast.error("No invoice selected"); return; }
+    if (!companyProfile?.phone) { toast.error("Company phone number not set in settings"); return; }
+    if (isSendingWhatsApp) return;
+
+    setIsSendingWhatsApp(true);
+    try {
+      toast.info("Generating invoice PDF… Please wait");
+
+      const element = document.getElementById("invoice-content");
+      if (!element) { toast.error("Invoice content not found"); setIsSendingWhatsApp(false); return; }
+
+      // Temporarily expand for full capture
+      const originalOverflow = element.style.overflow;
+      const originalHeight = element.style.height;
+      const originalMaxHeight = element.style.maxHeight;
+      element.style.overflow = "visible";
+      element.style.height = "auto";
+      element.style.maxHeight = "none";
+
+      let canvas: HTMLCanvasElement;
+      try {
+        canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" });
+      } finally {
+        element.style.overflow = originalOverflow;
+        element.style.height = originalHeight;
+        element.style.maxHeight = originalMaxHeight;
+      }
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pdfW = pdf.internal.pageSize.getWidth() - 20;
+      const pdfH = pdf.internal.pageSize.getHeight() - 20;
+      const ratio = Math.min(pdfW / canvas.width, pdfH / canvas.height);
+      const scaledH = canvas.height * ratio;
+
+      if (scaledH <= pdfH) {
+        pdf.addImage(imgData, "PNG", 10, 10, canvas.width * ratio, scaledH);
+      } else {
+        let yPos = 0;
+        while (yPos < canvas.height) {
+          if (yPos > 0) pdf.addPage();
+          const sliceH = Math.min(canvas.height - yPos, pdfH / ratio);
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceH;
+          sliceCanvas.getContext("2d")!.drawImage(canvas, 0, yPos, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+          pdf.addImage(sliceCanvas.toDataURL("image/png"), "PNG", 10, 10, canvas.width * ratio, sliceH * ratio);
+          yPos += sliceH;
+        }
+      }
+
+      const pdfBase64 = pdf.output("datauristring");
+      const filename = `Invoice-${invoiceDetails.invoiceNumber}.pdf`;
+      const uploadResult = await uploadPdfMutation.mutateAsync({ base64Data: pdfBase64, filename });
+
+      const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, "");
+      const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const message = `Invoice PDF Ready!\n\n📄 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} USD / ${localAmount} ${localCurrencyCode}\n📅 Due: ${new Date(invoiceDetails.dueDate || invoiceDetails.invoiceDate).toLocaleDateString()}\n📎 PDF: ${uploadResult.url}`;
+
+      toast.success("PDF uploaded! Opening WhatsApp…");
+      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+    } catch (err: any) {
+      console.error("WhatsApp PDF error:", err);
+      toast.error(`Failed to send PDF: ${err.message || "Unknown error"}`);
+    } finally {
+      setIsSendingWhatsApp(false);
+    }
+  };
 
   // Fetch company settings for exchange rate and VAT rate
   const { data: settings } = trpc.settings.get.useQuery();
@@ -427,36 +502,13 @@ export default function Invoices() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-2 border-t pt-3 mt-3 flex-wrap">
-                  <Button 
-                    onClick={() => {
-                      if (!invoiceDetails) {
-                        toast.error("No invoice selected");
-                        return;
-                      }
-                      
-                      // Use company phone number from company profile
-                      if (!companyProfile?.phone) {
-                        toast.error("Company phone number not set in settings");
-                        return;
-                      }
-                      
-                      // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
-                      const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, '');
-                      
-                      // Create WhatsApp message
-                      const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                      const message = `New Invoice Generated!\n\n💳 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} (USD)\n💵 Amount: ${localAmount} ${localCurrencyCode}\n📄 Status: ${invoiceDetails.paymentStatus.toUpperCase()}`;
-                      
-                      // Encode message for URL
-                      const encodedMessage = encodeURIComponent(message);
-                      
-                      // Open WhatsApp with pre-filled message
-                      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-                    }}
-                    variant="outline" 
+                  <Button
+                    onClick={handleWhatsAppPdf}
+                    disabled={isSendingWhatsApp}
+                    variant="outline"
                     className="flex-1 min-w-[150px] print:hidden text-sm"
                   >
-                    💬 Send via WhatsApp
+                    {isSendingWhatsApp ? "Generating PDF…" : "💬 Send PDF via WhatsApp"}
                   </Button>
                 </div>
 
