@@ -434,14 +434,14 @@ export default function Invoices() {
                         return;
                       }
                       
-                      // Use company phone number from settings
-                      if (!settings?.phone) {
+                      // Use company phone number from company profile
+                      if (!companyProfile?.phone) {
                         toast.error("Company phone number not set in settings");
                         return;
                       }
                       
                       // Format phone number for WhatsApp (remove spaces, dashes, parentheses)
-                      const phoneNumber = settings.phone.replace(/[\s\-\(\)]/g, '');
+                      const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, '');
                       
                       // Create WhatsApp message
                       const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
