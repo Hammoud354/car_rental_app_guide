@@ -257,8 +257,7 @@ export default function RentalContracts() {
   }, [selectedVehicleId, vehicles, rentalDays]);
   
   const createContract = trpc.contracts.create.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Contract created successfully! Contract Number: ${data.contractNumber}`);
+    onSuccess: () => {
       utils.contracts.list.invalidate();
       utils.contracts.listByStatus.invalidate();
       utils.fleet.list.invalidate();
@@ -396,13 +395,16 @@ export default function RentalContracts() {
         setContractData(null);
         setIsCreateDialogOpen(false);
 
-        // Open invoice if auto-generated, otherwise go to contracts page
+        // Force a fresh fetch so the new contract shows up immediately
+        utils.contracts.listByStatus.invalidate();
+        utils.contracts.list.invalidate();
+
+        // Open invoice if auto-generated, otherwise stay on contracts page
         if ((contract as any).invoice?.id) {
           toast.success("Contract created! Opening invoice…");
           setTimeout(() => setLocation(`/invoices?invoice=${(contract as any).invoice.id}`), 400);
         } else {
-          toast.success("Contract created successfully!");
-          setTimeout(() => setLocation("/rental-contracts"), 400);
+          toast.success(`Contract ${contract.contractNumber} created successfully!`);
         }
       },
       onError: (error) => {
@@ -1149,7 +1151,7 @@ export default function RentalContracts() {
                       </div>
                       <div>
                         <div className="text-sm text-gray-600">License Number</div>
-                        <div className="font-mono">{contract.drivingLicenseNumber}</div>
+                        <div className="font-mono">{contract.clientDriverLicense}</div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
@@ -1315,7 +1317,7 @@ export default function RentalContracts() {
                       )}
                       <div>
                         <div className="text-sm text-muted-foreground">License Number</div>
-                        <div className="font-mono">{selectedContract.drivingLicenseNumber}</div>
+                        <div className="font-mono">{selectedContract.clientDriverLicense}</div>
                       </div>
                       <div>
                         <div className="text-sm text-muted-foreground">License Expiry</div>

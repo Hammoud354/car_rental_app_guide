@@ -505,9 +505,9 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
   
   if (!status) {
     // Return all contracts if no status specified
-    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId));
+    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId)).orderBy(desc(rentalContracts.id));
   }
-  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status)));
+  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status))).orderBy(desc(rentalContracts.id));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
