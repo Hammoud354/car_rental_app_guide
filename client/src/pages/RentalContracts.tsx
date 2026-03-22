@@ -261,13 +261,15 @@ export default function RentalContracts() {
       toast.success(`Contract created successfully! Contract Number: ${data.contractNumber}`);
       utils.contracts.list.invalidate();
       utils.contracts.listByStatus.invalidate();
-      utils.fleet.list.invalidate(); // Update vehicle availability
+      utils.fleet.list.invalidate();
       setIsCreateDialogOpen(false);
     },
     onError: (error: any) => {
       toast.error(`Failed to create contract: ${error.message}`);
     },
   });
+
+  const addDamageMark = trpc.contracts.addDamageMark.useMutation();
   
   const renewContract = trpc.contracts.renew.useMutation({
     onSuccess: () => {
@@ -373,60 +375,35 @@ export default function RentalContracts() {
 
   const handleInspectionComplete = (damageMarks: any[], signatureData: string, fuelLevel: string) => {
     if (!contractData) return;
-    
+
     createContract.mutate({
       ...contractData,
       signatureData,
       fuelLevel,
     }, {
       onSuccess: (contract) => {
-        if (damageMarks.length === 0) {
-          setShowInspection(false);
-          setContractData(null);
-          setIsCreateDialogOpen(false);
-          toast.success("Contract created successfully!");
-          setTimeout(() => setLocation("/dashboard"), 500);
-          return;
-        }
-        
-        let savedCount = 0;
-        let errorCount = 0;
-        
+        // Save damage marks as fire-and-forget (don't block navigation)
         damageMarks.forEach(mark => {
-          const mutation = trpc.contracts.addDamageMark.useMutation();
-          mutation.mutate({
+          addDamageMark.mutate({
             contractId: contract.id,
             xPosition: mark.x.toString(),
             yPosition: mark.y.toString(),
             description: mark.description,
-          }, {
-            onSuccess: () => {
-              savedCount++;
-              if (savedCount + errorCount === damageMarks.length) {
-                setShowInspection(false);
-                setContractData(null);
-                setIsCreateDialogOpen(false);
-                toast.success("Contract created successfully!");
-                setTimeout(() => setLocation("/dashboard"), 500);
-              }
-            },
-            onError: (error) => {
-              errorCount++;
-              console.error("Error saving damage mark:", error);
-              if (savedCount + errorCount === damageMarks.length) {
-                setShowInspection(false);
-                setContractData(null);
-                setIsCreateDialogOpen(false);
-                if (errorCount > 0) {
-                  toast.warning("Contract created but some damage marks failed to save");
-                } else {
-                  toast.success("Contract created successfully!");
-                }
-                setTimeout(() => setLocation("/dashboard"), 500);
-              }
-            },
           });
         });
+
+        setShowInspection(false);
+        setContractData(null);
+        setIsCreateDialogOpen(false);
+
+        // Open invoice if auto-generated, otherwise go to contracts page
+        if ((contract as any).invoice?.id) {
+          toast.success("Contract created! Opening invoice…");
+          setTimeout(() => setLocation(`/invoices?invoice=${(contract as any).invoice.id}`), 400);
+        } else {
+          toast.success("Contract created successfully!");
+          setTimeout(() => setLocation("/rental-contracts"), 400);
+        }
       },
       onError: (error) => {
         console.error("Error creating contract:", error);

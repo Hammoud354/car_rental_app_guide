@@ -139,7 +139,11 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handlePanelClick = (view: CarView, x: number, y: number) => {
-    if (selectedMark) { setSelectedMark(null); setMarkDescription(""); return; }
+    if (selectedMark) {
+      setDamageMarks(p => p.map(m => m.id === selectedMark ? { ...m, description: markDescription } : m));
+      setSelectedMark(null);
+      setMarkDescription("");
+    }
     const mark: DamageMark = { id: `mark-${Date.now()}`, x, y, view, description: "" };
     setDamageMarks(p => [...p, mark]);
     setSelectedMark(mark.id);
@@ -159,10 +163,12 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
     if (selectedMark === id) { setSelectedMark(null); setMarkDescription(""); }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    try { onComplete(damageMarks, "", fuelLevel); } catch { setIsSubmitting(false); }
+    onComplete(damageMarks, "", fuelLevel);
+    // Reset after a tick so the button re-enables if the parent doesn't unmount (e.g. on error)
+    setTimeout(() => setIsSubmitting(false), 1500);
   };
 
   const panelProps = { marks: damageMarks, allMarks: damageMarks, selectedMark, onPanelClick: handlePanelClick, onMarkClick: handleMarkClick };
