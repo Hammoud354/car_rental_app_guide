@@ -100,86 +100,76 @@ export async function exportElementToPDF(
   fileName: string
 ): Promise<boolean> {
   const element = document.getElementById(elementId);
-  if (!element) {
-    return false;
-  }
+  if (!element) return false;
 
-  const originalOverflow = element.style.overflow;
-  const originalHeight = element.style.height;
-  const originalMaxHeight = element.style.maxHeight;
+  // Render an off-screen clone so parent dialog/modal overflow constraints
+  // don't clip the content — we capture the full height regardless.
+  const offscreen = document.createElement("div");
+  offscreen.style.cssText = [
+    "position:fixed",
+    "left:-9999px",
+    "top:0",
+    "width:794px",
+    "height:auto",
+    "overflow:visible",
+    "background:#ffffff",
+    "z-index:-1",
+    "font-family:inherit",
+  ].join(";");
 
-  element.style.overflow = "visible";
-  element.style.height = "auto";
-  element.style.maxHeight = "none";
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.style.cssText =
+    "width:794px;height:auto;overflow:visible;background:#ffffff;padding:24px;box-sizing:border-box;";
+
+  // Hide interactive elements that shouldn't appear in PDF
+  clone.querySelectorAll("button,[role='button'],svg.lucide").forEach(
+    (el) => ((el as HTMLElement).style.display = "none")
+  );
+
+  offscreen.appendChild(clone);
+  document.body.appendChild(offscreen);
 
   try {
-    const canvas = await html2canvas(element, {
+    // Let styles settle before capturing
+    await new Promise((r) => setTimeout(r, 150));
+
+    const canvas = await html2canvas(offscreen, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: "#ffffff",
-      windowHeight: element.scrollHeight,
-      height: element.scrollHeight,
-      onclone: (clonedDoc) => {
-        const buttons = clonedDoc.querySelectorAll("button, [role='button'], svg.lucide");
-        buttons.forEach((btn) => (btn as HTMLElement).style.display = "none");
-      },
+      width: 794,
+      height: offscreen.scrollHeight,
+      windowWidth: 794,
     });
 
-    element.style.overflow = originalOverflow;
-    element.style.height = originalHeight;
-    element.style.maxHeight = originalMaxHeight;
+    document.body.removeChild(offscreen);
 
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    const pageWidth = 210;
-    const pageHeight = 297;
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const margin = 10;
-    const contentWidth = pageWidth - margin * 2;
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = contentWidth / imgWidth;
-    const scaledHeight = imgHeight * ratio;
+    const contentWidth = 210 - margin * 2;
+    const pageHeight = 297 - margin * 2;
+    const ratio = contentWidth / canvas.width;
+    const scaledHeight = canvas.height * ratio;
 
-    if (scaledHeight <= pageHeight - margin * 2) {
-      pdf.addImage(imgData, "PNG", margin, margin, contentWidth, scaledHeight);
+    if (scaledHeight <= pageHeight) {
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, scaledHeight);
     } else {
-      let yPosition = 0;
+      let yPos = 0;
       let pageCount = 0;
-      const usableHeight = pageHeight - margin * 2;
-      const sliceHeight = usableHeight / ratio;
-
-      while (yPosition < imgHeight) {
-        if (pageCount > 0) {
-          pdf.addPage();
-        }
-
-        const currentSliceHeight = Math.min(sliceHeight, imgHeight - yPosition);
+      const sliceH = pageHeight / ratio;
+      while (yPos < canvas.height) {
+        if (pageCount > 0) pdf.addPage();
+        const curSlice = Math.min(sliceH, canvas.height - yPos);
         const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = imgWidth;
-        pageCanvas.height = currentSliceHeight;
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = curSlice;
         const ctx = pageCanvas.getContext("2d");
-
         if (ctx) {
-          ctx.drawImage(
-            canvas,
-            0, yPosition, imgWidth, currentSliceHeight,
-            0, 0, imgWidth, currentSliceHeight
-          );
-          const pageImgData = pageCanvas.toDataURL("image/png");
-          pdf.addImage(
-            pageImgData, "PNG",
-            margin, margin,
-            contentWidth, currentSliceHeight * ratio
-          );
+          ctx.drawImage(canvas, 0, yPos, canvas.width, curSlice, 0, 0, canvas.width, curSlice);
+          pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, curSlice * ratio);
         }
-
-        yPosition += currentSliceHeight;
+        yPos += curSlice;
         pageCount++;
       }
     }
@@ -187,9 +177,7 @@ export async function exportElementToPDF(
     pdf.save(fileName);
     return true;
   } catch (error) {
-    element.style.overflow = originalOverflow;
-    element.style.height = originalHeight;
-    element.style.maxHeight = originalMaxHeight;
+    if (document.body.contains(offscreen)) document.body.removeChild(offscreen);
     console.error("PDF export error:", error);
     return false;
   }
