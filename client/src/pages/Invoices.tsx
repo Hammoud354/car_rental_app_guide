@@ -46,7 +46,6 @@ export default function Invoices() {
   }, []);
 
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
-  const uploadPdfMutation = trpc.files.uploadPdf.useMutation();
 
   const handleWhatsAppPdf = async () => {
     if (!invoiceDetails) { toast.error("No invoice selected"); return; }
@@ -100,19 +99,22 @@ export default function Invoices() {
         }
       }
 
-      const pdfBase64 = pdf.output("datauristring");
+      // Download the PDF directly to the device
       const filename = `Invoice-${invoiceDetails.invoiceNumber}.pdf`;
-      const uploadResult = await uploadPdfMutation.mutateAsync({ base64Data: pdfBase64, filename });
+      pdf.save(filename);
 
+      // Open WhatsApp with invoice details — user attaches the downloaded PDF
       const phoneNumber = companyProfile.phone.replace(/[\s\-\(\)]/g, "");
       const localAmount = (parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-      const message = `Invoice PDF Ready!\n\n📄 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} USD / ${localAmount} ${localCurrencyCode}\n📅 Due: ${new Date(invoiceDetails.dueDate || invoiceDetails.invoiceDate).toLocaleDateString()}\n📎 PDF: ${uploadResult.url}`;
+      const message = `Hello,\n\nPlease find attached the invoice PDF for your rental.\n\n📄 Invoice: ${invoiceDetails.invoiceNumber}\n👤 Client: ${invoiceDetails.clientName}\n📅 Date: ${new Date(invoiceDetails.invoiceDate).toLocaleDateString()}\n💰 Amount: $${parseFloat(invoiceDetails.totalAmount).toFixed(2)} USD (${localAmount} ${localCurrencyCode})\n📋 Status: ${invoiceDetails.paymentStatus.toUpperCase()}\n\n(PDF has been downloaded to your device — please attach it to this message)`;
 
-      toast.success("PDF uploaded! Opening WhatsApp…");
-      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+      toast.success("PDF downloaded! Opening WhatsApp to send…");
+      setTimeout(() => {
+        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+      }, 800);
     } catch (err: any) {
       console.error("WhatsApp PDF error:", err);
-      toast.error(`Failed to send PDF: ${err.message || "Unknown error"}`);
+      toast.error(`Failed to generate PDF: ${err.message || "Unknown error"}`);
     } finally {
       setIsSendingWhatsApp(false);
     }
