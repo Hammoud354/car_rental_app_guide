@@ -1296,16 +1296,16 @@ export default function RentalContracts() {
                           <div>{selectedContract.clientAddress}</div>
                         </div>
                       )}
-                      {selectedContract.clientPassportNumber && (
+                      {selectedContract.clientPassport && (
                         <div>
                           <div className="text-sm text-muted-foreground">Passport/ID Number</div>
-                          <div className="font-mono">{selectedContract.clientPassportNumber}</div>
+                          <div className="font-mono">{selectedContract.clientPassport}</div>
                         </div>
                       )}
-                      {(selectedContract as any).clientRegistrationNumber && (
+                      {selectedContract.clientRegistrationNumber && (
                         <div>
                           <div className="text-sm text-muted-foreground">Registration Number</div>
-                          <div className="font-mono">{(selectedContract as any).clientRegistrationNumber}</div>
+                          <div className="font-mono">{selectedContract.clientRegistrationNumber}</div>
                         </div>
                       )}
                       {selectedContract.clientDateOfBirth && (
@@ -1524,10 +1524,23 @@ export default function RentalContracts() {
                   <ContractPDFTemplate 
                     contract={{
                       ...selectedContract,
-                      clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`,
+                      clientName: selectedContract.clientName,
+                      clientMotherFullName: selectedContract.clientMotherFullName,
+                      clientNationality: selectedContract.clientNationality,
+                      clientRegistrationNumber: selectedContract.clientRegistrationNumber,
+                      clientPassport: selectedContract.clientPassport,
+                      clientDateOfBirth: selectedContract.clientDateOfBirth,
+                      clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
+                      clientPhone: selectedContract.clientPhone || undefined,
+                      clientAddress: selectedContract.clientAddress || undefined,
                       drivingLicenseNumber: selectedContract.clientDriverLicense || "",
+                      licenseIssueDate: selectedContract.licenseIssueDate,
+                      licenseExpiryDate: selectedContract.licenseExpiryDate || "",
                     }} 
-                    vehicle={vehicle || null}
+                    vehicle={vehicle ? {
+                      ...vehicle,
+                      fuelType: vehicle.fuelType,
+                    } : null}
                     companyProfile={companyProfile || null}
                     damageMarks={selectedContractDamageMarks}
                   />

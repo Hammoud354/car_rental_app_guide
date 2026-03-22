@@ -42,20 +42,24 @@ interface Vehicle {
   category?: string | null;
   color?: string | null;
   vin?: string | null;
+  fuelType?: string | null;
 }
 
 interface Contract {
   contractNumber: string;
   clientName: string;
+  clientMotherFullName?: string | null;
+  clientNationality?: string | null;
+  clientRegistrationNumber?: string | null;
+  clientPassport?: string | null;
+  clientDateOfBirth?: string | Date | null;
+  clientPlaceOfBirth?: string | null;
   clientEmail?: string;
   clientPhone?: string;
   clientAddress?: string;
-  clientDateOfBirth?: string;
-  clientPassportNumber?: string;
-  clientPlaceOfBirth?: string;
   drivingLicenseNumber: string;
-  licenseIssueDate?: string;
-  licenseExpiryDate: string;
+  licenseIssueDate?: string | Date | null;
+  licenseExpiryDate: string | Date;
   rentalStartDate: string;
   rentalEndDate: string;
   rentalDays: number;
@@ -152,12 +156,17 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
       </div>
     );
   };
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const formatDate = (dateValue: string | Date | null | undefined) => {
+    if (!dateValue) return '—';
+    try {
+      return new Date(dateValue).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return String(dateValue);
+    }
   };
 
   const formatCurrency = (value: string | number) => {
@@ -229,40 +238,52 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
 
       {/* Client Information */}
       <div style={{ marginBottom: '25px' }}>
-        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
+        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
           CLIENT INFORMATION
         </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt' }}>
           <tbody>
-            <tr>
-              <td style={{ padding: '8px 0', width: '40%', fontWeight: 'bold' }}>Full Name:</td>
-              <td style={{ padding: '8px 0' }}>{contract.clientName}</td>
+            {/* Row 1: Full Name | Mother's Name */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Full Name:</td>
+              <td style={{ padding: '6px 8px', width: '25%' }}>{contract.clientName}</td>
+              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Mother's Name:</td>
+              <td style={{ padding: '6px 8px', width: '25%' }}>{contract.clientMotherFullName || '—'}</td>
             </tr>
-            {contract.clientEmail && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Email:</td>
-                <td style={{ padding: '8px 0' }}>{contract.clientEmail}</td>
-              </tr>
-            )}
-            {contract.clientPhone && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Phone:</td>
-                <td style={{ padding: '8px 0' }}>{contract.clientPhone}</td>
-              </tr>
-            )}
-            {contract.clientAddress && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Address:</td>
-                <td style={{ padding: '8px 0' }}>{contract.clientAddress}</td>
-              </tr>
-            )}
-            <tr>
-              <td style={{ padding: '8px 0', fontWeight: 'bold' }}>License Number:</td>
-              <td style={{ padding: '8px 0', fontFamily: 'monospace' }}>{contract.drivingLicenseNumber}</td>
+            {/* Row 2: Nationality | Registration Number */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Nationality:</td>
+              <td style={{ padding: '6px 8px' }}>{contract.clientNationality || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Registration No.:</td>
+              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.clientRegistrationNumber || '—'}</td>
             </tr>
-            <tr>
-              <td style={{ padding: '8px 0', fontWeight: 'bold' }}>License Expiry:</td>
-              <td style={{ padding: '8px 0' }}>{formatDate(contract.licenseExpiryDate)}</td>
+            {/* Row 3: Passport Number | Date of Birth */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Passport No.:</td>
+              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.clientPassport || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Date of Birth:</td>
+              <td style={{ padding: '6px 8px' }}>{formatDate(contract.clientDateOfBirth as any)}</td>
+            </tr>
+            {/* Row 4: Place of Birth | Phone */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Place of Birth:</td>
+              <td style={{ padding: '6px 8px' }}>{contract.clientPlaceOfBirth || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Phone Number:</td>
+              <td style={{ padding: '6px 8px' }}>{contract.clientPhone || '—'}</td>
+            </tr>
+            {/* Row 5: License Number | Issue Date */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>License No.:</td>
+              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.drivingLicenseNumber}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Issue Date:</td>
+              <td style={{ padding: '6px 8px' }}>{formatDate(contract.licenseIssueDate as any)}</td>
+            </tr>
+            {/* Row 6: Expiry Date | Address */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Expiry Date:</td>
+              <td style={{ padding: '6px 8px' }}>{formatDate(contract.licenseExpiryDate as any)}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Address:</td>
+              <td style={{ padding: '6px 8px' }}>{contract.clientAddress || '—'}</td>
             </tr>
           </tbody>
         </table>
@@ -270,39 +291,41 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
 
       {/* Vehicle Information */}
       <div style={{ marginBottom: '25px' }}>
-        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
+        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
           VEHICLE INFORMATION
         </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt' }}>
           <tbody>
-            <tr>
-              <td style={{ padding: '8px 0', width: '40%', fontWeight: 'bold' }}>Plate Number:</td>
-              <td style={{ padding: '8px 0', fontWeight: 'bold', fontSize: '12pt' }}>{vehicle?.plateNumber || 'Not Specified'}</td>
-            </tr>
-            <tr>
-              <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Vehicle:</td>
-              <td style={{ padding: '8px 0' }}>
-                {vehicle ? `${vehicle.brand} ${vehicle.model} (${vehicle.year})` : 'Not Specified'}
+            {/* Row 1: Make & Model | Model Year */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Make &amp; Model:</td>
+              <td style={{ padding: '6px 8px', width: '25%' }}>
+                {vehicle ? `${vehicle.brand} ${vehicle.model}` : '—'}
               </td>
+              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Model Year:</td>
+              <td style={{ padding: '6px 8px', width: '25%' }}>{vehicle?.year || '—'}</td>
             </tr>
-            {vehicle?.category && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Category:</td>
-                <td style={{ padding: '8px 0' }}>{vehicle.category}</td>
-              </tr>
-            )}
-            {vehicle?.color && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Color:</td>
-                <td style={{ padding: '8px 0' }}>{vehicle.color}</td>
-              </tr>
-            )}
-            {vehicle?.vin && (
-              <tr>
-                <td style={{ padding: '8px 0', fontWeight: 'bold' }}>VIN Number:</td>
-                <td style={{ padding: '8px 0', fontFamily: 'monospace' }}>{vehicle.vin}</td>
-              </tr>
-            )}
+            {/* Row 2: Plate Number | VIN */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Plate Number:</td>
+              <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontWeight: 'bold' }}>{vehicle?.plateNumber || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>VIN:</td>
+              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{vehicle?.vin || '—'}</td>
+            </tr>
+            {/* Row 3: Type | Color */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Type:</td>
+              <td style={{ padding: '6px 8px' }}>{vehicle?.category || contract.vehicleType || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Color:</td>
+              <td style={{ padding: '6px 8px' }}>{vehicle?.color || contract.vehicleColor || '—'}</td>
+            </tr>
+            {/* Row 4: Fuel */}
+            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Fuel Type:</td>
+              <td style={{ padding: '6px 8px' }}>{vehicle?.fuelType || contract.vehicleFuelType || '—'}</td>
+              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Fuel Level:</td>
+              <td style={{ padding: '6px 8px' }}>{contract.fuelLevel || '—'}</td>
+            </tr>
           </tbody>
         </table>
       </div>
