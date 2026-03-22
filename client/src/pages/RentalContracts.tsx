@@ -1763,14 +1763,14 @@ export default function RentalContracts() {
                   contractInvoice ? (
                     <Button 
                       onClick={() => {
-                        // Redirect to invoices page and open the invoice
                         window.location.href = `/invoices?invoice=${contractInvoice.id}`;
                       }} 
                       variant="outline"
-                      className="h-10 w-full"
+                      className="h-10 w-full overflow-hidden"
                       size="default"
+                      title={`View Invoice (${contractInvoice.invoiceNumber})`}
                     >
-                      View Invoice ({contractInvoice.invoiceNumber})
+                      <span className="truncate">View Invoice ({contractInvoice.invoiceNumber})</span>
                     </Button>
                   ) : (
                     <Button 
