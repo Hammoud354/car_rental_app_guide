@@ -301,6 +301,7 @@ export const damageMarks = pgTable("damageMarks", {
   contractId: integer("contractId").notNull().references(() => rentalContracts.id, { onDelete: "cascade" }),
   xPosition: decimal("xPosition", { precision: 5, scale: 2 }).notNull(),
   yPosition: decimal("yPosition", { precision: 5, scale: 2 }).notNull(),
+  view: varchar("view", { length: 10 }),
   description: varchar("description", { length: 500 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

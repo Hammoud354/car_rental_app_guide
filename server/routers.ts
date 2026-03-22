@@ -954,6 +954,7 @@ export const appRouter = router({
         contractId: z.number(),
         xPosition: z.string(),
         yPosition: z.string(),
+        view: z.string().optional(),
         description: z.string().max(500).optional(),
       }))
       .mutation(async ({ input, ctx }) => {

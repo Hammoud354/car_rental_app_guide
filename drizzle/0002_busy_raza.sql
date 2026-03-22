@@ -1,0 +1,1 @@
+ALTER TABLE "damageMarks" ADD COLUMN "view" varchar(10);

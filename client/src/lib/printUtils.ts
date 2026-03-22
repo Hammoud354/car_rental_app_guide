@@ -182,3 +182,65 @@ export async function exportElementToPDF(
     return false;
   }
 }
+
+/**
+ * Captures the ContractPDFTemplate element (already off-screen with A4 dimensions)
+ * directly — no clone needed, preserving all mm-unit sizing and background images.
+ */
+export async function exportContractTemplateToPDF(fileName: string): Promise<boolean> {
+  const template = document.getElementById("contract-pdf-template");
+  if (!template) return false;
+
+  // Give background images a moment to finish loading
+  await new Promise((r) => setTimeout(r, 300));
+
+  try {
+    const templateWidth = template.scrollWidth;
+    const templateHeight = template.scrollHeight;
+
+    const canvas = await html2canvas(template, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: "#ffffff",
+      width: templateWidth,
+      height: templateHeight,
+      windowWidth: templateWidth,
+    });
+
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const margin = 0;
+    const contentWidth = 210 - margin * 2;
+    const pageHeight = 297 - margin * 2;
+    const ratio = contentWidth / canvas.width;
+    const scaledHeight = canvas.height * ratio;
+
+    if (scaledHeight <= pageHeight) {
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, scaledHeight);
+    } else {
+      let yPos = 0;
+      let pageCount = 0;
+      const sliceH = pageHeight / ratio;
+      while (yPos < canvas.height) {
+        if (pageCount > 0) pdf.addPage();
+        const curSlice = Math.min(sliceH, canvas.height - yPos);
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = curSlice;
+        const ctx = pageCanvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(canvas, 0, yPos, canvas.width, curSlice, 0, 0, canvas.width, curSlice);
+          pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, curSlice * ratio);
+        }
+        yPos += curSlice;
+        pageCount++;
+      }
+    }
+
+    pdf.save(fileName);
+    return true;
+  } catch (error) {
+    console.error("Contract PDF export error:", error);
+    return false;
+  }
+}

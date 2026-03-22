@@ -1,5 +1,30 @@
 import React from 'react';
 
+interface PDFDamageMark {
+  id: number;
+  view?: string | null;
+  xPosition: string;
+  yPosition: string;
+  description?: string | null;
+}
+
+type CarView = "left" | "right" | "front" | "rear";
+
+const VIEW_LABELS: Record<CarView, string> = {
+  left: "LEFT SIDE",
+  right: "RIGHT SIDE",
+  front: "FRONT",
+  rear: "REAR",
+};
+
+// Matches the cropping from CarDamageInspection.tsx
+const VIEW_STYLE: Record<CarView, { bgSize: string; bgPos: string }> = {
+  left:  { bgSize: "100% 300%", bgPos: "50% 0%"   },
+  right: { bgSize: "100% 300%", bgPos: "50% 50%"  },
+  front: { bgSize: "200% 300%", bgPos: "0% 100%"  },
+  rear:  { bgSize: "200% 300%", bgPos: "100% 100%" },
+};
+
 interface CompanyProfile {
   companyName: string;
   logoUrl?: string | null;
@@ -62,9 +87,71 @@ interface ContractPDFTemplateProps {
   contract: Contract;
   vehicle: Vehicle | null;
   companyProfile?: CompanyProfile | null;
+  damageMarks?: PDFDamageMark[];
 }
 
-export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile }) => {
+export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile, damageMarks = [] }) => {
+  // Build absolute image URL so html2canvas can fetch it
+  const carSchemaUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/car-schema.jpeg`
+    : '/car-schema.jpeg';
+
+  const renderCarPanel = (view: CarView, panelWidth: string, marks: PDFDamageMark[]) => {
+    const { bgSize, bgPos } = VIEW_STYLE[view];
+    const viewMarks = marks.filter(m => m.view === view);
+    // padding-top % is always relative to the PARENT's width (CSS rule).
+    // Left/Right: full-width (100%), 3:1 → height = 33.33% of parent ✓
+    // Front/Rear: half-width (50%), 3:2 → height = (2/3)*(50%) = 33.33% of parent ✓
+    // All 4 views end up the same height — 33.33% of the content column width.
+    return (
+      <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: panelWidth === '50%' ? '4px' : '0', boxSizing: 'border-box' }}>
+        <div style={{ fontSize: '7pt', fontWeight: 'bold', color: '#6b7280', textAlign: 'center', marginBottom: '3px', letterSpacing: '1px' }}>
+          {VIEW_LABELS[view]}
+        </div>
+        {/* Outer div provides the aspect-ratio height via padding-top (% of parent width) */}
+        <div style={{ position: 'relative', width: '100%', paddingTop: '33.33%' }}>
+          {/* Inner div fills the outer space and holds the background + marks */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: `url(${carSchemaUrl})`,
+            backgroundSize: bgSize,
+            backgroundPosition: bgPos,
+            backgroundRepeat: 'no-repeat',
+            border: '1px solid #d1d5db',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}>
+            {viewMarks.map(mark => {
+              const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
+              return (
+                <div key={mark.id} style={{
+                  position: 'absolute',
+                  left: `${mark.xPosition}%`,
+                  top: `${mark.yPosition}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: '18px',
+                  height: '18px',
+                  borderRadius: '50%',
+                  backgroundColor: '#dc2626',
+                  border: '2px solid white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '8pt',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                  zIndex: 1,
+                }}>
+                  {globalIdx}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -387,6 +474,79 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           </table>
         </div>
       )}
+
+      {/* Vehicle Inspection Diagram */}
+      <div style={{ marginBottom: '25px', pageBreakInside: 'avoid' }}>
+        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
+          VEHICLE INSPECTION REPORT
+        </h2>
+        <div style={{ fontSize: '9pt', color: '#6b7280', marginBottom: '10px' }}>
+          Pre-rental condition documented at time of pickup. Numbered circles indicate existing damage locations.
+        </div>
+
+        {/* Left Side — full width */}
+        {renderCarPanel('left', '100%', damageMarks)}
+        <div style={{ height: '8px' }} />
+
+        {/* Right Side — full width */}
+        {renderCarPanel('right', '100%', damageMarks)}
+        <div style={{ height: '8px' }} />
+
+        {/* Front + Rear — side by side */}
+        <div style={{ fontSize: '0' }}>
+          {renderCarPanel('front', '50%', damageMarks)}
+          {renderCarPanel('rear', '50%', damageMarks)}
+        </div>
+
+        {/* Legend */}
+        {damageMarks.length > 0 ? (
+          <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px' }}>
+            <div style={{ fontSize: '9pt', fontWeight: 'bold', marginBottom: '6px', color: '#991b1b' }}>
+              Damage Notes ({damageMarks.length} mark{damageMarks.length !== 1 ? 's' : ''}):
+            </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9pt' }}>
+              <tbody>
+                {damageMarks.map((mark, idx) => (
+                  <tr key={mark.id} style={{ borderTop: idx > 0 ? '1px solid #fecaca' : 'none' }}>
+                    <td style={{ padding: '3px 8px 3px 0', width: '28px', verticalAlign: 'top' }}>
+                      <div style={{
+                        display: 'inline-block', width: '18px', height: '18px', borderRadius: '50%',
+                        backgroundColor: '#dc2626', color: 'white', fontSize: '8pt', fontWeight: 'bold',
+                        textAlign: 'center', lineHeight: '18px',
+                      }}>
+                        {idx + 1}
+                      </div>
+                    </td>
+                    <td style={{ padding: '3px 4px', verticalAlign: 'top', width: '60px', color: '#6b7280', textTransform: 'uppercase', fontSize: '8pt' }}>
+                      {mark.view || '—'}
+                    </td>
+                    <td style={{ padding: '3px 0', verticalAlign: 'top' }}>
+                      {mark.description || '(no description)'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#f0fdf4', border: '1px solid #86efac', borderRadius: '6px', fontSize: '9pt', color: '#166534', textAlign: 'center' }}>
+            ✓ No damage marks recorded — vehicle was in clean condition at pickup.
+          </div>
+        )}
+
+        {/* Client acknowledgement */}
+        <div style={{ marginTop: '15px', display: 'flex', gap: '20px' }}>
+          <div style={{ flex: 1, borderTop: '1px solid #000', paddingTop: '4px', fontSize: '8pt', color: '#4b5563', textAlign: 'center' }}>
+            Client Signature
+          </div>
+          <div style={{ flex: 1, borderTop: '1px solid #000', paddingTop: '4px', fontSize: '8pt', color: '#4b5563', textAlign: 'center' }}>
+            Date
+          </div>
+          <div style={{ flex: 1, borderTop: '1px solid #000', paddingTop: '4px', fontSize: '8pt', color: '#4b5563', textAlign: 'center' }}>
+            Agent Signature
+          </div>
+        </div>
+      </div>
 
       {/* Signature */}
       {contract.signatureData && (

@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { printElement, exportElementToPDF } from "@/lib/printUtils";
+import { printElement, exportElementToPDF, exportContractTemplateToPDF } from "@/lib/printUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
@@ -103,6 +103,10 @@ export default function RentalContracts() {
   const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
   const exchangeRate = companyProfile?.exchangeRate ? Number(companyProfile.exchangeRate) : 1.0;
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
+  const { data: selectedContractDamageMarks = [] } = trpc.contracts.getDamageMarks.useQuery(
+    { contractId: selectedContract?.id ?? 0 },
+    { enabled: !!selectedContract }
+  );
   const utils = trpc.useUtils();
   
   // Use predefined world nationalities list
@@ -387,6 +391,7 @@ export default function RentalContracts() {
             contractId: contract.id,
             xPosition: mark.x.toString(),
             yPosition: mark.y.toString(),
+            view: mark.view,
             description: mark.description,
           });
         });
@@ -1508,22 +1513,23 @@ export default function RentalContracts() {
               const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
               return (
                 <div 
-                  id="contract-pdf-template" 
                   style={{ 
                     position: 'absolute', 
                     left: '-9999px', 
                     top: '0',
-                    width: '210mm', // A4 width
+                    width: '210mm',
                     backgroundColor: 'white'
                   }}
                 >
                   <ContractPDFTemplate 
                     contract={{
                       ...selectedContract,
-                      clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`
+                      clientName: `${selectedContract.clientFirstName} ${selectedContract.clientLastName}`,
+                      drivingLicenseNumber: selectedContract.clientDriverLicense || "",
                     }} 
                     vehicle={vehicle || null}
                     companyProfile={companyProfile || null}
+                    damageMarks={selectedContractDamageMarks}
                   />
                 </div>
               );
@@ -1557,15 +1563,14 @@ export default function RentalContracts() {
                     }
                     
                     try {
-                      toast.info("Generating PDF...");
-                      const success = await exportElementToPDF(
-                        "contract-content",
+                      toast.info("Generating PDF with inspection diagram...");
+                      const success = await exportContractTemplateToPDF(
                         `Contract_${selectedContract.contractNumber || selectedContract.id}.pdf`
                       );
                       if (success) {
                         toast.success("PDF exported successfully!");
                       } else {
-                        toast.error("Contract content not found");
+                        toast.error("Contract template not found");
                       }
                     } catch (error: any) {
                       console.error("PDF export error:", error);
