@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
-import { CarLeftSVG, CarRightSVG, CarFrontSVG, CarRearSVG } from "@/components/CarOutlineSVGs";
 
 export type MarkSymbol = "X" | "O" | "dot";
 export type CarView = "front" | "rear" | "left" | "right";
@@ -57,18 +56,15 @@ const VIEW_LABELS: Record<CarView, string> = {
   right: "Right Side",
 };
 
-const VIEW_ASPECT: Record<CarView, string> = {
-  left: "3 / 1",
-  right: "3 / 1",
-  front: "4 / 3",
-  rear: "4 / 3",
-};
-
-const CarSVGMap: Record<CarView, (props: { style?: React.CSSProperties }) => JSX.Element> = {
-  left:  CarLeftSVG,
-  right: CarRightSVG,
-  front: CarFrontSVG,
-  rear:  CarRearSVG,
+/* New PNG is a 2×2 grid (1536×1024):
+   top-left = left side, top-right = right side,
+   bottom-left = front,  bottom-right = rear
+   → bgSize "200% 200%" zooms into each quadrant */
+const VIEW_STYLE: Record<CarView, { bgPos: string }> = {
+  left:  { bgPos: "0% 0%"     },
+  right: { bgPos: "100% 0%"   },
+  front: { bgPos: "0% 100%"   },
+  rear:  { bgPos: "100% 100%" },
 };
 
 /* ── Render a single symbol at given size ─── */
@@ -129,7 +125,7 @@ interface ViewPanelProps {
 
 function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkClick }: ViewPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const CarSVG = CarSVGMap[view];
+  const { bgPos } = VIEW_STYLE[view];
   const viewMarks = marks.filter(m => m.view === view);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -145,11 +141,17 @@ function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkCl
       </span>
       <div
         ref={ref}
-        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-visible shadow-sm hover:shadow-md transition-shadow bg-white"
-        style={{ aspectRatio: VIEW_ASPECT[view] }}
+        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+        style={{
+          aspectRatio: "3 / 2",
+          backgroundImage: "url('/car-schema.png')",
+          backgroundSize: "200% 200%",
+          backgroundPosition: bgPos,
+          backgroundRepeat: "no-repeat",
+          backgroundColor: "white",
+        }}
         onClick={handleClick}
       >
-        <CarSVG style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
 
         {viewMarks.map(mark => {
           const idx = allMarks.findIndex(m => m.id === mark.id) + 1;

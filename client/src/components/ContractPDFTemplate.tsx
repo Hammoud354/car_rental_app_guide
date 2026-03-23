@@ -1,5 +1,4 @@
 import React from 'react';
-import { CarLeftSVG, CarRightSVG, CarFrontSVG, CarRearSVG } from './CarOutlineSVGs';
 
 interface PDFDamageMark {
   id: number;
@@ -19,11 +18,12 @@ const VIEW_LABELS: Record<CarView, string> = {
   rear: "REAR",
 };
 
-const CAR_SVG_MAP: Record<CarView, React.FC<{ style?: React.CSSProperties }>> = {
-  left:  CarLeftSVG,
-  right: CarRightSVG,
-  front: CarFrontSVG,
-  rear:  CarRearSVG,
+/* 2×2 PNG grid: each quadrant is exactly one view */
+const VIEW_BG_POS: Record<CarView, string> = {
+  left:  "0% 0%",
+  right: "100% 0%",
+  front: "0% 100%",
+  rear:  "100% 100%",
 };
 
 interface CompanyProfile {
@@ -96,6 +96,9 @@ interface ContractPDFTemplateProps {
 }
 
 export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile, damageMarks = [] }) => {
+  const carSchemaUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/car-schema.png`
+    : '/car-schema.png';
 
   const renderMarkSymbol = (sym: string | null | undefined, idx: number, size = 18) => {
     const s = size;
@@ -117,8 +120,12 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
 
   const renderCarPanel = (view: CarView, panelWidth: string, marks: PDFDamageMark[]) => {
     const viewMarks = marks.filter(m => m.view === view);
-    const CarSVG = CAR_SVG_MAP[view];
-    const paddingTop = view === 'left' || view === 'right' ? '33.33%' : '44.44%';
+    const bgPos = VIEW_BG_POS[view];
+    // Each quadrant is 3:2 aspect ratio.
+    // padding-top % is relative to the PARENT width, so:
+    //   full-width panels (100%): paddingTop = 66.67% (= 2/3 * 100%)
+    //   half-width panels  (50%): paddingTop = 33.33% (= 2/3 * 50%)
+    const paddingTop = panelWidth === '50%' ? '33.33%' : '66.67%';
     return (
       <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: panelWidth === '50%' ? '4px' : '0', boxSizing: 'border-box' }}>
         <div style={{ fontSize: '7pt', fontWeight: 'bold', color: '#6b7280', textAlign: 'center', marginBottom: '3px', letterSpacing: '1px' }}>
@@ -127,12 +134,15 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         <div style={{ position: 'relative', width: '100%', paddingTop }}>
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            backgroundImage: `url(${carSchemaUrl})`,
+            backgroundSize: '200% 200%',
+            backgroundPosition: bgPos,
+            backgroundRepeat: 'no-repeat',
+            backgroundColor: 'white',
             border: '1px solid #d1d5db',
             borderRadius: '4px',
             overflow: 'hidden',
-            backgroundColor: 'white',
           }}>
-            <CarSVG style={{ width: '100%', height: '100%', display: 'block' }} />
             {viewMarks.map(mark => {
               const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
               return (
