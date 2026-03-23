@@ -211,14 +211,16 @@ export async function exportContractTemplateToPDF(fileName: string): Promise<boo
     const ratio = pageW / canvas.width;
     const pageSliceH = pageH / ratio; // canvas pixels that fit in one A4 page
 
-    // Detect the inspection section's position to snap the break cleanly
+    // Detect the inspection section's Y position using scroll-adjusted coordinates.
+    // getBoundingClientRect is viewport-relative; adding scrollY gives document-absolute Y.
     const inspectionEl = template.querySelector("#inspection-section") as HTMLElement | null;
     let smartBreakCanvasY = -1;
     if (inspectionEl) {
-      const templateRect = template.getBoundingClientRect();
-      const inspectionRect = inspectionEl.getBoundingClientRect();
-      const offsetY = inspectionRect.top - templateRect.top;
-      smartBreakCanvasY = Math.max(0, offsetY * scale);
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      const templateTop  = template.getBoundingClientRect().top  + scrollY;
+      const inspectionTop = inspectionEl.getBoundingClientRect().top + scrollY;
+      const offsetY = Math.max(0, inspectionTop - templateTop);
+      smartBreakCanvasY = Math.round(offsetY * scale);
     }
 
     const totalH = canvas.height;
@@ -231,17 +233,19 @@ export async function exportContractTemplateToPDF(fileName: string): Promise<boo
       // Default: full page slice
       let sliceH = Math.min(pageSliceH, totalH - yPos);
 
-      // If the smart break falls within this page's range, cut short here
+      // If the smart break falls within this page's range, cut right before it.
+      // Applies to any page (not just page 0) and is consumed once fired.
       if (
+        smartBreakCanvasY > 0 &&
         smartBreakCanvasY > yPos &&
-        smartBreakCanvasY < yPos + sliceH &&
-        pageCount === 0
+        smartBreakCanvasY < yPos + sliceH
       ) {
         sliceH = smartBreakCanvasY - yPos;
+        smartBreakCanvasY = -1; // consume — don't apply again
       }
 
       if (sliceH <= 0) {
-        yPos = smartBreakCanvasY;
+        yPos += pageSliceH; // safety: advance past a stuck position
         continue;
       }
 

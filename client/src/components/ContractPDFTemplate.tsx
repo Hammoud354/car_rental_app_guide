@@ -19,13 +19,14 @@ const VIEW_LABELS: Record<CarView, string> = {
 };
 
 /* 2×2 PNG grid offsets for <img> crop approach.
-   Image rendered at 200%×200% inside overflow:hidden container.
-   Each quadrant: shift left by 0 or -100%, top by 0 or -100% */
+   img is set width:200% height:auto → natural height = 4H (4× container height).
+   Quadrant height = 2H, so front/rear need top:-200% (= -2H) to shift by one quadrant.
+   left offset: -100% = -P (one quadrant width) to reach the right column. */
 const VIEW_IMG_OFFSET: Record<CarView, { left: string; top: string }> = {
   left:  { left: '0%',    top: '0%'    },
   right: { left: '-100%', top: '0%'    },
-  front: { left: '0%',    top: '-100%' },
-  rear:  { left: '-100%', top: '-100%' },
+  front: { left: '0%',    top: '-200%' },
+  rear:  { left: '-100%', top: '-200%' },
 };
 
 interface CompanyProfile {
@@ -140,14 +141,16 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
             overflow: 'hidden',
             backgroundColor: 'white',
           }}>
-            {/* <img> approach: natural aspect ratio is preserved, no stretch */}
+            {/* width:200% height:auto preserves natural 3:2 ratio.
+                Natural img height at 200% width = 4H (4× container H).
+                Offsets in VIEW_IMG_OFFSET account for this. */}
             <img
               src={carSchemaUrl}
               alt=""
               style={{
                 position: 'absolute',
                 width: '200%',
-                height: '200%',
+                height: 'auto',
                 left: imgLeft,
                 top: imgTop,
                 maxWidth: 'none',
