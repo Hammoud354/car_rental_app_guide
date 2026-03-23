@@ -1526,46 +1526,6 @@ export default function RentalContracts() {
                 </div>
               );
             })()}
-            {/* Hidden PDF Template for Export */}
-            {selectedContract && (() => {
-              const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
-              return (
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '-9999px', 
-                    top: '0',
-                    width: '210mm',
-                    backgroundColor: 'white'
-                  }}
-                >
-                  <ContractPDFTemplate 
-                    contract={{
-                      ...selectedContract,
-                      clientName: selectedContract.clientName,
-                      clientMotherFullName: selectedContract.clientMotherFullName,
-                      clientNationality: selectedContract.clientNationality,
-                      clientRegistrationNumber: selectedContract.clientRegistrationNumber,
-                      clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
-                      clientPassport: selectedContract.clientPassport,
-                      clientDateOfBirth: selectedContract.clientDateOfBirth,
-                      clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
-                      clientPhone: selectedContract.clientPhone || undefined,
-                      clientAddress: selectedContract.clientAddress || undefined,
-                      drivingLicenseNumber: selectedContract.clientDriverLicense || "",
-                      licenseIssueDate: selectedContract.licenseIssueDate,
-                      licenseExpiryDate: selectedContract.licenseExpiryDate || "",
-                    }} 
-                    vehicle={vehicle ? {
-                      ...vehicle,
-                      fuelType: vehicle.fuelType,
-                    } : null}
-                    companyProfile={companyProfile || null}
-                    damageMarks={selectedContractDamageMarks}
-                  />
-                </div>
-              );
-            })()}
             <DialogFooter className="flex-shrink-0 border-t border-gray-700 pt-4 pb-2">
               {/* Button grid layout - 2 columns, equal sizing */}
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
@@ -1602,7 +1562,7 @@ export default function RentalContracts() {
                       if (success) {
                         toast.success("PDF exported successfully!");
                       } else {
-                        toast.error("Contract template not found");
+                        toast.error("PDF generation failed. Please try again.");
                       }
                     } catch (error: any) {
                       console.error("PDF export error:", error);
@@ -2135,6 +2095,34 @@ export default function RentalContracts() {
           }}
         />
       )}
+
+      {/* PDF Template rendered at root level (outside any dialog/portal) so html2canvas works correctly */}
+      {selectedContract && (() => {
+        const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+        return (
+          <ContractPDFTemplate
+            contract={{
+              ...selectedContract,
+              clientName: selectedContract.clientName,
+              clientMotherFullName: selectedContract.clientMotherFullName,
+              clientNationality: selectedContract.clientNationality,
+              clientRegistrationNumber: selectedContract.clientRegistrationNumber,
+              clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
+              clientPassport: selectedContract.clientPassport,
+              clientDateOfBirth: selectedContract.clientDateOfBirth,
+              clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
+              clientPhone: selectedContract.clientPhone || undefined,
+              clientAddress: selectedContract.clientAddress || undefined,
+              drivingLicenseNumber: selectedContract.clientDriverLicense || "",
+              licenseIssueDate: selectedContract.licenseIssueDate,
+              licenseExpiryDate: selectedContract.licenseExpiryDate || "",
+            }}
+            vehicle={vehicle ? { ...vehicle, fuelType: vehicle.fuelType } : null}
+            companyProfile={companyProfile || null}
+            damageMarks={selectedContractDamageMarks}
+          />
+        );
+      })()}
     </>
   );
 }
