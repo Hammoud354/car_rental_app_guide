@@ -18,12 +18,14 @@ const VIEW_LABELS: Record<CarView, string> = {
   rear: "REAR",
 };
 
-/* 2×2 PNG grid: each quadrant is exactly one view */
-const VIEW_BG_POS: Record<CarView, string> = {
-  left:  "0% 0%",
-  right: "100% 0%",
-  front: "0% 100%",
-  rear:  "100% 100%",
+/* 2×2 PNG grid offsets for <img> crop approach.
+   Image rendered at 200%×200% inside overflow:hidden container.
+   Each quadrant: shift left by 0 or -100%, top by 0 or -100% */
+const VIEW_IMG_OFFSET: Record<CarView, { left: string; top: string }> = {
+  left:  { left: '0%',    top: '0%'    },
+  right: { left: '-100%', top: '0%'    },
+  front: { left: '0%',    top: '-100%' },
+  rear:  { left: '-100%', top: '-100%' },
 };
 
 interface CompanyProfile {
@@ -121,29 +123,36 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
 
   const renderCarPanel = (view: CarView, panelWidth: string, marks: PDFDamageMark[]) => {
     const viewMarks = marks.filter(m => m.view === view);
-    const bgPos = VIEW_BG_POS[view];
-    // Each quadrant is 3:2 aspect ratio.
-    // padding-top % is relative to the PARENT width, so:
-    //   full-width panels (100%): paddingTop = 66.67% (= 2/3 * 100%)
-    //   half-width panels  (50%): paddingTop = 33.33% (= 2/3 * 50%)
-    const paddingTop = panelWidth === '50%' ? '33.33%' : '66.67%';
+    const { left: imgLeft, top: imgTop } = VIEW_IMG_OFFSET[view];
+    // All panels are now 50% wide. Quadrant is 3:2, so paddingTop = 33.33%
+    const paddingTop = '33.33%';
     return (
-      <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: panelWidth === '50%' ? '4px' : '0', boxSizing: 'border-box' }}>
+      <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: '4px', boxSizing: 'border-box' }}>
         <div style={{ fontSize: '7pt', fontWeight: 'bold', color: '#6b7280', textAlign: 'center', marginBottom: '3px', letterSpacing: '1px' }}>
           {VIEW_LABELS[view]}
         </div>
         <div style={{ position: 'relative', width: '100%', paddingTop }}>
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundImage: `url(${carSchemaUrl})`,
-            backgroundSize: '200% 200%',
-            backgroundPosition: bgPos,
-            backgroundRepeat: 'no-repeat',
-            backgroundColor: 'white',
             border: '1px solid #d1d5db',
             borderRadius: '4px',
             overflow: 'hidden',
+            backgroundColor: 'white',
           }}>
+            {/* <img> approach: natural aspect ratio is preserved, no stretch */}
+            <img
+              src={carSchemaUrl}
+              alt=""
+              style={{
+                position: 'absolute',
+                width: '200%',
+                height: '200%',
+                left: imgLeft,
+                top: imgTop,
+                maxWidth: 'none',
+                display: 'block',
+              }}
+            />
             {viewMarks.map(mark => {
               const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
               return (
@@ -254,8 +263,13 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt' }}>
             <tbody>
               {[
-                ['Full Name',       contract.clientName,                              null],
-                ["Father's Name",   contract.clientFatherFullName || '—',             null],
+                ['Full Name', (() => {
+                    const parts = (contract.clientName || '').trim().split(/\s+/);
+                    const father = (contract.clientFatherFullName || '').trim();
+                    if (!father || parts.length === 0) return contract.clientName || '—';
+                    const [first, ...rest] = parts;
+                    return [first, father, ...rest].join(' ');
+                  })(),                                                                null],
                 ["Mother's Name",   contract.clientMotherFullName || '—',             null],
                 ['Nationality',     contract.clientNationality || '—',                null],
                 ['Registration No.',contract.clientRegistrationNumber || '—',         'monospace'],
@@ -474,7 +488,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
       )}
 
       {/* Vehicle Inspection Diagram */}
-      <div style={{ marginBottom: '25px', pageBreakInside: 'avoid' }}>
+      <div style={{ marginBottom: '25px', pageBreakBefore: 'always', pageBreakInside: 'avoid' }}>
         <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
           VEHICLE INSPECTION REPORT
         </h2>
