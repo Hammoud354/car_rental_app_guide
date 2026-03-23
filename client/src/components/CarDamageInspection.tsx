@@ -175,7 +175,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
-  const [activeSymbol, setActiveSymbol] = useState<MarkSymbol>("X");
+  const activeSymbol: MarkSymbol = "X";
   const [fuelLevel, setFuelLevel] = useState("Full");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -207,10 +207,6 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
     setMarkDescription("");
   };
 
-  const handleChangeSymbol = (id: string, sym: MarkSymbol) => {
-    setDamageMarks(p => p.map(m => m.id === id ? { ...m, symbol: sym } : m));
-  };
-
   const handleDelete = (id: string) => {
     setDamageMarks(p => p.filter(m => m.id !== id));
     if (selectedMark === id) { setSelectedMark(null); setMarkDescription(""); }
@@ -227,12 +223,6 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
   };
 
   const panelProps = { marks: damageMarks, allMarks: damageMarks, selectedMark, onPanelClick: handlePanelClick, onMarkClick: handleMarkClick };
-
-  const SYMBOLS: { sym: MarkSymbol; label: string }[] = [
-    { sym: "X",   label: "✕  Scratch / Major" },
-    { sym: "O",   label: "○  Dent / Dent" },
-    { sym: "dot", label: "•  Minor / Chip" },
-  ];
 
   return (
     <div className="space-y-6">
@@ -287,32 +277,10 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
         <CardHeader>
           <CardTitle>Vehicle Condition Inspection</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Choose a symbol, then click on any panel to mark damage. Click an existing mark to edit or change its symbol.
+            Click on any panel to mark existing damage. Click a marker again to add a description.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
-
-          {/* Symbol selector */}
-          <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-xl border">
-            <span className="text-sm font-semibold text-muted-foreground shrink-0">Mark type:</span>
-            <div className="flex gap-2 flex-wrap">
-              {SYMBOLS.map(({ sym, label }) => (
-                <button
-                  key={sym}
-                  type="button"
-                  onClick={() => setActiveSymbol(sym)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 text-sm font-medium transition-all ${
-                    activeSymbol === sym
-                      ? "border-slate-900 bg-slate-900 text-white"
-                      : "border-slate-300 bg-white hover:border-slate-500"
-                  }`}
-                >
-                  <SymbolBadge symbol={sym} index={1} selected={activeSymbol === sym} size={20} />
-                  <span className="hidden sm:inline">{label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Side views */}
           <div className="grid grid-cols-1 gap-4">
@@ -337,18 +305,6 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
                   <Label className="text-sm font-medium">
                     Damage #{idx} — <span className="text-muted-foreground">{VIEW_LABELS[mark.view]}</span>
                   </Label>
-                </div>
-                {/* Symbol changer for existing mark */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Change symbol:</span>
-                  {(["X", "O", "dot"] as MarkSymbol[]).map(sym => (
-                    <button key={sym} type="button"
-                      onClick={() => handleChangeSymbol(selectedMark, sym)}
-                      className={`p-1 rounded-md border ${mark.symbol === sym ? "border-slate-900 bg-slate-100" : "border-slate-200"}`}
-                    >
-                      <SymbolBadge symbol={sym} index={idx} selected={mark.symbol === sym} size={20} />
-                    </button>
-                  ))}
                 </div>
                 <div className="flex gap-2">
                   <Textarea
