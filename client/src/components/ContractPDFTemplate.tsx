@@ -211,6 +211,9 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         color: '#000000'
       }}
     >
+      {/* PAGE 1 CONTENT — captured separately; hidden when capturing page 2 */}
+      <div id="page1-content">
+
       {/* Company Branding Header */}
       {companyProfile && (
         <div style={{ marginBottom: '25px', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px' }}>
@@ -492,6 +495,8 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           </table>
         </div>
       )}
+
+      </div>{/* /page1-content */}
 
       {/* Vehicle Inspection Diagram */}
       <div id="inspection-section" style={{ marginBottom: '25px', pageBreakInside: 'avoid' }}>

@@ -180,6 +180,17 @@ export default function RentalContracts() {
           duration: 5000,
         });
       }
+
+      // Trigger contract PDF download if the template is still in the DOM
+      const contractNumber = selectedContract?.contractNumber || selectedContractForReturn;
+      if (document.getElementById("contract-pdf-template")) {
+        toast.info("Generating contract PDF...");
+        exportContractTemplateToPDF(`Contract_${contractNumber}.pdf`)
+          .then((ok) => {
+            if (ok) toast.success("Contract PDF downloaded.");
+          })
+          .catch(() => {});
+      }
       
       utils.contracts.listByStatus.invalidate();
       utils.contracts.list.invalidate();

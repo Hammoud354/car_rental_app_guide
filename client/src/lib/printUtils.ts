@@ -180,100 +180,121 @@ export async function exportElementToPDF(
 }
 
 /**
- * Captures the ContractPDFTemplate element and generates a PDF with a smart
- * page break: page 1 ends just before the #inspection-section element,
- * so the vehicle diagram always starts cleanly at the top of page 2.
+ * Appends a canvas to the PDF, slicing it into A4 pages as needed.
+ */
+function appendCanvasToPDF(
+  pdf: InstanceType<typeof jsPDF>,
+  canvas: HTMLCanvasElement,
+  isFirstPage: boolean
+): void {
+  const pageW = 210;
+  const pageH = 297;
+  const ratio = pageW / canvas.width;
+  const pageSliceH = pageH / ratio;
+
+  let yPos = 0;
+  let firstSlice = true;
+
+  while (yPos < canvas.height) {
+    if (!isFirstPage || !firstSlice) pdf.addPage();
+    firstSlice = false;
+
+    const sliceH = Math.min(pageSliceH, canvas.height - yPos);
+    if (sliceH <= 0) break;
+
+    const pageCanvas = document.createElement("canvas");
+    pageCanvas.width = canvas.width;
+    pageCanvas.height = sliceH;
+    const ctx = pageCanvas.getContext("2d");
+    if (ctx) {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+      ctx.drawImage(canvas, 0, yPos, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+      pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", 0, 0, pageW, sliceH * ratio);
+    }
+
+    yPos += pageSliceH;
+  }
+}
+
+/**
+ * Two-render approach: captures #page1-content and #inspection-section separately
+ * so the inspection section ALWAYS starts at the top of a new page, with no slicing.
  */
 export async function exportContractTemplateToPDF(fileName: string): Promise<boolean> {
   const template = document.getElementById("contract-pdf-template");
   if (!template) return false;
 
-  await new Promise((r) => setTimeout(r, 500));
+  const page1El  = template.querySelector("#page1-content")    as HTMLElement | null;
+  const page2El  = template.querySelector("#inspection-section") as HTMLElement | null;
+
+  // If the IDs aren't present, fall back to a full single-canvas export
+  if (!page1El || !page2El) {
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      const scale = 2;
+      const canvas = await html2canvas(template, {
+        scale, useCORS: true, logging: false, backgroundColor: "#ffffff",
+        width: template.scrollWidth, height: template.scrollHeight,
+        windowWidth: template.scrollWidth,
+      });
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      appendCanvasToPDF(pdf, canvas, true);
+      pdf.save(fileName);
+      return true;
+    } catch (e) {
+      console.error("Contract PDF fallback export error:", e);
+      return false;
+    }
+  }
+
+  // Allow any pending renders to settle
+  await new Promise((r) => setTimeout(r, 300));
+
+  const captureOpts = (w: number, h: number) => ({
+    scale: 2 as const,
+    useCORS: true,
+    logging: false,
+    backgroundColor: "#ffffff",
+    width: w,
+    height: h,
+    windowWidth: w,
+  });
 
   try {
-    const scale = 2;
-    const templateWidth = template.scrollWidth;
-    const templateHeight = template.scrollHeight;
+    const templateW = template.scrollWidth;
+    const savedMinHeight = template.style.minHeight;
 
-    const canvas = await html2canvas(template, {
-      scale,
-      useCORS: true,
-      logging: false,
-      backgroundColor: "#ffffff",
-      width: templateWidth,
-      height: templateHeight,
-      windowWidth: templateWidth,
-    });
+    // --- Capture Page 1: hide inspection section ---
+    page2El.style.display = "none";
+    await new Promise((r) => setTimeout(r, 80));
+    const h1 = template.scrollHeight;
+    const canvas1 = await html2canvas(template, captureOpts(templateW, h1));
 
+    // --- Capture Page 2: hide page1 content, show inspection ---
+    // Remove minHeight so the canvas is only as tall as the inspection content
+    page2El.style.display = "";
+    page1El.style.display = "none";
+    template.style.minHeight = "0";
+    await new Promise((r) => setTimeout(r, 80));
+    const h2 = template.scrollHeight;
+    const canvas2 = await html2canvas(template, captureOpts(templateW, h2));
+
+    // --- Restore ---
+    page1El.style.display = "";
+    template.style.minHeight = savedMinHeight;
+
+    // --- Build PDF ---
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageW = 210;
-    const pageH = 297;
-    const ratio = pageW / canvas.width;
-    const pageSliceH = pageH / ratio; // canvas pixels that fit in one A4 page
-
-    // Detect the inspection section's Y position using scroll-adjusted coordinates.
-    // getBoundingClientRect is viewport-relative; adding scrollY gives document-absolute Y.
-    const inspectionEl = template.querySelector("#inspection-section") as HTMLElement | null;
-    let smartBreakCanvasY = -1;
-    if (inspectionEl) {
-      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const templateTop  = template.getBoundingClientRect().top  + scrollY;
-      const inspectionTop = inspectionEl.getBoundingClientRect().top + scrollY;
-      const offsetY = Math.max(0, inspectionTop - templateTop);
-      smartBreakCanvasY = Math.round(offsetY * scale);
-    }
-
-    const totalH = canvas.height;
-    let yPos = 0;
-    let pageCount = 0;
-
-    while (yPos < totalH) {
-      if (pageCount > 0) pdf.addPage();
-
-      // Default: full page slice
-      let sliceH = Math.min(pageSliceH, totalH - yPos);
-
-      // If the smart break falls within this page's range, cut right before it.
-      // Applies to any page (not just page 0) and is consumed once fired.
-      if (
-        smartBreakCanvasY > 0 &&
-        smartBreakCanvasY > yPos &&
-        smartBreakCanvasY < yPos + sliceH
-      ) {
-        sliceH = smartBreakCanvasY - yPos;
-        smartBreakCanvasY = -1; // consume — don't apply again
-      }
-
-      if (sliceH <= 0) {
-        yPos += pageSliceH; // safety: advance past a stuck position
-        continue;
-      }
-
-      const pageCanvas = document.createElement("canvas");
-      pageCanvas.width = canvas.width;
-      pageCanvas.height = sliceH;
-      const ctx = pageCanvas.getContext("2d");
-      if (ctx) {
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-        ctx.drawImage(canvas, 0, yPos, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-        pdf.addImage(
-          pageCanvas.toDataURL("image/png"),
-          "PNG",
-          0,
-          0,
-          pageW,
-          sliceH * ratio
-        );
-      }
-
-      yPos += sliceH;
-      pageCount++;
-    }
+    appendCanvasToPDF(pdf, canvas1, true);   // page 1 content (may span multiple A4 pages)
+    appendCanvasToPDF(pdf, canvas2, false);  // inspection section (always starts fresh page)
 
     pdf.save(fileName);
     return true;
   } catch (error) {
+    // Always restore visibility on error
+    if (page1El) page1El.style.display = "";
+    if (page2El) page2El.style.display = "";
     console.error("Contract PDF export error:", error);
     return false;
   }
