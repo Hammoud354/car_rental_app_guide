@@ -10,7 +10,19 @@ let _db: ReturnType<typeof drizzle> | null = null;
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+      const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: process.env.NODE_ENV === "production"
+          ? { rejectUnauthorized: false }
+          : undefined,
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
+      });
+      // Catch pool-level errors to prevent unhandled rejection crashes
+      pool.on("error", (err) => {
+        console.warn("[Database] Pool error (non-fatal):", err.message);
+      });
       _db = drizzle(pool);
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
