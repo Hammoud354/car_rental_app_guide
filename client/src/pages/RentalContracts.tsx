@@ -348,6 +348,7 @@ export default function RentalContracts() {
       clientPlaceOfBirth: formData.get("clientPlaceOfBirth") as string || undefined,
       clientDateOfBirth: formData.get("clientDateOfBirth") as string || undefined,
       clientRegistrationNumber: formData.get("clientRegistrationNumber") as string || undefined,
+      clientPlaceOfRegistration: formData.get("clientPlaceOfRegistration") as string || undefined,
       drivingLicenseNumber: formData.get("drivingLicenseNumber") as string,
       licenseIssueDate,
       licenseExpiryDate: licenseExpiryDate!,
@@ -779,7 +780,11 @@ export default function RentalContracts() {
                       </div>
                       <div>
                         <Label htmlFor="clientRegistrationNumber">Registration Number</Label>
-                        <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                        <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="e.g., 267" className="input-client" />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientPlaceOfRegistration">Place of Registration</Label>
+                        <Input id="clientPlaceOfRegistration" name="clientPlaceOfRegistration" placeholder="e.g., Beirut, North Lebanon" className="input-client" />
                       </div>
                       <div>
                         <Label htmlFor="clientDateOfBirth">Date of Birth</Label>
@@ -1530,6 +1535,7 @@ export default function RentalContracts() {
                       clientMotherFullName: selectedContract.clientMotherFullName,
                       clientNationality: selectedContract.clientNationality,
                       clientRegistrationNumber: selectedContract.clientRegistrationNumber,
+                      clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
                       clientPassport: selectedContract.clientPassport,
                       clientDateOfBirth: selectedContract.clientDateOfBirth,
                       clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,

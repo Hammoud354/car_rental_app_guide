@@ -22,6 +22,13 @@
       "when": 1774182988735,
       "tag": "0002_busy_raza",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774302341812,
+      "tag": "0003_elite_zarek",
+      "breakpoints": true
     }
   ]
 }

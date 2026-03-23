@@ -55,6 +55,7 @@ interface Contract {
   clientMotherFullName?: string | null;
   clientNationality?: string | null;
   clientRegistrationNumber?: string | null;
+  clientPlaceOfRegistration?: string | null;
   clientPassport?: string | null;
   clientDateOfBirth?: string | Date | null;
   clientPlaceOfBirth?: string | null;
@@ -262,29 +263,31 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           </h2>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt' }}>
             <tbody>
-              {[
-                ['Full Name', (() => {
-                    const parts = (contract.clientName || '').trim().split(/\s+/);
-                    const father = (contract.clientFatherFullName || '').trim();
-                    if (!father || parts.length === 0) return contract.clientName || '—';
-                    const [first, ...rest] = parts;
-                    return [first, father, ...rest].join(' ');
-                  })(),                                                                null],
-                ["Mother's Name",   contract.clientMotherFullName || '—',             null],
-                ['Nationality',     contract.clientNationality || '—',                null],
-                ['Registration No.',contract.clientRegistrationNumber || '—',         'monospace'],
-                ['Passport No.',    contract.clientPassport || '—',                   'monospace'],
-                ['Date of Birth',   formatDate(contract.clientDateOfBirth as any),   null],
-                ['Place of Birth',  contract.clientPlaceOfBirth || '—',              null],
-                ['Phone',           contract.clientPhone || '—',                      null],
-                ['License No.',     contract.drivingLicenseNumber,                   'monospace'],
-                ['Issue Date',      formatDate(contract.licenseIssueDate as any),    null],
-                ['Expiry Date',     formatDate(contract.licenseExpiryDate as any),   null],
-                ['Address',         contract.clientAddress || '—',                   null],
-              ].map(([label, value, font]) => (
+              {(() => {
+                const parts = (contract.clientName || '').trim().split(/\s+/);
+                const father = (contract.clientFatherFullName || '').trim();
+                const displayName = father && parts.length > 0
+                  ? [parts[0], father, ...parts.slice(1)].join('\u00A0')
+                  : contract.clientName || '—';
+                return [
+                  ['Full Name',          displayName,                                          null],
+                  ["Mother's Name",      contract.clientMotherFullName || '—',                 null],
+                  ['Nationality',        contract.clientNationality || '—',                    null],
+                  ['Registration No.',   contract.clientRegistrationNumber || '—',             'monospace'],
+                  ['Place of Reg.',      contract.clientPlaceOfRegistration || '—',            null],
+                  ['Passport No.',       contract.clientPassport || '—',                       'monospace'],
+                  ['Date of Birth',      formatDate(contract.clientDateOfBirth as any),       null],
+                  ['Place of Birth',     contract.clientPlaceOfBirth || '—',                  null],
+                  ['Phone',              contract.clientPhone || '—',                          null],
+                  ['License No.',        contract.drivingLicenseNumber,                        'monospace'],
+                  ['Issue Date',         formatDate(contract.licenseIssueDate as any),         null],
+                  ['Expiry Date',        formatDate(contract.licenseExpiryDate as any),        null],
+                  ['Address',            contract.clientAddress || '—',                        null],
+                ] as [string, string, string | null][];
+              })().map(([label, value, font]) => (
                 <tr key={String(label)} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap' }}>{label}:</td>
-                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'monospace' : 'inherit', wordBreak: 'break-all' }}>{value as string}</td>
+                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{label}:</td>
+                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'Courier New, monospace' : 'Arial, sans-serif', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{value}</td>
                 </tr>
               ))}
             </tbody>
@@ -309,8 +312,8 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
                 ['Fuel Level',   contract.fuelLevel || '—',                            null],
               ].map(([label, value, font]) => (
                 <tr key={String(label)} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap' }}>{label}:</td>
-                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'monospace' : 'inherit', wordBreak: 'break-all' }}>{value as string}</td>
+                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap', fontFamily: 'Arial, sans-serif' }}>{label}:</td>
+                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'Courier New, monospace' : 'Arial, sans-serif', wordBreak: 'break-word' }}>{value as string}</td>
                 </tr>
               ))}
             </tbody>
@@ -324,7 +327,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
           RENTAL PERIOD & PRICING
         </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Arial, sans-serif', fontSize: '10pt' }}>
           <tbody>
             <tr>
               <td style={{ padding: '8px 0', width: '40%', fontWeight: 'bold' }}>Start Date:</td>
@@ -353,8 +356,8 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
               </tr>
             )}
             <tr style={{ borderTop: '2px solid #e5e7eb' }}>
-              <td style={{ padding: '12px 0', fontWeight: 'bold', fontSize: '13pt' }}>Final Amount:</td>
-              <td style={{ padding: '12px 0', fontWeight: 'bold', fontSize: '15pt', color: '#1e40af' }}>
+              <td style={{ padding: '12px 0', fontWeight: 'bold', fontSize: '12pt' }}>Final Amount:</td>
+              <td style={{ padding: '12px 0', fontWeight: 'bold', fontSize: '14pt', color: '#1e40af' }}>
                 {formatCurrency(contract.finalAmount)}
               </td>
             </tr>
@@ -488,7 +491,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
       )}
 
       {/* Vehicle Inspection Diagram */}
-      <div style={{ marginBottom: '25px', pageBreakBefore: 'always', pageBreakInside: 'avoid' }}>
+      <div id="inspection-section" style={{ marginBottom: '25px', pageBreakInside: 'avoid' }}>
         <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
           VEHICLE INSPECTION REPORT
         </h2>
