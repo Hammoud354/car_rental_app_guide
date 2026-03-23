@@ -227,10 +227,14 @@ export default function RentalContracts() {
     },
   });
   
-  // Auto-set start date to today when dialog opens (but allow user to change to any date)
+  // Auto-set start date to today and pickup time to current system time whenever the dialog opens
   useEffect(() => {
-    if (isCreateDialogOpen && !rentalStartDate) {
-      setRentalStartDate(new Date());
+    if (isCreateDialogOpen) {
+      const now = new Date();
+      setRentalStartDate(now);
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      setPickupTime(`${hh}:${mm}`);
     }
   }, [isCreateDialogOpen]);
   
