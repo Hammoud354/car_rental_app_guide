@@ -220,54 +220,53 @@ function appendCanvasToPDF(
 /**
  * Two-render approach: captures #page1-content and #inspection-section separately
  * so the inspection section ALWAYS starts at the top of a new page, with no slicing.
+ *
+ * Works by cloning the off-screen template into a visible position on document.body
+ * so html2canvas can reliably measure and capture it.
  */
 export async function exportContractTemplateToPDF(fileName: string): Promise<boolean> {
   const template = document.getElementById("contract-pdf-template");
-  if (!template) return false;
-
-  const page1El  = template.querySelector("#page1-content")    as HTMLElement | null;
-  const page2El  = template.querySelector("#inspection-section") as HTMLElement | null;
-
-  // If the IDs aren't present, fall back to a full single-canvas export
-  if (!page1El || !page2El) {
-    await new Promise((r) => setTimeout(r, 300));
-    try {
-      const scale = 2;
-      const canvas = await html2canvas(template, {
-        scale, useCORS: true, logging: false, backgroundColor: "#ffffff",
-        width: template.scrollWidth, height: template.scrollHeight,
-        windowWidth: template.scrollWidth,
-      });
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-      appendCanvasToPDF(pdf, canvas, true);
-      pdf.save(fileName);
-      return true;
-    } catch (e) {
-      console.error("Contract PDF fallback export error:", e);
-      return false;
-    }
+  if (!template) {
+    console.error("exportContractTemplateToPDF: #contract-pdf-template not found in DOM");
+    return false;
   }
 
-  // Wait for car-view data-URL images to be loaded into the DOM.
-  // They are set via a React useEffect, so they may arrive after mount.
+  // Wait for car-view data-URL images to be loaded (set by React useEffect after mount).
   await new Promise<void>((resolve) => {
+    const deadline = Date.now() + 5000;
     const check = () => {
-      const imgs = Array.from(template.querySelectorAll('img[src^="data:"]'));
-      const allReady = imgs.length >= 4 && imgs.every((el) => {
-        const img = el as HTMLImageElement;
-        return img.complete && img.naturalWidth > 0;
-      });
-      if (allReady) return resolve();
-      setTimeout(check, 50);
+      const imgs = Array.from(template.querySelectorAll('img[src^="data:"]')) as HTMLImageElement[];
+      if (imgs.length >= 4 && imgs.every((img) => img.complete && img.naturalWidth > 0)) {
+        return resolve();
+      }
+      if (Date.now() >= deadline) return resolve(); // give up after 5s
+      setTimeout(check, 60);
     };
     check();
-    // Hard cap: resolve after 3s regardless
-    setTimeout(resolve, 3000);
   });
+
+  // Clone the template and position it visibly but behind all content.
+  // html2canvas cannot reliably capture elements at left:-9999px; a low z-index clone works better.
+  const clone = template.cloneNode(true) as HTMLElement;
+  clone.style.cssText = [
+    "position:fixed",
+    "top:0",
+    "left:0",
+    "z-index:-9999",
+    "pointer-events:none",
+    `width:${template.offsetWidth || 794}px`,
+    "min-height:0",
+    "background:#ffffff",
+  ].join(";");
+  document.body.appendChild(clone);
+
+  const page1El = clone.querySelector("#page1-content") as HTMLElement | null;
+  const page2El = clone.querySelector("#inspection-section") as HTMLElement | null;
 
   const captureOpts = (w: number, h: number) => ({
     scale: 2 as const,
     useCORS: true,
+    allowTaint: true,
     logging: false,
     backgroundColor: "#ffffff",
     width: w,
@@ -276,39 +275,42 @@ export async function exportContractTemplateToPDF(fileName: string): Promise<boo
   });
 
   try {
-    const templateW = template.scrollWidth;
-    const savedMinHeight = template.style.minHeight;
+    let canvas1: HTMLCanvasElement;
+    let canvas2: HTMLCanvasElement | null = null;
 
-    // --- Capture Page 1: hide inspection section ---
-    page2El.style.display = "none";
-    await new Promise((r) => setTimeout(r, 80));
-    const h1 = template.scrollHeight;
-    const canvas1 = await html2canvas(template, captureOpts(templateW, h1));
+    if (!page1El || !page2El) {
+      // Fallback: single-canvas capture of the whole template
+      await new Promise((r) => setTimeout(r, 120));
+      const w = clone.scrollWidth;
+      const h = clone.scrollHeight;
+      canvas1 = await html2canvas(clone, captureOpts(w, h));
+    } else {
+      // --- Capture Page 1: hide inspection section ---
+      page2El.style.display = "none";
+      await new Promise((r) => setTimeout(r, 120));
+      const w = clone.scrollWidth;
+      const h1 = clone.scrollHeight;
+      canvas1 = await html2canvas(clone, captureOpts(w, h1));
 
-    // --- Capture Page 2: hide page1 content, show inspection ---
-    // Remove minHeight so the canvas is only as tall as the inspection content
-    page2El.style.display = "";
-    page1El.style.display = "none";
-    template.style.minHeight = "0";
-    await new Promise((r) => setTimeout(r, 80));
-    const h2 = template.scrollHeight;
-    const canvas2 = await html2canvas(template, captureOpts(templateW, h2));
+      // --- Capture Page 2: show inspection, hide page1 ---
+      page2El.style.display = "";
+      page1El.style.display = "none";
+      await new Promise((r) => setTimeout(r, 120));
+      const h2 = clone.scrollHeight;
+      canvas2 = await html2canvas(clone, captureOpts(w, h2));
+    }
 
-    // --- Restore ---
-    page1El.style.display = "";
-    template.style.minHeight = savedMinHeight;
+    document.body.removeChild(clone);
 
     // --- Build PDF ---
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    appendCanvasToPDF(pdf, canvas1, true);   // page 1 content (may span multiple A4 pages)
-    appendCanvasToPDF(pdf, canvas2, false);  // inspection section (always starts fresh page)
+    appendCanvasToPDF(pdf, canvas1, true);
+    if (canvas2) appendCanvasToPDF(pdf, canvas2, false);
 
     pdf.save(fileName);
     return true;
   } catch (error) {
-    // Always restore visibility on error
-    if (page1El) page1El.style.display = "";
-    if (page2El) page2El.style.display = "";
+    if (document.body.contains(clone)) document.body.removeChild(clone);
     console.error("Contract PDF export error:", error);
     return false;
   }

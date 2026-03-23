@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { ContractPDFTemplate } from "@/components/ContractPDFTemplate";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -2096,33 +2097,36 @@ export default function RentalContracts() {
         />
       )}
 
-      {/* PDF Template rendered at root level (outside any dialog/portal) so html2canvas works correctly */}
-      {selectedContract && (() => {
-        const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
-        return (
-          <ContractPDFTemplate
-            contract={{
-              ...selectedContract,
-              clientName: selectedContract.clientName,
-              clientMotherFullName: selectedContract.clientMotherFullName,
-              clientNationality: selectedContract.clientNationality,
-              clientRegistrationNumber: selectedContract.clientRegistrationNumber,
-              clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
-              clientPassport: selectedContract.clientPassport,
-              clientDateOfBirth: selectedContract.clientDateOfBirth,
-              clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
-              clientPhone: selectedContract.clientPhone || undefined,
-              clientAddress: selectedContract.clientAddress || undefined,
-              drivingLicenseNumber: selectedContract.clientDriverLicense || "",
-              licenseIssueDate: selectedContract.licenseIssueDate,
-              licenseExpiryDate: selectedContract.licenseExpiryDate || "",
-            }}
-            vehicle={vehicle ? { ...vehicle, fuelType: vehicle.fuelType } : null}
-            companyProfile={companyProfile || null}
-            damageMarks={selectedContractDamageMarks}
-          />
-        );
-      })()}
+      {/* PDF Template — portalled directly into document.body so html2canvas has no parent CSS interference */}
+      {selectedContract && createPortal(
+        (() => {
+          const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+          return (
+            <ContractPDFTemplate
+              contract={{
+                ...selectedContract,
+                clientName: selectedContract.clientName,
+                clientMotherFullName: selectedContract.clientMotherFullName,
+                clientNationality: selectedContract.clientNationality,
+                clientRegistrationNumber: selectedContract.clientRegistrationNumber,
+                clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
+                clientPassport: selectedContract.clientPassport,
+                clientDateOfBirth: selectedContract.clientDateOfBirth,
+                clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
+                clientPhone: selectedContract.clientPhone || undefined,
+                clientAddress: selectedContract.clientAddress || undefined,
+                drivingLicenseNumber: selectedContract.clientDriverLicense || "",
+                licenseIssueDate: selectedContract.licenseIssueDate,
+                licenseExpiryDate: selectedContract.licenseExpiryDate || "",
+              }}
+              vehicle={vehicle ? { ...vehicle, fuelType: vehicle.fuelType } : null}
+              companyProfile={companyProfile || null}
+              damageMarks={selectedContractDamageMarks}
+            />
+          );
+        })(),
+        document.body
+      )}
     </>
   );
 }
