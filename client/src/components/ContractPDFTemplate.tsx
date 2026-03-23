@@ -236,98 +236,65 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         </div>
       </div>
 
-      {/* Client Information */}
-      <div style={{ marginBottom: '25px' }}>
-        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
-          CLIENT INFORMATION
-        </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt' }}>
-          <tbody>
-            {/* Row 1: Full Name | Mother's Name */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Full Name:</td>
-              <td style={{ padding: '6px 8px', width: '25%' }}>{contract.clientName}</td>
-              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Mother's Name:</td>
-              <td style={{ padding: '6px 8px', width: '25%' }}>{contract.clientMotherFullName || '—'}</td>
-            </tr>
-            {/* Row 2: Nationality | Registration Number */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Nationality:</td>
-              <td style={{ padding: '6px 8px' }}>{contract.clientNationality || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Registration No.:</td>
-              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.clientRegistrationNumber || '—'}</td>
-            </tr>
-            {/* Row 3: Passport Number | Date of Birth */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Passport No.:</td>
-              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.clientPassport || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Date of Birth:</td>
-              <td style={{ padding: '6px 8px' }}>{formatDate(contract.clientDateOfBirth as any)}</td>
-            </tr>
-            {/* Row 4: Place of Birth | Phone */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Place of Birth:</td>
-              <td style={{ padding: '6px 8px' }}>{contract.clientPlaceOfBirth || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Phone Number:</td>
-              <td style={{ padding: '6px 8px' }}>{contract.clientPhone || '—'}</td>
-            </tr>
-            {/* Row 5: License Number | Issue Date */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>License No.:</td>
-              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{contract.drivingLicenseNumber}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Issue Date:</td>
-              <td style={{ padding: '6px 8px' }}>{formatDate(contract.licenseIssueDate as any)}</td>
-            </tr>
-            {/* Row 6: Expiry Date | Address */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Expiry Date:</td>
-              <td style={{ padding: '6px 8px' }}>{formatDate(contract.licenseExpiryDate as any)}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Address:</td>
-              <td style={{ padding: '6px 8px' }}>{contract.clientAddress || '—'}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      {/* Client Info (left) + Vehicle Info (right) side by side */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '25px', alignItems: 'flex-start' }}>
 
-      {/* Vehicle Information */}
-      <div style={{ marginBottom: '25px' }}>
-        <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
-          VEHICLE INFORMATION
-        </h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10pt' }}>
-          <tbody>
-            {/* Row 1: Make & Model | Model Year */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Make &amp; Model:</td>
-              <td style={{ padding: '6px 8px', width: '25%' }}>
-                {vehicle ? `${vehicle.brand} ${vehicle.model}` : '—'}
-              </td>
-              <td style={{ padding: '6px 8px', width: '25%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Model Year:</td>
-              <td style={{ padding: '6px 8px', width: '25%' }}>{vehicle?.year || '—'}</td>
-            </tr>
-            {/* Row 2: Plate Number | VIN */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Plate Number:</td>
-              <td style={{ padding: '6px 8px', fontFamily: 'monospace', fontWeight: 'bold' }}>{vehicle?.plateNumber || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>VIN:</td>
-              <td style={{ padding: '6px 8px', fontFamily: 'monospace' }}>{vehicle?.vin || '—'}</td>
-            </tr>
-            {/* Row 3: Type | Color */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Type:</td>
-              <td style={{ padding: '6px 8px' }}>{vehicle?.category || contract.vehicleType || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Color:</td>
-              <td style={{ padding: '6px 8px' }}>{vehicle?.color || contract.vehicleColor || '—'}</td>
-            </tr>
-            {/* Row 4: Fuel */}
-            <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Fuel Type:</td>
-              <td style={{ padding: '6px 8px' }}>{vehicle?.fuelType || contract.vehicleFuelType || '—'}</td>
-              <td style={{ padding: '6px 8px', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb' }}>Fuel Level:</td>
-              <td style={{ padding: '6px 8px' }}>{contract.fuelLevel || '—'}</td>
-            </tr>
-          </tbody>
-        </table>
+        {/* ── LEFT: Client Information ── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2 style={{ fontSize: '11pt', fontWeight: 'bold', marginBottom: '6px', color: '#1e40af', borderBottom: '2px solid #2563eb', paddingBottom: '4px' }}>
+            CLIENT INFORMATION
+          </h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt' }}>
+            <tbody>
+              {[
+                ['Full Name',       contract.clientName,                              null],
+                ["Mother's Name",   contract.clientMotherFullName || '—',             null],
+                ['Nationality',     contract.clientNationality || '—',                null],
+                ['Registration No.',contract.clientRegistrationNumber || '—',         'monospace'],
+                ['Passport No.',    contract.clientPassport || '—',                   'monospace'],
+                ['Date of Birth',   formatDate(contract.clientDateOfBirth as any),   null],
+                ['Place of Birth',  contract.clientPlaceOfBirth || '—',              null],
+                ['Phone',           contract.clientPhone || '—',                      null],
+                ['License No.',     contract.drivingLicenseNumber,                   'monospace'],
+                ['Issue Date',      formatDate(contract.licenseIssueDate as any),    null],
+                ['Expiry Date',     formatDate(contract.licenseExpiryDate as any),   null],
+                ['Address',         contract.clientAddress || '—',                   null],
+              ].map(([label, value, font]) => (
+                <tr key={String(label)} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap' }}>{label}:</td>
+                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'monospace' : 'inherit', wordBreak: 'break-all' }}>{value as string}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ── RIGHT: Vehicle Information ── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h2 style={{ fontSize: '11pt', fontWeight: 'bold', marginBottom: '6px', color: '#1e40af', borderBottom: '2px solid #2563eb', paddingBottom: '4px' }}>
+            VEHICLE INFORMATION
+          </h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '8.5pt' }}>
+            <tbody>
+              {[
+                ['Make & Model', vehicle ? `${vehicle.brand} ${vehicle.model}` : '—', null],
+                ['Model Year',   String(vehicle?.year || '—'),                         null],
+                ['Plate Number', vehicle?.plateNumber || '—',                          'monospace'],
+                ['VIN',          vehicle?.vin || '—',                                  'monospace'],
+                ['Type',         vehicle?.category || contract.vehicleType || '—',     null],
+                ['Color',        vehicle?.color || contract.vehicleColor || '—',       null],
+                ['Fuel Type',    vehicle?.fuelType || contract.vehicleFuelType || '—', null],
+                ['Fuel Level',   contract.fuelLevel || '—',                            null],
+              ].map(([label, value, font]) => (
+                <tr key={String(label)} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <td style={{ padding: '4px 6px', width: '42%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap' }}>{label}:</td>
+                  <td style={{ padding: '4px 6px', fontFamily: font === 'monospace' ? 'monospace' : 'inherit', wordBreak: 'break-all' }}>{value as string}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
       </div>
 
       {/* Rental Period & Pricing */}

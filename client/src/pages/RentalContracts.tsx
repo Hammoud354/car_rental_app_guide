@@ -811,7 +811,6 @@ export default function RentalContracts() {
                         label="Expiry Date *"
                         value={licenseExpiryDate}
                         onChange={setLicenseExpiryDate}
-                        minDate={new Date()}
                         required
                       />
                     </div>
@@ -1324,10 +1323,12 @@ export default function RentalContracts() {
                         <div className="text-sm text-muted-foreground">License Number</div>
                         <div className="font-mono">{selectedContract.clientDriverLicense}</div>
                       </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">License Expiry</div>
-                        <div>{new Date(selectedContract.licenseExpiryDate).toLocaleDateString()}</div>
-                      </div>
+                      {selectedContract.licenseExpiryDate && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">License Expiry</div>
+                          <div>{new Date(selectedContract.licenseExpiryDate).toLocaleDateString()}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
