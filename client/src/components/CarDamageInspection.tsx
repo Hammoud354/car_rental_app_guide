@@ -284,14 +284,10 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
         </CardHeader>
         <CardContent className="space-y-4">
 
-          {/* Side views */}
-          <div className="grid grid-cols-1 gap-4">
+          {/* All 4 views in a 2×2 grid */}
+          <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto">
             <ViewPanel view="left"  {...panelProps} />
             <ViewPanel view="right" {...panelProps} />
-          </div>
-
-          {/* Front / Rear */}
-          <div className="grid grid-cols-2 gap-4">
             <ViewPanel view="front" {...panelProps} />
             <ViewPanel view="rear"  {...panelProps} />
           </div>
