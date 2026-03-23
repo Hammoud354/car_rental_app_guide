@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface PDFDamageMark {
   id: number;
@@ -18,16 +18,37 @@ const VIEW_LABELS: Record<CarView, string> = {
   rear: "REAR",
 };
 
-/* 2×2 PNG grid offsets for <img> crop approach.
-   img is set width:200% height:auto → natural height = 4H (4× container height).
-   Quadrant height = 2H, so front/rear need top:-200% (= -2H) to shift by one quadrant.
-   left offset: -100% = -P (one quadrant width) to reach the right column. */
-const VIEW_IMG_OFFSET: Record<CarView, { left: string; top: string }> = {
-  left:  { left: '0%',    top: '0%'    },
-  right: { left: '-100%', top: '0%'    },
-  front: { left: '0%',    top: '-200%' },
-  rear:  { left: '-100%', top: '-200%' },
+// Pixel offsets into the 1536×1024 2×2 grid for each view (each quadrant = 768×512)
+const VIEW_QUADRANT: Record<CarView, { sx: number; sy: number }> = {
+  left:  { sx: 0,   sy: 0   },
+  right: { sx: 768, sy: 0   },
+  front: { sx: 0,   sy: 512 },
+  rear:  { sx: 768, sy: 512 },
 };
+
+// Module-level cache so we only render once per page load
+let _cachedCarViews: Record<CarView, string> | null = null;
+
+function preRenderCarViews(src: string): Promise<Record<CarView, string>> {
+  if (_cachedCarViews) return Promise.resolve(_cachedCarViews);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const result = {} as Record<CarView, string>;
+      for (const view of ['left', 'right', 'front', 'rear'] as CarView[]) {
+        const { sx, sy } = VIEW_QUADRANT[view];
+        const c = document.createElement('canvas');
+        c.width = 768; c.height = 512;
+        c.getContext('2d')!.drawImage(img, sx, sy, 768, 512, 0, 0, 768, 512);
+        result[view] = c.toDataURL('image/png');
+      }
+      _cachedCarViews = result;
+      resolve(result);
+    };
+    img.onerror = () => resolve({ left: '', right: '', front: '', rear: '' });
+    img.src = src;
+  });
+}
 
 interface CompanyProfile {
   companyName: string;
@@ -101,9 +122,14 @@ interface ContractPDFTemplateProps {
 }
 
 export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile, damageMarks = [] }) => {
-  const carSchemaUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/car-schema.png`
-    : '/car-schema.png';
+  // Pre-render each car view quadrant to a data URL so html2canvas has no image loading issues
+  const emptyViews: Record<CarView, string> = { left: '', right: '', front: '', rear: '' };
+  const [carViewUrls, setCarViewUrls] = useState<Record<CarView, string>>(emptyViews);
+
+  useEffect(() => {
+    const src = '/car-schema.png';
+    preRenderCarViews(src).then(setCarViewUrls);
+  }, []);
 
   const renderMarkSymbol = (sym: string | null | undefined, idx: number, size = 18) => {
     const s = size;
@@ -123,55 +149,36 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
     );
   };
 
+  // Each panel shows its own pre-rendered quadrant image (768×512 data URL).
+  // Simple img width:100% height:auto — no CSS cropping, no absolute positioning.
   const renderCarPanel = (view: CarView, panelWidth: string, marks: PDFDamageMark[]) => {
     const viewMarks = marks.filter(m => m.view === view);
-    const { left: imgLeft, top: imgTop } = VIEW_IMG_OFFSET[view];
-    // All panels are now 50% wide. Quadrant is 3:2, so paddingTop = 33.33%
-    const paddingTop = '33.33%';
+    const dataUrl = carViewUrls[view];
     return (
       <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: '4px', boxSizing: 'border-box' }}>
         <div style={{ fontSize: '7pt', fontWeight: 'bold', color: '#6b7280', textAlign: 'center', marginBottom: '3px', letterSpacing: '1px' }}>
           {VIEW_LABELS[view]}
         </div>
-        <div style={{ position: 'relative', width: '100%', paddingTop }}>
-          <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            border: '1px solid #d1d5db',
-            borderRadius: '4px',
-            overflow: 'hidden',
-            backgroundColor: 'white',
-          }}>
-            {/* width:200% height:auto preserves natural 3:2 ratio.
-                Natural img height at 200% width = 4H (4× container H).
-                Offsets in VIEW_IMG_OFFSET account for this. */}
-            <img
-              src={carSchemaUrl}
-              alt=""
-              style={{
+        {/* position:relative so marks can be overlaid with position:absolute */}
+        <div style={{ position: 'relative', border: '1px solid #d1d5db', borderRadius: '4px', overflow: 'hidden', backgroundColor: 'white', lineHeight: 0 }}>
+          {dataUrl
+            ? <img src={dataUrl} alt={VIEW_LABELS[view]} style={{ display: 'block', width: '100%', height: 'auto' }} />
+            : <div style={{ paddingTop: '33.33%', backgroundColor: '#f9fafb' }} />
+          }
+          {viewMarks.map(mark => {
+            const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
+            return (
+              <div key={mark.id} style={{
                 position: 'absolute',
-                width: '200%',
-                height: 'auto',
-                left: imgLeft,
-                top: imgTop,
-                maxWidth: 'none',
-                display: 'block',
-              }}
-            />
-            {viewMarks.map(mark => {
-              const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
-              return (
-                <div key={mark.id} style={{
-                  position: 'absolute',
-                  left: `${mark.xPosition}%`,
-                  top: `${mark.yPosition}%`,
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 2,
-                }}>
-                  {renderMarkSymbol(mark.symbol, globalIdx, 18)}
-                </div>
-              );
-            })}
-          </div>
+                left: `${mark.xPosition}%`,
+                top: `${mark.yPosition}%`,
+                transform: 'translate(-50%, -50%)',
+                zIndex: 2,
+              }}>
+                {renderMarkSymbol(mark.symbol, globalIdx, 18)}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -560,30 +567,30 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
             Agent Signature
           </div>
         </div>
-      </div>
 
-      {/* Signature */}
-      {contract.signatureData && (
-        <div style={{ marginTop: '40px', pageBreakInside: 'avoid' }}>
-          <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
-            CLIENT SIGNATURE
-          </h2>
-          <div style={{ border: '2px solid #d1d5db', borderRadius: '8px', padding: '15px', backgroundColor: '#f9fafb' }}>
-            <img 
-              src={contract.signatureData} 
-              alt="Client Signature" 
-              style={{ maxWidth: '100%', height: '120px', display: 'block', border: '1px solid #9ca3af', borderRadius: '4px', backgroundColor: '#ffffff' }}
-            />
+        {/* Signature — inside inspection section so it stays on page 2 */}
+        {contract.signatureData && (
+          <div style={{ marginTop: '40px', pageBreakInside: 'avoid' }}>
+            <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
+              CLIENT SIGNATURE
+            </h2>
+            <div style={{ border: '2px solid #d1d5db', borderRadius: '8px', padding: '15px', backgroundColor: '#f9fafb' }}>
+              <img 
+                src={contract.signatureData} 
+                alt="Client Signature" 
+                style={{ maxWidth: '100%', height: '120px', display: 'block', border: '1px solid #9ca3af', borderRadius: '4px', backgroundColor: '#ffffff' }}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Footer */}
-      <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '2px solid #e5e7eb', textAlign: 'center', fontSize: '9pt', color: '#6b7280' }}>
-        <p style={{ margin: '5px 0' }}>This is a legally binding contract. Please read all terms and conditions carefully.</p>
-        <p style={{ margin: '5px 0' }}>For questions or concerns, please contact our customer service.</p>
-        <p style={{ margin: '10px 0 0 0', fontWeight: 'bold' }}>Thank you for choosing our car rental service!</p>
-      </div>
+        {/* Footer — inside inspection section so it stays on page 2 */}
+        <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '2px solid #e5e7eb', textAlign: 'center', fontSize: '9pt', color: '#6b7280' }}>
+          <p style={{ margin: '5px 0' }}>This is a legally binding contract. Please read all terms and conditions carefully.</p>
+          <p style={{ margin: '5px 0' }}>For questions or concerns, please contact our customer service.</p>
+          <p style={{ margin: '10px 0 0 0', fontWeight: 'bold' }}>Thank you for choosing our car rental service!</p>
+        </div>
+      </div>{/* /inspection-section */}
     </div>
   );
 };

@@ -248,8 +248,22 @@ export async function exportContractTemplateToPDF(fileName: string): Promise<boo
     }
   }
 
-  // Allow any pending renders to settle
-  await new Promise((r) => setTimeout(r, 300));
+  // Wait for car-view data-URL images to be loaded into the DOM.
+  // They are set via a React useEffect, so they may arrive after mount.
+  await new Promise<void>((resolve) => {
+    const check = () => {
+      const imgs = Array.from(template.querySelectorAll('img[src^="data:"]'));
+      const allReady = imgs.length >= 4 && imgs.every((el) => {
+        const img = el as HTMLImageElement;
+        return img.complete && img.naturalWidth > 0;
+      });
+      if (allReady) return resolve();
+      setTimeout(check, 50);
+    };
+    check();
+    // Hard cap: resolve after 3s regardless
+    setTimeout(resolve, 3000);
+  });
 
   const captureOpts = (w: number, h: number) => ({
     scale: 2 as const,
