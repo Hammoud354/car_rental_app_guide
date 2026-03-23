@@ -29,6 +29,13 @@
       "when": 1774302341812,
       "tag": "0003_elite_zarek",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774307161522,
+      "tag": "0004_supreme_living_lightning",
+      "breakpoints": true
     }
   ]
 }

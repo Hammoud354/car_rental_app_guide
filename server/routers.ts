@@ -831,6 +831,11 @@ export const appRouter = router({
         depositStatus: z.enum(["None", "Held", "Refunded", "Forfeited"]).default("None"),
         // Fuel policy
         fuelPolicy: z.enum(["Full-to-Full", "Same-to-Same", "Pre-purchase"]).default("Full-to-Full"),
+        // Second driver (optional)
+        secondDriverName: z.string().max(200).optional(),
+        secondDriverDateOfBirth: z.date().optional(),
+        secondDriverLicenseIssueDate: z.date().optional(),
+        secondDriverLicenseExpiryDate: z.date().optional(),
         targetUserId: z.number().optional(), // For Super Admin to assign contract to specific user
       }))
       .mutation(async ({ input, ctx }) => {
@@ -947,6 +952,11 @@ export const appRouter = router({
           depositStatus: input.depositStatus,
           // Fuel policy
           fuelPolicy: input.fuelPolicy,
+          // Second driver
+          secondDriverName: input.secondDriverName || null,
+          secondDriverDateOfBirth: input.secondDriverDateOfBirth || null,
+          secondDriverLicenseIssueDate: input.secondDriverLicenseIssueDate || null,
+          secondDriverLicenseExpiryDate: input.secondDriverLicenseExpiryDate || null,
         });
         
         // Auto-generate invoice immediately when contract is created

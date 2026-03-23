@@ -112,6 +112,10 @@ interface Contract {
   damageInspection?: string;
   returnNotes?: string;
   signatureData?: string;
+  secondDriverName?: string | null;
+  secondDriverDateOfBirth?: string | Date | null;
+  secondDriverLicenseIssueDate?: string | Date | null;
+  secondDriverLicenseExpiryDate?: string | Date | null;
 }
 
 interface ContractPDFTemplateProps {
@@ -210,7 +214,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         top: 0,
         width: '210mm', // A4 width
         minHeight: '297mm', // A4 height
-        padding: '20mm',
+        padding: '20mm 28mm',
         backgroundColor: '#ffffff',
         fontFamily: 'Arial, sans-serif',
         fontSize: '11pt',
@@ -335,6 +339,30 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
 
       </div>
 
+      {/* Second Driver Information (shown only when present) */}
+      {contract.secondDriverName && (
+        <div style={{ marginBottom: '25px' }}>
+          <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '10px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
+            SECOND DRIVER
+          </h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Arial, sans-serif', fontSize: '9.5pt' }}>
+            <tbody>
+              {[
+                ['Full Name',          contract.secondDriverName || '—',                                null],
+                ['Date of Birth',      formatDate(contract.secondDriverDateOfBirth as any),            null],
+                ['License Issue Date', formatDate(contract.secondDriverLicenseIssueDate as any),       null],
+                ['License Expiry Date',formatDate(contract.secondDriverLicenseExpiryDate as any),      null],
+              ].map(([label, value]) => (
+                <tr key={String(label)} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                  <td style={{ padding: '5px 6px', width: '35%', fontWeight: 'bold', color: '#374151', backgroundColor: '#f9fafb', whiteSpace: 'nowrap' }}>{label}:</td>
+                  <td style={{ padding: '5px 6px' }}>{value as string}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {/* Rental Period & Pricing */}
       <div style={{ marginBottom: '25px' }}>
         <h2 style={{ fontSize: '14pt', fontWeight: 'bold', marginBottom: '12px', color: '#1e40af', borderBottom: '2px solid #e5e7eb', paddingBottom: '5px' }}>
@@ -344,7 +372,10 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           <tbody>
             <tr>
               <td style={{ padding: '8px 0', width: '40%', fontWeight: 'bold' }}>Start Date:</td>
-              <td style={{ padding: '8px 0' }}>{formatDate(contract.rentalStartDate)}</td>
+              <td style={{ padding: '8px 0' }}>
+                {formatDate(contract.rentalStartDate)}
+                {contract.pickupTime ? ` — ${contract.pickupTime}` : ''}
+              </td>
             </tr>
             <tr>
               <td style={{ padding: '8px 0', fontWeight: 'bold' }}>Return Date:</td>

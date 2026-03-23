@@ -47,6 +47,13 @@ export default function RentalContracts() {
   const [licenseExpiryDate, setLicenseExpiryDate] = useState<Date>();
   const [rentalStartDate, setRentalStartDate] = useState<Date>();
   const [rentalEndDate, setRentalEndDate] = useState<Date>();
+  const [pickupTime, setPickupTime] = useState<string>("");
+
+  // Second driver states
+  const [secondDriverClientId, setSecondDriverClientId] = useState<string>("");
+  const [secondDriverComboboxOpen, setSecondDriverComboboxOpen] = useState(false);
+  const [secondDriverLicenseIssueDate, setSecondDriverLicenseIssueDate] = useState<Date | undefined>();
+  const [secondDriverLicenseExpiryDate, setSecondDriverLicenseExpiryDate] = useState<Date | undefined>();
   
   // Pricing states
   const [rentalDays, setRentalDays] = useState<number>(0);
@@ -372,6 +379,7 @@ export default function RentalContracts() {
       discount: discount.toFixed(2),
       finalAmount: finalAmount.toFixed(2),
       pickupKm,
+      pickupTime: pickupTime || undefined,
       // Insurance fields
       insurancePackage,
       insuranceCost: insuranceCost.toFixed(2),
@@ -381,6 +389,16 @@ export default function RentalContracts() {
       depositStatus,
       // Fuel policy
       fuelPolicy,
+      // Second driver
+      ...(secondDriverClientId ? (() => {
+        const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
+        return {
+          secondDriverName: c?.name || undefined,
+          secondDriverDateOfBirth: (c as any)?.dateOfBirth ? new Date((c as any).dateOfBirth) : undefined,
+          secondDriverLicenseIssueDate: secondDriverLicenseIssueDate,
+          secondDriverLicenseExpiryDate: secondDriverLicenseExpiryDate,
+        };
+      })() : {}),
       targetUserId: selectedTargetUserId || undefined,
     };
     
@@ -834,21 +852,145 @@ export default function RentalContracts() {
                     </div>
                   </div>
 
+                  {/* Second Driver (Optional) */}
+                  <div className="border-t pt-6">
+                    <h3 className="font-semibold mb-1">Second Driver <span className="text-muted-foreground font-normal text-sm">(Optional)</span></h3>
+                    <p className="text-xs text-muted-foreground mb-5">Select an existing client as a second driver</p>
+                    <div className="space-y-5">
+                      {/* Client picker */}
+                      <div>
+                        <Label>Select Client</Label>
+                        <Popover open={secondDriverComboboxOpen} onOpenChange={setSecondDriverComboboxOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between mt-1 input-client font-normal"
+                              type="button"
+                            >
+                              {secondDriverClientId
+                                ? (() => {
+                                    const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
+                                    return c ? c.name : "Select client";
+                                  })()
+                                : "Select second driver..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search clients..." />
+                              <CommandList>
+                                <CommandEmpty>No client found.</CommandEmpty>
+                                <CommandGroup>
+                                  {/* Clear option */}
+                                  <CommandItem
+                                    value="__clear__"
+                                    onSelect={() => {
+                                      setSecondDriverClientId("");
+                                      setSecondDriverLicenseIssueDate(undefined);
+                                      setSecondDriverLicenseExpiryDate(undefined);
+                                      setSecondDriverComboboxOpen(false);
+                                    }}
+                                  >
+                                    <span className="text-muted-foreground italic">— Remove second driver —</span>
+                                  </CommandItem>
+                                  {clients.map((cl) => (
+                                    <CommandItem
+                                      key={cl.id}
+                                      value={`${cl.name} ${cl.driverLicenseNumber || ""}`}
+                                      onSelect={() => {
+                                        setSecondDriverClientId(cl.id.toString());
+                                        // Auto-populate license dates from client if available
+                                        if ((cl as any).licenseIssueDate) setSecondDriverLicenseIssueDate(new Date((cl as any).licenseIssueDate));
+                                        if ((cl as any).licenseExpiryDate) setSecondDriverLicenseExpiryDate(new Date((cl as any).licenseExpiryDate));
+                                        setSecondDriverComboboxOpen(false);
+                                      }}
+                                    >
+                                      <Check className={`mr-2 h-4 w-4 ${secondDriverClientId === cl.id.toString() ? "opacity-100" : "opacity-0"}`} />
+                                      <div>
+                                        <div className="font-medium">{cl.name}</div>
+                                        {cl.driverLicenseNumber && <div className="text-xs text-muted-foreground">{cl.driverLicenseNumber}</div>}
+                                      </div>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {secondDriverClientId && (() => {
+                        const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
+                        if (!c) return null;
+                        return (
+                          <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
+                            {/* Name (read-only) */}
+                            <div>
+                              <Label>Full Name</Label>
+                              <Input value={c.name} readOnly className="mt-1 bg-gray-50 input-client" />
+                            </div>
+                            {/* Date of Birth (read-only) */}
+                            <div>
+                              <Label>Date of Birth</Label>
+                              <Input
+                                value={(c as any).dateOfBirth ? new Date((c as any).dateOfBirth).toLocaleDateString() : "—"}
+                                readOnly
+                                className="mt-1 bg-gray-50 input-client"
+                              />
+                            </div>
+                            {/* License dates */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                              <DateDropdownSelector
+                                id="secondDriverLicenseIssueDate"
+                                label="License Issue Date"
+                                value={secondDriverLicenseIssueDate}
+                                onChange={setSecondDriverLicenseIssueDate}
+                              />
+                              <DateDropdownSelector
+                                id="secondDriverLicenseExpiryDate"
+                                label="License Expiry Date"
+                                value={secondDriverLicenseExpiryDate}
+                                onChange={setSecondDriverLicenseExpiryDate}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
                   {/* Rental Period */}
                   <div className="border-t pt-6">
                     <h3 className="font-semibold mb-5">Rental Period</h3>
                     <div className="space-y-5">
-                      <div>
-                        <DateDropdownSelector
-                          id="rentalStartDate"
-                          label="Rental Start Date *"
-                          value={rentalStartDate}
-                          onChange={setRentalStartDate}
-                          required
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          You can select any date, including past dates
-                        </p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                          <DateDropdownSelector
+                            id="rentalStartDate"
+                            label="Rental Start Date *"
+                            value={rentalStartDate}
+                            onChange={setRentalStartDate}
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            You can select any date, including past dates
+                          </p>
+                        </div>
+                        <div>
+                          <Label htmlFor="pickupTime">Pickup Time</Label>
+                          <Input
+                            id="pickupTime"
+                            type="time"
+                            value={pickupTime}
+                            onChange={(e) => setPickupTime(e.target.value)}
+                            className="mt-1 input-client"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Exact hour the car was rented
+                          </p>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
