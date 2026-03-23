@@ -49,6 +49,7 @@ interface Vehicle {
 interface Contract {
   contractNumber: string;
   clientName: string;
+  clientFatherFullName?: string | null;
   clientMotherFullName?: string | null;
   clientNationality?: string | null;
   clientRegistrationNumber?: string | null;
@@ -254,6 +255,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
             <tbody>
               {[
                 ['Full Name',       contract.clientName,                              null],
+                ["Father's Name",   contract.clientFatherFullName || '—',             null],
                 ["Mother's Name",   contract.clientMotherFullName || '—',             null],
                 ['Nationality',     contract.clientNationality || '—',                null],
                 ['Registration No.',contract.clientRegistrationNumber || '—',         'monospace'],
@@ -480,15 +482,12 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           Pre-rental condition documented at time of pickup. Numbered circles indicate existing damage locations.
         </div>
 
-        {/* Left Side — full width */}
-        {renderCarPanel('left', '100%', damageMarks)}
-        <div style={{ height: '8px' }} />
-
-        {/* Right Side — full width */}
-        {renderCarPanel('right', '100%', damageMarks)}
-        <div style={{ height: '8px' }} />
-
-        {/* Front + Rear — side by side */}
+        {/* All 4 views — 2×2 grid matching the inspection form */}
+        <div style={{ fontSize: '0' }}>
+          {renderCarPanel('left', '50%', damageMarks)}
+          {renderCarPanel('right', '50%', damageMarks)}
+        </div>
+        <div style={{ height: '6px' }} />
         <div style={{ fontSize: '0' }}>
           {renderCarPanel('front', '50%', damageMarks)}
           {renderCarPanel('rear', '50%', damageMarks)}

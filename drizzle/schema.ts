@@ -245,6 +245,7 @@ export const rentalContracts = pgTable("rentalContracts", {
   clientEmail: varchar("clientEmail", { length: 320 }),
   clientNationality: varchar("clientNationality", { length: 100 }),
   clientMotherFullName: varchar("clientMotherFullName", { length: 200 }),
+  clientDriverLicense: varchar("clientDriverLicense", { length: 100 }),
   clientFatherFullName: varchar("clientFatherFullName", { length: 200 }),
   clientDateOfBirth: timestamp("clientDateOfBirth"),
   clientPlaceOfBirth: varchar("clientPlaceOfBirth", { length: 200 }),
