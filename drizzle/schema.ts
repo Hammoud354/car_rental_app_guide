@@ -309,6 +309,7 @@ export const damageMarks = pgTable("damageMarks", {
   yPosition: decimal("yPosition", { precision: 5, scale: 2 }).notNull(),
   view: varchar("view", { length: 10 }),
   description: varchar("description", { length: 500 }),
+  symbol: varchar("symbol", { length: 10 }).default("X"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CarLeftSVG, CarRightSVG, CarFrontSVG, CarRearSVG } from './CarOutlineSVGs';
 
 interface PDFDamageMark {
   id: number;
@@ -6,6 +7,7 @@ interface PDFDamageMark {
   xPosition: string;
   yPosition: string;
   description?: string | null;
+  symbol?: string | null;
 }
 
 type CarView = "left" | "right" | "front" | "rear";
@@ -17,12 +19,11 @@ const VIEW_LABELS: Record<CarView, string> = {
   rear: "REAR",
 };
 
-// Matches the cropping from CarDamageInspection.tsx
-const VIEW_STYLE: Record<CarView, { bgSize: string; bgPos: string }> = {
-  left:  { bgSize: "100% 300%", bgPos: "50% 0%"   },
-  right: { bgSize: "100% 300%", bgPos: "50% 50%"  },
-  front: { bgSize: "200% 300%", bgPos: "0% 100%"  },
-  rear:  { bgSize: "200% 300%", bgPos: "100% 100%" },
+const CAR_SVG_MAP: Record<CarView, React.FC<{ style?: React.CSSProperties }>> = {
+  left:  CarLeftSVG,
+  right: CarRightSVG,
+  front: CarFrontSVG,
+  rear:  CarRearSVG,
 };
 
 interface CompanyProfile {
@@ -95,36 +96,43 @@ interface ContractPDFTemplateProps {
 }
 
 export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contract, vehicle, companyProfile, damageMarks = [] }) => {
-  // Build absolute image URL so html2canvas can fetch it
-  const carSchemaUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/car-schema.jpeg`
-    : '/car-schema.jpeg';
+
+  const renderMarkSymbol = (sym: string | null | undefined, idx: number, size = 18) => {
+    const s = size;
+    const cx = s / 2, cy = s / 2, r = s / 2 - 1;
+    const pad = s * 0.22;
+    return (
+      <svg width={s} height={s} style={{ overflow: 'visible', display: 'block' }}>
+        <circle cx={cx} cy={cy} r={r} fill="black" stroke="black" strokeWidth={1} />
+        {(!sym || sym === 'X') && (<>
+          <line x1={cx - r + pad} y1={cy - r + pad} x2={cx + r - pad} y2={cy + r - pad} stroke="white" strokeWidth={1.6} strokeLinecap="round" />
+          <line x1={cx + r - pad} y1={cy - r + pad} x2={cx - r + pad} y2={cy + r - pad} stroke="white" strokeWidth={1.6} strokeLinecap="round" />
+        </>)}
+        {sym === 'O' && <circle cx={cx} cy={cy} r={r - pad} fill="none" stroke="white" strokeWidth={1.6} />}
+        {sym === 'dot' && <circle cx={cx} cy={cy} r={r * 0.38} fill="white" />}
+        <text x={cx} y={cy + s * 0.13} textAnchor="middle" fontSize={s * 0.38} fontWeight="bold" fill="white" fontFamily="Arial,sans-serif">{idx}</text>
+      </svg>
+    );
+  };
 
   const renderCarPanel = (view: CarView, panelWidth: string, marks: PDFDamageMark[]) => {
-    const { bgSize, bgPos } = VIEW_STYLE[view];
     const viewMarks = marks.filter(m => m.view === view);
-    // padding-top % is always relative to the PARENT's width (CSS rule).
-    // Left/Right: full-width (100%), 3:1 → height = 33.33% of parent ✓
-    // Front/Rear: half-width (50%), 3:2 → height = (2/3)*(50%) = 33.33% of parent ✓
-    // All 4 views end up the same height — 33.33% of the content column width.
+    const CarSVG = CAR_SVG_MAP[view];
+    const paddingTop = view === 'left' || view === 'right' ? '33.33%' : '44.44%';
     return (
       <div style={{ width: panelWidth, display: 'inline-block', verticalAlign: 'top', paddingRight: panelWidth === '50%' ? '4px' : '0', boxSizing: 'border-box' }}>
         <div style={{ fontSize: '7pt', fontWeight: 'bold', color: '#6b7280', textAlign: 'center', marginBottom: '3px', letterSpacing: '1px' }}>
           {VIEW_LABELS[view]}
         </div>
-        {/* Outer div provides the aspect-ratio height via padding-top (% of parent width) */}
-        <div style={{ position: 'relative', width: '100%', paddingTop: '33.33%' }}>
-          {/* Inner div fills the outer space and holds the background + marks */}
+        <div style={{ position: 'relative', width: '100%', paddingTop }}>
           <div style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundImage: `url(${carSchemaUrl})`,
-            backgroundSize: bgSize,
-            backgroundPosition: bgPos,
-            backgroundRepeat: 'no-repeat',
             border: '1px solid #d1d5db',
             borderRadius: '4px',
             overflow: 'hidden',
+            backgroundColor: 'white',
           }}>
+            <CarSVG style={{ width: '100%', height: '100%', display: 'block' }} />
             {viewMarks.map(mark => {
               const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
               return (
@@ -133,21 +141,9 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
                   left: `${mark.xPosition}%`,
                   top: `${mark.yPosition}%`,
                   transform: 'translate(-50%, -50%)',
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  backgroundColor: '#dc2626',
-                  border: '2px solid white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '8pt',
-                  fontWeight: 'bold',
-                  color: 'white',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.5)',
-                  zIndex: 1,
+                  zIndex: 2,
                 }}>
-                  {globalIdx}
+                  {renderMarkSymbol(mark.symbol, globalIdx, 18)}
                 </div>
               );
             })}
@@ -491,21 +487,15 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         {/* Legend */}
         {damageMarks.length > 0 ? (
           <div style={{ marginTop: '12px', padding: '10px', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '6px' }}>
-            <div style={{ fontSize: '9pt', fontWeight: 'bold', marginBottom: '6px', color: '#991b1b' }}>
+            <div style={{ fontSize: '9pt', fontWeight: 'bold', marginBottom: '6px' }}>
               Damage Notes ({damageMarks.length} mark{damageMarks.length !== 1 ? 's' : ''}):
             </div>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9pt' }}>
               <tbody>
                 {damageMarks.map((mark, idx) => (
-                  <tr key={mark.id} style={{ borderTop: idx > 0 ? '1px solid #fecaca' : 'none' }}>
-                    <td style={{ padding: '3px 8px 3px 0', width: '28px', verticalAlign: 'top' }}>
-                      <div style={{
-                        display: 'inline-block', width: '18px', height: '18px', borderRadius: '50%',
-                        backgroundColor: '#dc2626', color: 'white', fontSize: '8pt', fontWeight: 'bold',
-                        textAlign: 'center', lineHeight: '18px',
-                      }}>
-                        {idx + 1}
-                      </div>
+                  <tr key={mark.id} style={{ borderTop: idx > 0 ? '1px solid #d1d5db' : 'none' }}>
+                    <td style={{ padding: '3px 8px 3px 0', width: '28px', verticalAlign: 'middle' }}>
+                      {renderMarkSymbol(mark.symbol, idx + 1, 18)}
                     </td>
                     <td style={{ padding: '3px 4px', verticalAlign: 'top', width: '60px', color: '#6b7280', textTransform: 'uppercase', fontSize: '8pt' }}>
                       {mark.view || '—'}

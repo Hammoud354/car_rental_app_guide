@@ -970,6 +970,7 @@ export const appRouter = router({
         yPosition: z.string(),
         view: z.string().optional(),
         description: z.string().max(500).optional(),
+        symbol: z.string().max(10).optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         return await db.createDamageMark({ ...input, userId: ctx.user?.id || 1 });

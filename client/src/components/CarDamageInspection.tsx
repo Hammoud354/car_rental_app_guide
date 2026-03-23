@@ -4,15 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2 } from "lucide-react";
+import { CarLeftSVG, CarRightSVG, CarFrontSVG, CarRearSVG } from "@/components/CarOutlineSVGs";
 
-type CarView = "front" | "rear" | "left" | "right";
+export type MarkSymbol = "X" | "O" | "dot";
+export type CarView = "front" | "rear" | "left" | "right";
 
-interface DamageMark {
+export interface DamageMark {
   id: string;
   x: number;
   y: number;
   view: CarView;
   description: string;
+  symbol: MarkSymbol;
 }
 
 interface ContractData {
@@ -54,35 +57,79 @@ const VIEW_LABELS: Record<CarView, string> = {
   right: "Right Side",
 };
 
-/*
-  The source image (car-schema.jpeg, 612×612) has this layout:
-    Row 1 (y 0–33%):       Left side view  — full width
-    Row 2 (y 33–66%):      Right side view — full width
-    Row 3 left (y 66–100%, x 0–50%):  Front view
-    Row 3 right (y 66–100%, x 50–100%): Rear view
-
-  We crop each region by setting background-size & background-position.
-*/
-const VIEW_STYLE: Record<CarView, { bgSize: string; bgPos: string; aspect: string }> = {
-  left:  { bgSize: "100% 300%",  bgPos: "50% 0%",   aspect: "3 / 1" },
-  right: { bgSize: "100% 300%",  bgPos: "50% 50%",  aspect: "3 / 1" },
-  front: { bgSize: "200% 300%",  bgPos: "0% 100%",  aspect: "3 / 2" },
-  rear:  { bgSize: "200% 300%",  bgPos: "100% 100%",aspect: "3 / 2" },
+const VIEW_ASPECT: Record<CarView, string> = {
+  left: "3 / 1",
+  right: "3 / 1",
+  front: "4 / 3",
+  rear: "4 / 3",
 };
 
-/* ─── Single clickable panel ─────────────────────── */
+const CarSVGMap: Record<CarView, (props: { style?: React.CSSProperties }) => JSX.Element> = {
+  left:  CarLeftSVG,
+  right: CarRightSVG,
+  front: CarFrontSVG,
+  rear:  CarRearSVG,
+};
+
+/* ── Render a single symbol at given size ─── */
+function SymbolBadge({
+  symbol, index, selected, size = 28
+}: { symbol: MarkSymbol; index: number; selected?: boolean; size?: number }) {
+  const s = size;
+  const r = s / 2 - 1;
+  const cx = s / 2, cy = s / 2;
+  const pad = s * 0.22;
+
+  return (
+    <svg
+      width={s} height={s}
+      style={{
+        overflow: "visible",
+        filter: selected ? "drop-shadow(0 0 3px rgba(0,0,0,0.5))" : undefined,
+      }}
+    >
+      <circle cx={cx} cy={cy} r={r}
+        fill={selected ? "#111" : "white"}
+        stroke="black" strokeWidth={1.6}
+      />
+      {symbol === "X" && (
+        <>
+          <line x1={cx - r + pad} y1={cy - r + pad} x2={cx + r - pad} y2={cy + r - pad}
+            stroke={selected ? "white" : "black"} strokeWidth={1.8} strokeLinecap="round" />
+          <line x1={cx + r - pad} y1={cy - r + pad} x2={cx - r + pad} y2={cy + r - pad}
+            stroke={selected ? "white" : "black"} strokeWidth={1.8} strokeLinecap="round" />
+        </>
+      )}
+      {symbol === "O" && (
+        <circle cx={cx} cy={cy} r={r - pad}
+          fill="none" stroke={selected ? "white" : "black"} strokeWidth={1.8} />
+      )}
+      {symbol === "dot" && (
+        <circle cx={cx} cy={cy} r={r * 0.38}
+          fill={selected ? "white" : "black"} />
+      )}
+      {/* index number */}
+      <text x={cx} y={cy + 3.5} textAnchor="middle" fontSize={s * 0.3}
+        fontWeight="bold" fill={selected ? "white" : "black"}
+        fontFamily="sans-serif"
+      >{index}</text>
+    </svg>
+  );
+}
+
+/* ── Single clickable view panel ─── */
 interface ViewPanelProps {
   view: CarView;
   marks: DamageMark[];
   allMarks: DamageMark[];
   selectedMark: string | null;
   onPanelClick: (view: CarView, x: number, y: number) => void;
-  onMarkClick: (id: string, description: string) => void;
+  onMarkClick: (id: string) => void;
 }
 
 function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkClick }: ViewPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { bgSize, bgPos, aspect } = VIEW_STYLE[view];
+  const CarSVG = CarSVGMap[view];
   const viewMarks = marks.filter(m => m.view === view);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -98,30 +145,23 @@ function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkCl
       </span>
       <div
         ref={ref}
-        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white"
-        style={{
-          aspectRatio: aspect,
-          backgroundImage: "url(/car-schema.jpeg)",
-          backgroundSize: bgSize,
-          backgroundPosition: bgPos,
-          backgroundRepeat: "no-repeat",
-        }}
+        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-visible shadow-sm hover:shadow-md transition-shadow bg-white"
+        style={{ aspectRatio: VIEW_ASPECT[view] }}
         onClick={handleClick}
       >
+        <CarSVG style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} />
+
         {viewMarks.map(mark => {
           const idx = allMarks.findIndex(m => m.id === mark.id) + 1;
+          const isSelected = selectedMark === mark.id;
           return (
             <div
               key={mark.id}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full border-2 border-white flex items-center justify-center cursor-pointer text-white font-bold text-xs transition-all shadow-lg ${
-                selectedMark === mark.id
-                  ? "bg-red-600 scale-125 ring-2 ring-red-300"
-                  : "bg-red-500 hover:scale-110"
-              }`}
-              style={{ left: `${mark.x}%`, top: `${mark.y}%` }}
-              onClick={e => { e.stopPropagation(); onMarkClick(mark.id, mark.description); }}
+              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110"
+              style={{ left: `${mark.x}%`, top: `${mark.y}%`, zIndex: 10 }}
+              onClick={e => { e.stopPropagation(); onMarkClick(mark.id); }}
             >
-              {idx}
+              <SymbolBadge symbol={mark.symbol} index={idx} selected={isSelected} size={26} />
             </div>
           );
         })}
@@ -130,11 +170,12 @@ function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkCl
   );
 }
 
-/* ─── Main Component ────────────────────────────── */
+/* ── Main Component ─── */
 export default function CarDamageInspection({ onComplete, onCancel, onBack, contractData }: CarDamageInspectionProps) {
   const [damageMarks, setDamageMarks] = useState<DamageMark[]>([]);
   const [selectedMark, setSelectedMark] = useState<string | null>(null);
   const [markDescription, setMarkDescription] = useState("");
+  const [activeSymbol, setActiveSymbol] = useState<MarkSymbol>("X");
   const [fuelLevel, setFuelLevel] = useState("Full");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -144,18 +185,30 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
       setSelectedMark(null);
       setMarkDescription("");
     }
-    const mark: DamageMark = { id: `mark-${Date.now()}`, x, y, view, description: "" };
+    const mark: DamageMark = { id: `mark-${Date.now()}`, x, y, view, description: "", symbol: activeSymbol };
     setDamageMarks(p => [...p, mark]);
     setSelectedMark(mark.id);
     setMarkDescription("");
   };
 
-  const handleMarkClick = (id: string, description: string) => { setSelectedMark(id); setMarkDescription(description); };
+  const handleMarkClick = (id: string) => {
+    if (selectedMark && selectedMark !== id) {
+      setDamageMarks(p => p.map(m => m.id === selectedMark ? { ...m, description: markDescription } : m));
+    }
+    const mark = damageMarks.find(m => m.id === id);
+    setSelectedMark(id);
+    setMarkDescription(mark?.description ?? "");
+  };
 
   const handleSave = () => {
     if (!selectedMark) return;
     setDamageMarks(p => p.map(m => m.id === selectedMark ? { ...m, description: markDescription } : m));
-    setSelectedMark(null); setMarkDescription("");
+    setSelectedMark(null);
+    setMarkDescription("");
+  };
+
+  const handleChangeSymbol = (id: string, sym: MarkSymbol) => {
+    setDamageMarks(p => p.map(m => m.id === id ? { ...m, symbol: sym } : m));
   };
 
   const handleDelete = (id: string) => {
@@ -165,17 +218,24 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
 
   const handleSubmit = () => {
     if (isSubmitting) return;
+    if (selectedMark) {
+      setDamageMarks(p => p.map(m => m.id === selectedMark ? { ...m, description: markDescription } : m));
+    }
     setIsSubmitting(true);
     onComplete(damageMarks, "", fuelLevel);
-    // Reset after a tick so the button re-enables if the parent doesn't unmount (e.g. on error)
     setTimeout(() => setIsSubmitting(false), 1500);
   };
 
   const panelProps = { marks: damageMarks, allMarks: damageMarks, selectedMark, onPanelClick: handlePanelClick, onMarkClick: handleMarkClick };
 
+  const SYMBOLS: { sym: MarkSymbol; label: string }[] = [
+    { sym: "X",   label: "✕  Scratch / Major" },
+    { sym: "O",   label: "○  Dent / Dent" },
+    { sym: "dot", label: "•  Minor / Chip" },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Contract details */}
       {contractData && (
         <Card>
           <CardHeader>
@@ -223,47 +283,86 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
         </Card>
       )}
 
-      {/* 4-panel inspection */}
       <Card>
         <CardHeader>
           <CardTitle>Vehicle Condition Inspection</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Click on any panel to mark existing damage. Click a marker again to describe it.
+            Choose a symbol, then click on any panel to mark damage. Click an existing mark to edit or change its symbol.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">
 
-          {/* Side views — full width each */}
+          {/* Symbol selector */}
+          <div className="flex items-center gap-3 p-3 bg-muted/40 rounded-xl border">
+            <span className="text-sm font-semibold text-muted-foreground shrink-0">Mark type:</span>
+            <div className="flex gap-2 flex-wrap">
+              {SYMBOLS.map(({ sym, label }) => (
+                <button
+                  key={sym}
+                  type="button"
+                  onClick={() => setActiveSymbol(sym)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 text-sm font-medium transition-all ${
+                    activeSymbol === sym
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-300 bg-white hover:border-slate-500"
+                  }`}
+                >
+                  <SymbolBadge symbol={sym} index={1} selected={activeSymbol === sym} size={20} />
+                  <span className="hidden sm:inline">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Side views */}
           <div className="grid grid-cols-1 gap-4">
             <ViewPanel view="left"  {...panelProps} />
             <ViewPanel view="right" {...panelProps} />
           </div>
 
-          {/* Front / Rear — side by side */}
+          {/* Front / Rear */}
           <div className="grid grid-cols-2 gap-4">
             <ViewPanel view="front" {...panelProps} />
             <ViewPanel view="rear"  {...panelProps} />
           </div>
 
           {/* Description editor */}
-          {selectedMark && (
-            <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800">
-              <Label className="text-sm font-medium">
-                Damage #{damageMarks.findIndex(m => m.id === selectedMark) + 1}
-                {" — "}
-                <span className="text-muted-foreground">{VIEW_LABELS[damageMarks.find(m => m.id === selectedMark)?.view ?? "front"]}</span>
-              </Label>
-              <div className="flex gap-2 mt-2">
-                <Textarea
-                  value={markDescription}
-                  onChange={e => setMarkDescription(e.target.value)}
-                  placeholder="e.g., Scratch on door panel, dent on bumper…"
-                  className="flex-1" rows={2}
-                />
-                <Button type="button" onClick={handleSave}>Save</Button>
+          {selectedMark && (() => {
+            const mark = damageMarks.find(m => m.id === selectedMark)!;
+            const idx = damageMarks.findIndex(m => m.id === selectedMark) + 1;
+            return (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-800 space-y-3">
+                <div className="flex items-center gap-2">
+                  <SymbolBadge symbol={mark.symbol} index={idx} selected size={24} />
+                  <Label className="text-sm font-medium">
+                    Damage #{idx} — <span className="text-muted-foreground">{VIEW_LABELS[mark.view]}</span>
+                  </Label>
+                </div>
+                {/* Symbol changer for existing mark */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Change symbol:</span>
+                  {(["X", "O", "dot"] as MarkSymbol[]).map(sym => (
+                    <button key={sym} type="button"
+                      onClick={() => handleChangeSymbol(selectedMark, sym)}
+                      className={`p-1 rounded-md border ${mark.symbol === sym ? "border-slate-900 bg-slate-100" : "border-slate-200"}`}
+                    >
+                      <SymbolBadge symbol={sym} index={idx} selected={mark.symbol === sym} size={20} />
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Textarea
+                    value={markDescription}
+                    onChange={e => setMarkDescription(e.target.value)}
+                    placeholder="e.g., Scratch on door panel, dent on bumper…"
+                    className="flex-1"
+                    rows={2}
+                  />
+                  <Button type="button" onClick={handleSave}>Save</Button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Damage list */}
           {damageMarks.length > 0 && (
@@ -272,7 +371,9 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {damageMarks.map((mark, i) => (
                   <div key={mark.id} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg border">
-                    <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">{i + 1}</div>
+                    <div className="flex-shrink-0 mt-0.5">
+                      <SymbolBadge symbol={mark.symbol} index={i + 1} size={24} />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium">{VIEW_LABELS[mark.view]}</div>
                       <div className="text-xs text-muted-foreground truncate">{mark.description || <em>No description added</em>}</div>
@@ -290,9 +391,7 @@ export default function CarDamageInspection({ onComplete, onCancel, onBack, cont
 
       {/* Fuel Level */}
       <Card>
-        <CardHeader>
-          <CardTitle>Fuel Level at Rental Start</CardTitle>
-        </CardHeader>
+        <CardHeader><CardTitle>Fuel Level at Rental Start</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <div className="flex gap-2">
             {["Empty", "1/4", "1/2", "3/4", "Full"].map(l => (

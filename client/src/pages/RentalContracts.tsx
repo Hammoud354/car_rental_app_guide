@@ -393,6 +393,7 @@ export default function RentalContracts() {
             yPosition: mark.y.toString(),
             view: mark.view,
             description: mark.description,
+            symbol: mark.symbol ?? "X",
           });
         });
 
