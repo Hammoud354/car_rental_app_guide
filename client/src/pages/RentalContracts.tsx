@@ -1723,10 +1723,18 @@ export default function RentalContracts() {
                 >
                   📄 Export to PDF
                 </Button>
-                {companyProfile?.contractTemplateUrl && companyProfile?.contractTemplateFieldMap && (
+                {companyProfile && (
                   <Button
                     onClick={async () => {
                       if (!selectedContract) { toast.error("No contract selected"); return; }
+                      if (!companyProfile.contractTemplateUrl) {
+                        toast.error("No template uploaded. Go to Company Settings → Contract Template to upload one.");
+                        return;
+                      }
+                      if (!companyProfile.contractTemplateFieldMap) {
+                        toast.error("Field positions not configured. Go to Company Settings → Configure Field Positions first.");
+                        return;
+                      }
                       const vehicle = vehicles.find(v => v.id === selectedContract.vehicleId);
                       const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
                       const contractData: Record<string, string> = {
