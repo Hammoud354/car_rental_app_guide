@@ -188,8 +188,9 @@ export async function exportTemplateOverlayToPDF(
   templateUrl: string,
   fieldMap: Record<string, { x: number; y: number; fontSize: number; alignment: string; fontColor?: string }>,
   contractData: Record<string, string>,
-  fileName: string = "contract.pdf"
-): Promise<boolean> {
+  fileName: string = "contract.pdf",
+  returnBase64 = false
+): Promise<boolean | string> {
   let container: HTMLDivElement | null = null;
   try {
     // Pre-load template image to get natural dimensions
@@ -308,6 +309,9 @@ export async function exportTemplateOverlayToPDF(
       }
     }
 
+    if (returnBase64) {
+      return pdf.output("datauristring");
+    }
     pdf.save(fileName);
     return true;
   } catch (error) {
@@ -362,7 +366,7 @@ function appendCanvasToPDF(
  * Works by cloning the off-screen template into a visible position on document.body
  * so html2canvas can reliably measure and capture it.
  */
-export async function exportContractTemplateToPDF(fileName: string): Promise<boolean> {
+export async function exportContractTemplateToPDF(fileName: string, returnBase64 = false): Promise<boolean | string> {
   const template = document.getElementById("contract-pdf-template");
   if (!template) {
     console.error("exportContractTemplateToPDF: #contract-pdf-template not found in DOM");
@@ -445,6 +449,9 @@ export async function exportContractTemplateToPDF(fileName: string): Promise<boo
     appendCanvasToPDF(pdf, canvas1, true);
     if (canvas2) appendCanvasToPDF(pdf, canvas2, false);
 
+    if (returnBase64) {
+      return pdf.output("datauristring");
+    }
     pdf.save(fileName);
     return true;
   } catch (error) {

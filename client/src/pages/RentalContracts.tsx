@@ -2453,29 +2453,111 @@ export default function RentalContracts() {
               <Button
                 variant="outline"
                 className="h-12 justify-start gap-3 text-sm"
-                onClick={() => {
+                onClick={async () => {
                   const c = postCompletionModal.contract;
-                  const v = postCompletionModal.vehicle;
+                  const v = postCompletionModal.vehicle || vehicles.find((vv: any) => vv.id === c.vehicleId);
                   const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+
+                  // Build contract data for template overlay (if configured)
+                  const hasTemplate = !!(companyProfile?.contractTemplateUrl && companyProfile?.contractTemplateFieldMap);
+
+                  toast.info("Generating PDF…");
+
+                  let pdfBase64: string | null = null;
+                  try {
+                    if (hasTemplate) {
+                      // Generate template overlay PDF
+                      const data: Record<string, string> = {
+                        clientName: c.clientName || "",
+                        clientMotherFullName: c.clientMotherFullName || "",
+                        clientFatherFullName: c.clientFatherFullName || "",
+                        clientNationality: c.clientNationality || "",
+                        clientPhone: c.clientPhone || "",
+                        clientAddress: c.clientAddress || "",
+                        clientEmail: c.clientEmail || "",
+                        clientDateOfBirth: fmtDate(c.clientDateOfBirth),
+                        clientPlaceOfBirth: c.clientPlaceOfBirth || "",
+                        clientPassportNumber: c.clientPassport || "",
+                        clientRegistrationNumber: c.clientRegistrationNumber || "",
+                        clientPlaceOfRegistration: c.clientPlaceOfRegistration || "",
+                        clientLicenseNumber: c.clientDriverLicense || "",
+                        clientLicenseIssueDate: fmtDate(c.licenseIssueDate),
+                        clientLicenseExpiryDate: fmtDate(c.licenseExpiryDate),
+                        vehiclePlate: v?.plateNumber || "",
+                        vehicleMake: v?.brand || "",
+                        vehicleModel: v?.model || "",
+                        vehicleYear: v?.year?.toString() || "",
+                        vehicleColor: c.vehicleColor || v?.color || "",
+                        vehicleFuelType: c.vehicleFuelType || v?.fuelType || "",
+                        vehicleVIN: c.vehicleVIN || v?.vin || "",
+                        contractNumber: c.contractNumber || c.id?.toString() || "",
+                        startDate: fmtDate(c.rentalStartDate),
+                        endDate: fmtDate(c.rentalEndDate),
+                        pickupTime: c.pickupTime || "",
+                        returnTime: c.returnTime || "",
+                        rentalDays: c.rentalDays?.toString() || "",
+                        dailyRate: c.dailyRate?.toString() || "",
+                        totalAmount: c.totalAmount?.toString() || "",
+                        deposit: c.depositAmount?.toString() || "",
+                        companyName: companyProfile?.companyName || "",
+                        companyPhone: companyProfile?.phone || "",
+                        companyAddress: companyProfile?.address || "",
+                      };
+                      const result = await exportTemplateOverlayToPDF(
+                        companyProfile!.contractTemplateUrl!,
+                        companyProfile!.contractTemplateFieldMap as Record<string, any>,
+                        data,
+                        `Contract_${c.contractNumber || c.id}.pdf`,
+                        true
+                      );
+                      if (typeof result === "string") pdfBase64 = result;
+                    } else {
+                      // Fallback: standard A4 PDF
+                      const result = await exportContractTemplateToPDF(
+                        `Contract_${c.contractNumber || c.id}.pdf`,
+                        true
+                      );
+                      if (typeof result === "string") pdfBase64 = result;
+                    }
+                  } catch (err) {
+                    console.error("PDF generation error:", err);
+                  }
+
+                  let pdfUrl: string | null = null;
+                  if (pdfBase64) {
+                    try {
+                      toast.info("Uploading PDF…");
+                      const uploadResult = await uploadPdfMutation.mutateAsync({
+                        base64Data: pdfBase64,
+                        filename: `Contract-${c.contractNumber || c.id}.pdf`,
+                      });
+                      pdfUrl = uploadResult.url;
+                    } catch (err) {
+                      console.error("PDF upload error:", err);
+                    }
+                  }
+
                   const message =
                     `✅ *Contract Completed*\n` +
                     `Contract: *${c.contractNumber}*\n` +
                     `Client: ${c.clientName}\n` +
                     `Vehicle: ${v?.brand || ""} ${v?.model || ""} — ${v?.plateNumber || ""}\n` +
                     `Period: ${fmtDate(c.rentalStartDate)} → ${fmtDate(c.rentalEndDate)}\n` +
-                    `Total: $${c.totalAmount || c.finalAmount || "0"}\n\n` +
-                    `Thank you for choosing ${companyProfile?.companyName || "us"}! 🚗`;
+                    `Total: $${c.totalAmount || c.finalAmount || "0"}` +
+                    (pdfUrl ? `\n\n📄 Contract PDF:\n${pdfUrl}` : "") +
+                    `\n\nThank you for choosing ${companyProfile?.companyName || "us"}! 🚗`;
+
                   const phone = (c.clientPhone || "").replace(/[\s\-\(\)]/g, "");
-                  const url = phone
+                  const waUrl = phone
                     ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
                     : `https://wa.me/?text=${encodeURIComponent(message)}`;
-                  window.open(url, "_blank");
+                  window.open(waUrl, "_blank");
                 }}
               >
                 <span className="text-xl">💬</span>
                 <div className="text-left">
                   <div className="font-medium">Send via WhatsApp</div>
-                  <div className="text-xs text-muted-foreground">Send contract summary to client</div>
+                  <div className="text-xs text-muted-foreground">Generates PDF & sends link to client</div>
                 </div>
               </Button>
             </div>
