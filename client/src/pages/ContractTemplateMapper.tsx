@@ -6,9 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Save, ArrowLeft, Trash2, GripVertical, Eye, EyeOff, Grid3X3 } from "lucide-react";
+import { Loader2, Save, ArrowLeft, Trash2, GripVertical, Eye, EyeOff, Magnet, AlignCenter, Ruler } from "lucide-react";
 
 const SAMPLE_DATA: Record<string, string> = {
   clientName: "John Doe",
@@ -59,7 +58,7 @@ const CONTRACT_FIELDS = [
     { id: "clientEmail", label: "Email" },
     { id: "clientDateOfBirth", label: "Date of Birth" },
     { id: "clientPlaceOfBirth", label: "Place of Birth" },
-    { id: "clientPassportNumber", label: "Passport Number" },
+    { id: "clientPassportNumber", label: "Passport No." },
     { id: "clientRegistrationNumber", label: "R.No." },
     { id: "clientPlaceOfRegistration", label: "Place of Registration" },
     { id: "clientLicenseNumber", label: "License No." },
@@ -113,6 +112,21 @@ type DragState = {
   startFpY: number;
 };
 
+type Guide = { axis: "x" | "y"; value: number };
+
+const SNAP_SIZES = [
+  { label: "Off", value: 0 },
+  { label: "0.5%", value: 0.5 },
+  { label: "1%", value: 1 },
+  { label: "2%", value: 2 },
+];
+const ALIGN_SNAP_THRESHOLD = 0.8; // % tolerance for alignment guide snapping
+
+function snapVal(v: number, snapSize: number) {
+  if (!snapSize) return v;
+  return Math.round(v / snapSize) * snapSize;
+}
+
 export default function ContractTemplateMapper() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -126,9 +140,12 @@ export default function ContractTemplateMapper() {
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showPreview, setShowPreview] = useState(true);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
+  const [snapSize, setSnapSize] = useState(1);
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [activeGroup, setActiveGroup] = useState<string>("Client");
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     if (profile?.contractTemplateFieldMap) {
@@ -138,7 +155,7 @@ export default function ContractTemplateMapper() {
         x: config.x ?? 50,
         y: config.y ?? 10,
         fontSize: config.fontSize ?? 11,
-        alignment: config.alignment ?? "center",
+        alignment: config.alignment ?? "left",
         fontColor: config.fontColor ?? "#000000",
       }));
       setFieldPositions(positions);
@@ -151,24 +168,53 @@ export default function ContractTemplateMapper() {
     return "translateX(0)";
   };
 
+  const computeGuides = useCallback((draggingId: string, newX: number, newY: number): Guide[] => {
+    const others = fieldPositions.filter(fp => fp.fieldId !== draggingId);
+    const found: Guide[] = [];
+    for (const fp of others) {
+      if (Math.abs(fp.x - newX) < ALIGN_SNAP_THRESHOLD) found.push({ axis: "x", value: fp.x });
+      if (Math.abs(fp.y - newY) < ALIGN_SNAP_THRESHOLD) found.push({ axis: "y", value: fp.y });
+    }
+    return found;
+  }, [fieldPositions]);
+
   const handleContainerMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!dragState || !imageRef.current) return;
+    if (!imageRef.current) return;
     const rect = imageRef.current.getBoundingClientRect();
+    const rawX = ((e.clientX - rect.left) / rect.width) * 100;
+    const rawY = ((e.clientY - rect.top) / rect.height) * 100;
+    setCursorPos({ x: parseFloat(rawX.toFixed(1)), y: parseFloat(rawY.toFixed(1)) });
+
+    if (!dragState) return;
     const dx = ((e.clientX - dragState.startMouseX) / rect.width) * 100;
     const dy = ((e.clientY - dragState.startMouseY) / rect.height) * 100;
-    const newX = Math.max(0, Math.min(100, dragState.startFpX + dx));
-    const newY = Math.max(0, Math.min(100, dragState.startFpY + dy));
+    let newX = Math.max(0, Math.min(100, dragState.startFpX + dx));
+    let newY = Math.max(0, Math.min(100, dragState.startFpY + dy));
+
+    // Snap to other field alignment guides first
+    const others = fieldPositions.filter(fp => fp.fieldId !== dragState.fieldId);
+    for (const fp of others) {
+      if (Math.abs(fp.x - newX) < ALIGN_SNAP_THRESHOLD) newX = fp.x;
+      if (Math.abs(fp.y - newY) < ALIGN_SNAP_THRESHOLD) newY = fp.y;
+    }
+
+    // Then snap to grid
+    newX = snapVal(newX, snapSize);
+    newY = snapVal(newY, snapSize);
+
+    newX = parseFloat(newX.toFixed(2));
+    newY = parseFloat(newY.toFixed(2));
+
+    setGuides(computeGuides(dragState.fieldId, newX, newY));
+
     setFieldPositions(prev =>
-      prev.map(fp =>
-        fp.fieldId === dragState.fieldId
-          ? { ...fp, x: parseFloat(newX.toFixed(2)), y: parseFloat(newY.toFixed(2)) }
-          : fp
-      )
+      prev.map(fp => fp.fieldId === dragState.fieldId ? { ...fp, x: newX, y: newY } : fp)
     );
-  }, [dragState]);
+  }, [dragState, snapSize, computeGuides, fieldPositions]);
 
   const handleContainerMouseUp = useCallback(() => {
     setDragState(null);
+    setGuides([]);
   }, []);
 
   const handleFieldMouseDown = (e: React.MouseEvent, fieldId: string) => {
@@ -176,13 +222,7 @@ export default function ContractTemplateMapper() {
     e.stopPropagation();
     const fp = fieldPositions.find(f => f.fieldId === fieldId);
     if (!fp) return;
-    setDragState({
-      fieldId,
-      startMouseX: e.clientX,
-      startMouseY: e.clientY,
-      startFpX: fp.x,
-      startFpY: fp.y,
-    });
+    setDragState({ fieldId, startMouseX: e.clientX, startMouseY: e.clientY, startFpX: fp.x, startFpY: fp.y });
     setSelectedFieldId(fieldId);
   };
 
@@ -190,8 +230,10 @@ export default function ContractTemplateMapper() {
     if (dragState) return;
     if (!selectedFieldId || !imageRef.current) return;
     const rect = imageRef.current.getBoundingClientRect();
-    const x = parseFloat((((e.clientX - rect.left) / rect.width) * 100).toFixed(2));
-    const y = parseFloat((((e.clientY - rect.top) / rect.height) * 100).toFixed(2));
+    let x = ((e.clientX - rect.left) / rect.width) * 100;
+    let y = ((e.clientY - rect.top) / rect.height) * 100;
+    x = parseFloat(snapVal(x, snapSize).toFixed(2));
+    y = parseFloat(snapVal(y, snapSize).toFixed(2));
 
     const existingIndex = fieldPositions.findIndex(fp => fp.fieldId === selectedFieldId);
     if (existingIndex >= 0) {
@@ -199,14 +241,7 @@ export default function ContractTemplateMapper() {
         fp.fieldId === selectedFieldId ? { ...fp, x, y } : fp
       ));
     } else {
-      setFieldPositions(prev => [...prev, {
-        fieldId: selectedFieldId,
-        x,
-        y,
-        fontSize: 11,
-        alignment: "center",
-        fontColor: "#000000",
-      }]);
+      setFieldPositions(prev => [...prev, { fieldId: selectedFieldId, x, y, fontSize: 11, alignment: "left", fontColor: "#000000" }]);
     }
   };
 
@@ -215,21 +250,14 @@ export default function ContractTemplateMapper() {
     if (!already) {
       const count = fieldPositions.length;
       setFieldPositions(prev => [...prev, {
-        fieldId,
-        x: 50,
-        y: Math.min(10 + count * 5, 90),
-        fontSize: 11,
-        alignment: "center",
-        fontColor: "#000000",
+        fieldId, x: 25, y: Math.min(8 + count * 4, 88), fontSize: 11, alignment: "left", fontColor: "#000000",
       }]);
     }
     setSelectedFieldId(fieldId);
   };
 
   const updateFieldProp = (fieldId: string, prop: keyof FieldPosition, value: any) => {
-    setFieldPositions(prev =>
-      prev.map(fp => fp.fieldId === fieldId ? { ...fp, [prop]: value } : fp)
-    );
+    setFieldPositions(prev => prev.map(fp => fp.fieldId === fieldId ? { ...fp, [prop]: value } : fp));
   };
 
   const removeField = (fieldId: string) => {
@@ -241,18 +269,9 @@ export default function ContractTemplateMapper() {
     try {
       const fieldMap: Record<string, any> = {};
       fieldPositions.forEach(fp => {
-        fieldMap[fp.fieldId] = {
-          x: fp.x,
-          y: fp.y,
-          fontSize: fp.fontSize,
-          alignment: fp.alignment,
-          fontColor: fp.fontColor,
-        };
+        fieldMap[fp.fieldId] = { x: fp.x, y: fp.y, fontSize: fp.fontSize, alignment: fp.alignment, fontColor: fp.fontColor };
       });
-      await updateProfile.mutateAsync({
-        companyName: profile?.companyName || "",
-        contractTemplateFieldMap: fieldMap,
-      });
+      await updateProfile.mutateAsync({ companyName: profile?.companyName || "", contractTemplateFieldMap: fieldMap });
       toast({ title: "Saved", description: "Field positions saved successfully." });
     } catch {
       toast({ title: "Error", description: "Failed to save. Please try again.", variant: "destructive" });
@@ -260,11 +279,7 @@ export default function ContractTemplateMapper() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
+    return <div className="flex items-center justify-center min-h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
 
   if (!profile?.contractTemplateUrl) {
@@ -277,8 +292,7 @@ export default function ContractTemplateMapper() {
           </CardHeader>
           <CardContent>
             <Button onClick={() => setLocation("/company-settings")}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Go to Company Settings
+              <ArrowLeft className="mr-2 h-4 w-4" /> Go to Company Settings
             </Button>
           </CardContent>
         </Card>
@@ -288,64 +302,78 @@ export default function ContractTemplateMapper() {
 
   const selectedFp = fieldPositions.find(fp => fp.fieldId === selectedFieldId);
 
+  // Compute major grid lines (every 10%) and minor (every 2%)
+  const majorLines = Array.from({ length: 9 }, (_, i) => (i + 1) * 10);
+  const minorLines = Array.from({ length: 49 }, (_, i) => (i + 1) * 2).filter(v => v % 10 !== 0);
+
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b bg-background shrink-0">
+      <div className="flex items-center justify-between px-4 py-2 border-b bg-background shrink-0 gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="sm" onClick={() => setLocation("/company-settings")}>
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back
+            <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Contract Template Field Mapper</h1>
-            <p className="text-xs text-muted-foreground">
-              Click a field to select it, then click on the template or drag to reposition
+            <h1 className="text-base font-bold leading-none">Template Field Mapper</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {selectedFieldId
+                ? `Click on template to place "${ALL_FIELDS.find(f => f.id === selectedFieldId)?.label}" · Drag to move`
+                : "Select a field from the left, then click the template to place it"}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
-            <Grid3X3 className="h-4 w-4 mr-1" />
-            {showGrid ? "Hide Grid" : "Grid"}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Snap control */}
+          <div className="flex items-center gap-1.5">
+            <Magnet className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Snap:</span>
+            <Select value={snapSize.toString()} onValueChange={v => setSnapSize(parseFloat(v))}>
+              <SelectTrigger className="h-7 w-20 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SNAP_SIZES.map(s => (
+                  <SelectItem key={s.value} value={s.value.toString()}>{s.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant={showGrid ? "default" : "outline"} size="sm" className="h-7 text-xs" onClick={() => setShowGrid(!showGrid)}>
+            <Ruler className="h-3.5 w-3.5 mr-1" /> Grid
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
-            {showPreview ? <EyeOff className="h-4 w-4 mr-1" /> : <Eye className="h-4 w-4 mr-1" />}
-            {showPreview ? "Labels" : "Preview"}
+          <Button variant={showPreview ? "default" : "outline"} size="sm" className="h-7 text-xs" onClick={() => setShowPreview(!showPreview)}>
+            {showPreview ? <Eye className="h-3.5 w-3.5 mr-1" /> : <EyeOff className="h-3.5 w-3.5 mr-1" />}
+            Preview
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={updateProfile.isPending}>
-            {updateProfile.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            <Save className="mr-2 h-4 w-4" />
-            Save Layout
+          <Button size="sm" className="h-7 text-xs" onClick={handleSave} disabled={updateProfile.isPending}>
+            {updateProfile.isPending && <Loader2 className="mr-2 h-3 w-3 animate-spin" />}
+            <Save className="mr-1 h-3.5 w-3.5" /> Save Layout
           </Button>
         </div>
       </div>
 
-      {/* Main content */}
+      {/* Main */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar: field picker */}
-        <div className="w-56 border-r bg-muted/30 flex flex-col overflow-hidden shrink-0">
-          <div className="px-3 py-2 border-b">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fields</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{fieldPositions.length} placed</p>
+
+        {/* Left sidebar — field list */}
+        <div className="w-52 border-r bg-background flex flex-col overflow-hidden shrink-0">
+          <div className="px-3 py-2 border-b bg-muted/40">
+            <div className="flex gap-1 flex-wrap">
+              {CONTRACT_FIELDS.map(g => (
+                <button
+                  key={g.group}
+                  onClick={() => setActiveGroup(g.group)}
+                  className={`text-xs px-2 py-0.5 rounded border transition-colors ${
+                    activeGroup === g.group ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"
+                  }`}
+                >
+                  {g.group}
+                </button>
+              ))}
+            </div>
           </div>
-          {/* Group tabs */}
-          <div className="flex flex-wrap gap-1 px-2 py-2 border-b">
-            {CONTRACT_FIELDS.map(g => (
-              <button
-                key={g.group}
-                onClick={() => setActiveGroup(g.group)}
-                className={`text-xs px-2 py-0.5 rounded-full border transition-colors ${
-                  activeGroup === g.group
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "border-border hover:bg-accent"
-                }`}
-              >
-                {g.group}
-              </button>
-            ))}
-          </div>
-          <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1">
+          <div className="flex-1 overflow-y-auto py-1">
             {CONTRACT_FIELDS.find(g => g.group === activeGroup)?.fields.map(field => {
               const isPlaced = fieldPositions.some(fp => fp.fieldId === field.id);
               const isSelected = selectedFieldId === field.id;
@@ -353,137 +381,259 @@ export default function ContractTemplateMapper() {
                 <button
                   key={field.id}
                   onClick={() => addFieldAtDefault(field.id)}
-                  className={`w-full text-left text-xs px-2 py-1.5 rounded flex items-center gap-1.5 transition-colors ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : isPlaced
-                      ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 hover:bg-green-200"
-                      : "hover:bg-accent"
+                  className={`w-full text-left text-xs px-3 py-1.5 flex items-center gap-1.5 transition-colors border-b border-border/40 ${
+                    isSelected ? "bg-primary text-primary-foreground"
+                    : isPlaced ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300"
+                    : "hover:bg-accent"
                   }`}
                 >
-                  {isPlaced && <span className="text-green-600 dark:text-green-400 shrink-0">✓</span>}
+                  {isPlaced
+                    ? <span className="text-green-500 shrink-0 font-bold">✓</span>
+                    : <span className="w-3 shrink-0" />}
                   {field.label}
                 </button>
               );
             })}
           </div>
-        </div>
-
-        {/* Center: template image */}
-        <div
-          className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900 p-4"
-          onMouseMove={handleContainerMouseMove}
-          onMouseUp={handleContainerMouseUp}
-          onMouseLeave={handleContainerMouseUp}
-          style={{ cursor: dragState ? "grabbing" : selectedFieldId ? "crosshair" : "default" }}
-        >
-          <div
-            ref={containerRef}
-            className="relative inline-block shadow-xl"
-            style={{ userSelect: "none" }}
-          >
-            <img
-              ref={imageRef}
-              src={profile.contractTemplateUrl}
-              alt="Contract Template"
-              className="block max-w-full h-auto"
-              style={{ maxHeight: "calc(100vh - 120px)" }}
-              onClick={handleImageClick}
-              onLoad={() => setImageLoaded(true)}
-              draggable={false}
-            />
-
-            {/* Grid overlay */}
-            {imageLoaded && showGrid && (
-              <div className="absolute inset-0 pointer-events-none">
-                {Array.from({ length: 19 }).map((_, i) => (
-                  <div key={`v-${i}`} className="absolute top-0 bottom-0 border-l border-blue-400/20" style={{ left: `${(i + 1) * 5}%` }} />
-                ))}
-                {Array.from({ length: 19 }).map((_, i) => (
-                  <div key={`h-${i}`} className="absolute left-0 right-0 border-t border-blue-400/20" style={{ top: `${(i + 1) * 5}%` }} />
-                ))}
-              </div>
-            )}
-
-            {/* Placed field overlays */}
-            {imageLoaded && fieldPositions.map(fp => {
-              const field = ALL_FIELDS.find(f => f.id === fp.fieldId);
-              const isSelected = fp.fieldId === selectedFieldId;
-              const sampleValue = SAMPLE_DATA[fp.fieldId] || fp.fieldId;
-              return (
-                <div
-                  key={fp.fieldId}
-                  style={{
-                    position: "absolute",
-                    left: `${fp.x}%`,
-                    top: `${fp.y}%`,
-                    transform: getTransform(fp.alignment),
-                    zIndex: isSelected ? 20 : 10,
-                  }}
-                >
-                  <div
-                    onMouseDown={(e) => handleFieldMouseDown(e, fp.fieldId)}
-                    style={{
-                      cursor: "grab",
-                      whiteSpace: "nowrap",
-                      fontSize: `${fp.fontSize}px`,
-                      fontFamily: "Arial, sans-serif",
-                      color: showPreview ? fp.fontColor : "transparent",
-                      backgroundColor: isSelected
-                        ? "rgba(59,130,246,0.15)"
-                        : showPreview
-                        ? "transparent"
-                        : "rgba(59,130,246,0.1)",
-                      border: isSelected ? "1.5px solid #3b82f6" : showPreview ? "1px dashed rgba(59,130,246,0.4)" : "1px solid rgba(59,130,246,0.4)",
-                      borderRadius: "2px",
-                      padding: "1px 3px",
-                      lineHeight: 1.2,
-                    }}
-                    title={`${field?.label} — drag to reposition`}
-                  >
-                    {showPreview ? sampleValue : (
-                      <span style={{ color: "#3b82f6", fontSize: "10px", fontFamily: "Arial", fontWeight: "bold" }}>
-                        {field?.label}
-                      </span>
-                    )}
-                  </div>
-                  {/* Delete dot */}
-                  {isSelected && (
-                    <button
-                      onMouseDown={e => { e.stopPropagation(); removeField(fp.fieldId); }}
-                      style={{
-                        position: "absolute",
-                        top: "-8px",
-                        right: "-8px",
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                        background: "#ef4444",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        lineHeight: 1,
-                        zIndex: 30,
-                      }}
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+          <div className="p-2 border-t text-xs text-muted-foreground">
+            {fieldPositions.length} field{fieldPositions.length !== 1 ? "s" : ""} placed
           </div>
         </div>
 
-        {/* Right sidebar: field properties */}
-        <div className="w-60 border-l bg-background flex flex-col overflow-hidden shrink-0">
-          <div className="px-3 py-2 border-b">
+        {/* Center — canvas */}
+        <div
+          className="flex-1 overflow-auto"
+          style={{ background: "#e8eaed" }}
+          onMouseMove={handleContainerMouseMove}
+          onMouseUp={handleContainerMouseUp}
+          onMouseLeave={handleContainerMouseUp}
+        >
+          <div className="p-6 min-h-full flex items-start justify-center">
+            {/* Ruler + canvas wrapper */}
+            <div style={{ position: "relative" }}>
+              {/* Top ruler */}
+              {showGrid && imageLoaded && imageRef.current && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: -20,
+                    left: 0,
+                    width: imageRef.current.getBoundingClientRect().width,
+                    height: 20,
+                    display: "flex",
+                    alignItems: "flex-end",
+                    overflow: "hidden",
+                  }}
+                >
+                  {majorLines.map(pct => (
+                    <div
+                      key={pct}
+                      style={{
+                        position: "absolute",
+                        left: `${pct}%`,
+                        bottom: 0,
+                        transform: "translateX(-50%)",
+                        fontSize: "9px",
+                        color: "#6b7280",
+                        lineHeight: 1,
+                        userSelect: "none",
+                      }}
+                    >
+                      {pct}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Left ruler */}
+              {showGrid && imageLoaded && imageRef.current && (
+                <div
+                  style={{
+                    position: "absolute",
+                    left: -22,
+                    top: 0,
+                    width: 22,
+                    height: imageRef.current.getBoundingClientRect().height,
+                    overflow: "hidden",
+                  }}
+                >
+                  {majorLines.map(pct => (
+                    <div
+                      key={pct}
+                      style={{
+                        position: "absolute",
+                        top: `${pct}%`,
+                        right: 2,
+                        transform: "translateY(-50%)",
+                        fontSize: "9px",
+                        color: "#6b7280",
+                        lineHeight: 1,
+                        userSelect: "none",
+                      }}
+                    >
+                      {pct}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Main image + overlays */}
+              <div
+                ref={containerRef}
+                style={{
+                  position: "relative",
+                  display: "inline-block",
+                  boxShadow: "0 4px 32px rgba(0,0,0,0.25)",
+                  cursor: dragState ? "grabbing" : selectedFieldId ? "crosshair" : "default",
+                  userSelect: "none",
+                }}
+              >
+                <img
+                  ref={imageRef}
+                  src={profile.contractTemplateUrl}
+                  alt="Contract Template"
+                  style={{ display: "block", maxHeight: "calc(100vh - 140px)", maxWidth: "100%", height: "auto" }}
+                  onClick={handleImageClick}
+                  onLoad={() => setImageLoaded(true)}
+                  draggable={false}
+                />
+
+                {/* Grid overlay */}
+                {showGrid && imageLoaded && (
+                  <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+                    {/* Minor gridlines — every 2% */}
+                    {minorLines.map(pct => (
+                      <div key={`mv-${pct}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${pct}%`, borderLeft: "1px solid rgba(99,102,241,0.12)" }} />
+                    ))}
+                    {minorLines.map(pct => (
+                      <div key={`mh-${pct}`} style={{ position: "absolute", left: 0, right: 0, top: `${pct}%`, borderTop: "1px solid rgba(99,102,241,0.12)" }} />
+                    ))}
+                    {/* Major gridlines — every 10% */}
+                    {majorLines.map(pct => (
+                      <div key={`Mv-${pct}`} style={{ position: "absolute", top: 0, bottom: 0, left: `${pct}%`, borderLeft: "1px solid rgba(99,102,241,0.3)" }} />
+                    ))}
+                    {majorLines.map(pct => (
+                      <div key={`Mh-${pct}`} style={{ position: "absolute", left: 0, right: 0, top: `${pct}%`, borderTop: "1px solid rgba(99,102,241,0.3)" }} />
+                    ))}
+                    {/* Center column guide (50%) — stronger */}
+                    <div style={{ position: "absolute", top: 0, bottom: 0, left: "50%", borderLeft: "1.5px dashed rgba(239,68,68,0.35)" }} />
+                  </div>
+                )}
+
+                {/* Alignment guides (flash during drag) */}
+                {guides.map((g, i) => (
+                  g.axis === "x"
+                    ? <div key={i} style={{ position: "absolute", top: 0, bottom: 0, left: `${g.value}%`, borderLeft: "1.5px solid #f59e0b", zIndex: 15, pointerEvents: "none" }} />
+                    : <div key={i} style={{ position: "absolute", left: 0, right: 0, top: `${g.value}%`, borderTop: "1.5px solid #f59e0b", zIndex: 15, pointerEvents: "none" }} />
+                ))}
+
+                {/* Live cursor position */}
+                {cursorPos && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: 4,
+                      right: 4,
+                      background: "rgba(0,0,0,0.6)",
+                      color: "white",
+                      fontSize: "10px",
+                      padding: "2px 6px",
+                      borderRadius: 4,
+                      pointerEvents: "none",
+                      zIndex: 20,
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    x:{cursorPos.x}% y:{cursorPos.y}%
+                  </div>
+                )}
+
+                {/* Placed fields */}
+                {imageLoaded && fieldPositions.map(fp => {
+                  const field = ALL_FIELDS.find(f => f.id === fp.fieldId);
+                  const isSelected = fp.fieldId === selectedFieldId;
+                  const isDraggingThis = dragState?.fieldId === fp.fieldId;
+                  return (
+                    <div
+                      key={fp.fieldId}
+                      style={{
+                        position: "absolute",
+                        left: `${fp.x}%`,
+                        top: `${fp.y}%`,
+                        transform: getTransform(fp.alignment),
+                        zIndex: isSelected ? 20 : 10,
+                        pointerEvents: "auto",
+                      }}
+                    >
+                      <div
+                        onMouseDown={(e) => handleFieldMouseDown(e, fp.fieldId)}
+                        title={`${field?.label} — drag to move`}
+                        style={{
+                          cursor: isDraggingThis ? "grabbing" : "grab",
+                          whiteSpace: "nowrap",
+                          fontSize: `${fp.fontSize}px`,
+                          fontFamily: "Arial, Helvetica, sans-serif",
+                          color: showPreview ? fp.fontColor : "#3b82f6",
+                          lineHeight: 1.1,
+                          padding: "1px 4px",
+                          borderRadius: 2,
+                          border: isSelected
+                            ? "1.5px solid #3b82f6"
+                            : "1px dashed rgba(99,102,241,0.5)",
+                          background: isSelected
+                            ? "rgba(59,130,246,0.08)"
+                            : isDraggingThis
+                            ? "rgba(245,158,11,0.15)"
+                            : "transparent",
+                          boxShadow: isSelected ? "0 0 0 2px rgba(59,130,246,0.2)" : "none",
+                        }}
+                      >
+                        {showPreview
+                          ? (SAMPLE_DATA[fp.fieldId] || fp.fieldId)
+                          : <span style={{ fontWeight: "bold", fontSize: "10px" }}>{field?.label}</span>
+                        }
+                      </div>
+
+                      {/* Selected: show remove button + position tooltip */}
+                      {isSelected && (
+                        <>
+                          <button
+                            onMouseDown={e => { e.stopPropagation(); removeField(fp.fieldId); }}
+                            style={{
+                              position: "absolute", top: -9, right: -9,
+                              width: 16, height: 16, borderRadius: "50%",
+                              background: "#ef4444", color: "white", border: "none",
+                              cursor: "pointer", fontSize: 11, lineHeight: 1,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              zIndex: 30, fontWeight: "bold",
+                            }}
+                          >×</button>
+                          <div
+                            style={{
+                              position: "absolute", top: -18, left: "50%",
+                              transform: "translateX(-50%)",
+                              background: "rgba(0,0,0,0.7)", color: "white",
+                              fontSize: 9, padding: "1px 5px", borderRadius: 3,
+                              whiteSpace: "nowrap", pointerEvents: "none", zIndex: 25,
+                            }}
+                          >
+                            {fp.x}%, {fp.y}%
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right sidebar — properties + summary */}
+        <div className="w-56 border-l bg-background flex flex-col overflow-hidden shrink-0">
+          <div className="px-3 py-2 border-b bg-muted/40">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {selectedFp ? `Edit: ${ALL_FIELDS.find(f => f.id === selectedFp.fieldId)?.label}` : "Properties"}
+              {selectedFp ? ALL_FIELDS.find(f => f.id === selectedFp.fieldId)?.label : "Properties"}
             </p>
           </div>
 
@@ -492,46 +642,29 @@ export default function ContractTemplateMapper() {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label className="text-xs">X (%)</Label>
-                  <Input
-                    type="number"
-                    value={selectedFp.x}
+                  <Input type="number" value={selectedFp.x}
                     onChange={e => updateFieldProp(selectedFp.fieldId, "x", parseFloat(e.target.value) || 0)}
-                    min={0} max={100} step={0.5}
-                    className="h-7 text-xs"
-                  />
+                    min={0} max={100} step={0.5} className="h-7 text-xs" />
                 </div>
                 <div>
                   <Label className="text-xs">Y (%)</Label>
-                  <Input
-                    type="number"
-                    value={selectedFp.y}
+                  <Input type="number" value={selectedFp.y}
                     onChange={e => updateFieldProp(selectedFp.fieldId, "y", parseFloat(e.target.value) || 0)}
-                    min={0} max={100} step={0.5}
-                    className="h-7 text-xs"
-                  />
+                    min={0} max={100} step={0.5} className="h-7 text-xs" />
                 </div>
               </div>
 
               <div>
                 <Label className="text-xs">Font Size (px)</Label>
-                <Input
-                  type="number"
-                  value={selectedFp.fontSize}
+                <Input type="number" value={selectedFp.fontSize}
                   onChange={e => updateFieldProp(selectedFp.fieldId, "fontSize", parseInt(e.target.value) || 11)}
-                  min={6} max={48}
-                  className="h-7 text-xs"
-                />
+                  min={6} max={48} className="h-7 text-xs" />
               </div>
 
               <div>
                 <Label className="text-xs">Alignment</Label>
-                <Select
-                  value={selectedFp.alignment}
-                  onValueChange={v => updateFieldProp(selectedFp.fieldId, "alignment", v)}
-                >
-                  <SelectTrigger className="h-7 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
+                <Select value={selectedFp.alignment} onValueChange={v => updateFieldProp(selectedFp.fieldId, "alignment", v)}>
+                  <SelectTrigger className="h-7 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="left">Left</SelectItem>
                     <SelectItem value="center">Center</SelectItem>
@@ -542,64 +675,64 @@ export default function ContractTemplateMapper() {
 
               <div>
                 <Label className="text-xs">Text Color</Label>
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="color"
-                    value={selectedFp.fontColor}
+                <div className="flex gap-1.5 mt-1">
+                  <input type="color" value={selectedFp.fontColor}
                     onChange={e => updateFieldProp(selectedFp.fieldId, "fontColor", e.target.value)}
-                    className="h-7 w-10 rounded border cursor-pointer"
-                  />
-                  <Input
-                    type="text"
-                    value={selectedFp.fontColor}
+                    className="h-7 w-9 rounded border cursor-pointer p-0.5" />
+                  <Input type="text" value={selectedFp.fontColor}
                     onChange={e => updateFieldProp(selectedFp.fieldId, "fontColor", e.target.value)}
-                    className="h-7 text-xs flex-1 font-mono"
-                    maxLength={7}
-                  />
+                    className="h-7 text-xs font-mono flex-1" maxLength={7} />
                 </div>
               </div>
 
-              <Button
-                variant="destructive"
-                size="sm"
-                className="w-full h-7 text-xs"
-                onClick={() => removeField(selectedFp.fieldId)}
-              >
-                <Trash2 className="h-3 w-3 mr-1" />
-                Remove Field
+              {/* Quick align buttons */}
+              <div>
+                <Label className="text-xs text-muted-foreground">Quick align X to:</Label>
+                <div className="flex gap-1 mt-1 flex-wrap">
+                  {[25, 50, 75].map(v => (
+                    <button key={v} onClick={() => updateFieldProp(selectedFp.fieldId, "x", v)}
+                      className="text-xs px-2 py-0.5 rounded border border-border hover:bg-accent transition-colors">
+                      {v}%
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button variant="destructive" size="sm" className="w-full h-7 text-xs"
+                onClick={() => removeField(selectedFp.fieldId)}>
+                <Trash2 className="h-3 w-3 mr-1" /> Remove
               </Button>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center text-muted-foreground">
-              <GripVertical className="h-8 w-8 mb-2 opacity-30" />
-              <p className="text-xs">Select a field from the left panel, then click on the template to place it.</p>
-              <p className="text-xs mt-2">Drag any placed field to reposition it.</p>
+            <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
+              <GripVertical className="h-8 w-8 mb-2 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">Pick a field and click the template, or drag a placed field to move it.</p>
+              <p className="text-xs text-muted-foreground mt-2">Yellow lines = alignment with other fields. Orange = snap to grid.</p>
             </div>
           )}
 
-          {/* Placed fields summary */}
-          <div className="border-t p-2 space-y-1 max-h-48 overflow-y-auto">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Placed fields ({fieldPositions.length})</p>
-            {fieldPositions.map(fp => {
-              const field = ALL_FIELDS.find(f => f.id === fp.fieldId);
-              return (
-                <div
-                  key={fp.fieldId}
-                  onClick={() => setSelectedFieldId(fp.fieldId)}
-                  className={`flex items-center justify-between px-2 py-1 rounded text-xs cursor-pointer transition-colors ${
-                    selectedFieldId === fp.fieldId ? "bg-primary/10 text-primary" : "hover:bg-accent"
-                  }`}
-                >
-                  <span className="truncate">{field?.label}</span>
-                  <button
-                    onMouseDown={e => { e.stopPropagation(); removeField(fp.fieldId); }}
-                    className="text-muted-foreground hover:text-destructive shrink-0 ml-1"
+          {/* Placed fields list */}
+          <div className="border-t">
+            <div className="px-3 py-1.5 bg-muted/30">
+              <p className="text-xs font-medium text-muted-foreground">Placed ({fieldPositions.length})</p>
+            </div>
+            <div className="max-h-56 overflow-y-auto">
+              {fieldPositions.map(fp => {
+                const field = ALL_FIELDS.find(f => f.id === fp.fieldId);
+                return (
+                  <div
+                    key={fp.fieldId}
+                    onClick={() => setSelectedFieldId(fp.fieldId)}
+                    className={`flex items-center justify-between px-3 py-1 cursor-pointer transition-colors border-b border-border/30 text-xs ${
+                      selectedFieldId === fp.fieldId ? "bg-primary/10 text-primary" : "hover:bg-accent"
+                    }`}
                   >
-                    ×
-                  </button>
-                </div>
-              );
-            })}
+                    <span className="truncate">{field?.label}</span>
+                    <span className="text-muted-foreground ml-1 shrink-0 font-mono text-[10px]">{fp.x},{fp.y}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
