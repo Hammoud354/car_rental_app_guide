@@ -81,6 +81,11 @@ export default function RentalContracts() {
   const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
   const [returnInspectionOpen, setReturnInspectionOpen] = useState(false);
   const [selectedContractForReturn, setSelectedContractForReturn] = useState<number | null>(null);
+  const [postCompletionModal, setPostCompletionModal] = useState<{
+    contract: any;
+    vehicle: any;
+    invoiceDestination: string;
+  } | null>(null);
   
   // Fetch last odometer reading when vehicle is selected
   const { data: lastOdometerReading } = trpc.contracts.getLastOdometerReading.useQuery(
@@ -165,7 +170,11 @@ export default function RentalContracts() {
   
   const markAsReturnedMutation = trpc.contracts.markAsReturned.useMutation({
     onSuccess: (data) => {
-      // Close dialog and reset state first
+      // Capture contract data before clearing state
+      const completedContract = contracts.find(c => c.id === selectedContractForReturn);
+      const completedVehicle = completedContract ? vehicles.find(v => v.id === completedContract.vehicleId) : null;
+
+      // Close dialog and reset state
       setReturnInspectionOpen(false);
       setSelectedContractForReturn(null);
       setReturnKm(0);
@@ -181,34 +190,27 @@ export default function RentalContracts() {
         );
       }
       
-      // Show invoice auto-generation success
       if (data.invoice) {
         toast.success("Invoice automatically generated!", {
           description: `Invoice ${data.invoice.invoiceNumber} has been created for this contract.`,
-          duration: 5000,
+          duration: 4000,
         });
       }
 
-      // Trigger contract PDF download if the template is still in the DOM
-      const contractNumber = selectedContract?.contractNumber || selectedContractForReturn;
-      if (document.getElementById("contract-pdf-template")) {
-        toast.info("Generating contract PDF...");
-        exportContractTemplateToPDF(`Contract_${contractNumber}.pdf`)
-          .then((ok) => {
-            if (ok) toast.success("Contract PDF downloaded.");
-          })
-          .catch(() => {});
-      }
-      
       utils.contracts.listByStatus.invalidate();
       utils.contracts.list.invalidate();
       utils.fleet.list.invalidate();
       utils.invoices.list.invalidate();
-      
-      // Redirect to dashboard after contract completion
-      setTimeout(() => {
-        setLocation("/dashboard");
-      }, 1500);
+
+      // Show post-completion action sheet instead of immediately redirecting
+      const destination = data.invoice?.id
+        ? `/invoices?invoice=${data.invoice.id}`
+        : "/dashboard";
+      if (completedContract) {
+        setPostCompletionModal({ contract: completedContract, vehicle: completedVehicle, invoiceDestination: destination });
+      } else {
+        setTimeout(() => setLocation(destination), 800);
+      }
     },
     onError: (error) => {
       toast.error("Failed to mark contract as returned: " + error.message);
@@ -2285,54 +2287,52 @@ export default function RentalContracts() {
           kmLimit={selectedContract.kmLimit}
           overLimitKmRate={selectedContract.overLimitKmRate ? parseFloat(selectedContract.overLimitKmRate) : 0.5}
           onSuccess={async () => {
-            // Refresh contracts list
+            // Capture contract + vehicle before clearing
+            const completedContract = selectedContract;
+            const completedVehicle = vehicles.find(v => v.id === selectedContract.id);
+
             refetch();
-            // Close details dialog
             setIsDetailsDialogOpen(false);
-            const contractId = selectedContract.id;
+            const contractId = completedContract.id;
             setSelectedContract(null);
-            
-            // Generate invoice and navigate to it
-            setTimeout(async () => {
-              try {
-                const invoice = await generateInvoice.mutateAsync({ contractId });
-                // Navigate to invoices page with invoice dialog open
-                if (invoice && invoice.id) {
-                  window.location.href = `/invoices?invoice=${invoice.id}`;
-                } else {
-                  window.location.href = '/dashboard';
-                }
-              } catch (error) {
-                console.error('Failed to generate invoice:', error);
-                // Fallback to dashboard if invoice generation fails
-                window.location.href = '/dashboard';
-              }
-            }, 1000); // Wait 1 second to show success message
+
+            // Generate invoice in background
+            let destination = "/dashboard";
+            try {
+              const invoice = await generateInvoice.mutateAsync({ contractId });
+              if (invoice?.id) destination = `/invoices?invoice=${invoice.id}`;
+            } catch (error) {
+              console.error("Failed to generate invoice:", error);
+            }
+
+            // Show post-completion action sheet
+            setPostCompletionModal({ contract: completedContract, vehicle: completedVehicle, invoiceDestination: destination });
           }}
         />
       )}
 
       {/* PDF Template — portalled directly into document.body so html2canvas has no parent CSS interference */}
-      {selectedContract && createPortal(
+      {(selectedContract || postCompletionModal?.contract) && createPortal(
         (() => {
-          const vehicle = vehicles.find((v) => v.id === selectedContract.vehicleId);
+          const c = selectedContract || postCompletionModal!.contract;
+          const vehicle = vehicles.find((v) => v.id === c.vehicleId) || postCompletionModal?.vehicle;
           return (
             <ContractPDFTemplate
               contract={{
-                ...selectedContract,
-                clientName: selectedContract.clientName,
-                clientMotherFullName: selectedContract.clientMotherFullName,
-                clientNationality: selectedContract.clientNationality,
-                clientRegistrationNumber: selectedContract.clientRegistrationNumber,
-                clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration,
-                clientPassport: selectedContract.clientPassport,
-                clientDateOfBirth: selectedContract.clientDateOfBirth,
-                clientPlaceOfBirth: selectedContract.clientPlaceOfBirth,
-                clientPhone: selectedContract.clientPhone || undefined,
-                clientAddress: selectedContract.clientAddress || undefined,
-                drivingLicenseNumber: selectedContract.clientDriverLicense || "",
-                licenseIssueDate: selectedContract.licenseIssueDate,
-                licenseExpiryDate: selectedContract.licenseExpiryDate || "",
+                ...c,
+                clientName: c.clientName,
+                clientMotherFullName: c.clientMotherFullName,
+                clientNationality: c.clientNationality,
+                clientRegistrationNumber: c.clientRegistrationNumber,
+                clientPlaceOfRegistration: c.clientPlaceOfRegistration,
+                clientPassport: c.clientPassport,
+                clientDateOfBirth: c.clientDateOfBirth,
+                clientPlaceOfBirth: c.clientPlaceOfBirth,
+                clientPhone: c.clientPhone || undefined,
+                clientAddress: c.clientAddress || undefined,
+                drivingLicenseNumber: c.clientDriverLicense || "",
+                licenseIssueDate: c.licenseIssueDate,
+                licenseExpiryDate: c.licenseExpiryDate || "",
               }}
               vehicle={vehicle ? { ...vehicle, fuelType: vehicle.fuelType } : null}
               companyProfile={companyProfile || null}
@@ -2341,6 +2341,159 @@ export default function RentalContracts() {
           );
         })(),
         document.body
+      )}
+
+      {/* Post-completion action sheet */}
+      {postCompletionModal && (
+        <Dialog open onOpenChange={() => { setPostCompletionModal(null); setLocation(postCompletionModal.invoiceDestination); }}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-lg flex items-center gap-2">
+                ✅ Contract Completed
+              </DialogTitle>
+              <DialogDescription className="text-sm">
+                Contract <strong>{postCompletionModal.contract?.contractNumber}</strong> for{" "}
+                <strong>{postCompletionModal.contract?.clientName}</strong> has been completed.
+                What would you like to do next?
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="flex flex-col gap-3 py-2">
+              {/* Print with Template */}
+              <Button
+                variant="outline"
+                className="h-12 justify-start gap-3 text-sm"
+                onClick={async () => {
+                  if (!companyProfile?.contractTemplateUrl) {
+                    toast.error("No template uploaded. Configure one in Company Settings.");
+                    return;
+                  }
+                  if (!companyProfile?.contractTemplateFieldMap) {
+                    toast.error("Field positions not set. Use 'Configure Field Positions' in Company Settings.");
+                    return;
+                  }
+                  const c = postCompletionModal.contract;
+                  const v = postCompletionModal.vehicle;
+                  const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+                  const data: Record<string, string> = {
+                    clientName: c.clientName || "",
+                    clientMotherFullName: c.clientMotherFullName || "",
+                    clientFatherFullName: c.clientFatherFullName || "",
+                    clientNationality: c.clientNationality || "",
+                    clientPhone: c.clientPhone || "",
+                    clientAddress: c.clientAddress || "",
+                    clientEmail: c.clientEmail || "",
+                    clientDateOfBirth: fmtDate(c.clientDateOfBirth),
+                    clientPlaceOfBirth: c.clientPlaceOfBirth || "",
+                    clientPassportNumber: c.clientPassport || "",
+                    clientRegistrationNumber: c.clientRegistrationNumber || "",
+                    clientPlaceOfRegistration: c.clientPlaceOfRegistration || "",
+                    clientLicenseNumber: c.clientDriverLicense || "",
+                    clientLicenseIssueDate: fmtDate(c.licenseIssueDate),
+                    clientLicenseExpiryDate: fmtDate(c.licenseExpiryDate),
+                    vehiclePlate: v?.plateNumber || "",
+                    vehicleMake: v?.brand || "",
+                    vehicleModel: v?.model || "",
+                    vehicleYear: v?.year?.toString() || "",
+                    vehicleColor: c.vehicleColor || v?.color || "",
+                    vehicleFuelType: c.vehicleFuelType || v?.fuelType || "",
+                    vehicleVIN: c.vehicleVIN || v?.vin || "",
+                    contractNumber: c.contractNumber || c.id?.toString() || "",
+                    startDate: fmtDate(c.rentalStartDate),
+                    endDate: fmtDate(c.rentalEndDate),
+                    pickupTime: c.pickupTime || "",
+                    returnTime: c.returnTime || "",
+                    rentalDays: c.rentalDays?.toString() || "",
+                    dailyRate: c.dailyRate?.toString() || "",
+                    totalAmount: c.totalAmount?.toString() || "",
+                    deposit: c.depositAmount?.toString() || "",
+                    companyName: companyProfile.companyName || "",
+                    companyPhone: companyProfile.phone || "",
+                    companyAddress: companyProfile.address || "",
+                  };
+                  toast.info("Generating template PDF…");
+                  const ok = await exportTemplateOverlayToPDF(
+                    companyProfile.contractTemplateUrl!,
+                    companyProfile.contractTemplateFieldMap as Record<string, any>,
+                    data,
+                    `Contract_${c.contractNumber || c.id}.pdf`
+                  );
+                  if (ok) toast.success("Template PDF exported!");
+                  else toast.error("Failed to export PDF.");
+                }}
+              >
+                <span className="text-xl">🖼️</span>
+                <div className="text-left">
+                  <div className="font-medium">Print with Template</div>
+                  <div className="text-xs text-muted-foreground">Overlay on your pre-printed form</div>
+                </div>
+              </Button>
+
+              {/* Print Standard A4 */}
+              <Button
+                variant="outline"
+                className="h-12 justify-start gap-3 text-sm"
+                onClick={async () => {
+                  toast.info("Generating A4 PDF…");
+                  const ok = await exportContractTemplateToPDF(
+                    `Contract_${postCompletionModal.contract?.contractNumber || postCompletionModal.contract?.id}.pdf`
+                  );
+                  if (ok) toast.success("Contract PDF downloaded!");
+                  else toast.error("Could not generate PDF.");
+                }}
+              >
+                <span className="text-xl">📄</span>
+                <div className="text-left">
+                  <div className="font-medium">Print Standard A4</div>
+                  <div className="text-xs text-muted-foreground">Formatted contract layout</div>
+                </div>
+              </Button>
+
+              {/* Send via WhatsApp */}
+              <Button
+                variant="outline"
+                className="h-12 justify-start gap-3 text-sm"
+                onClick={() => {
+                  const c = postCompletionModal.contract;
+                  const v = postCompletionModal.vehicle;
+                  const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+                  const message =
+                    `✅ *Contract Completed*\n` +
+                    `Contract: *${c.contractNumber}*\n` +
+                    `Client: ${c.clientName}\n` +
+                    `Vehicle: ${v?.brand || ""} ${v?.model || ""} — ${v?.plateNumber || ""}\n` +
+                    `Period: ${fmtDate(c.rentalStartDate)} → ${fmtDate(c.rentalEndDate)}\n` +
+                    `Total: $${c.totalAmount || c.finalAmount || "0"}\n\n` +
+                    `Thank you for choosing ${companyProfile?.companyName || "us"}! 🚗`;
+                  const phone = (c.clientPhone || "").replace(/[\s\-\(\)]/g, "");
+                  const url = phone
+                    ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
+                    : `https://wa.me/?text=${encodeURIComponent(message)}`;
+                  window.open(url, "_blank");
+                }}
+              >
+                <span className="text-xl">💬</span>
+                <div className="text-left">
+                  <div className="font-medium">Send via WhatsApp</div>
+                  <div className="text-xs text-muted-foreground">Send contract summary to client</div>
+                </div>
+              </Button>
+            </div>
+
+            <DialogFooter>
+              <Button
+                className="w-full"
+                onClick={() => {
+                  const dest = postCompletionModal.invoiceDestination;
+                  setPostCompletionModal(null);
+                  setLocation(dest);
+                }}
+              >
+                Continue →
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );
