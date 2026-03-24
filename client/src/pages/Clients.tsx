@@ -429,16 +429,16 @@ export default function Clients() {
                         <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
-                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
                         <Label htmlFor="registrationNumber">Registration Number</Label>
                         <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
                       </div>
                       <div className="col-span-2">
                         <Label htmlFor="placeOfRegistration">Place of Registration</Label>
                         <Input id="placeOfRegistration" name="placeOfRegistration" placeholder="e.g., Beirut, Tripoli" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
                       </div>
                     </div>
                   </div>
@@ -688,16 +688,16 @@ export default function Clients() {
                       <Input id="edit-placeOfBirth" name="placeOfBirth" defaultValue={selectedClient.placeOfBirth || ""} placeholder="City, Country" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
-                      <Input id="edit-passportIdNumber" name="passportIdNumber" defaultValue={selectedClient.passportIdNumber || ""} placeholder="Passport or National ID" className="input-client" />
-                    </div>
-                    <div className="col-span-2">
                       <Label htmlFor="edit-registrationNumber">Registration Number</Label>
                       <Input id="edit-registrationNumber" name="registrationNumber" defaultValue={selectedClient.registrationNumber || ""} placeholder="Business/Company Registration" className="input-client" />
                     </div>
                     <div className="col-span-2">
                       <Label htmlFor="edit-placeOfRegistration">Place of Registration</Label>
                       <Input id="edit-placeOfRegistration" name="placeOfRegistration" defaultValue={selectedClient.placeOfRegistration || ""} placeholder="e.g., Beirut, Tripoli" className="input-client" />
+                    </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
+                      <Input id="edit-passportIdNumber" name="passportIdNumber" defaultValue={selectedClient.passportIdNumber || ""} placeholder="Passport or National ID" className="input-client" />
                     </div>
                   </div>
                 </div>
