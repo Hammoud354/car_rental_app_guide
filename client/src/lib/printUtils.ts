@@ -181,6 +181,143 @@ export async function exportElementToPDF(
 }
 
 /**
+ * Exports a contract PDF using an uploaded template image with text overlaid
+ * at positions defined in fieldMap (percentages 0–100 of the image dimensions).
+ */
+export async function exportTemplateOverlayToPDF(
+  templateUrl: string,
+  fieldMap: Record<string, { x: number; y: number; fontSize: number; alignment: string; fontColor?: string }>,
+  contractData: Record<string, string>,
+  fileName: string = "contract.pdf"
+): Promise<boolean> {
+  let container: HTMLDivElement | null = null;
+  try {
+    // Pre-load template image to get natural dimensions
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Failed to load template image"));
+      img.src = templateUrl;
+    });
+
+    const naturalW = img.naturalWidth || 794;
+    const naturalH = img.naturalHeight || 1123;
+    const aspectRatio = naturalH / naturalW;
+
+    // Render at A4 pixel width (794px @ 96dpi)
+    const renderW = 794;
+    const renderH = Math.round(renderW * aspectRatio);
+
+    container = document.createElement("div");
+    container.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: -9999px;
+      width: ${renderW}px;
+      height: ${renderH}px;
+      overflow: hidden;
+      background: white;
+    `;
+
+    // Background template image
+    const bgImg = document.createElement("img");
+    bgImg.src = templateUrl;
+    bgImg.style.cssText = `
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: fill;
+      display: block;
+    `;
+    container.appendChild(bgImg);
+
+    // Overlay text fields
+    Object.entries(fieldMap).forEach(([fieldId, cfg]) => {
+      const value = contractData[fieldId];
+      if (!value) return;
+
+      const transform =
+        cfg.alignment === "center"
+          ? "translateX(-50%)"
+          : cfg.alignment === "right"
+          ? "translateX(-100%)"
+          : "translateX(0)";
+
+      const span = document.createElement("div");
+      span.style.cssText = `
+        position: absolute;
+        left: ${cfg.x}%;
+        top: ${cfg.y}%;
+        font-size: ${cfg.fontSize ?? 11}px;
+        font-family: Arial, Helvetica, sans-serif;
+        color: ${cfg.fontColor ?? "#000000"};
+        white-space: nowrap;
+        line-height: 1;
+        transform: ${transform};
+        pointer-events: none;
+      `;
+      span.textContent = value;
+      container.appendChild(span);
+    });
+
+    document.body.appendChild(container);
+
+    // Wait for image to paint
+    await new Promise(r => setTimeout(r, 300));
+
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: "#ffffff",
+      width: renderW,
+      height: renderH,
+      windowWidth: renderW,
+    });
+
+    document.body.removeChild(container);
+    container = null;
+
+    // Build PDF — fit image width to A4, proportional height
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pdfW = 210;
+    const pdfH = pdfW * aspectRatio;
+
+    if (pdfH <= 297) {
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pdfW, pdfH);
+    } else {
+      // Multi-page split
+      const scale = canvas.width / pdfW;
+      const pageSlicePx = Math.round(297 * scale);
+      let yPx = 0;
+      let pageCount = 0;
+      while (yPx < canvas.height) {
+        if (pageCount > 0) pdf.addPage();
+        const sliceH = Math.min(pageSlicePx, canvas.height - yPx);
+        const pc = document.createElement("canvas");
+        pc.width = canvas.width;
+        pc.height = sliceH;
+        const ctx = pc.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(canvas, 0, yPx, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+          pdf.addImage(pc.toDataURL("image/png"), "PNG", 0, 0, pdfW, sliceH / scale);
+        }
+        yPx += pageSlicePx;
+        pageCount++;
+      }
+    }
+
+    pdf.save(fileName);
+    return true;
+  } catch (error) {
+    if (container && document.body.contains(container)) document.body.removeChild(container);
+    console.error("Template overlay PDF export error:", error);
+    return false;
+  }
+}
+
+/**
  * Appends a canvas to the PDF, slicing it into A4 pages as needed.
  */
 function appendCanvasToPDF(

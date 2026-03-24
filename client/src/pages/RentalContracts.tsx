@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { trpc } from "@/lib/trpc";
-import { printElement, exportElementToPDF, exportContractTemplateToPDF } from "@/lib/printUtils";
+import { printElement, exportElementToPDF, exportContractTemplateToPDF, exportTemplateOverlayToPDF } from "@/lib/printUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
@@ -1723,6 +1723,66 @@ export default function RentalContracts() {
                 >
                   📄 Export to PDF
                 </Button>
+                {companyProfile?.contractTemplateUrl && companyProfile?.contractTemplateFieldMap && (
+                  <Button
+                    onClick={async () => {
+                      if (!selectedContract) { toast.error("No contract selected"); return; }
+                      const vehicle = vehicles.find(v => v.id === selectedContract.vehicleId);
+                      const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+                      const contractData: Record<string, string> = {
+                        clientName: selectedContract.clientName || "",
+                        clientMotherFullName: selectedContract.clientMotherFullName || "",
+                        clientFatherFullName: selectedContract.clientFatherFullName || "",
+                        clientNationality: selectedContract.clientNationality || "",
+                        clientPhone: selectedContract.clientPhone || "",
+                        clientAddress: selectedContract.clientAddress || "",
+                        clientEmail: selectedContract.clientEmail || "",
+                        clientDateOfBirth: fmtDate(selectedContract.clientDateOfBirth),
+                        clientPlaceOfBirth: selectedContract.clientPlaceOfBirth || "",
+                        clientPassportNumber: selectedContract.clientPassport || "",
+                        clientRegistrationNumber: selectedContract.clientRegistrationNumber || "",
+                        clientPlaceOfRegistration: selectedContract.clientPlaceOfRegistration || "",
+                        clientLicenseNumber: selectedContract.clientDriverLicense || "",
+                        clientLicenseIssueDate: fmtDate(selectedContract.licenseIssueDate),
+                        clientLicenseExpiryDate: fmtDate(selectedContract.licenseExpiryDate),
+                        vehiclePlate: vehicle?.plateNumber || "",
+                        vehicleMake: vehicle?.brand || "",
+                        vehicleModel: vehicle?.model || "",
+                        vehicleYear: vehicle?.year?.toString() || "",
+                        vehicleType: selectedContract.vehicleType || vehicle?.category || "",
+                        vehicleColor: selectedContract.vehicleColor || vehicle?.color || "",
+                        vehicleFuelType: selectedContract.vehicleFuelType || vehicle?.fuelType || "",
+                        vehicleVIN: selectedContract.vehicleVIN || vehicle?.vin || "",
+                        contractNumber: selectedContract.contractNumber || selectedContract.id?.toString() || "",
+                        startDate: fmtDate(selectedContract.rentalStartDate),
+                        endDate: fmtDate(selectedContract.rentalEndDate),
+                        pickupTime: selectedContract.pickupTime || "",
+                        returnTime: selectedContract.returnTime || "",
+                        rentalDays: selectedContract.rentalDays?.toString() || "",
+                        dailyRate: selectedContract.dailyRate?.toString() || "",
+                        totalAmount: selectedContract.totalAmount?.toString() || "",
+                        deposit: selectedContract.depositAmount?.toString() || "",
+                        companyName: companyProfile.companyName || "",
+                        companyPhone: companyProfile.phone || "",
+                        companyAddress: companyProfile.address || "",
+                      };
+                      toast.info("Generating template PDF...");
+                      const ok = await exportTemplateOverlayToPDF(
+                        companyProfile.contractTemplateUrl!,
+                        companyProfile.contractTemplateFieldMap as Record<string, any>,
+                        contractData,
+                        `Contract_${selectedContract.contractNumber || selectedContract.id}.pdf`
+                      );
+                      if (ok) toast.success("Template PDF exported!");
+                      else toast.error("Failed to export PDF.");
+                    }}
+                    variant="outline"
+                    className="h-10 w-full"
+                    size="default"
+                  >
+                    🖼️ Print with Template
+                  </Button>
+                )}
                 <Button 
                   onClick={async () => {
                     if (!selectedContract) {
