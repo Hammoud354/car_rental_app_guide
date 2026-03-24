@@ -2270,43 +2270,40 @@ export const appRouter = router({
         const currentYear = currentDate.getFullYear();
         const currentMonth = currentDate.getMonth();
 
-        const contracts = await db.getCompletedContracts(userId);
-        const invoices = await db.getPaidInvoices(userId);
-
-        // Only include months up to current month if it's the current year
+        // Always show all 12 months; current year shows up to current month
         const monthsToShow = year === currentYear ? currentMonth + 1 : 12;
-        const monthlyData = Array.from({ length: monthsToShow }, (_, i) => ({
+        const monthlyData = Array.from({ length: 12 }, (_, i) => ({
           month: i + 1,
           monthName: new Date(year, i).toLocaleString('default', { month: 'long' }),
           revenue: 0,
           expenses: 0,
+          isActive: i < monthsToShow,
         }));
 
-        // Add contract revenue
-        contracts.forEach(contract => {
-          const contractDate = new Date(contract.rentalEndDate);
-          if (contractDate.getFullYear() === year) {
-            const month = contractDate.getMonth();
-            monthlyData[month].revenue += parseFloat(contract.finalAmount?.toString() || '0');
-          }
-        });
-
-        // Add invoice revenue
-        invoices.forEach(invoice => {
-          const invoiceDate = new Date(invoice.createdAt);
-          if (invoiceDate.getFullYear() === year) {
-            const month = invoiceDate.getMonth();
-            monthlyData[month].revenue += parseFloat(invoice.totalAmount?.toString() || '0');
+        // Use invoices with invoiceDate as the revenue source (matches calculatePnL)
+        const allInvoices = await db.getAllInvoices(userId);
+        allInvoices.forEach(invoice => {
+          const d = new Date(invoice.invoiceDate || invoice.createdAt);
+          if (d.getFullYear() === year) {
+            monthlyData[d.getMonth()].revenue += parseFloat(invoice.totalAmount?.toString() || '0');
           }
         });
 
         // Add maintenance expenses
         const maintenanceRecords = await db.getMaintenanceRecords(userId);
         maintenanceRecords.forEach(record => {
-          const recordDate = new Date(record.performedAt);
-          if (recordDate.getFullYear() === year) {
-            const month = recordDate.getMonth();
-            monthlyData[month].expenses += parseFloat(record.cost?.toString() || '0');
+          const d = new Date(record.performedAt);
+          if (d.getFullYear() === year) {
+            monthlyData[d.getMonth()].expenses += parseFloat(record.cost?.toString() || '0');
+          }
+        });
+
+        // Add insurance expenses
+        const insurancePolicies = await db.getAllInsurancePolicies(userId);
+        insurancePolicies.forEach(policy => {
+          const d = new Date(policy.policyStartDate);
+          if (d.getFullYear() === year) {
+            monthlyData[d.getMonth()].expenses += parseFloat(policy.annualPremium?.toString() || '0');
           }
         });
 

@@ -274,45 +274,52 @@ export default function ProfitAndLoss() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {monthlyData?.map((month) => {
-                const profit = month.revenue - month.expenses;
-                const profitMargin = month.revenue > 0 ? (profit / month.revenue) * 100 : 0;
-                
-                return (
-                  <div
-                    key={month.month}
-                    onClick={() => handleMonthClick(month)}
-                    className="p-5 border border-gray-200 rounded-lg hover:shadow-md hover:border-primary transition-all cursor-pointer bg-white hover:bg-gray-50"
-                  >
-                    <div className="space-y-4">
-                      <h3 className="font-semibold text-lg text-gray-900">{month.monthName}</h3>
-                      
-                      <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 font-medium">Revenue</span>
-                          <span className="font-semibold text-green-600">${month.revenue.toFixed(2)}</span>
+              {monthlyData
+                ?.filter((month: any) => month.isActive !== false)
+                .map((month: any) => {
+                  const profit = month.revenue - month.expenses;
+                  const profitMargin = month.revenue > 0 ? (profit / month.revenue) * 100 : 0;
+                  
+                  return (
+                    <div
+                      key={month.month}
+                      onClick={() => handleMonthClick(month)}
+                      className="p-5 border border-gray-200 rounded-lg hover:shadow-md hover:border-primary transition-all cursor-pointer bg-white hover:bg-gray-50"
+                    >
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg text-gray-900">{month.monthName}</h3>
+                        
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 font-medium">Revenue</span>
+                            <span className="font-semibold text-green-600">${month.revenue.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 font-medium">Expenses</span>
+                            <span className="font-semibold text-red-600">${month.expenses.toFixed(2)}</span>
+                          </div>
+                          <div className="border-t pt-3 flex justify-between items-center">
+                            <span className="text-sm font-semibold text-gray-900">Profit/Loss</span>
+                            <span className={`font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {profit >= 0 ? '+' : ''} ${profit.toFixed(2)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600 font-medium">Expenses</span>
-                          <span className="font-semibold text-red-600">${month.expenses.toFixed(2)}</span>
-                        </div>
-                        <div className="border-t pt-3 flex justify-between items-center">
-                          <span className="text-sm font-semibold text-gray-900">Profit/Loss</span>
-                          <span className={`font-bold text-lg ${profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {profit >= 0 ? '+' : ''} ${profit.toFixed(2)}
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="pt-2 border-t">
-                        <p className="text-xs text-gray-500 text-center font-medium">
-                          Margin: {profitMargin.toFixed(1)}%
-                        </p>
+                        <div className="pt-2 border-t">
+                          <p className="text-xs text-gray-500 text-center font-medium">
+                            Margin: {profitMargin.toFixed(1)}%
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              {(!monthlyData || monthlyData.filter((m: any) => m.isActive !== false).length === 0) && (
+                <div className="col-span-3 text-center py-12 text-muted-foreground">
+                  No data available for {currentYear}.
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
