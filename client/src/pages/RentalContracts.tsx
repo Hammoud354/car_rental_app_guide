@@ -719,6 +719,7 @@ export default function RentalContracts() {
                                       (document.getElementById("clientPlaceOfBirth") as HTMLInputElement).value = client.placeOfBirth || "";
                                       (document.getElementById("clientDateOfBirth") as HTMLInputElement).value = client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : "";
                                       (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.idNumber || "";
+                                      (document.getElementById("clientPlaceOfRegistration") as HTMLInputElement).value = client.placeOfRegistration || "";
                                       (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.driverLicenseNumber || "";
                                       setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
                                       setLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
