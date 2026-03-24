@@ -142,14 +142,15 @@ export async function exportElementToPDF(
     document.body.removeChild(offscreen);
 
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const margin = 10;
-    const contentWidth = 210 - margin * 2;
-    const pageHeight = 297 - margin * 2;
+    const marginX = 20;
+    const marginY = 10;
+    const contentWidth = 210 - marginX * 2;
+    const pageHeight = 297 - marginY * 2;
     const ratio = contentWidth / canvas.width;
     const scaledHeight = canvas.height * ratio;
 
     if (scaledHeight <= pageHeight) {
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, scaledHeight);
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", marginX, marginY, contentWidth, scaledHeight);
     } else {
       let yPos = 0;
       let pageCount = 0;
@@ -163,7 +164,7 @@ export async function exportElementToPDF(
         const ctx = pageCanvas.getContext("2d");
         if (ctx) {
           ctx.drawImage(canvas, 0, yPos, canvas.width, curSlice, 0, 0, canvas.width, curSlice);
-          pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", margin, margin, contentWidth, curSlice * ratio);
+          pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", marginX, marginY, contentWidth, curSlice * ratio);
         }
         yPos += sliceH;
         pageCount++;

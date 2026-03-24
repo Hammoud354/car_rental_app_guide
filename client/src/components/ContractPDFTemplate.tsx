@@ -214,7 +214,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
         top: 0,
         width: '210mm', // A4 width
         minHeight: '297mm', // A4 height
-        padding: '20mm 28mm',
+        padding: '20mm 32mm',
         backgroundColor: '#ffffff',
         fontFamily: 'Arial, sans-serif',
         fontSize: '11pt',
