@@ -1222,6 +1222,7 @@ export const appRouter = router({
         placeOfBirth: z.string().max(200).optional(),
         passportIdNumber: z.string().max(100).optional(),
         registrationNumber: z.string().max(100).optional(),
+        placeOfRegistration: z.string().max(200).optional(),
         drivingLicenseNumber: z.string().min(1).max(100),
         licenseIssueDate: z.date().optional(),
         licenseExpiryDate: z.date(),
@@ -1260,6 +1261,7 @@ export const appRouter = router({
           drivingLicenseNumber,
           passportIdNumber,
           registrationNumber,
+          placeOfRegistration,
           licenseIssueDate,
           licenseExpiryDate,
           ...rest
@@ -1284,6 +1286,7 @@ export const appRouter = router({
           licenseExpiryDate: licenseExpiryDate || undefined,
           passportNumber: passportIdNumber || undefined,
           idNumber: registrationNumber || undefined,
+          placeOfRegistration: placeOfRegistration || undefined,
           userId,
         });
       }),
@@ -1302,6 +1305,7 @@ export const appRouter = router({
         placeOfBirth: z.string().max(200).optional(),
         passportIdNumber: z.string().max(100).optional(),
         registrationNumber: z.string().max(100).optional(),
+        placeOfRegistration: z.string().max(200).optional(),
         drivingLicenseNumber: z.string().max(100).optional(),
         licenseIssueDate: z.date().optional(),
         licenseExpiryDate: z.date().optional(),
@@ -1319,6 +1323,7 @@ export const appRouter = router({
           drivingLicenseNumber,
           passportIdNumber,
           registrationNumber,
+          placeOfRegistration,
           licenseIssueDate,
           licenseExpiryDate,
           ...rest
@@ -1344,6 +1349,7 @@ export const appRouter = router({
         if (drivingLicenseNumber !== undefined) finalUpdates.driverLicenseNumber = drivingLicenseNumber;
         if (passportIdNumber !== undefined) finalUpdates.passportNumber = passportIdNumber;
         if (registrationNumber !== undefined) finalUpdates.idNumber = registrationNumber;
+        if (placeOfRegistration !== undefined) finalUpdates.placeOfRegistration = placeOfRegistration;
         if (dateOfBirth) finalUpdates.dateOfBirth = new Date(dateOfBirth);
         if (licenseIssueDate) finalUpdates.licenseIssueDate = licenseIssueDate;
         if (licenseExpiryDate) {

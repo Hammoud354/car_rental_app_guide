@@ -178,6 +178,7 @@ export default function Clients() {
       placeOfBirth: (formData.get("placeOfBirth") as string || "").trim() || undefined,
       passportIdNumber: (formData.get("passportIdNumber") as string || "").trim() || undefined,
       registrationNumber: (formData.get("registrationNumber") as string || "").trim() || undefined,
+      placeOfRegistration: (formData.get("placeOfRegistration") as string || "").trim() || undefined,
       drivingLicenseNumber,
       licenseIssueDate: createLicenseIssueDate,
       licenseExpiryDate: createLicenseExpiryDate,
@@ -266,6 +267,7 @@ export default function Clients() {
       placeOfBirth: (formData.get("placeOfBirth") as string || "").trim() || undefined,
       passportIdNumber: (formData.get("passportIdNumber") as string || "").trim() || undefined,
       registrationNumber: (formData.get("registrationNumber") as string || "").trim() || undefined,
+      placeOfRegistration: (formData.get("placeOfRegistration") as string || "").trim() || undefined,
       drivingLicenseNumber,
       licenseIssueDate: editLicenseIssueDate,
       licenseExpiryDate: editLicenseExpiryDate,
@@ -433,6 +435,10 @@ export default function Clients() {
                       <div className="col-span-2">
                         <Label htmlFor="registrationNumber">Registration Number</Label>
                         <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
+                      </div>
+                      <div className="col-span-2">
+                        <Label htmlFor="placeOfRegistration">Place of Registration</Label>
+                        <Input id="placeOfRegistration" name="placeOfRegistration" placeholder="e.g., Beirut, Tripoli" className="input-client" />
                       </div>
                     </div>
                   </div>
@@ -689,6 +695,10 @@ export default function Clients() {
                       <Label htmlFor="edit-registrationNumber">Registration Number</Label>
                       <Input id="edit-registrationNumber" name="registrationNumber" defaultValue={selectedClient.registrationNumber || ""} placeholder="Business/Company Registration" className="input-client" />
                     </div>
+                    <div className="col-span-2">
+                      <Label htmlFor="edit-placeOfRegistration">Place of Registration</Label>
+                      <Input id="edit-placeOfRegistration" name="placeOfRegistration" defaultValue={selectedClient.placeOfRegistration || ""} placeholder="e.g., Beirut, Tripoli" className="input-client" />
+                    </div>
                   </div>
                 </div>
 
@@ -797,6 +807,10 @@ export default function Clients() {
                   <div>
                     <span className="text-muted-foreground">Registration Number</span>
                     <p className="font-semibold">{selectedClient.registrationNumber || "N/A"}</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Place of Registration</span>
+                    <p className="font-semibold">{selectedClient.placeOfRegistration || "N/A"}</p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Driving License Number</span>

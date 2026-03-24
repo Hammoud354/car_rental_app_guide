@@ -223,6 +223,7 @@ export const clients = pgTable("clients", {
   licenseExpiryDate: timestamp("licenseExpiryDate"),
   passportNumber: varchar("passportNumber", { length: 100 }),
   idNumber: varchar("idNumber", { length: 100 }),
+  placeOfRegistration: varchar("placeOfRegistration", { length: 200 }),
   address: text("address"),
   notes: text("notes"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
