@@ -225,17 +225,17 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
               {logoPreview ? (
-                <div className="w-32 h-32 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center shrink-0">
                   <img src={logoPreview} alt="Company Logo" className="max-w-full max-h-full object-contain" />
                 </div>
               ) : (
-                <div className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted">
-                  <Building2 className="h-12 w-12 text-muted-foreground" />
+                <div className="w-24 h-24 sm:w-32 sm:h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted shrink-0">
+                  <Building2 className="h-10 w-10 text-muted-foreground" />
                 </div>
               )}
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <Label htmlFor="logo" className="cursor-pointer">
                   <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit">
                     <Upload className="h-4 w-4" />
@@ -266,8 +266,8 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
                 <Label htmlFor="companyName">Company Name *</Label>
                 <Input
                   id="companyName"
@@ -305,8 +305,8 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -404,7 +404,7 @@ export default function CompanySettings() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <Label htmlFor="website">Website</Label>
                 <Input
                   id="website"
@@ -427,20 +427,20 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
               {templatePreview ? (
-                <div className="w-48 h-64 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                <div className="w-full sm:w-48 h-48 sm:h-64 border-2 border-border rounded-lg overflow-hidden bg-muted flex items-center justify-center shrink-0">
                   <img src={templatePreview} alt="Contract Template" className="max-w-full max-h-full object-contain" />
                 </div>
               ) : (
-                <div className="w-48 h-64 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted">
+                <div className="w-full sm:w-48 h-40 sm:h-64 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted shrink-0">
                   <div className="text-center p-4">
-                    <Upload className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                    <Upload className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">No template uploaded</p>
                   </div>
                 </div>
               )}
-              <div className="flex-1 space-y-4">
+              <div className="flex-1 w-full space-y-4">
                 <div>
                   <Label htmlFor="contractTemplate" className="cursor-pointer">
                     <div className="flex items-center gap-2 px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors w-fit">
@@ -463,6 +463,7 @@ export default function CompanySettings() {
                   <Button
                     type="button"
                     variant="outline"
+                    className="w-full sm:w-auto"
                     onClick={() => setLocation('/contract-template-mapper')}
                   >
                     Configure Field Positions
@@ -482,7 +483,7 @@ export default function CompanySettings() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="defaultCurrency">Default Operating Currency</Label>
                 <select
@@ -510,7 +511,7 @@ export default function CompanySettings() {
                   maxLength={3}
                 />
               </div>
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <Label htmlFor="exchangeRate">Exchange Rate</Label>
                 <Input
                   id="exchangeRate"
@@ -525,7 +526,7 @@ export default function CompanySettings() {
                 />
                 <p className="text-xs text-muted-foreground mt-1">Local currency to USD conversion rate</p>
               </div>
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <Label htmlFor="vatRate">VAT Rate (%)</Label>
                 <Input
                   id="vatRate"
