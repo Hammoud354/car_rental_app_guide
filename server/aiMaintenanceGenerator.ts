@@ -361,7 +361,7 @@ function generateRuleBasedSchedule(
   ];
 
   const usageIntensity = usage.averageKmPerDay > 100 ? "high" : usage.averageKmPerDay > 50 ? "moderate" : "low";
-  const costMultiplier = vehicle.category === "Luxury" || vehicle.category === "Sports" ? 1.5 : vehicle.category === "SUV" ? 1.2 : 1.0;
+  const costMultiplier = vehicle.category === "Luxury" || (vehicle.category as string) === "Sports" ? 1.5 : vehicle.category === "SUV" ? 1.2 : 1.0;
   const lastServiceKm = usage.lastMaintenanceKm || 0;
 
   for (const item of intervals) {

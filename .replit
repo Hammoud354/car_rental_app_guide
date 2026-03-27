@@ -43,5 +43,10 @@ externalPort = 3002
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["node", "./dist/index.js"]
+run = ["node", "dist/index.js"]
 build = ["npm", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+VITE_APP_ID = "41441854-d220-4390-8b57-240072bee172"

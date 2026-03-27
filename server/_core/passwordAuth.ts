@@ -152,9 +152,8 @@ export async function loginUser(input: LoginInput) {
     throw new Error("Invalid username or password");
   }
 
-  // Check if user has a password (might be OAuth-only user)
   if (!user.password) {
-    throw new Error("This account uses OAuth login. Please use the OAuth login button.");
+    throw new Error("This account does not have a password set. Please contact support.");
   }
 
   // Verify password

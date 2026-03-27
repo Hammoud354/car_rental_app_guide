@@ -514,7 +514,7 @@ export default function Clients() {
             </Card>
           ) : (
             filteredClients.map((client) => {
-              const licenseStatus = getLicenseExpiryStatus(client.licenseExpiryDate);
+              const licenseStatus = getLicenseExpiryStatus(client.licenseExpiryDate ?? new Date());
               return (
                 <Card key={client.id} className={`${licenseStatus.bgColor} ${licenseStatus.borderColor} border`}>
                   <CardContent className="pt-6">

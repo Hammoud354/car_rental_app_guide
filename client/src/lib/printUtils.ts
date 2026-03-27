@@ -259,7 +259,7 @@ export async function exportTemplateOverlayToPDF(
         pointer-events: none;
       `;
       span.textContent = value;
-      container.appendChild(span);
+      if (container) container.appendChild(span);
     });
 
     document.body.appendChild(container);

@@ -2139,7 +2139,7 @@ export default function RentalContracts() {
                     const vehicle = vehicles.find((v: any) => v.id === contract?.vehicleId);
                     return contract ? (
                       <li key={contractId} className="text-sm py-1.5 px-2 bg-white rounded border">
-                        {contract.clientFirstName} {contract.clientLastName} - {vehicle?.brand} {vehicle?.model}
+                        {contract.clientName} - {vehicle?.brand} {vehicle?.model}
                       </li>
                     ) : null;
                   })}

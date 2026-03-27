@@ -1155,7 +1155,7 @@ export default function FleetManagement() {
                         className="text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50 border-orange-200"
                         onClick={() => {
                           setMaintenanceVehicle(vehicle);
-                          setMaintenanceForm({ garage: "", type: "", mileage: vehicle.mileage?.toString() || "", notes: "" });
+                          setMaintenanceForm({ garage: "", type: "", mileage: vehicle.mileage?.toString() || "", nextKm: "", notes: "" });
                           setMaintenanceEntryDate(new Date());
                           setIsMaintenanceDialogOpen(true);
                         }}

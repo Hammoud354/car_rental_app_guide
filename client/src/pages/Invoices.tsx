@@ -442,7 +442,7 @@ export default function Invoices() {
                         </tr>
                       </thead>
                       <tbody className="divide-y">
-                        {invoiceDetails.lineItems.map((item, index) => (
+                        {invoiceDetails.lineItems.map((item: any, index: number) => (
                           <tr key={index}>
                             <td className="py-4">{item.description}</td>
                             <td className="py-4 text-right px-6 tracking-wider">

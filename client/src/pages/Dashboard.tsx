@@ -57,7 +57,7 @@ function ExportToExcelButton() {
 
       const contractsData = (contracts || []).map(c => ({
         "Contract Number": c.contractNumber,
-        "Client Name": `${c.clientFirstName || ""} ${c.clientLastName || ""}`.trim(),
+        "Client Name": c.clientName || "",
         "Vehicle ID": c.vehicleId,
         "Start Date": c.rentalStartDate ? new Date(c.rentalStartDate).toLocaleDateString() : "",
         "End Date": c.rentalEndDate ? new Date(c.rentalEndDate).toLocaleDateString() : "",
@@ -73,12 +73,11 @@ function ExportToExcelButton() {
       }));
 
       const clientsData = (clients || []).map(c => ({
-        "First Name": c.firstName,
-        "Last Name": c.lastName,
+        "Full Name": c.name,
         "Nationality": c.nationality || "",
         "Phone": c.phone || "",
         "Email": c.email || "",
-        "License Number": c.drivingLicenseNumber,
+        "License Number": c.driverLicenseNumber || "",
         "License Expiry": c.licenseExpiryDate ? new Date(c.licenseExpiryDate).toLocaleDateString() : "",
         "Address": c.address || "",
       }));
