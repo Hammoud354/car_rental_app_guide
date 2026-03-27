@@ -79,6 +79,7 @@ Full-stack car rental management application built with Express + React/Vite, tR
 ## Auth
 - Local authentication with username/password (cookie-based sessions)
 - Super Admin: `superadmin` (role: `super_admin`) — full system access, can manage users/passwords/subscriptions
+- **Super Admin Data Bypass**: `isSuperAdmin()` cached helper + `effectiveFilter` pattern in `server/db.ts`; super admin sees all tenants' data (vehicles, contracts, clients, invoices, maintenance, insurance); non-admin `filterUserId` is ignored (IDOR protection); ~30+ functions covered
 - CEO Dashboard: `/admin/analytics` — platform-wide analytics (users, fleet, revenue, subscriptions, top users, signup trends)
 - Special user: `dimarentacar` (isInternal: true, bypasses subscription limits)
 - Demo mode: `/demo` route auto-creates demo user with 10-minute session, pre-seeded data via `server/seedDemoData.ts`

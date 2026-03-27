@@ -383,9 +383,8 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
-        // Super Admin can filter by specific user, otherwise show own vehicles
-        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
-        return await db.getAllVehicles(targetUserId, input?.filterUserId);
+        const userId = ctx.user?.id || 1;
+        return await db.getAllVehicles(userId, input?.filterUserId);
       }),
     
     getVehicleCount: protectedProcedure
@@ -584,8 +583,8 @@ export const appRouter = router({
     listAvailableForMaintenance: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
-        const targetUserId = input?.filterUserId || ctx.user?.id || 1;
-        return await db.getAvailableVehiclesForMaintenance(targetUserId, input?.filterUserId);
+        const userId = ctx.user?.id || 1;
+        return await db.getAvailableVehiclesForMaintenance(userId, input?.filterUserId);
       }),
 
     // Vehicle Images
@@ -1240,13 +1239,9 @@ export const appRouter = router({
         
         const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
         
-        // Super Admin must provide targetUserId, regular users use their own ID
         let userId: number;
         if (isAdmin) {
-          if (!input.targetUserId || input.targetUserId === 0) {
-            throw new Error("Super Admin must select a specific user to create client for");
-          }
-          userId = input.targetUserId;
+          userId = (input.targetUserId && input.targetUserId !== 0) ? input.targetUserId : (ctx.user?.id || 1);
         } else {
           userId = ctx.user?.id || 1;
         }

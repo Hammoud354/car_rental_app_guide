@@ -2,7 +2,6 @@ import { eq, and, or, lte, gte, lt, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy } from "../drizzle/schema";
-import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -32,13 +31,23 @@ export async function getDb() {
   return _db;
 }
 
-// Helper function to check if a user is Super Admin
+// Helper function to check if a user is Super Admin (with request-level cache)
+const _superAdminCache = new Map<number, { result: boolean; ts: number }>();
 export async function isSuperAdmin(userId: number): Promise<boolean> {
+  const cached = _superAdminCache.get(userId);
+  if (cached && Date.now() - cached.ts < 5000) return cached.result;
   const db = await getDb();
   if (!db) return false;
-  
   const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  return user.length > 0 && user[0].role === 'super_admin';
+  const result = user.length > 0 && user[0].role === 'super_admin';
+  _superAdminCache.set(userId, { result, ts: Date.now() });
+  return result;
+}
+
+// Helper: build ownership where clause - super admin bypasses userId filter
+async function ownerWhere(table: any, idField: any, idValue: number, userIdField: any, userId: number) {
+  const admin = await isSuperAdmin(userId);
+  return admin ? eq(idField, idValue) : and(eq(idField, idValue), eq(userIdField, userId));
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
@@ -79,9 +88,6 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     if (user.role !== undefined) {
       values.role = user.role;
       updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'super_admin';
-      updateSet.role = 'super_admin';
     }
 
     if (!values.lastSignedIn) {
@@ -122,12 +128,12 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
     return [];
   }
   
-  // All users (including super admin) see only their own data by default
-  // Super Admin can optionally filter by specific user in admin panel
-  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
-  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, targetUserId));
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const allVehicles = effectiveFilter != null
+    ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
+    : await db.select().from(vehicles);
   
-  // Calculate total maintenance cost and effective status for each vehicle
   const now = new Date();
   const vehiclesWithCosts = await Promise.all(
     allVehicles.map(async (vehicle) => {
@@ -204,11 +210,12 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
     return [];
   }
   
-  // Get all vehicles first - all users see only their own data by default
-  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
-  const allVehicles = await db.select().from(vehicles).where(eq(vehicles.userId, targetUserId));
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const allVehicles = effectiveFilter != null
+    ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
+    : await db.select().from(vehicles);
   
-  // Filter out vehicles with active contracts (status = 'Active')
   const availableVehicles = await Promise.all(
     allVehicles.map(async (vehicle) => {
       const activeContracts = await db.select()
@@ -236,8 +243,8 @@ export async function getVehicleById(id: number, userId: number) {
     return undefined;
   }
   
-  // All users (including super admin) can only view their own vehicles
-  const result = await db.select().from(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId))).limit(1);
+  const w = await ownerWhere(vehicles, vehicles.id, id, vehicles.userId, userId);
+  const result = await db.select().from(vehicles).where(w).limit(1);
   
   return result.length > 0 ? result[0] : undefined;
 }
@@ -301,7 +308,8 @@ export async function updateVehicle(id: number, userId: number, vehicle: Partial
   if (!db) {
     throw new Error("Database not available");
   }
-  await db.update(vehicles).set(vehicle).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
+  const w = await ownerWhere(vehicles, vehicles.id, id, vehicles.userId, userId);
+  await db.update(vehicles).set(vehicle).where(w);
 }
 
 export async function deleteVehicle(id: number, userId: number) {
@@ -309,9 +317,8 @@ export async function deleteVehicle(id: number, userId: number) {
   if (!db) {
     throw new Error("Database not available");
   }
-  
-  // All users (including super admin) can only delete their own vehicles
-  await db.delete(vehicles).where(and(eq(vehicles.id, id), eq(vehicles.userId, userId)));
+  const w = await ownerWhere(vehicles, vehicles.id, id, vehicles.userId, userId);
+  await db.delete(vehicles).where(w);
 }
 
 // Remove vehicle from maintenance and set status to Available
@@ -321,17 +328,22 @@ export async function removeVehicleFromMaintenance(vehicleId: number, userId: nu
     throw new Error("Database not available");
   }
   
+  const isAdmin = await isSuperAdmin(userId);
+  const vehicleWhere = isAdmin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  const recordsWhere = isAdmin
+    ? eq(maintenanceRecords.vehicleId, vehicleId)
+    : and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId));
+  
   // Update vehicle status to Available
   await db.update(vehicles)
     .set({ status: 'Available', updatedAt: new Date() })
-    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+    .where(vehicleWhere);
   
   // Set garageExitDate to now for any maintenance records without an exit date
   const openRecords = await db.select().from(maintenanceRecords)
-    .where(and(
-      eq(maintenanceRecords.vehicleId, vehicleId),
-      eq(maintenanceRecords.userId, userId)
-    ));
+    .where(recordsWhere);
   
   for (const record of openRecords) {
     if (record.garageEntryDate && !record.garageExitDate) {
@@ -350,7 +362,12 @@ export async function sendVehicleToMaintenance(vehicleId: number, userId: number
     throw new Error("Database not available");
   }
   
-  const vehicle = await db.select().from(vehicles).where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId))).limit(1);
+  const isAdmin = await isSuperAdmin(userId);
+  const whereCondition = isAdmin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  
+  const vehicle = await db.select().from(vehicles).where(whereCondition).limit(1);
   if (vehicle.length === 0) {
     throw new Error("Vehicle not found");
   }
@@ -360,7 +377,7 @@ export async function sendVehicleToMaintenance(vehicleId: number, userId: number
   
   await db.update(vehicles)
     .set({ status: 'Maintenance', updatedAt: new Date() })
-    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+    .where(eq(vehicles.id, vehicleId));
   
   return { success: true };
 }
@@ -372,7 +389,11 @@ export async function getMaintenanceRecordsByVehicleId(vehicleId: number, userId
     console.warn("[Database] Cannot get maintenance records: database not available");
     return [];
   }
-  return await db.select().from(maintenanceRecords).where(and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId)));
+  const admin = await isSuperAdmin(userId);
+  const w = admin
+    ? eq(maintenanceRecords.vehicleId, vehicleId)
+    : and(eq(maintenanceRecords.vehicleId, vehicleId), eq(maintenanceRecords.userId, userId));
+  return await db.select().from(maintenanceRecords).where(w);
 }
 
 export async function createMaintenanceRecord(record: InsertMaintenanceRecord & { markInMaintenance?: boolean }) {
@@ -416,7 +437,8 @@ export async function deleteMaintenanceRecord(id: number, userId: number) {
   if (!db) {
     throw new Error("Database not available");
   }
-  await db.delete(maintenanceRecords).where(and(eq(maintenanceRecords.id, id), eq(maintenanceRecords.userId, userId)));
+  const w = await ownerWhere(maintenanceRecords, maintenanceRecords.id, id, maintenanceRecords.userId, userId);
+  await db.delete(maintenanceRecords).where(w);
   return { success: true };
 }
 
@@ -425,9 +447,10 @@ export async function updateMaintenanceRecord(id: number, userId: number, update
   if (!db) {
     throw new Error("Database not available");
   }
+  const w = await ownerWhere(maintenanceRecords, maintenanceRecords.id, id, maintenanceRecords.userId, userId);
   await db.update(maintenanceRecords)
     .set(updates)
-    .where(and(eq(maintenanceRecords.id, id), eq(maintenanceRecords.userId, userId)));
+    .where(w);
   const updated = await db.select().from(maintenanceRecords).where(eq(maintenanceRecords.id, id)).limit(1);
   if (updated.length === 0) {
     throw new Error("Maintenance record not found or unauthorized");
@@ -442,9 +465,11 @@ export async function getAllRentalContracts(userId: number, filterUserId?: numbe
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  // All users (including super admin) see only their own contracts by default
-  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
-  return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId));
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  return effectiveFilter != null
+    ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, effectiveFilter))
+    : await db.select().from(rentalContracts);
 }
 
 export async function getRentalContractById(id: number, userId: number) {
@@ -453,7 +478,8 @@ export async function getRentalContractById(id: number, userId: number) {
     console.warn("[Database] Cannot get contract: database not available");
     return undefined;
   }
-  const result = await db.select().from(rentalContracts).where(and(eq(rentalContracts.id, id), eq(rentalContracts.userId, userId))).limit(1);
+  const w = await ownerWhere(rentalContracts, rentalContracts.id, id, rentalContracts.userId, userId);
+  const result = await db.select().from(rentalContracts).where(w).limit(1);
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -512,14 +538,17 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
     console.warn("[Database] Cannot get contracts: database not available");
     return [];
   }
-  // All users (including super admin) see only their own contracts by default
-  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
   
   if (!status) {
-    // Return all contracts if no status specified
-    return await db.select().from(rentalContracts).where(eq(rentalContracts.userId, targetUserId)).orderBy(desc(rentalContracts.id));
+    return effectiveFilter != null
+      ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, effectiveFilter)).orderBy(desc(rentalContracts.id))
+      : await db.select().from(rentalContracts).orderBy(desc(rentalContracts.id));
   }
-  return await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, targetUserId), eq(rentalContracts.status, status))).orderBy(desc(rentalContracts.id));
+  return effectiveFilter != null
+    ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, effectiveFilter), eq(rentalContracts.status, status))).orderBy(desc(rentalContracts.id))
+    : await db.select().from(rentalContracts).where(eq(rentalContracts.status, status)).orderBy(desc(rentalContracts.id));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
@@ -528,8 +557,10 @@ export async function getActiveContractsByVehicleId(vehicleId: number, userId: n
     console.warn("[Database] Cannot get active contracts: database not available");
     return [];
   }
-  return await db.select().from(rentalContracts)
-    .where(and(eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.userId, userId), eq(rentalContracts.status, "active")));
+  const admin = await isSuperAdmin(userId);
+  const conditions = [eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.status, "active")];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
+  return await db.select().from(rentalContracts).where(and(...conditions));
 }
 
 export async function getRentalContractsByClientId(clientId: number, userId: number) {
@@ -538,8 +569,11 @@ export async function getRentalContractsByClientId(clientId: number, userId: num
     console.warn("[Database] Cannot get contracts by client: database not available");
     return [];
   }
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(rentalContracts.clientId, clientId)];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
   return await db.select().from(rentalContracts)
-    .where(and(eq(rentalContracts.clientId, clientId), eq(rentalContracts.userId, userId)))
+    .where(and(...conditions))
     .orderBy(desc(rentalContracts.rentalStartDate));
 }
 
@@ -900,16 +934,19 @@ export async function getAllClients(userId: number, filterUserId?: number | null
   const db = await getDb();
   if (!db) return [];
   
-  // All users (including super admin) see only their own clients by default
-  const targetUserId = filterUserId !== undefined && filterUserId !== null ? filterUserId : userId;
-  return await db.select().from(clients).where(eq(clients.userId, targetUserId));
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  return effectiveFilter != null
+    ? await db.select().from(clients).where(eq(clients.userId, effectiveFilter))
+    : await db.select().from(clients);
 }
 
 export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(clients).where(and(eq(clients.id, id), eq(clients.userId, userId))).limit(1);
+  const w = await ownerWhere(clients, clients.id, id, clients.userId, userId);
+  const result = await db.select().from(clients).where(w).limit(1);
   return result[0];
 }
 
@@ -917,7 +954,10 @@ export async function getClientByLicenseNumber(licenseNumber: string, userId: nu
   const db = await getDb();
   if (!db) return undefined;
   
-  const result = await db.select().from(clients).where(and(eq(clients.driverLicenseNumber, licenseNumber), eq(clients.userId, userId))).limit(1);
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(clients.driverLicenseNumber, licenseNumber)];
+  if (!admin) conditions.push(eq(clients.userId, userId));
+  const result = await db.select().from(clients).where(and(...conditions)).limit(1);
   return result[0];
 }
 
@@ -925,25 +965,15 @@ export async function updateClient(id: number, userId: number, updates: Partial<
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  console.log('[DB] updateClient called with:', { id, userId, updates });
-  
-  // First check if the client exists
   const existingClient = await getClientById(id, userId);
   if (!existingClient) {
-    console.error('[DB] Client not found:', { id, userId });
     throw new Error(`Client with id ${id} not found or doesn't belong to user ${userId}`);
   }
   
-  console.log('[DB] Existing client before update:', existingClient);
+  const w = await ownerWhere(clients, clients.id, id, clients.userId, userId);
+  await db.update(clients).set(updates).where(w);
   
-  // Perform the update
-  const result: any = await db.update(clients).set(updates).where(and(eq(clients.id, id), eq(clients.userId, userId)));
-  console.log('[DB] update result (affected rows):', result);
-  
-  // Fetch the updated client
   const updatedClient = await getClientById(id, userId);
-  console.log('[DB] fetched updated client after update:', updatedClient);
-  
   return updatedClient;
 }
 
@@ -951,33 +981,24 @@ export async function deleteClient(id: number, userId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // First verify the client exists and belongs to this user
-  const existingClient = await db
-    .select()
-    .from(clients)
-    .where(and(eq(clients.id, id), eq(clients.userId, userId)))
-    .limit(1);
+  const w = await ownerWhere(clients, clients.id, id, clients.userId, userId);
+  const existingClient = await db.select().from(clients).where(w).limit(1);
   
   if (existingClient.length === 0) {
     throw new Error("Client not found or you don't have permission to delete this client.");
   }
   
-  // Check if client has any related contracts
-  const relatedContracts = await db
-    .select()
-    .from(rentalContracts)
-    .where(and(
-      eq(rentalContracts.clientId, id),
-      eq(rentalContracts.userId, userId)
-    ))
-    .limit(1);
+  const admin = await isSuperAdmin(userId);
+  const contractConditions: any[] = [eq(rentalContracts.clientId, id)];
+  if (!admin) contractConditions.push(eq(rentalContracts.userId, userId));
+  const relatedContracts = await db.select().from(rentalContracts)
+    .where(and(...contractConditions)).limit(1);
   
   if (relatedContracts.length > 0) {
     throw new Error("Cannot delete client with existing rental contracts. Please delete the contracts first.");
   }
   
-  // No related records, safe to delete
-  await db.delete(clients).where(and(eq(clients.id, id), eq(clients.userId, userId)));
+  await db.delete(clients).where(w);
 }
 
 // Vehicle Profitability Analytics
@@ -1052,8 +1073,8 @@ export async function getVehicleFinancialDetails(vehicleId: number, userId: numb
     throw new Error("Database not available");
   }
   
-  // Get vehicle info for this user
-  const vehicle = await db.select().from(vehicles).where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId))).limit(1);
+  const vw = await ownerWhere(vehicles, vehicles.id, vehicleId, vehicles.userId, userId);
+  const vehicle = await db.select().from(vehicles).where(vw).limit(1);
   
   if (!vehicle || vehicle.length === 0) {
     throw new Error("Vehicle not found");
@@ -1707,7 +1728,7 @@ export async function createPasswordResetToken(userId: number, token: string, ex
     token,
     expiresAt,
     used: false,
-  });
+  }).returning();
 
   return result;
 }
@@ -1992,8 +2013,8 @@ export async function generateInvoiceForContract(contractId: number, userId: num
       userId,
       contractId,
       invoiceNumber,
-      invoiceDate,
-      dueDate,
+      invoiceDate: invoiceDate.toISOString().split('T')[0],
+      dueDate: dueDate.toISOString().split('T')[0],
       subtotal: subtotal.toFixed(2),
       taxAmount: taxAmount.toFixed(2),
       totalAmount: totalAmount.toFixed(2),
@@ -2193,8 +2214,8 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // All users (including super admin) see only their own invoices
-  const [invoice] = await db.select().from(invoices).where(and(eq(invoices.id, invoiceId), eq(invoices.userId, userId))).limit(1);
+  const iw = await ownerWhere(invoices, invoices.id, invoiceId, invoices.userId, userId);
+  const [invoice] = await db.select().from(invoices).where(iw).limit(1);
   
   if (!invoice) return null;
   
@@ -2231,8 +2252,10 @@ export async function listInvoices(userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  // All users (including super admin) see only their own invoices
-  const results = await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
+  const admin = await isSuperAdmin(userId);
+  const results = admin
+    ? await db.select().from(invoices).orderBy(desc(invoices.createdAt))
+    : await db.select().from(invoices).where(eq(invoices.userId, userId)).orderBy(desc(invoices.createdAt));
   return results;
 }
 
@@ -2269,13 +2292,11 @@ export async function updateInvoicePaymentStatus(
       updateData
     });
     
+    const iw = await ownerWhere(invoices, invoices.id, invoiceId, invoices.userId, userId);
     const result = await db
       .update(invoices)
       .set(updateData)
-      .where(and(
-        eq(invoices.id, invoiceId),
-        eq(invoices.userId, userId)
-      ));
+      .where(iw);
     
     console.log('[updateInvoicePaymentStatus] Update result:', result);
     
@@ -2415,6 +2436,9 @@ export async function getLastCompletedContractForVehicle(vehicleId: number, user
     return null;
   }
   
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(rentalContracts.vehicleId, vehicleId), eq(rentalContracts.status, "completed")];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
   const contracts = await db
     .select({
       id: rentalContracts.id,
@@ -2422,13 +2446,7 @@ export async function getLastCompletedContractForVehicle(vehicleId: number, user
       returnedAt: rentalContracts.returnedAt,
     })
     .from(rentalContracts)
-    .where(
-      and(
-        eq(rentalContracts.vehicleId, vehicleId),
-        eq(rentalContracts.userId, userId),
-        eq(rentalContracts.status, "completed")
-      )
-    )
+    .where(and(...conditions))
     .orderBy(desc(rentalContracts.returnedAt))
     .limit(1);
   
@@ -2463,6 +2481,7 @@ export async function updateVehicleMaintenanceSchedule(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
+  const vw = await ownerWhere(vehicles, vehicles.id, vehicleId, vehicles.userId, userId);
   await db.update(vehicles)
     .set({
       nextMaintenanceDate,
@@ -2471,7 +2490,7 @@ export async function updateVehicleMaintenanceSchedule(
       maintenanceIntervalMonths,
       updatedAt: new Date(),
     })
-    .where(and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId)));
+    .where(vw);
 }
 
 
@@ -2490,12 +2509,10 @@ export async function getCompletedContracts(
   const db = await getDb();
   if (!db) return [];
 
-  const conditions = [
-    eq(rentalContracts.userId, userId),
-    eq(rentalContracts.status, "completed")
-  ];
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(rentalContracts.status, "completed")];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
 
-  // Apply date filters if provided
   if (startDate) {
     conditions.push(gte(rentalContracts.rentalEndDate, startDate));
   }
@@ -2520,12 +2537,10 @@ export async function getPaidInvoices(
   const db = await getDb();
   if (!db) return [];
 
-  const conditions = [
-    eq(invoices.userId, userId)
-    // Note: invoices table doesn't have status field, all invoices are considered
-  ];
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [];
+  if (!admin) conditions.push(eq(invoices.userId, userId));
 
-  // Apply date filters if provided
   if (startDate) {
     conditions.push(gte(invoices.createdAt, startDate));
   }
@@ -2536,7 +2551,7 @@ export async function getPaidInvoices(
   return await db
     .select()
     .from(invoices)
-    .where(and(...conditions));
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
 }
 
 /**
@@ -2550,7 +2565,9 @@ export async function getMaintenanceRecords(
   const db = await getDb();
   if (!db) return [];
 
-  const conditions = [eq(maintenanceRecords.userId, userId)];
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [];
+  if (!admin) conditions.push(eq(maintenanceRecords.userId, userId));
 
   // Apply date filters if provided
   if (startDate) {
@@ -2563,7 +2580,7 @@ export async function getMaintenanceRecords(
   return await db
     .select()
     .from(maintenanceRecords)
-    .where(and(...conditions));
+    .where(conditions.length > 0 ? and(...conditions) : undefined);
 }
 
 // getAllVehicles already exists above, no need to duplicate
@@ -2719,13 +2736,11 @@ export async function getMaintenanceTasksByVehicleId(vehicleId: number, userId: 
     return [];
   }
   
-  return await db
-    .select()
-    .from(maintenanceTasks)
-    .where(and(
-      eq(maintenanceTasks.vehicleId, vehicleId),
-      eq(maintenanceTasks.userId, userId)
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(maintenanceTasks.vehicleId, vehicleId)];
+  if (!admin) conditions.push(eq(maintenanceTasks.userId, userId));
+  return await db.select().from(maintenanceTasks)
+    .where(and(...conditions))
     .orderBy(maintenanceTasks.priority, maintenanceTasks.triggerDate);
 }
 
@@ -2736,11 +2751,10 @@ export async function getAllMaintenanceTasks(userId: number) {
     return [];
   }
   
-  return await db
-    .select()
-    .from(maintenanceTasks)
-    .where(eq(maintenanceTasks.userId, userId))
-    .orderBy(maintenanceTasks.status, maintenanceTasks.priority);
+  const admin = await isSuperAdmin(userId);
+  return admin
+    ? await db.select().from(maintenanceTasks).orderBy(maintenanceTasks.status, maintenanceTasks.priority)
+    : await db.select().from(maintenanceTasks).where(eq(maintenanceTasks.userId, userId)).orderBy(maintenanceTasks.status, maintenanceTasks.priority);
 }
 
 export async function updateMaintenanceTask(
@@ -2751,13 +2765,11 @@ export async function updateMaintenanceTask(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  const tw = await ownerWhere(maintenanceTasks, maintenanceTasks.id, taskId, maintenanceTasks.userId, userId);
   await db
     .update(maintenanceTasks)
     .set({ ...updates, updatedAt: new Date() })
-    .where(and(
-      eq(maintenanceTasks.id, taskId),
-      eq(maintenanceTasks.userId, userId)
-    ));
+    .where(tw);
   
   const updated = await db
     .select()
@@ -2780,6 +2792,7 @@ export async function completeMaintenanceTask(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  const tw = await ownerWhere(maintenanceTasks, maintenanceTasks.id, taskId, maintenanceTasks.userId, userId);
   await db
     .update(maintenanceTasks)
     .set({
@@ -2790,10 +2803,7 @@ export async function completeMaintenanceTask(
       maintenanceRecordId: data.maintenanceRecordId,
       updatedAt: new Date()
     })
-    .where(and(
-      eq(maintenanceTasks.id, taskId),
-      eq(maintenanceTasks.userId, userId)
-    ));
+    .where(tw);
   
   return { success: true };
 }
@@ -2802,12 +2812,8 @@ export async function deleteMaintenanceTask(taskId: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  await db
-    .delete(maintenanceTasks)
-    .where(and(
-      eq(maintenanceTasks.id, taskId),
-      eq(maintenanceTasks.userId, userId)
-    ));
+  const tw = await ownerWhere(maintenanceTasks, maintenanceTasks.id, taskId, maintenanceTasks.userId, userId);
+  await db.delete(maintenanceTasks).where(tw);
   
   return { success: true };
 }
@@ -2822,15 +2828,15 @@ export async function getUpcomingMaintenanceTasks(userId: number, daysAhead: num
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + daysAhead);
   
-  return await db
-    .select()
-    .from(maintenanceTasks)
-    .where(and(
-      eq(maintenanceTasks.userId, userId),
-      eq(maintenanceTasks.status, "Pending"),
-      // Tasks due within the next X days
-      sql`${maintenanceTasks.triggerDate} <= ${futureDate}`
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    eq(maintenanceTasks.status, "Pending"),
+    sql`${maintenanceTasks.triggerDate} <= ${futureDate}`
+  ];
+  if (!admin) conditions.push(eq(maintenanceTasks.userId, userId));
+  
+  return await db.select().from(maintenanceTasks)
+    .where(and(...conditions))
     .orderBy(maintenanceTasks.triggerDate, maintenanceTasks.priority);
 }
 
@@ -2843,14 +2849,15 @@ export async function getOverdueMaintenanceTasks(userId: number) {
   
   const today = new Date();
   
-  return await db
-    .select()
-    .from(maintenanceTasks)
-    .where(and(
-      eq(maintenanceTasks.userId, userId),
-      eq(maintenanceTasks.status, "Pending"),
-      sql`${maintenanceTasks.triggerDate} < ${today}`
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    eq(maintenanceTasks.status, "Pending"),
+    sql`${maintenanceTasks.triggerDate} < ${today}`
+  ];
+  if (!admin) conditions.push(eq(maintenanceTasks.userId, userId));
+  
+  return await db.select().from(maintenanceTasks)
+    .where(and(...conditions))
     .orderBy(maintenanceTasks.priority, maintenanceTasks.triggerDate);
 }
 
@@ -2865,13 +2872,11 @@ export async function getRentalContractsByVehicle(vehicleId: number, userId: num
     return [];
   }
   
-  return await db
-    .select()
-    .from(rentalContracts)
-    .where(and(
-      eq(rentalContracts.vehicleId, vehicleId),
-      eq(rentalContracts.userId, userId)
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(rentalContracts.vehicleId, vehicleId)];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
+  return await db.select().from(rentalContracts)
+    .where(and(...conditions))
     .orderBy(rentalContracts.rentalStartDate);
 }
 
@@ -2894,15 +2899,16 @@ export async function getVehiclesWithExpiringInsurance(userId: number, daysThres
   const futureDate = new Date();
   futureDate.setDate(futureDate.getDate() + daysThreshold);
   
-  return await db
-    .select()
-    .from(vehicles)
-    .where(and(
-      eq(vehicles.userId, userId),
-      sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
-      sql`${vehicles.insuranceExpiryDate} > ${today}`,
-      sql`${vehicles.insuranceExpiryDate} <= ${futureDate}`
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
+    sql`${vehicles.insuranceExpiryDate} > ${today}`,
+    sql`${vehicles.insuranceExpiryDate} <= ${futureDate}`
+  ];
+  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  
+  return await db.select().from(vehicles)
+    .where(and(...conditions))
     .orderBy(vehicles.insuranceExpiryDate);
 }
 
@@ -2918,14 +2924,15 @@ export async function getVehiclesWithExpiredInsurance(userId: number) {
   
   const today = new Date();
   
-  return await db
-    .select()
-    .from(vehicles)
-    .where(and(
-      eq(vehicles.userId, userId),
-      sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
-      sql`${vehicles.insuranceExpiryDate} < ${today}`
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
+    sql`${vehicles.insuranceExpiryDate} < ${today}`
+  ];
+  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  
+  return await db.select().from(vehicles)
+    .where(and(...conditions))
     .orderBy(vehicles.insuranceExpiryDate);
 }
 
@@ -2945,15 +2952,12 @@ export async function renewVehicleInsurance(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Mark previous active policies as expired
-  await db
-    .update(insurancePolicies)
-    .set({ status: 'expired', updatedAt: new Date() })
-    .where(and(
-      eq(insurancePolicies.vehicleId, vehicleId),
-      eq(insurancePolicies.userId, userId),
-      eq(insurancePolicies.status, 'active')
-    ));
+  const admin = await isSuperAdmin(userId);
+  const ipConditions: any[] = [eq(insurancePolicies.vehicleId, vehicleId), eq(insurancePolicies.isActive, true)];
+  if (!admin) ipConditions.push(eq(insurancePolicies.userId, userId));
+  await db.update(insurancePolicies)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(and(...ipConditions));
   
   // Create new insurance policy record
   await db.insert(insurancePolicies).values({
@@ -2964,7 +2968,7 @@ export async function renewVehicleInsurance(
     policyStartDate,
     policyEndDate: policyExpiryDate,
     annualPremium,
-    status: 'active'
+    isActive: true
   });
   
   // Update vehicle record with current policy info (for quick reference)
@@ -2983,13 +2987,10 @@ export async function renewVehicleInsurance(
     updateData.insurancePolicyNumber = policyNumber;
   }
   
-  await db
-    .update(vehicles)
-    .set(updateData)
-    .where(and(
-      eq(vehicles.id, vehicleId),
-      eq(vehicles.userId, userId)
-    ));
+  const vw2 = admin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  await db.update(vehicles).set(updateData).where(vw2);
   
   return { success: true, message: "Insurance renewed successfully" };
 }
@@ -3001,13 +3002,11 @@ export async function getVehicleInsurancePolicies(vehicleId: number, userId: num
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  return await db
-    .select()
-    .from(insurancePolicies)
-    .where(and(
-      eq(insurancePolicies.vehicleId, vehicleId),
-      eq(insurancePolicies.userId, userId)
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(insurancePolicies.vehicleId, vehicleId)];
+  if (!admin) conditions.push(eq(insurancePolicies.userId, userId));
+  return await db.select().from(insurancePolicies)
+    .where(and(...conditions))
     .orderBy(desc(insurancePolicies.policyStartDate));
 }
 
@@ -3018,14 +3017,11 @@ export async function getActiveInsurancePolicy(vehicleId: number, userId: number
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const policies = await db
-    .select()
-    .from(insurancePolicies)
-    .where(and(
-      eq(insurancePolicies.vehicleId, vehicleId),
-      eq(insurancePolicies.userId, userId),
-      eq(insurancePolicies.status, 'active')
-    ))
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [eq(insurancePolicies.vehicleId, vehicleId), eq(insurancePolicies.isActive, true)];
+  if (!admin) conditions.push(eq(insurancePolicies.userId, userId));
+  const policies = await db.select().from(insurancePolicies)
+    .where(and(...conditions))
     .limit(1);
   
   return policies.length > 0 ? policies[0] : null;
@@ -3044,20 +3040,14 @@ export async function getInsuranceCostForPeriod(
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // Get all policies that overlap with the date range
-  const policies = await db
-    .select()
-    .from(insurancePolicies)
-    .where(and(
-      eq(insurancePolicies.vehicleId, vehicleId),
-      eq(insurancePolicies.userId, userId),
-      or(
-        and(
-          lte(insurancePolicies.policyStartDate, endDate),
-          gte(insurancePolicies.policyEndDate, startDate)
-        )
-      )
-    ));
+  const admin = await isSuperAdmin(userId);
+  const ipConds: any[] = [
+    eq(insurancePolicies.vehicleId, vehicleId),
+    lte(insurancePolicies.policyStartDate, endDate),
+    gte(insurancePolicies.policyEndDate, startDate)
+  ];
+  if (!admin) ipConds.push(eq(insurancePolicies.userId, userId));
+  const policies = await db.select().from(insurancePolicies).where(and(...ipConds));
   
   // Calculate prorated cost for each policy based on overlap
   let totalCost = 0;
@@ -3070,7 +3060,7 @@ export async function getInsuranceCostForPeriod(
     const overlapDays = Math.ceil((overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60 * 24));
     const policyDays = Math.ceil((policyEnd.getTime() - policyStart.getTime()) / (1000 * 60 * 60 * 24));
     
-    const proratedCost = (parseFloat(policy.annualPremium) / policyDays) * overlapDays;
+    const proratedCost = (parseFloat(policy.annualPremium ?? '0') / policyDays) * overlapDays;
     totalCost += proratedCost;
   }
   
@@ -3083,10 +3073,10 @@ export async function getAllInvoices(userId: number) {
   if (!db) return [];
 
   try {
-    const result = await db
-      .select()
-      .from(invoices)
-      .where(eq(invoices.userId, userId));
+    const admin = await isSuperAdmin(userId);
+    const result = admin
+      ? await db.select().from(invoices)
+      : await db.select().from(invoices).where(eq(invoices.userId, userId));
     return result;
   } catch (error) {
     console.error("Error fetching invoices:", error);
