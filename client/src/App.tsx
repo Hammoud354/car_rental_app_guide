@@ -5,6 +5,7 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import SidebarLayout from "./components/SidebarLayout";
+import { useAuth } from "./_core/hooks/useAuth";
 import Landing from "./pages/Landing";
 import Clients from "./pages/Clients";
 import RentalContracts from "./pages/RentalContracts";
@@ -45,6 +46,24 @@ import ContractManagement from "./pages/ContractManagement";
 
 const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password"];
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { loading, isAuthenticated } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/signin" });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <>{children}</>;
+}
+
 function AppContent() {
   const [location] = useLocation();
   const isPublicRoute = PUBLIC_ROUTES.some(route => location === route);
@@ -65,6 +84,7 @@ function AppContent() {
   }
 
   return (
+    <ProtectedRoute>
     <SidebarLayout>
       <Switch>
         <Route path="/clients" component={Clients} />
@@ -100,6 +120,7 @@ function AppContent() {
         <Route component={NotFound} />
       </Switch>
     </SidebarLayout>
+    </ProtectedRoute>
   );
 }
 
