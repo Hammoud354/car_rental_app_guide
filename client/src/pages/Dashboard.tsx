@@ -440,7 +440,7 @@ function MaintenanceAlertsWidget() {
               <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">{alertData.summary.canwait} Later</span>
             )}
           </div>
-          <Link href="/ai-maintenance">
+          <Link href="/maintenance">
             <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
               View All <ChevronRight className="ml-1 h-3 w-3" />
             </Button>
@@ -449,6 +449,9 @@ function MaintenanceAlertsWidget() {
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {alertData.alerts.slice(0, 6).map((alert) => {
             const config = levelConfig[alert.level];
+            const fixHref = alert.type === "insurance"
+              ? `/fleet-management?vehicle=${alert.vehicleId}`
+              : "/maintenance";
             return (
               <div key={alert.id} className={`flex items-center gap-3 p-2.5 rounded-lg ${config.bg} ${config.border} border`}>
                 <AlertTriangle className={`h-4 w-4 shrink-0 ${config.icon}`} />
@@ -459,7 +462,7 @@ function MaintenanceAlertsWidget() {
                   </div>
                   <p className="text-xs text-gray-600 truncate">{alert.vehicleName} ({alert.plateNumber}) - {alert.description}</p>
                 </div>
-                <Link href="/maintenance">
+                <Link href={fixHref}>
                   <Button variant="ghost" size="sm" className="h-7 text-xs">
                     <Wrench className="h-3 w-3 mr-1" /> Fix
                   </Button>
