@@ -719,7 +719,6 @@ html body[data-scroll-locked] {
 }
 
 html:has(body[data-scroll-locked]) {
-  overflow: hidden !important;
   scrollbar-gutter: stable !important;
 }
 
