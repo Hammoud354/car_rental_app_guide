@@ -496,8 +496,10 @@ function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: numb
   );
 }
 
-function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCount: number }) {
+function ExpiringDocumentsCardWithModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: expiringDocuments } = trpc.dashboard.getExpiringDocuments.useQuery();
+  const count = expiringDocuments?.length ?? 0;
 
   return (
     <>
@@ -511,7 +513,7 @@ function ExpiringDocumentsCardWithModal({ expiringDocsCount }: { expiringDocsCou
             <AlertTriangle className="h-4 w-4 text-amber-500" />
           </div>
         </div>
-        <div className="text-3xl font-bold text-gray-900">{expiringDocsCount}</div>
+        <div className="text-3xl font-bold text-gray-900">{count}</div>
         <p className="text-xs text-gray-400 mt-1">Click to view details</p>
       </div>
       <ExpiringDocumentsModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
@@ -714,7 +716,7 @@ export default function Dashboard() {
         )}
 
         {widgetVisibility.expiringDocs && (
-          <ExpiringDocumentsCardWithModal expiringDocsCount={expiringDocs} />
+          <ExpiringDocumentsCardWithModal />
         )}
       </div>
 

@@ -2408,13 +2408,39 @@ export const appRouter = router({
         today.setHours(0, 0, 0, 0);
 
         const vehicles = await db.getAllVehicles(userId);
-        
+        const seenInsurancePolicies = new Set<string>();
+
+        // Check insurance policies from the dedicated insurancePolicies table first
+        const allPolicies = await db.getAllInsurancePolicies(userId);
+        allPolicies.forEach((policy: any) => {
+          if (!policy.policyEndDate) return;
+          const vehicle = vehicles.find((v: any) => v.id === policy.vehicleId);
+          const vehicleName = vehicle
+            ? `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`
+            : `Vehicle #${policy.vehicleId}`;
+          const expiryDate = new Date(policy.policyEndDate);
+          const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+          if (daysRemaining <= daysThreshold) {
+            expiringDocuments.push({
+              documentType: 'Insurance Policy',
+              vehicleName,
+              clientName: null,
+              expiryDate: policy.policyEndDate,
+              daysRemaining,
+              additionalInfo: policy.policyNumber
+                ? `Policy #${policy.policyNumber}${policy.insuranceProvider ? ` · ${policy.insuranceProvider}` : ''}`
+                : policy.insuranceProvider || null,
+            });
+            if (vehicle) seenInsurancePolicies.add(String(vehicle.id));
+          }
+        });
+
         vehicles.forEach((vehicle: any) => {
-          if (vehicle.insuranceExpiryDate) {
+          // Only fall back to the field on the vehicle if no dedicated policy was found
+          if (!seenInsurancePolicies.has(String(vehicle.id)) && vehicle.insuranceExpiryDate) {
             const expiryDate = new Date(vehicle.insuranceExpiryDate);
             const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            
-            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+            if (daysRemaining <= daysThreshold) {
               expiringDocuments.push({
                 documentType: 'Insurance Policy',
                 vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
@@ -2429,8 +2455,7 @@ export const appRouter = router({
           if (vehicle.registrationExpiryDate) {
             const expiryDate = new Date(vehicle.registrationExpiryDate);
             const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            
-            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+            if (daysRemaining <= daysThreshold) {
               expiringDocuments.push({
                 documentType: 'Vehicle Registration',
                 vehicleName: `${vehicle.brand} ${vehicle.model} (${vehicle.plateNumber})`,
@@ -2444,13 +2469,11 @@ export const appRouter = router({
         });
 
         const clients = await db.getAllClients(userId);
-        
         clients.forEach((client: any) => {
           if (client.licenseExpiryDate) {
             const expiryDate = new Date(client.licenseExpiryDate);
             const daysRemaining = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            
-            if (daysRemaining > 0 && daysRemaining <= daysThreshold) {
+            if (daysRemaining <= daysThreshold) {
               expiringDocuments.push({
                 documentType: 'Driver License',
                 vehicleName: null,
