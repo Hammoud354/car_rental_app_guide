@@ -348,7 +348,7 @@ function KmMaintenanceAlertsWidget({ vehicles }: { vehicles: any[] }) {
       ...v,
       kmLeft: v.nextMaintenanceKm - v.mileage,
     }))
-    .filter(v => v.kmLeft <= 1000)
+    .filter(v => v.kmLeft <= 500)
     .sort((a, b) => a.kmLeft - b.kmLeft);
 
   if (alerts.length === 0) return null;
@@ -681,7 +681,6 @@ export default function Dashboard() {
       {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
       {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
 
-      <MaintenanceAlertsWidget />
       <KmMaintenanceAlertsWidget vehicles={vehicles || []} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
