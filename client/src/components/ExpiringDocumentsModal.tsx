@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, Clock, FileText, Shield, Car, CreditCard } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface ExpiringDocumentsModalProps {
   isOpen: boolean;
@@ -13,6 +14,16 @@ export function ExpiringDocumentsModal({ isOpen, onOpenChange }: ExpiringDocumen
   const { data: expiringDocuments, isLoading } = trpc.dashboard.getExpiringDocuments.useQuery(undefined, {
     enabled: isOpen,
   });
+  const [, navigate] = useLocation();
+
+  const handleNavigate = (doc: any) => {
+    onOpenChange(false);
+    if (doc.vehicleId) {
+      navigate(`/vehicle/${doc.vehicleId}`);
+    } else {
+      navigate("/clients");
+    }
+  };
 
   const getUrgencyColor = (daysRemaining: number) => {
     if (daysRemaining <= 0) return "bg-red-100 border-red-300";
@@ -115,10 +126,10 @@ export function ExpiringDocumentsModal({ isOpen, onOpenChange }: ExpiringDocumen
                     </div>
                   </div>
                   <div className="flex gap-2 mt-3 pt-3 border-t">
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleNavigate(doc)}>
                       Renew
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleNavigate(doc)}>
                       View Details
                     </Button>
                   </div>
