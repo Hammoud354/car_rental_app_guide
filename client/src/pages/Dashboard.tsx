@@ -410,7 +410,7 @@ function KmMaintenanceAlertsWidget({ vehicles }: { vehicles: any[] }) {
 function MaintenanceAlertsWidget() {
   const { data: alertData, isLoading } = trpc.aiMaintenance.getMaintenanceAlerts.useQuery();
   
-  if (isLoading || !alertData || alertData.summary.total === 0) return null;
+  if (isLoading || !alertData || !alertData.hasAiTasks || alertData.summary.total === 0) return null;
 
   const levelConfig = {
     critical: { bg: "bg-red-50", border: "border-red-200", badge: "bg-red-600", text: "text-red-800", icon: "text-red-600", label: "Critical" },
@@ -681,6 +681,7 @@ export default function Dashboard() {
       {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
       {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
 
+      <MaintenanceAlertsWidget />
       <KmMaintenanceAlertsWidget vehicles={vehicles || []} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

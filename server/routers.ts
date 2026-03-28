@@ -2853,6 +2853,7 @@ export const appRouter = router({
 
         return {
           alerts,
+          hasAiTasks: allTasks.some((t: any) => t.aiGenerated),
           summary: {
             critical: alerts.filter(a => a.level === "critical").length,
             attention: alerts.filter(a => a.level === "attention").length,
