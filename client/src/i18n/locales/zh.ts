@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "仪表板",
+    profitLoss: "损益",
+    analysis: "分析",
+    fleet: "车队",
+    reservations: "预订",
+    contracts: "合同",
+    maintenance: "维护",
+    aiMaintenance: "AI维护",
+    clients: "客户",
+    invoices: "发票",
+    ceoDashboard: "CEO仪表板",
+    numberingManagement: "编号管理",
+    userManagement: "用户管理",
+    auditLogs: "审计日志",
+  },
+  sections: {
+    main: "主菜单",
+    management: "管理",
+    clientsInvoices: "客户与发票",
+    admin: "管理员",
+  },
+  user: {
+    myAccount: "我的账户",
+    myProfile: "我的资料",
+    companySettings: "公司设置",
+    signOut: "退出登录",
+    userId: "用户ID",
+    rentalManagement: "租赁管理",
+  },
+  language: {
+    select: "选择语言",
+    current: "语言",
+  },
+};

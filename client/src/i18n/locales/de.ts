@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Dashboard",
+    profitLoss: "Gewinn & Verlust",
+    analysis: "Analyse",
+    fleet: "Fuhrpark",
+    reservations: "Reservierungen",
+    contracts: "Verträge",
+    maintenance: "Wartung",
+    aiMaintenance: "KI-Wartung",
+    clients: "Kunden",
+    invoices: "Rechnungen",
+    ceoDashboard: "CEO-Dashboard",
+    numberingManagement: "Nummernverwaltung",
+    userManagement: "Benutzerverwaltung",
+    auditLogs: "Prüfprotokolle",
+  },
+  sections: {
+    main: "HAUPTMENÜ",
+    management: "VERWALTUNG",
+    clientsInvoices: "KUNDEN & RECHNUNGEN",
+    admin: "ADMIN",
+  },
+  user: {
+    myAccount: "Mein Konto",
+    myProfile: "Mein Profil",
+    companySettings: "Unternehmenseinstellungen",
+    signOut: "Abmelden",
+    userId: "Benutzer-ID",
+    rentalManagement: "Mietverwaltung",
+  },
+  language: {
+    select: "Sprache wählen",
+    current: "Sprache",
+  },
+};

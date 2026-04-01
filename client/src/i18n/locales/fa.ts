@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "داشبورد",
+    profitLoss: "سود و زیان",
+    analysis: "تحلیل",
+    fleet: "ناوگان",
+    reservations: "رزروها",
+    contracts: "قراردادها",
+    maintenance: "نگهداری",
+    aiMaintenance: "نگهداری هوش مصنوعی",
+    clients: "مشتریان",
+    invoices: "صورتحساب‌ها",
+    ceoDashboard: "داشبورد مدیرعامل",
+    numberingManagement: "مدیریت شماره‌گذاری",
+    userManagement: "مدیریت کاربران",
+    auditLogs: "گزارش‌های حسابرسی",
+  },
+  sections: {
+    main: "اصلی",
+    management: "مدیریت",
+    clientsInvoices: "مشتریان و فاکتورها",
+    admin: "مدیر",
+  },
+  user: {
+    myAccount: "حساب من",
+    myProfile: "پروفایل من",
+    companySettings: "تنظیمات شرکت",
+    signOut: "خروج",
+    userId: "شناسه کاربر",
+    rentalManagement: "مدیریت اجاره",
+  },
+  language: {
+    select: "انتخاب زبان",
+    current: "زبان",
+  },
+};

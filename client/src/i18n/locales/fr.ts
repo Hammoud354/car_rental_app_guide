@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Tableau de bord",
+    profitLoss: "Profits & Pertes",
+    analysis: "Analyse",
+    fleet: "Flotte",
+    reservations: "Réservations",
+    contracts: "Contrats",
+    maintenance: "Maintenance",
+    aiMaintenance: "Maintenance IA",
+    clients: "Clients",
+    invoices: "Factures",
+    ceoDashboard: "Tableau PDG",
+    numberingManagement: "Gestion de numérotation",
+    userManagement: "Gestion des utilisateurs",
+    auditLogs: "Journaux d'audit",
+  },
+  sections: {
+    main: "PRINCIPAL",
+    management: "GESTION",
+    clientsInvoices: "CLIENTS & FACTURES",
+    admin: "ADMIN",
+  },
+  user: {
+    myAccount: "Mon compte",
+    myProfile: "Mon profil",
+    companySettings: "Paramètres société",
+    signOut: "Se déconnecter",
+    userId: "ID utilisateur",
+    rentalManagement: "Gestion de location",
+  },
+  language: {
+    select: "Choisir la langue",
+    current: "Langue",
+  },
+};

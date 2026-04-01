@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "대시보드",
+    profitLoss: "손익",
+    analysis: "분석",
+    fleet: "차량 관리",
+    reservations: "예약",
+    contracts: "계약",
+    maintenance: "유지보수",
+    aiMaintenance: "AI 유지보수",
+    clients: "고객",
+    invoices: "청구서",
+    ceoDashboard: "CEO 대시보드",
+    numberingManagement: "번호 관리",
+    userManagement: "사용자 관리",
+    auditLogs: "감사 로그",
+  },
+  sections: {
+    main: "메인",
+    management: "관리",
+    clientsInvoices: "고객 및 청구서",
+    admin: "관리자",
+  },
+  user: {
+    myAccount: "내 계정",
+    myProfile: "내 프로필",
+    companySettings: "회사 설정",
+    signOut: "로그아웃",
+    userId: "사용자 ID",
+    rentalManagement: "렌탈 관리",
+  },
+  language: {
+    select: "언어 선택",
+    current: "언어",
+  },
+};

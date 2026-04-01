@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "لوحة التحكم",
+    profitLoss: "الأرباح والخسائر",
+    analysis: "التحليل",
+    fleet: "الأسطول",
+    reservations: "الحجوزات",
+    contracts: "العقود",
+    maintenance: "الصيانة",
+    aiMaintenance: "صيانة ذكاء اصطناعي",
+    clients: "العملاء",
+    invoices: "الفواتير",
+    ceoDashboard: "لوحة الرئيس التنفيذي",
+    numberingManagement: "إدارة الترقيم",
+    userManagement: "إدارة المستخدمين",
+    auditLogs: "سجلات المراجعة",
+  },
+  sections: {
+    main: "الرئيسية",
+    management: "الإدارة",
+    clientsInvoices: "العملاء والفواتير",
+    admin: "المشرف",
+  },
+  user: {
+    myAccount: "حسابي",
+    myProfile: "ملفي الشخصي",
+    companySettings: "إعدادات الشركة",
+    signOut: "تسجيل الخروج",
+    userId: "معرف المستخدم",
+    rentalManagement: "إدارة التأجير",
+  },
+  language: {
+    select: "اختر اللغة",
+    current: "اللغة",
+  },
+};

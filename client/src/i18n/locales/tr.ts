@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Gösterge Paneli",
+    profitLoss: "Kâr & Zarar",
+    analysis: "Analiz",
+    fleet: "Filo",
+    reservations: "Rezervasyonlar",
+    contracts: "Sözleşmeler",
+    maintenance: "Bakım",
+    aiMaintenance: "YZ Bakımı",
+    clients: "Müşteriler",
+    invoices: "Faturalar",
+    ceoDashboard: "CEO Paneli",
+    numberingManagement: "Numaralandırma Yönetimi",
+    userManagement: "Kullanıcı Yönetimi",
+    auditLogs: "Denetim Kayıtları",
+  },
+  sections: {
+    main: "ANA MENÜ",
+    management: "YÖNETİM",
+    clientsInvoices: "MÜŞTERİLER VE FATURALAR",
+    admin: "YÖNETİCİ",
+  },
+  user: {
+    myAccount: "Hesabım",
+    myProfile: "Profilim",
+    companySettings: "Şirket Ayarları",
+    signOut: "Çıkış Yap",
+    userId: "Kullanıcı Kimliği",
+    rentalManagement: "Kiralama Yönetimi",
+  },
+  language: {
+    select: "Dil Seçin",
+    current: "Dil",
+  },
+};

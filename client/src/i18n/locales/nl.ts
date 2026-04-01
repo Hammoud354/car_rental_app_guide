@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Dashboard",
+    profitLoss: "Winst & Verlies",
+    analysis: "Analyse",
+    fleet: "Wagenpark",
+    reservations: "Reserveringen",
+    contracts: "Contracten",
+    maintenance: "Onderhoud",
+    aiMaintenance: "AI Onderhoud",
+    clients: "Klanten",
+    invoices: "Facturen",
+    ceoDashboard: "CEO Dashboard",
+    numberingManagement: "Nummeringsbeheer",
+    userManagement: "Gebruikersbeheer",
+    auditLogs: "Auditlogboeken",
+  },
+  sections: {
+    main: "HOOFD",
+    management: "BEHEER",
+    clientsInvoices: "KLANTEN & FACTUREN",
+    admin: "BEHEERDER",
+  },
+  user: {
+    myAccount: "Mijn account",
+    myProfile: "Mijn profiel",
+    companySettings: "Bedrijfsinstellingen",
+    signOut: "Uitloggen",
+    userId: "Gebruikers-ID",
+    rentalManagement: "Verhuurbeheer",
+  },
+  language: {
+    select: "Taal selecteren",
+    current: "Taal",
+  },
+};

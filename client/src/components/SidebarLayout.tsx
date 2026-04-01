@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 interface NavSection {
   label: string;
@@ -35,6 +37,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const [location, setLocation] = useLocation();
   const { data: user } = trpc.auth.me.useQuery();
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
+  const { t } = useTranslation();
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: () => {
       toast.success("Signed out successfully");
@@ -78,40 +81,40 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   const navSections: NavSection[] = [
     {
       label: "main",
-      displayLabel: "MAIN",
+      displayLabel: t("sections.main"),
       items: [
-        { href: "/dashboard", label: "Dashboard", icon: BarChart3 },
-        { href: "/profit-loss", label: "Profit & Loss", icon: DollarSign },
-        { href: "/analysis", label: "Analysis", icon: TrendingUp },
+        { href: "/dashboard", label: t("nav.dashboard"), icon: BarChart3 },
+        { href: "/profit-loss", label: t("nav.profitLoss"), icon: DollarSign },
+        { href: "/analysis", label: t("nav.analysis"), icon: TrendingUp },
       ],
     },
     {
       label: "management",
-      displayLabel: "MANAGEMENT",
+      displayLabel: t("sections.management"),
       items: [
-        { href: "/fleet-management", label: "Fleet", icon: Car },
-        { href: "/reservations", label: "Reservations", icon: CalendarDays },
-        { href: "/rental-contracts", label: "Contracts", icon: FileText },
-        { href: "/maintenance", label: "Maintenance", icon: Wrench },
-        { href: "/ai-maintenance", label: "AI Maintenance", icon: Sparkles },
+        { href: "/fleet-management", label: t("nav.fleet"), icon: Car },
+        { href: "/reservations", label: t("nav.reservations"), icon: CalendarDays },
+        { href: "/rental-contracts", label: t("nav.contracts"), icon: FileText },
+        { href: "/maintenance", label: t("nav.maintenance"), icon: Wrench },
+        { href: "/ai-maintenance", label: t("nav.aiMaintenance"), icon: Sparkles },
       ],
     },
     {
       label: "clients-invoices",
-      displayLabel: "CLIENTS & INVOICES",
+      displayLabel: t("sections.clientsInvoices"),
       items: [
-        { href: "/clients", label: "Clients", icon: Users },
-        { href: "/invoices", label: "Invoices", icon: Receipt },
+        { href: "/clients", label: t("nav.clients"), icon: Users },
+        { href: "/invoices", label: t("nav.invoices"), icon: Receipt },
       ],
     },
     ...(user?.role === "super_admin" ? [{
       label: "admin",
-      displayLabel: "ADMIN",
+      displayLabel: t("sections.admin"),
       items: [
-        { href: "/admin/analytics", label: "CEO Dashboard", icon: Crown },
-        { href: "/admin/numbering", label: "Numbering Management", icon: FileText },
-        { href: "/admin/user-management", label: "User Management", icon: Users },
-        { href: "/admin/audit-logs", label: "Audit Logs", icon: FileText },
+        { href: "/admin/analytics", label: t("nav.ceoDashboard"), icon: Crown },
+        { href: "/admin/numbering", label: t("nav.numberingManagement"), icon: FileText },
+        { href: "/admin/user-management", label: t("nav.userManagement"), icon: Users },
+        { href: "/admin/audit-logs", label: t("nav.auditLogs"), icon: FileText },
       ],
     }] : []),
   ];
@@ -241,6 +244,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
 
+        {/* Language Selector */}
+        <div className="px-3 pb-1">
+          <LanguageSelector isCollapsed={isCollapsed} />
+        </div>
+
         {/* User Profile */}
         {user && (
           <div className="p-4 border-t border-gray-200 bg-gray-50">
@@ -265,23 +273,23 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>{t("user.myAccount")}</DropdownMenuLabel>
                 <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                  User ID: {user.id}
+                  {t("user.userId")}: {user.id}
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setLocation("/my-profile")}>
                   <User className="h-4 w-4 mr-2" />
-                  My Profile
+                  {t("user.myProfile")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setLocation("/company-settings")}>
                   <Settings className="h-4 w-4 mr-2" />
-                  Company Settings
+                  {t("user.companySettings")}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                  {t("user.signOut")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

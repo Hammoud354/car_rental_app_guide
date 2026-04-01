@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Painel",
+    profitLoss: "Lucros e Perdas",
+    analysis: "Análise",
+    fleet: "Frota",
+    reservations: "Reservas",
+    contracts: "Contratos",
+    maintenance: "Manutenção",
+    aiMaintenance: "Manutenção IA",
+    clients: "Clientes",
+    invoices: "Faturas",
+    ceoDashboard: "Painel do CEO",
+    numberingManagement: "Gestão de numeração",
+    userManagement: "Gestão de utilizadores",
+    auditLogs: "Registos de auditoria",
+  },
+  sections: {
+    main: "PRINCIPAL",
+    management: "GESTÃO",
+    clientsInvoices: "CLIENTES E FATURAS",
+    admin: "ADMIN",
+  },
+  user: {
+    myAccount: "Minha conta",
+    myProfile: "Meu perfil",
+    companySettings: "Configurações da empresa",
+    signOut: "Sair",
+    userId: "ID de utilizador",
+    rentalManagement: "Gestão de aluguer",
+  },
+  language: {
+    select: "Selecionar idioma",
+    current: "Idioma",
+  },
+};

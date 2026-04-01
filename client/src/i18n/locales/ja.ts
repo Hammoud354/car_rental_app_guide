@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "ダッシュボード",
+    profitLoss: "損益",
+    analysis: "分析",
+    fleet: "車両管理",
+    reservations: "予約",
+    contracts: "契約",
+    maintenance: "メンテナンス",
+    aiMaintenance: "AIメンテナンス",
+    clients: "クライアント",
+    invoices: "請求書",
+    ceoDashboard: "CEOダッシュボード",
+    numberingManagement: "番号管理",
+    userManagement: "ユーザー管理",
+    auditLogs: "監査ログ",
+  },
+  sections: {
+    main: "メイン",
+    management: "管理",
+    clientsInvoices: "クライアントと請求書",
+    admin: "管理者",
+  },
+  user: {
+    myAccount: "マイアカウント",
+    myProfile: "マイプロフィール",
+    companySettings: "会社設定",
+    signOut: "サインアウト",
+    userId: "ユーザーID",
+    rentalManagement: "レンタル管理",
+  },
+  language: {
+    select: "言語を選択",
+    current: "言語",
+  },
+};

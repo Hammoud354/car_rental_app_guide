@@ -7,6 +7,7 @@ import superjson from "superjson";
 import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
+import "./i18n";
 import { UserFilterProvider } from "./contexts/UserFilterContext";
 
 const queryClient = new QueryClient();

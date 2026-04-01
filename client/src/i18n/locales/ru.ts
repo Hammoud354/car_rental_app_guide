@@ -1,0 +1,36 @@
+export default {
+  nav: {
+    dashboard: "Панель управления",
+    profitLoss: "Прибыль и убытки",
+    analysis: "Анализ",
+    fleet: "Автопарк",
+    reservations: "Бронирования",
+    contracts: "Контракты",
+    maintenance: "Техобслуживание",
+    aiMaintenance: "ИИ обслуживание",
+    clients: "Клиенты",
+    invoices: "Счета",
+    ceoDashboard: "Панель CEO",
+    numberingManagement: "Управление нумерацией",
+    userManagement: "Управление пользователями",
+    auditLogs: "Журналы аудита",
+  },
+  sections: {
+    main: "ГЛАВНАЯ",
+    management: "УПРАВЛЕНИЕ",
+    clientsInvoices: "КЛИЕНТЫ И СЧЕТА",
+    admin: "АДМИНИСТРАТОР",
+  },
+  user: {
+    myAccount: "Мой аккаунт",
+    myProfile: "Мой профиль",
+    companySettings: "Настройки компании",
+    signOut: "Выйти",
+    userId: "ID пользователя",
+    rentalManagement: "Управление арендой",
+  },
+  language: {
+    select: "Выбрать язык",
+    current: "Язык",
+  },
+};
