@@ -39,8 +39,10 @@ import { Redirect, Link } from "wouter";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function AdminUsers() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const utils = trpc.useUtils();
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
@@ -382,7 +384,7 @@ export default function AdminUsers() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            User Management
+            {t("admin.userManagement")}
           </CardTitle>
         </CardHeader>
         <CardContent>

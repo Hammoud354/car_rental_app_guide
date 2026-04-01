@@ -10,8 +10,10 @@ import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, Mess
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+import { useTranslation } from "react-i18next";
 
 export default function MaintenanceTracking() {
+  const { t } = useTranslation();
   const [selectedVehicle, setSelectedVehicle] = useState<number | null>(null);
   const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [nextMaintenanceDate, setNextMaintenanceDate] = useState<Date>();
@@ -83,7 +85,7 @@ export default function MaintenanceTracking() {
           <span className="hover:text-foreground cursor-pointer input-client">Overview</span>
         </Link>
         <ChevronRight className="h-4 w-4 input-client" />
-        <span className="text-foreground font-medium input-client">Maintenance Tracking</span>
+        <span className="text-foreground font-medium input-client">{t("maintenance.title")}</span>
       </div>
 
       <div className="mb-8 flex justify-between items-start input-client">

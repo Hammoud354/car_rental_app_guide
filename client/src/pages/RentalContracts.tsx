@@ -27,8 +27,10 @@ import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTe
 import { generateThumbnail } from "@/lib/thumbnailGenerator";
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
 import { exportContractsToCSV } from "@shared/csvExport";
+import { useTranslation } from "react-i18next";
 
 export default function RentalContracts() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
@@ -301,7 +303,7 @@ export default function RentalContracts() {
   
   const renewContract = trpc.contracts.renew.useMutation({
     onSuccess: () => {
-      toast.success("Contract renewed successfully");
+      toast.success(t("contracts.contractRenewed"));
       utils.contracts.list.invalidate(); // Refresh contract list
       setIsRenewDialogOpen(false);
       setIsDetailsDialogOpen(false);
@@ -516,7 +518,7 @@ export default function RentalContracts() {
           
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Rental Contracts</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t("contracts.title")}</h1>
               <p className="text-sm text-gray-500 mt-0.5">Manage rental agreements and client information</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
@@ -526,7 +528,7 @@ export default function RentalContracts() {
                 className="w-full sm:w-auto"
                 onClick={() => {
                   if (!contracts || contracts.length === 0) {
-                    toast.error("No contracts to export");
+                    toast.error(t("contracts.noContractsToExport"));
                     return;
                   }
                   exportContractsToCSV(contracts);
@@ -1683,7 +1685,7 @@ export default function RentalContracts() {
                 <Button 
                   onClick={() => {
                     if (!selectedContract) {
-                      toast.error("No contract selected");
+                      toast.error(t("contracts.noContractSelected"));
                       return;
                     }
                     const success = printElement("contract-content", `Contract ${selectedContract.contractNumber || selectedContract.id}`);
@@ -1700,7 +1702,7 @@ export default function RentalContracts() {
                 <Button 
                   onClick={async () => {
                     if (!selectedContract) {
-                      toast.error("No contract selected");
+                      toast.error(t("contracts.noContractSelected"));
                       return;
                     }
                     
@@ -1728,7 +1730,7 @@ export default function RentalContracts() {
                 {companyProfile && (
                   <Button
                     onClick={async () => {
-                      if (!selectedContract) { toast.error("No contract selected"); return; }
+                      if (!selectedContract) { toast.error(t("contracts.noContractSelected")); return; }
                       if (!companyProfile.contractTemplateUrl) {
                         toast.error("No template uploaded. Go to Company Settings → Contract Template to upload one.");
                         return;
@@ -1796,7 +1798,7 @@ export default function RentalContracts() {
                 <Button 
                   onClick={async () => {
                     if (!selectedContract) {
-                      toast.error("No contract selected");
+                      toast.error(t("contracts.noContractSelected"));
                       return;
                     }
                     
@@ -2438,7 +2440,7 @@ export default function RentalContracts() {
                   const ok = await exportContractTemplateToPDF(
                     `Contract_${postCompletionModal.contract?.contractNumber || postCompletionModal.contract?.id}.pdf`
                   );
-                  if (ok) toast.success("Contract PDF downloaded!");
+                  if (ok) toast.success(t("contracts.contractPdfDownloaded"));
                   else toast.error("Could not generate PDF.");
                 }}
               >

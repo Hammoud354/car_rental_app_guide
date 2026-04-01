@@ -14,8 +14,10 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function AuditLogs() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const [limit] = useState(100);
   const [offset] = useState(0);

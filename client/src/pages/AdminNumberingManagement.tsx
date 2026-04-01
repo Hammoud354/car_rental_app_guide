@@ -11,8 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, RefreshCw, Edit2, ChevronRight } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function AdminNumberingManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -93,12 +95,12 @@ export default function AdminNumberingManagement() {
           Dashboard
         </button>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-foreground font-medium">Numbering Management</span>
+        <span className="text-foreground font-medium">{t("admin.numberingManagement")}</span>
       </div>
 
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Numbering Management</h1>
+          <h1 className="text-3xl font-bold">{t("admin.numberingManagement")}</h1>
           <p className="text-muted-foreground mt-2">Manage contract and invoice numbering for all users</p>
         </div>
         <Button onClick={() => refetchUsers()} disabled={isLoadingUsers} variant="outline">

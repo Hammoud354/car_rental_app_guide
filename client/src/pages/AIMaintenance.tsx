@@ -11,8 +11,10 @@ import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCi
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTranslation } from "react-i18next";
 
 export default function AIMaintenance() {
+  const { t } = useTranslation();
   const utils = trpc.useUtils();
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -235,10 +237,10 @@ export default function AIMaintenance() {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-blue-600" />
-              AI Maintenance
+              {t("aiMaintenance.title")}
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Intelligent maintenance scheduling with priority classification
+              {t("aiMaintenance.subtitle")}
             </p>
           </div>
         </div>

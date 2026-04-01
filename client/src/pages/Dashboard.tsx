@@ -18,6 +18,7 @@ import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { generateExcelBuffer, downloadExcel } from "@/lib/excelUtils";
+import { useTranslation } from "react-i18next";
 
 function ExportToExcelButton() {
   const [isExporting, setIsExporting] = useState(false);
@@ -525,6 +526,7 @@ function ExpiringDocumentsCardWithModal() {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   
   const [widgetVisibility, setWidgetVisibility] = useState({
@@ -588,7 +590,7 @@ export default function Dashboard() {
   const actualRevenue = contractStats?.totalRevenue || 0;
   const revenueThisMonth = contractStats?.revenueThisMonth || 0;
 
-  const available = vehicles?.filter(v => v.status === "Available").length || 0;
+  const available = vehicles?.filter(v => v.status === "t('status.available')").length || 0;
   const rented = vehicles?.filter(v => v.status === "Rented").length || 0;
   const maintenance = vehicles?.filter(v => v.status === "Maintenance").length || 0;
 
@@ -605,7 +607,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("nav.dashboard")}</h1>
           <p className="text-sm text-gray-500 mt-0.5">Welcome back{user?.name ? `, ${user.name}` : ''}. Here's your fleet overview.</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -759,7 +761,7 @@ export default function Dashboard() {
                 <div className="flex gap-5">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
-                    <span className="text-xs text-gray-600">Available ({available})</span>
+                    <span className="text-xs text-gray-600">t('status.available') ({available})</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>

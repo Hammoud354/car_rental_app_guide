@@ -12,6 +12,7 @@ import {
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 function StatCard({ title, value, subtitle, icon: Icon, color, trend }: {
   title: string; value: string | number; subtitle?: string;
@@ -57,6 +58,7 @@ function ProgressBar({ label, value, max, color }: { label: string; value: numbe
 }
 
 export default function AdminAnalytics() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const { data: analytics, isLoading } = trpc.admin.getPlatformAnalytics.useQuery(undefined, {
     enabled: user?.role === "super_admin",

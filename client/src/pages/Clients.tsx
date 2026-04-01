@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { WORLD_NATIONALITIES } from "@shared/nationalities";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
 import { exportClientsToCSV } from "@shared/csvExport";
+import { useTranslation } from "react-i18next";
 
 // Helper function to check license expiry status
 const getLicenseExpiryStatus = (expiryDate: Date | string) => {
@@ -35,6 +36,7 @@ const getLicenseExpiryStatus = (expiryDate: Date | string) => {
 };
 
 export default function Clients() {
+  const { t } = useTranslation();
   const utils = trpc.useUtils();
   const { user } = useAuth();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
@@ -77,7 +79,7 @@ export default function Clients() {
   
   const createClient = trpc.clients.create.useMutation({
     onSuccess: () => {
-      toast.success("Client added successfully");
+      toast.success(t("clients.clientAdded"));
       utils.clients.list.invalidate();
       setIsCreateDialogOpen(false);
       setCreateLicenseIssueDate(undefined);
@@ -92,7 +94,7 @@ export default function Clients() {
 
   const updateClient = trpc.clients.update.useMutation({
     onSuccess: async () => {
-      toast.success("Client updated successfully");
+      toast.success(t("clients.clientUpdated"));
       // Invalidate both the list and individual client queries
       await utils.clients.list.invalidate();
       await utils.clients.getById.invalidate();
@@ -110,7 +112,7 @@ export default function Clients() {
 
   const deleteClient = trpc.clients.delete.useMutation({
     onSuccess: () => {
-      toast.success("Client deleted successfully");
+      toast.success(t("clients.clientDeleted"));
       utils.clients.list.invalidate();
       setSelectedClient(null);
     },
@@ -138,11 +140,11 @@ export default function Clients() {
     
     // Validate required fields
     if (!firstName) {
-      toast.error("First name is required");
+      toast.error(t("clients.firstNameRequired"));
       return;
     }
     if (!lastName) {
-      toast.error("Last name is required");
+      toast.error(t("clients.lastNameRequired"));
       return;
     }
     if (!fatherName) {
@@ -230,11 +232,11 @@ export default function Clients() {
     
     // Validate required fields
     if (!firstName) {
-      toast.error("First name is required");
+      toast.error(t("clients.firstNameRequired"));
       return;
     }
     if (!lastName) {
-      toast.error("Last name is required");
+      toast.error(t("clients.lastNameRequired"));
       return;
     }
     if (!fatherName) {
@@ -287,8 +289,8 @@ export default function Clients() {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Clients</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Manage your rental clients and their information</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t("clients.title")}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t("clients.subtitle")}</p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
@@ -593,7 +595,7 @@ export default function Clients() {
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Edit Client</DialogTitle>
+              <DialogTitle>{t("clients.editClient")}</DialogTitle>
               <DialogDescription>
                 Update the client's information
               </DialogDescription>

@@ -5,8 +5,10 @@ import { trpc } from "@/lib/trpc";
 import { ChevronLeft, ChevronRight, Calendar, Car, User, Phone, AlertTriangle, Clock, X } from "lucide-react";
 import React, { useState } from "react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function Reservations() {
+  const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isDateDialogOpen, setIsDateDialogOpen] = useState(false);
@@ -100,7 +102,7 @@ export default function Reservations() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reservations Calendar</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("reservations.title")}</h1>
             <p className="text-sm text-gray-500 mt-0.5">
               View upcoming rental reservations and vehicle availability
             </p>
@@ -266,7 +268,7 @@ export default function Reservations() {
             <div className="space-y-4">
               {getReservationsForDay(selectedDate.getDate()).length > 0 ? (
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-lg text-gray-900">Reservations for this day</h3>
+                  <h3 className="font-semibold text-lg text-gray-900">{t("reservations.title")}</h3>
                   {getReservationsForDay(selectedDate.getDate()).map((reservation) => {
                     const startDate = new Date(reservation.rentalStartDate);
                     const endDate = new Date(reservation.rentalEndDate);

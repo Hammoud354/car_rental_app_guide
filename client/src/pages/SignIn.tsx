@@ -8,8 +8,10 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Loader2, Eye, EyeOff, ArrowRight, Clock } from "lucide-react";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function SignIn() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     username: "",
@@ -84,13 +86,13 @@ export default function SignIn() {
           </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Welcome back</h1>
+            <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">{t("auth.welcomeBack")}</h1>
             <p className="text-sm text-gray-500 mt-1">Sign in to your account to continue</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <Label htmlFor="username" className="text-sm font-medium text-gray-700">Username</Label>
+              <Label htmlFor="username" className="text-sm font-medium text-gray-700">{t("auth.username")}</Label>
               <Input
                 id="username"
                 type="text"
@@ -104,7 +106,7 @@ export default function SignIn() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">{t("auth.password")}</Label>
                 <button
                   type="button"
                   onClick={() => setLocation("/forgot-password")}

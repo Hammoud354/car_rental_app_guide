@@ -24,8 +24,10 @@ import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useTranslation } from "react-i18next";
 
 export default function Invoices() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const utils = trpc.useUtils();
@@ -48,7 +50,7 @@ export default function Invoices() {
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
 
   const handleWhatsAppPdf = async () => {
-    if (!invoiceDetails) { toast.error("No invoice selected"); return; }
+    if (!invoiceDetails) { toast.error(t("invoices.noInvoiceSelected")); return; }
     if (!companyProfile?.phone) { toast.error("Company phone number not set in settings"); return; }
     if (isSendingWhatsApp) return;
 
@@ -201,13 +203,13 @@ export default function Invoices() {
 
   const handleExportPDF = async () => {
     try {
-      toast.info("Generating PDF...");
+      toast.info(t("invoices.generatingPdf"));
       const success = await exportElementToPDF(
         "invoice-content",
         `${invoiceDetails?.invoiceNumber || "invoice"}.pdf`
       );
       if (success) {
-        toast.success("PDF exported successfully");
+        toast.success(t("invoices.pdfExported"));
       } else {
         toast.error("Could not find invoice content to export");
       }
@@ -234,7 +236,7 @@ export default function Invoices() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Invoices</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("invoices.title")}</h1>
             <p className="text-sm text-gray-500 mt-0.5">Manage billing and payments</p>
           </div>
         </div>

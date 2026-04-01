@@ -13,8 +13,10 @@ import { countries } from "@/lib/countries";
 import { getCurrencyCodeForCountry } from "@/lib/countryCurrencyMap";
 import { getVATRateByCountry, getExchangeRateByCountry } from "@/lib/vatRates";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function CompanySettings() {
+  const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { data: profile, isLoading, refetch } = trpc.company.getProfile.useQuery();
@@ -208,7 +210,7 @@ export default function CompanySettings() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Company Settings</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t("companySettings.title")}</h1>
           <p className="text-sm text-gray-500 mt-0.5">
             Configure your company branding and information for contracts and documents
           </p>

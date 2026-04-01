@@ -10,6 +10,7 @@ import { Plus, Wrench, MapPin, Gauge, DollarSign, Car, Edit, Trash2, CheckCircle
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+import { useTranslation } from "react-i18next";
 
 const MAINTENANCE_TYPES = ["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"] as const;
 
@@ -33,6 +34,7 @@ function getStatusStyle(status: string) {
 }
 
 export default function Maintenance() {
+  const { t } = useTranslation();
   const utils = trpc.useUtils();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
@@ -188,7 +190,7 @@ export default function Maintenance() {
     const formData = new FormData(e.currentTarget);
     
     if (!selectedVehicleId) {
-      toast.error("Please select a vehicle");
+      toast.error(t("maintenance.selectVehicleError"));
       return;
     }
     if (!performedAtDate) {
@@ -224,8 +226,8 @@ export default function Maintenance() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Maintenance</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Track and manage vehicle service records</p>
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t("nav.maintenance")}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t("maintenance.subtitle")}</p>
           </div>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
@@ -687,7 +689,7 @@ export default function Maintenance() {
                 ) : (
                   <div className="text-center py-12">
                     <Wrench className="h-10 w-10 mx-auto text-gray-300 mb-3" />
-                    <p className="text-sm font-medium text-gray-500">No maintenance records yet</p>
+                    <p className="text-sm font-medium text-gray-500">{t("maintenance.noRecordsYet")}</p>
                     <p className="text-xs text-gray-400 mt-1">Add a record using the button above</p>
                   </div>
                 )}

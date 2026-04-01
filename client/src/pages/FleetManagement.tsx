@@ -23,8 +23,10 @@ import { SearchableSelect } from "@/components/SearchableSelect";
 import { BulkImportDialog } from "@/components/BulkImportDialog";
 import { exportVehiclesToCSV } from "@shared/csvExport";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+import { useTranslation } from "react-i18next";
 
 export default function FleetManagement() {
+  const { t } = useTranslation();
   const utils = trpc.useUtils();
   const { user } = useAuth();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
@@ -160,7 +162,7 @@ export default function FleetManagement() {
   });
   const createMutation = trpc.fleet.create.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle added successfully");
+      toast.success(t("fleet.vehicleAdded"));
       utils.fleet.list.invalidate();
       setIsAddDialogOpen(false);
     },
@@ -182,7 +184,7 @@ export default function FleetManagement() {
 
   const updateMutation = trpc.fleet.update.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle updated successfully");
+      toast.success(t("fleet.vehicleUpdated"));
       utils.fleet.list.invalidate();
       setIsEditDialogOpen(false);
     },
@@ -193,7 +195,7 @@ export default function FleetManagement() {
 
   const deleteMutation = trpc.fleet.delete.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle deleted successfully");
+      toast.success(t("fleet.vehicleDeleted"));
       utils.fleet.list.invalidate();
     },
     onError: (error) => {
@@ -203,7 +205,7 @@ export default function FleetManagement() {
   
   const createCustomMakerMutation = trpc.carMakers.createCustomMaker.useMutation({
     onSuccess: (newMaker) => {
-      toast.success("Custom maker added successfully");
+      toast.success(t("fleet.customMakerAdded"));
       setIsCustomMakerDialogOpen(false);
       setCustomMakerName("");
       setSelectedMakerId(newMaker.id);
@@ -216,7 +218,7 @@ export default function FleetManagement() {
   
   const createCustomModelMutation = trpc.carMakers.createCustomModel.useMutation({
     onSuccess: (newModel) => {
-      toast.success("Custom model added successfully");
+      toast.success(t("fleet.customModelAdded"));
       setIsCustomModelDialogOpen(false);
       setCustomModelName("");
       setSelectedModelId(newModel.id);
@@ -246,7 +248,7 @@ export default function FleetManagement() {
     const selectedModel = carModels?.find(m => m.id === selectedModelId);
     
     if (!selectedMaker || !selectedModel) {
-      toast.error("Please select both car maker and model");
+      toast.error(t("fleet.selectMakerAndModel"));
       return;
     }
     
@@ -299,7 +301,7 @@ export default function FleetManagement() {
     const selectedModel = editCarModels?.find(m => m.id === editSelectedModelId);
     
     if (!selectedMaker || !selectedModel) {
-      toast.error("Please select both car maker and model");
+      toast.error(t("fleet.selectMakerAndModel"));
       return;
     }
     
@@ -338,17 +340,17 @@ export default function FleetManagement() {
 
   const sendToMaintenanceMutation = trpc.fleet.sendToMaintenance.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      toast.success(t("fleet.sendToMaintenance"));
       utils.fleet.list.invalidate();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send vehicle to maintenance");
+      toast.error(error.message || t("fleet.failedSendMaintenance"));
     },
   });
 
   const removeFromMaintenanceMutation = trpc.fleet.removeFromMaintenance.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle marked as Available");
+      toast.success(t("fleet.vehicleMarkedAvailable"));
       utils.fleet.list.invalidate();
     },
     onError: (error: any) => {
@@ -358,7 +360,7 @@ export default function FleetManagement() {
 
   const addMaintenanceRecordMutation = trpc.fleet.addMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      toast.success(t("fleet.sendToMaintenance"));
       utils.fleet.list.invalidate();
       setIsMaintenanceDialogOpen(false);
       setMaintenanceVehicle(null);
@@ -367,7 +369,7 @@ export default function FleetManagement() {
       setMaintenanceExitDate(undefined);
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send vehicle to maintenance");
+      toast.error(error.message || t("fleet.failedSendMaintenance"));
     },
   });
 
@@ -436,7 +438,7 @@ export default function FleetManagement() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Wrench className="h-5 w-5 text-orange-500" />
-              Send to Maintenance
+              {t("fleet.sendToMaintenance")}
             </DialogTitle>
             <DialogDescription>
               {maintenanceVehicle && (
@@ -461,7 +463,7 @@ export default function FleetManagement() {
             </div>
 
             <div>
-              <Label htmlFor="maint-type">Maintenance Type *</Label>
+              <Label htmlFor="maint-type">{t("fleet.maintenanceType")} *</Label>
               <Select
                 value={maintenanceForm.type}
                 onValueChange={(val) => setMaintenanceForm(f => ({ ...f, type: val }))}
@@ -555,7 +557,7 @@ export default function FleetManagement() {
                 });
               }}
             >
-              {addMaintenanceRecordMutation.isPending ? "Sending..." : "Confirm & Send to Garage"}
+              {addMaintenanceRecordMutation.isPending ? t("common.sending") : t("fleet.confirmSendToGarage")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -574,22 +576,22 @@ export default function FleetManagement() {
               size="sm"
               disabled={populateMakersMutation.isPending}
             >
-              {populateMakersMutation.isPending ? "Populating..." : "Populate Car Makers"}
+              {populateMakersMutation.isPending ? t("common.loading") : t("fleet.populateCarMakers")}
             </Button>
           </div>
         ) : null}
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Fleet Management</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Manage your vehicle inventory and track maintenance</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t("fleet.title")}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t("fleet.subtitle")}</p>
           </div>
           
           <div className="flex items-center gap-2 flex-wrap">
             <Link href="/maintenance">
               <Button variant="outline" size="sm">
                 <Wrench className="mr-1.5 h-3.5 w-3.5" />
-                Maintenance
+                {t("nav.maintenance")}
               </Button>
             </Link>
             <BulkImportDialog
@@ -626,7 +628,7 @@ export default function FleetManagement() {
                 if (vehicles && vehicles.length > 0) {
                   exportVehiclesToCSV(vehicles);
                 } else {
-                  toast.error("No vehicles to export");
+                  toast.error(t("fleet.noVehiclesToExport"));
                 }
               }}
             >
@@ -670,7 +672,7 @@ export default function FleetManagement() {
                   }}
                 >
                   <Plus className="mr-1.5 h-3.5 w-3.5" />
-                  Add Vehicle
+                  {t("fleet.addVehicle")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
@@ -1062,7 +1064,7 @@ export default function FleetManagement() {
                     Cancel
                   </Button>
                   <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
-                    {createMutation.isPending ? "Adding..." : "Add Vehicle"}
+                    {createMutation.isPending ? t("common.loading") : t("fleet.addVehicle")}
                   </Button>
                 </DialogFooter>
               </form>
@@ -1076,7 +1078,7 @@ export default function FleetManagement() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
             type="text"
-            placeholder="Search by plate number or model..."
+            placeholder={t("fleet.searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 pr-10"
@@ -1159,7 +1161,7 @@ export default function FleetManagement() {
                           setMaintenanceEntryDate(new Date());
                           setIsMaintenanceDialogOpen(true);
                         }}
-                        title="Send to Maintenance"
+                        title={t("fleet.sendToMaintenance")}
                       >
                         <Wrench className="h-3 w-3" />
                       </Button>
@@ -1174,7 +1176,7 @@ export default function FleetManagement() {
                           }
                         }}
                         disabled={removeFromMaintenanceMutation.isPending}
-                        title="Remove from Maintenance"
+                        title={t("common.manage")}
                       >
                         <Wrench className="h-3 w-3" />
                       </Button>
@@ -1197,7 +1199,7 @@ export default function FleetManagement() {
           <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
             <Search className="h-10 w-10 mx-auto text-gray-300 mb-3" />
             <h3 className="text-base font-semibold text-gray-700 mb-1">No Results Found</h3>
-            <p className="text-sm text-gray-400 mb-4">No vehicles match "{searchQuery}"</p>
+            <p className="text-sm text-gray-400 mb-4">t("fleet.noVehicles") + " \"{searchQuery}"</p>
             <Button onClick={() => setSearchQuery("")} variant="outline" size="sm">
               Clear Search
             </Button>
@@ -1469,7 +1471,7 @@ export default function FleetManagement() {
                     Cancel
                   </Button>
                   <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
-                    {updateMutation.isPending ? "Updating..." : "Update Vehicle"}
+                    {updateMutation.isPending ? t("common.loading") : t("fleet.updateVehicle")}
                   </Button>
                 </DialogFooter>
               </form>
@@ -1488,7 +1490,7 @@ export default function FleetManagement() {
           <form onSubmit={(e) => {
             e.preventDefault();
             if (!customMakerName.trim()) {
-              toast.error("Please enter a maker name");
+              toast.error(t("fleet.enterMakerName"));
               return;
             }
             createCustomMakerMutation.mutate({
@@ -1514,7 +1516,7 @@ export default function FleetManagement() {
                 Cancel
               </Button>
               <Button type="submit" disabled={createCustomMakerMutation.isPending}>
-                {createCustomMakerMutation.isPending ? "Adding..." : "Add Maker"}
+                {createCustomMakerMutation.isPending ? t("common.loading") : t("fleet.addMaker")}
               </Button>
             </DialogFooter>
           </form>
@@ -1531,11 +1533,11 @@ export default function FleetManagement() {
           <form onSubmit={(e) => {
             e.preventDefault();
             if (!customModelName.trim()) {
-              toast.error("Please enter a model name");
+              toast.error(t("fleet.enterModelName"));
               return;
             }
             if (!customModelMakerId) {
-              toast.error("Please select a maker first");
+              toast.error(t("fleet.selectMakerFirst"));
               return;
             }
             createCustomModelMutation.mutate({
@@ -1580,7 +1582,7 @@ export default function FleetManagement() {
                 Cancel
               </Button>
               <Button type="submit" disabled={createCustomModelMutation.isPending}>
-                {createCustomModelMutation.isPending ? "Adding..." : "Add Model"}
+                {createCustomModelMutation.isPending ? t("common.loading") : t("fleet.addModel")}
               </Button>
             </DialogFooter>
           </form>

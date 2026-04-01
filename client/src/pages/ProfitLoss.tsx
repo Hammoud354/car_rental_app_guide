@@ -19,8 +19,10 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+import { useTranslation } from "react-i18next";
 
 export default function ProfitLoss() {
+  const { t } = useTranslation();
   const [dateRange, setDateRange] = useState<{
     startDate: string;
     endDate: string;
@@ -254,10 +256,10 @@ export default function ProfitLoss() {
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
           <DollarSign className="h-6 w-6 sm:h-8 sm:w-8" />
-          Profit & Loss Statement
+          {t("profitLoss.title")}
         </h1>
         <p className="text-gray-600 mt-1 text-sm">
-          Comprehensive financial overview of your car rental business
+          {t("profitLoss.subtitle")}
         </p>
       </div>
 
@@ -390,8 +392,8 @@ export default function ProfitLoss() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Month</TableHead>
-                  <TableHead className="text-right">Revenue</TableHead>
-                  <TableHead className="text-right">Expenses</TableHead>
+                  <TableHead className="text-right">{t("profitLoss.revenue")}</TableHead>
+                  <TableHead className="text-right">{t("profitLoss.expenses")}</TableHead>
                   <TableHead className="text-right">Net</TableHead>
                 </TableRow>
               </TableHeader>
@@ -429,9 +431,9 @@ export default function ProfitLoss() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Vehicle</TableHead>
-                  <TableHead className="text-right">Revenue</TableHead>
-                  <TableHead className="text-right">Expenses</TableHead>
-                  <TableHead className="text-right">Net Profit</TableHead>
+                  <TableHead className="text-right">{t("profitLoss.revenue")}</TableHead>
+                  <TableHead className="text-right">{t("profitLoss.expenses")}</TableHead>
+                  <TableHead className="text-right">{t("profitLoss.netProfit")}</TableHead>
                   <TableHead className="text-right">ROI</TableHead>
                   <TableHead className="text-right">Contracts</TableHead>
                 </TableRow>

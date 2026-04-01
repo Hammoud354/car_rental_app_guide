@@ -9,6 +9,7 @@ import { TrendingUp, TrendingDown, DollarSign, Percent, ChevronRight, Home } fro
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 
 interface DetailedBreakdown {
   type: "revenue" | "expenses" | "profit";
@@ -24,6 +25,7 @@ interface MonthlyDetail {
 }
 
 export default function ProfitAndLoss() {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState<Date | undefined>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date | undefined>(endOfMonth(new Date()));
   const [selectedBreakdown, setSelectedBreakdown] = useState<DetailedBreakdown | null>(null);
@@ -116,7 +118,7 @@ export default function ProfitAndLoss() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Profit & Loss</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t("profitLoss.title")}</h1>
             <p className="text-sm text-gray-500 mt-0.5">Track revenue, expenses, and profitability</p>
           </div>
           <div className="flex gap-4">

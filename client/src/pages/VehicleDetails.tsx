@@ -14,8 +14,10 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
+import { useTranslation } from "react-i18next";
 
 export default function VehicleDetails() {
+  const { t } = useTranslation();
   const params = useParams();
   const [, setLocation] = useLocation();
   const vehicleId = parseInt(params.id || "0");

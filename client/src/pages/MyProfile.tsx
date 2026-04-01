@@ -9,8 +9,10 @@ import { toast } from "sonner";
 import { User, Mail, Phone, Globe, Lock, Save, Shield, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { countries } from "@shared/countries";
+import { useTranslation } from "react-i18next";
 
 export default function MyProfile() {
+  const { t } = useTranslation();
   const utils = trpc.useUtils();
   const { data: profile, isLoading } = trpc.auth.getMyProfile.useQuery();
 
@@ -34,7 +36,7 @@ export default function MyProfile() {
 
   const updateProfile = trpc.auth.updateMyProfile.useMutation({
     onSuccess: () => {
-      toast.success("Profile updated successfully");
+      toast.success(t("profile.profileUpdated"));
       utils.auth.getMyProfile.invalidate();
       utils.auth.me.invalidate();
     },
@@ -45,7 +47,7 @@ export default function MyProfile() {
 
   const changePassword = trpc.auth.changePassword.useMutation({
     onSuccess: () => {
-      toast.success("Password changed successfully");
+      toast.success(t("profile.passwordChanged"));
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -57,7 +59,7 @@ export default function MyProfile() {
 
   const handleUpdateProfile = () => {
     if (!name.trim()) {
-      toast.error("Name is required");
+      toast.error(t("profile.nameRequired"));
       return;
     }
     if (!email.trim()) {
@@ -77,7 +79,7 @@ export default function MyProfile() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error(t("profile.passwordsNoMatch"));
       return;
     }
     changePassword.mutate({ currentPassword, newPassword });
@@ -106,7 +108,7 @@ export default function MyProfile() {
   return (
     <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("profile.title")}</h1>
         <p className="text-sm text-gray-500 mt-0.5">Manage your account information and security</p>
       </div>
 
