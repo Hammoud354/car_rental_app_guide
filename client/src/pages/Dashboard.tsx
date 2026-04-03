@@ -478,6 +478,7 @@ function MaintenanceAlertsWidget() {
 }
 
 function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: number }) {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -487,13 +488,13 @@ function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: numb
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">In Maintenance</span>
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.maintenanceVehicles")}</span>
           <div className="p-2 bg-red-50 rounded-lg">
             <Wrench className="h-4 w-4 text-red-500" />
           </div>
         </div>
         <div className="text-3xl font-bold text-gray-900">{maintenanceCount}</div>
-        <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+        <p className="text-xs text-gray-400 mt-1">{t("dashboard.clickToViewDetails")}</p>
       </div>
       <MaintenanceModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
@@ -501,6 +502,7 @@ function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: numb
 }
 
 function ExpiringDocumentsCardWithModal() {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: expiringDocuments } = trpc.dashboard.getExpiringDocuments.useQuery();
   const count = expiringDocuments?.length ?? 0;
@@ -512,13 +514,13 @@ function ExpiringDocumentsCardWithModal() {
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Expiring Docs</span>
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.expiringDocs")}</span>
           <div className="p-2 bg-amber-50 rounded-lg">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
           </div>
         </div>
         <div className="text-3xl font-bold text-gray-900">{count}</div>
-        <p className="text-xs text-gray-400 mt-1">Click to view details</p>
+        <p className="text-xs text-gray-400 mt-1">{t("dashboard.clickToViewDetails")}</p>
       </div>
       <ExpiringDocumentsModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
     </>
@@ -693,26 +695,26 @@ export default function Dashboard() {
         {widgetVisibility.totalFleet && (
           <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Fleet</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.totalFleet")}</span>
               <div className="p-2 bg-blue-50 rounded-lg">
                 <Car className="h-4 w-4 text-blue-500" />
               </div>
             </div>
             <div className="text-3xl font-bold text-gray-900">{totalFleet}</div>
-            <p className="text-xs text-gray-400 mt-1">{available} available</p>
+            <p className="text-xs text-gray-400 mt-1">{available} {t("dashboard.availableCount")}</p>
           </div>
         )}
 
         {widgetVisibility.totalRevenue && (
           <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Revenue</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.totalRevenue")}</span>
               <div className="p-2 bg-emerald-50 rounded-lg">
                 <DollarSign className="h-4 w-4 text-emerald-500" />
               </div>
             </div>
             <div className="text-3xl font-bold text-gray-900">${actualRevenue.toFixed(2)}</div>
-            <p className="text-xs text-gray-400 mt-1">This month: ${revenueThisMonth.toFixed(2)}</p>
+            <p className="text-xs text-gray-400 mt-1">{t("dashboard.thisMonth")}: ${revenueThisMonth.toFixed(2)}</p>
           </div>
         )}
 
@@ -729,8 +731,8 @@ export default function Dashboard() {
         {widgetVisibility.fleetStatus && (
           <Card className="shadow-none border border-gray-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold text-gray-900">Fleet Status</CardTitle>
-              <p className="text-xs text-gray-500">Current availability of vehicles</p>
+              <CardTitle className="text-base font-semibold text-gray-900">{t("dashboard.fleetStatus")}</CardTitle>
+              <p className="text-xs text-gray-500">{t("dashboard.fleetStatusSubtitle")}</p>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center space-y-5">
@@ -754,22 +756,22 @@ export default function Dashboard() {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                       <span className="text-2xl font-bold text-gray-900">{totalFleet}</span>
-                      <span className="block text-[10px] text-gray-500">Total</span>
+                      <span className="block text-[10px] text-gray-500">{t("dashboard.total")}</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex gap-5">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
-                    <span className="text-xs text-gray-600">t('status.available') ({available})</span>
+                    <span className="text-xs text-gray-600">{t("dashboard.availableVehicles")} ({available})</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-blue-500 rounded-full"></div>
-                    <span className="text-xs text-gray-600">Rented ({rented})</span>
+                    <span className="text-xs text-gray-600">{t("dashboard.rented")} ({rented})</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
-                    <span className="text-xs text-gray-600">Maintenance ({maintenance})</span>
+                    <span className="text-xs text-gray-600">{t("dashboard.maintenanceVehicles")} ({maintenance})</span>
                   </div>
                 </div>
               </div>
@@ -780,8 +782,8 @@ export default function Dashboard() {
         {widgetVisibility.fleetComposition && (
           <Card className="shadow-none border border-gray-200">
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold text-gray-900">Fleet Composition</CardTitle>
-              <p className="text-xs text-gray-500">Distribution by vehicle category</p>
+              <CardTitle className="text-base font-semibold text-gray-900">{t("dashboard.fleetComposition")}</CardTitle>
+              <p className="text-xs text-gray-500">{t("dashboard.fleetCompositionSubtitle")}</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -802,9 +804,9 @@ export default function Dashboard() {
                 {Object.keys(categories).length === 0 && (
                   <div className="text-center py-8">
                     <Car className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm text-gray-400">No vehicles in fleet yet</p>
+                    <p className="text-sm text-gray-400">{t("dashboard.noVehicles")}</p>
                     <Link href="/fleet-management">
-                      <Button variant="outline" size="sm" className="mt-3">Add Your First Vehicle</Button>
+                      <Button variant="outline" size="sm" className="mt-3">{t("fleet.addVehicle")}</Button>
                     </Link>
                   </div>
                 )}

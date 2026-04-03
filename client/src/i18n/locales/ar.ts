@@ -203,7 +203,7 @@ export default {
     maintenanceAlerts: "تنبيهات الصيانة", fleetOverview: "نظرة عامة على الأسطول",
     noExpiringDocuments: "لا توجد مستندات منتهية الصلاحية", noAlerts: "لا توجد تنبيهات",
     viewAllContracts: "عرض جميع العقود", viewAllMaintenance: "عرض جميع الصيانة",
-    kmAlert: "كم متبقية حتى الخدمة", daysUntilExpiry: "أيام حتى الانتهاء", expired: "منتهي", expiresToday: "ينتهي اليوم",
+    kmAlert: "كم متبقية حتى الخدمة", daysUntilExpiry: "أيام حتى الانتهاء", expired: "منتهي", expiresToday: "ينتهي اليوم", totalFleet: "الأسطول الكامل", expiringDocs: "وثائق منتهية", clickToViewDetails: "انقر لعرض التفاصيل", thisMonth: "هذا الشهر", fleetStatus: "حالة الأسطول", fleetStatusSubtitle: "توافر المركبات الحالي", fleetComposition: "تكوين الأسطول", fleetCompositionSubtitle: "التوزيع حسب فئة المركبة", rented: "مؤجرة", total: "المجموع", availableCount: "متاح", noVehicles: "لا توجد مركبات بعد",
   },
   companySettings: {
     title: "إعدادات الشركة", companyInfo: "معلومات الشركة", companyLogo: "شعار الشركة",
@@ -250,4 +250,13 @@ export default {
     paid: "مدفوع", unpaid: "غير مدفوع", partial: "جزئي", overdue: "متأخر",
   },
   notFound: { title: "الصفحة غير موجودة", subtitle: "الصفحة التي تبحث عنها غير موجودة.", goHome: "الذهاب للوحة التحكم" },
+
+  subscription: {
+    yourSubscription: "اشتراكك", vehicles: "المركبات", clients: "العملاء",
+    includedFeatures: "الميزات المضمنة", changePlan: "تغيير الخطة", unlimited: "غير محدود",
+    of: "من", loading: "جارٍ تحميل الاشتراك...", noActiveSubscription: "لا يوجد اشتراك نشط",
+    noSubscriptionText: "اختر خطة اشتراك لفتح جميع الميزات وإدارة أسطولك.",
+    choosePlan: "اختر خطة", subscriptionError: "خطأ في الاشتراك",
+    subscriptionErrorText: "تعذر تحميل تفاصيل الاشتراك. يرجى تحديث الصفحة.", refreshPage: "تحديث الصفحة",
+  },
 };
