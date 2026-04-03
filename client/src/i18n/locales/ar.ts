@@ -62,7 +62,7 @@ export default {
   },
   clients: {
     title: "العملاء", subtitle: "إدارة قاعدة بيانات العملاء",
-    addClient: "إضافة عميل", editClient: "تعديل العميل", updateClient: "تحديث العميل", deleteClient: "حذف العميل",
+    addClient: "إضافة عميل", editClient: "تعديل العميل", clientDetails: "تفاصيل العميل", updateClient: "تحديث العميل", deleteClient: "حذف العميل",
     searchPlaceholder: "البحث بالاسم أو الهاتف أو رقم الرخصة...", firstName: "الاسم الأول",
     lastName: "اسم العائلة", fathersName: "اسم الأب", mothersFullName: "اسم الأم الكامل",
     dateOfBirth: "تاريخ الميلاد", placeOfBirth: "مكان الميلاد", nationality: "الجنسية",
@@ -75,7 +75,7 @@ export default {
     firstNameRequired: "الاسم الأول مطلوب", lastNameRequired: "اسم العائلة مطلوب",
     fatherNameRequired: "اسم الأب مطلوب", motherNameRequired: "اسم الأم الكامل مطلوب",
     licenseRequired: "رقم رخصة القيادة مطلوب", licenseIssueDateRequired: "تاريخ إصدار الرخصة مطلوب",
-    licenseExpiryDateRequired: "تاريخ انتهاء الرخصة مطلوب", searchNationality: "البحث عن الجنسية...",
+    licenseExpiryDateRequired: "تاريخ انتهاء الرخصة مطلوب", licenseExpired: "انتهت صلاحية الرخصة", licenseExpiringSoon: "تنتهي الصلاحية قريباً", searchNationality: "البحث عن الجنسية...",
     selectNationality: "اختر الجنسية...", selectDate: "اختر تاريخاً", issueDate: "تاريخ الإصدار",
     expiryDate: "تاريخ الانتهاء", selectUser: "يرجى اختيار مستخدم محدد لإنشاء هذا العميل له",
   },

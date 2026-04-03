@@ -1114,19 +1114,19 @@ export default function FleetManagement() {
                   </div>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-4">
                     <div>
-                      <span className="text-xs text-gray-400">Category</span>
+                      <span className="text-xs text-gray-400">{t("common.category")}</span>
                       <p className="font-medium text-gray-700">{vehicle.category}</p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400">Color</span>
+                      <span className="text-xs text-gray-400">{t("common.color")}</span>
                       <p className="font-medium text-gray-700">{vehicle.color}</p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400">Daily Rate</span>
+                      <span className="text-xs text-gray-400">{t("fleet.dailyRate")}</span>
                       <p className="font-medium text-gray-700">${vehicle.dailyRate}</p>
                     </div>
                     <div>
-                      <span className="text-xs text-gray-400">Mileage</span>
+                      <span className="text-xs text-gray-400">{t("fleet.mileage")}</span>
                       <p className="font-medium text-gray-700">{vehicle.mileage || 0} km</p>
                     </div>
                   </div>

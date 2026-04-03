@@ -590,7 +590,7 @@ export default function Dashboard() {
   const actualRevenue = contractStats?.totalRevenue || 0;
   const revenueThisMonth = contractStats?.revenueThisMonth || 0;
 
-  const available = vehicles?.filter(v => v.status === "t('status.available')").length || 0;
+  const available = vehicles?.filter(v => v.status === "Available").length || 0;
   const rented = vehicles?.filter(v => v.status === "Rented").length || 0;
   const maintenance = vehicles?.filter(v => v.status === "Maintenance").length || 0;
 

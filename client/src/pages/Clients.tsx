@@ -28,11 +28,11 @@ const getLicenseExpiryStatus = (expiryDate: Date | string) => {
   threeMonthsFromNow.setMonth(today.getMonth() + 3);
 
   if (expiry < today) {
-    return { status: 'expired', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200', message: 'License Expired' };
+    return { status: 'expired', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200', messageKey: 'clients.licenseExpired' };
   } else if (expiry <= threeMonthsFromNow) {
-    return { status: 'expiring', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', message: 'Expiring Soon' };
+    return { status: 'expiring', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', messageKey: 'clients.licenseExpiringSoon' };
   }
-  return { status: 'valid', color: '', bgColor: '', borderColor: '', message: '' };
+  return { status: 'valid', color: '', bgColor: '', borderColor: '', messageKey: '' };
 };
 
 export default function Clients() {
@@ -148,11 +148,11 @@ export default function Clients() {
       return;
     }
     if (!fatherName) {
-      toast.error("Father's name is required");
+      toast.error(t("clients.fatherNameRequired"));
       return;
     }
     if (!motherFullName) {
-      toast.error("Mother's full name is required");
+      toast.error(t("clients.motherNameRequired"));
       return;
     }
     if (!drivingLicenseNumber) {
@@ -160,11 +160,11 @@ export default function Clients() {
       return;
     }
     if (!createLicenseExpiryDate) {
-      toast.error("License expiry date is required");
+      toast.error(t("clients.licenseExpiryDateRequired"));
       return;
     }
     if (!createLicenseIssueDate) {
-      toast.error("License issue date is required");
+      toast.error(t("clients.licenseIssueDateRequired"));
       return;
     }
     
@@ -240,11 +240,11 @@ export default function Clients() {
       return;
     }
     if (!fatherName) {
-      toast.error("Father's name is required");
+      toast.error(t("clients.fatherNameRequired"));
       return;
     }
     if (!motherFullName) {
-      toast.error("Mother's full name is required");
+      toast.error(t("clients.motherNameRequired"));
       return;
     }
     if (!drivingLicenseNumber) {
@@ -252,7 +252,7 @@ export default function Clients() {
       return;
     }
     if (!editLicenseExpiryDate) {
-      toast.error("License expiry date is required");
+      toast.error(t("clients.licenseExpiryDateRequired"));
       return;
     }
 
@@ -360,7 +360,7 @@ export default function Clients() {
                         <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="nationality">Nationality</Label>
+                        <Label htmlFor="nationality">{t("clients.nationality")}</Label>
                         <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
                           <PopoverTrigger asChild>
                             <Button
@@ -407,19 +407,19 @@ export default function Clients() {
                         <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="phone">Phone Number</Label>
+                        <Label htmlFor="phone">{t("common.phone")}</Label>
                         <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t("common.email")}</Label>
                         <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="address">Address</Label>
+                        <Label htmlFor="address">{t("common.address")}</Label>
                         <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label>Date of Birth</Label>
+                        <Label>{t("clients.dateOfBirth")}</Label>
                         <ModernDatePicker
                           date={createDateOfBirth}
                           onDateChange={setCreateDateOfBirth}
@@ -427,19 +427,19 @@ export default function Clients() {
                         />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="placeOfBirth">Place of Birth</Label>
+                        <Label htmlFor="placeOfBirth">{t("clients.placeOfBirth")}</Label>
                         <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="registrationNumber">Registration Number</Label>
+                        <Label htmlFor="registrationNumber">{t("clients.registrationNumber")}</Label>
                         <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="placeOfRegistration">Place of Registration</Label>
+                        <Label htmlFor="placeOfRegistration">{t("clients.placeOfRegistration")}</Label>
                         <Input id="placeOfRegistration" name="placeOfRegistration" placeholder="e.g., Beirut, Tripoli" className="input-client" />
                       </div>
                       <div className="col-span-2">
-                        <Label htmlFor="passportIdNumber">Passport/ID Number</Label>
+                        <Label htmlFor="passportIdNumber">{t("clients.passportNumber")}</Label>
                         <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
                       </div>
                     </div>
@@ -447,10 +447,10 @@ export default function Clients() {
 
                   {/* Driving License */}
                    <div className="border-t border-gray-700 pt-4">
-                     <h3 className="font-semibold mb-4">Driving License</h3>
+                     <h3 className="font-semibold mb-4">{t("clients.drivingLicense")}</h3>
                      <div className="space-y-6">
                        <div>
-                         <Label htmlFor="drivingLicenseNumber">License Number *</Label>
+                         <Label htmlFor="drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
                          <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
                        </div>
                        <div className="pt-2">
@@ -477,7 +477,7 @@ export default function Clients() {
 
                   {/* Notes */}
                   <div className="border-t border-gray-700 pt-4">
-                    <Label htmlFor="notes">Notes</Label>
+                    <Label htmlFor="notes">{t("common.notes")}</Label>
                     <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client" />
                   </div>
 
@@ -525,23 +525,23 @@ export default function Clients() {
                         <h3 className="font-semibold text-lg">{client.name}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 text-sm">
                           <div>
-                            <span className="text-muted-foreground">Phone:</span>
-                            <p>{client.phone || "N/A"}</p>
+                            <span className="text-muted-foreground">{t("common.phone")}:</span>
+                            <p>{client.phone || t("common.na")}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">License:</span>
-                            <p>{client.driverLicenseNumber || "N/A"}</p>
+                            <span className="text-muted-foreground">{t("clients.drivingLicense")}:</span>
+                            <p>{client.driverLicenseNumber || t("common.na")}</p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">License Expiry:</span>
+                            <span className="text-muted-foreground">{t("clients.licenseExpiryDate")}:</span>
                             <p className={licenseStatus.color}>
-                              {client.licenseExpiryDate ? new Date(client.licenseExpiryDate).toLocaleDateString() : "N/A"}
-                              {licenseStatus.message && ` - ${licenseStatus.message}`}
+                              {client.licenseExpiryDate ? new Date(client.licenseExpiryDate).toLocaleDateString() : t("common.na")}
+                              {licenseStatus.messageKey && ` - ${t(licenseStatus.messageKey)}`}
                             </p>
                           </div>
                           <div>
-                            <span className="text-muted-foreground">Nationality:</span>
-                            <p>{client.nationality || "N/A"}</p>
+                            <span className="text-muted-foreground">{t("clients.nationality")}:</span>
+                            <p>{client.nationality || t("common.na")}</p>
                           </div>
                         </div>
                       </div>
@@ -619,7 +619,7 @@ export default function Clients() {
                       <Input id="edit-fatherName" name="fatherName" defaultValue={selectedClient.fatherName} required placeholder="Ahmed Hassan" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-nationality">Nationality</Label>
+                      <Label htmlFor="edit-nationality">{t("clients.nationality")}</Label>
                       <Popover open={editNationalityOpen} onOpenChange={setEditNationalityOpen}>
                         <PopoverTrigger asChild>
                           <Button
@@ -666,19 +666,19 @@ export default function Clients() {
                       <Input id="edit-motherFullName" name="motherFullName" defaultValue={selectedClient.motherFullName} required placeholder="Fatima Ahmed" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-phone">Phone Number</Label>
+                      <Label htmlFor="edit-phone">{t("common.phone")}</Label>
                       <Input id="edit-phone" name="phone" type="tel" defaultValue={selectedClient.phone || ""} placeholder="e.g., +1 234 567 8900" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-email">Email</Label>
+                      <Label htmlFor="edit-email">{t("common.email")}</Label>
                       <Input id="edit-email" name="email" type="email" defaultValue={selectedClient.email || ""} placeholder="client@example.com" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-address">Address</Label>
+                      <Label htmlFor="edit-address">{t("common.address")}</Label>
                       <Input id="edit-address" name="address" defaultValue={selectedClient.address || ""} placeholder="Street, City, State, ZIP" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label>Date of Birth</Label>
+                      <Label>{t("clients.dateOfBirth")}</Label>
                       <ModernDatePicker
                         date={editDateOfBirth}
                         onDateChange={setEditDateOfBirth}
@@ -686,19 +686,19 @@ export default function Clients() {
                       />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-placeOfBirth">Place of Birth</Label>
+                      <Label htmlFor="edit-placeOfBirth">{t("clients.placeOfBirth")}</Label>
                       <Input id="edit-placeOfBirth" name="placeOfBirth" defaultValue={selectedClient.placeOfBirth || ""} placeholder="City, Country" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-registrationNumber">Registration Number</Label>
+                      <Label htmlFor="edit-registrationNumber">{t("clients.registrationNumber")}</Label>
                       <Input id="edit-registrationNumber" name="registrationNumber" defaultValue={selectedClient.registrationNumber || ""} placeholder="Business/Company Registration" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-placeOfRegistration">Place of Registration</Label>
+                      <Label htmlFor="edit-placeOfRegistration">{t("clients.placeOfRegistration")}</Label>
                       <Input id="edit-placeOfRegistration" name="placeOfRegistration" defaultValue={selectedClient.placeOfRegistration || ""} placeholder="e.g., Beirut, Tripoli" className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-passportIdNumber">Passport/ID Number</Label>
+                      <Label htmlFor="edit-passportIdNumber">{t("clients.passportNumber")}</Label>
                       <Input id="edit-passportIdNumber" name="passportIdNumber" defaultValue={selectedClient.passportIdNumber || ""} placeholder="Passport or National ID" className="input-client" />
                     </div>
                   </div>
@@ -706,10 +706,10 @@ export default function Clients() {
 
                 {/* Driving License */}
                  <div className="border-t border-gray-700 pt-4">
-                   <h3 className="font-semibold mb-4">Driving License</h3>
+                   <h3 className="font-semibold mb-4">{t("clients.drivingLicense")}</h3>
                    <div className="space-y-6">
                      <div>
-                       <Label htmlFor="edit-drivingLicenseNumber">License Number *</Label>
+                       <Label htmlFor="edit-drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
                        <Input id="edit-drivingLicenseNumber" name="drivingLicenseNumber" defaultValue={selectedClient.drivingLicenseNumber} required className="input-client" />
                      </div>
                      <div className="pt-2">
@@ -736,7 +736,7 @@ export default function Clients() {
 
                 {/* Notes */}
                 <div className="border-t border-gray-700 pt-4">
-                  <Label htmlFor="edit-notes">Notes</Label>
+                  <Label htmlFor="edit-notes">{t("common.notes")}</Label>
                   <Input id="edit-notes" name="notes" defaultValue={selectedClient.notes || ""} placeholder="Additional information about the client" className="input-client" />
                 </div>
 
@@ -757,78 +757,78 @@ export default function Clients() {
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Client Details</DialogTitle>
+              <DialogTitle>{t("clients.clientDetails")}</DialogTitle>
             </DialogHeader>
             {selectedClient && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <span className="text-muted-foreground">First Name</span>
+                    <span className="text-muted-foreground">{t("clients.firstName")}</span>
                     <p className="font-semibold">{selectedClient.firstName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Last Name</span>
+                    <span className="text-muted-foreground">{t("clients.lastName")}</span>
                     <p className="font-semibold">{selectedClient.lastName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Father's Name</span>
+                    <span className="text-muted-foreground">{t("clients.fathersName")}</span>
                     <p className="font-semibold">{selectedClient.fatherName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Mother's Full Name</span>
+                    <span className="text-muted-foreground">{t("clients.mothersFullName")}</span>
                     <p className="font-semibold">{selectedClient.motherFullName}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Nationality</span>
-                    <p className="font-semibold">{selectedClient.nationality || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("clients.nationality")}</span>
+                    <p className="font-semibold">{selectedClient.nationality || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Phone</span>
-                    <p className="font-semibold">{selectedClient.phone || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("common.phone")}</span>
+                    <p className="font-semibold">{selectedClient.phone || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Email</span>
-                    <p className="font-semibold">{selectedClient.email || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("common.email")}</span>
+                    <p className="font-semibold">{selectedClient.email || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Address</span>
-                    <p className="font-semibold">{selectedClient.address || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("common.address")}</span>
+                    <p className="font-semibold">{selectedClient.address || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Date of Birth</span>
+                    <span className="text-muted-foreground">{t("clients.dateOfBirth")}</span>
                     <p className="font-semibold">{selectedClient.dateOfBirth ? new Date(selectedClient.dateOfBirth).toLocaleDateString() : "N/A"}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Place of Birth</span>
-                    <p className="font-semibold">{selectedClient.placeOfBirth || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("clients.placeOfBirth")}</span>
+                    <p className="font-semibold">{selectedClient.placeOfBirth || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Passport/ID Number</span>
-                    <p className="font-semibold">{selectedClient.passportIdNumber || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("clients.passportNumber")}</span>
+                    <p className="font-semibold">{selectedClient.passportIdNumber || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Registration Number</span>
-                    <p className="font-semibold">{selectedClient.registrationNumber || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("clients.registrationNumber")}</span>
+                    <p className="font-semibold">{selectedClient.registrationNumber || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Place of Registration</span>
-                    <p className="font-semibold">{selectedClient.placeOfRegistration || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("clients.placeOfRegistration")}</span>
+                    <p className="font-semibold">{selectedClient.placeOfRegistration || t("common.na")}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Driving License Number</span>
+                    <span className="text-muted-foreground">{t("clients.drivingLicense")}</span>
                     <p className="font-semibold">{selectedClient.drivingLicenseNumber}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">License Issue Date</span>
+                    <span className="text-muted-foreground">{t("clients.licenseIssueDate")}</span>
                     <p className="font-semibold">{selectedClient.licenseIssueDate ? new Date(selectedClient.licenseIssueDate).toLocaleDateString() : "N/A"}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">License Expiry Date</span>
+                    <span className="text-muted-foreground">{t("clients.licenseExpiryDate")}</span>
                     <p className="font-semibold">{selectedClient.licenseExpiryDate ? new Date(selectedClient.licenseExpiryDate).toLocaleDateString() : "N/A"}</p>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Notes</span>
-                    <p className="font-semibold">{selectedClient.notes || "N/A"}</p>
+                    <span className="text-muted-foreground">{t("common.notes")}</span>
+                    <p className="font-semibold">{selectedClient.notes || t("common.na")}</p>
                   </div>
                 </div>
 
