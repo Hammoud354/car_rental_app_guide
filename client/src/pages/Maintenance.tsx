@@ -229,7 +229,16 @@ export default function Maintenance() {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t("nav.maintenance")}</h1>
             <p className="text-sm text-gray-500 mt-0.5">{t("maintenance.subtitle")}</p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+              setIsAddDialogOpen(open);
+              if (!open) {
+                setSelectedVehicleId(null);
+                setPerformedAtDate(undefined);
+                setGarageEntryDate(undefined);
+                setGarageExitDate(undefined);
+                setMarkInMaintenance(true);
+              }
+            }}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm" size="sm">
                 <Plus className="mr-1.5 h-4 w-4" />
@@ -244,7 +253,11 @@ export default function Maintenance() {
               <form onSubmit={handleAddMaintenance} className="space-y-4 mt-2">
                 <div>
                   <Label className="text-xs font-medium text-gray-700">Vehicle *</Label>
-                  <Select onValueChange={(value) => setSelectedVehicleId(parseInt(value))} required>
+                  <Select
+                    value={selectedVehicleId?.toString() || ""}
+                    onValueChange={(value) => setSelectedVehicleId(parseInt(value))}
+                    required
+                  >
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="Select a vehicle" />
                     </SelectTrigger>
@@ -483,14 +496,13 @@ export default function Maintenance() {
                           size="sm"
                           className="flex-1 text-xs h-8 border-orange-200 text-orange-700 hover:bg-orange-50"
                           onClick={() => {
-                            if (confirm(`Send ${vehicle.plateNumber} to maintenance? This will block it from being rented.`)) {
-                              sendToMaintenanceMutation.mutate({ vehicleId: vehicle.id });
-                            }
+                            setSelectedVehicleId(vehicle.id);
+                            setMarkInMaintenance(true);
+                            setIsAddDialogOpen(true);
                           }}
-                          disabled={sendToMaintenanceMutation.isPending}
                         >
                           <AlertTriangle className="mr-1 h-3.5 w-3.5" />
-                          {sendToMaintenanceMutation.isPending ? "..." : "Send to Garage"}
+                          Send to Garage
                         </Button>
                       ) : null}
                     </div>
