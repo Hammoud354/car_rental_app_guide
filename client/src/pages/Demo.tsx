@@ -37,7 +37,7 @@ export default function Demo() {
       await loginDemoMutation.mutateAsync();
       setStatus("ready");
       setTimeout(() => {
-        setLocation("/dashboard");
+        window.location.href = "/dashboard";
       }, 2000);
     } catch (error) {
       console.error("Demo login failed:", error);

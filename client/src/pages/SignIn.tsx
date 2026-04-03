@@ -23,7 +23,7 @@ export default function SignIn() {
   const signInMutation = trpc.auth.login.useMutation({
     onSuccess: () => {
       toast.success("Welcome back! Redirecting...");
-      setTimeout(() => setLocation("/dashboard"), 800);
+      setTimeout(() => { window.location.href = "/dashboard"; }, 800);
     },
     onError: (error) => {
       toast.error(error.message || "Invalid credentials. Please try again.");
