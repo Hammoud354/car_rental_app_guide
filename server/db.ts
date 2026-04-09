@@ -3718,3 +3718,96 @@ export async function getGeneratedContract(rentalContractId: number) {
 
   return contract[0] || null;
 }
+
+export async function createWhishPaymentRequest(
+  userId: number,
+  tierId: number,
+  transactionId: string,
+  amount: number
+) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const { whishPaymentRequests } = await import("../drizzle/schema");
+    await db.insert(whishPaymentRequests).values({
+      userId,
+      tierId,
+      transactionId,
+      amount: amount.toString(),
+      status: "pending",
+    });
+    const { eq } = await import("drizzle-orm");
+    const result = await db
+      .select()
+      .from(whishPaymentRequests)
+      .where(eq(whishPaymentRequests.userId, userId))
+      .orderBy(whishPaymentRequests.createdAt)
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error creating Whish payment request:", error);
+    return null;
+  }
+}
+
+export async function getAllWhishPaymentRequests() {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const { whishPaymentRequests } = await import("../drizzle/schema");
+    const { desc } = await import("drizzle-orm");
+    const rows = await db
+      .select()
+      .from(whishPaymentRequests)
+      .orderBy(desc(whishPaymentRequests.createdAt));
+    return rows;
+  } catch (error) {
+    console.error("Error fetching Whish payment requests:", error);
+    return [];
+  }
+}
+
+export async function getUserWhishPaymentRequests(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  try {
+    const { whishPaymentRequests } = await import("../drizzle/schema");
+    const { eq, desc } = await import("drizzle-orm");
+    const rows = await db
+      .select()
+      .from(whishPaymentRequests)
+      .where(eq(whishPaymentRequests.userId, userId))
+      .orderBy(desc(whishPaymentRequests.createdAt));
+    return rows;
+  } catch (error) {
+    console.error("Error fetching user Whish payment requests:", error);
+    return [];
+  }
+}
+
+export async function updateWhishPaymentRequestStatus(
+  id: number,
+  status: "approved" | "rejected",
+  reviewedBy: number,
+  notes?: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+  try {
+    const { whishPaymentRequests } = await import("../drizzle/schema");
+    const { eq } = await import("drizzle-orm");
+    await db
+      .update(whishPaymentRequests)
+      .set({ status, notes: notes || null, reviewedBy, reviewedAt: new Date(), updatedAt: new Date() })
+      .where(eq(whishPaymentRequests.id, id));
+    const result = await db
+      .select()
+      .from(whishPaymentRequests)
+      .where(eq(whishPaymentRequests.id, id))
+      .limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.error("Error updating Whish payment request:", error);
+    return null;
+  }
+}

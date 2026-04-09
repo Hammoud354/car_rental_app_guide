@@ -41,6 +41,7 @@ import Home from "./pages/Home";
 import AIMaintenance from "./pages/AIMaintenance";
 import AdminNumberingManagement from "./pages/AdminNumberingManagement";
 import AdminAnalytics from "./pages/AdminAnalytics";
+import AdminPaymentRequests from "./pages/AdminPaymentRequests";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import ContractManagement from "./pages/ContractManagement";
 
@@ -108,6 +109,7 @@ function AppContent() {
         <Route path="/admin/audit-logs" component={AuditLogs} />
         <Route path="/admin/numbering" component={AdminNumberingManagement} />
         <Route path="/admin/analytics" component={AdminAnalytics} />
+        <Route path="/admin/payment-requests" component={AdminPaymentRequests} />
         <Route path="/subscription-plans" component={SubscriptionPlans} />
         <Route path="/analysis" component={Analysis} />
         <Route path="/reservations" component={Reservations} />

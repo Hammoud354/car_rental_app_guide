@@ -3,10 +3,21 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Loader2, CreditCard, ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Check, Loader2, ArrowLeft, Wallet, Copy, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
+
+const WHISH_PHONE_NUMBER = "+961 XX XXX XXX";
 
 const HARDCODED_PLANS = [
   {
@@ -26,7 +37,6 @@ const HARDCODED_PLANS = [
       "Contract management",
       "Email support (48h)",
     ],
-    stripePriceId: null as string | null,
   },
   {
     id: 2,
@@ -48,7 +58,6 @@ const HARDCODED_PLANS = [
       "WhatsApp integration",
       "Priority support (24h)",
     ],
-    stripePriceId: null as string | null,
   },
   {
     id: 3,
@@ -69,52 +78,69 @@ const HARDCODED_PLANS = [
       "Dedicated account manager",
       "24/7 priority support",
     ],
-    stripePriceId: null as string | null,
   },
 ];
 
 export default function SubscriptionPlans() {
   const [, setLocation] = useLocation();
-  const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<typeof HARDCODED_PLANS[0] | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [transactionId, setTransactionId] = useState("");
+  const [copied, setCopied] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const { data: currentPlan } = trpc.subscription.getCurrentPlan.useQuery(undefined, {
     enabled: isAuthenticated,
   });
 
-  const handleSelectPlan = async (plan: typeof HARDCODED_PLANS[0]) => {
-    setIsLoading(true);
-    setSelectedPlanId(plan.id);
+  const { data: myPayments } = trpc.subscription.getMyWhishPayments.useQuery(undefined, {
+    enabled: isAuthenticated,
+  });
 
+  const submitMutation = trpc.subscription.submitWhishPayment.useMutation({
+    onSuccess: () => {
+      toast.success("Payment request submitted! We'll activate your subscription once verified.");
+      setDialogOpen(false);
+      setTransactionId("");
+      setSelectedPlan(null);
+    },
+    onError: (err) => {
+      toast.error(err.message || "Failed to submit payment request");
+    },
+  });
+
+  const handleSelectPlan = (plan: typeof HARDCODED_PLANS[0]) => {
     if (!isAuthenticated) {
-      localStorage.setItem('selectedSubscriptionPlanId', plan.id.toString());
-      toast.info("Please sign up first, then you'll be redirected to complete payment.");
+      localStorage.setItem("selectedSubscriptionPlanId", plan.id.toString());
+      toast.info("Please sign up first.");
       setTimeout(() => setLocation("/signup"), 1000);
       return;
     }
-
-    if (plan.stripePriceId) {
-      try {
-        const response = await fetch("/api/stripe/create-checkout-session", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ priceId: plan.stripePriceId, planName: plan.name }),
-        });
-        const data = await response.json();
-        if (data.url) {
-          window.location.href = data.url;
-          return;
-        }
-      } catch (error) {
-        console.error("Stripe checkout error:", error);
-      }
-    }
-
-    toast.info("Stripe payment is not yet configured. The plan will be activated once Stripe is set up.");
-    setIsLoading(false);
-    setSelectedPlanId(null);
+    setSelectedPlan(plan);
+    setTransactionId("");
+    setDialogOpen(true);
   };
+
+  const handleCopyNumber = () => {
+    navigator.clipboard.writeText(WHISH_PHONE_NUMBER.replace(/\s/g, ""));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSubmit = () => {
+    if (!selectedPlan || !transactionId.trim()) {
+      toast.error("Please enter your Whish transaction ID");
+      return;
+    }
+    submitMutation.mutate({
+      tierId: selectedPlan.id,
+      transactionId: transactionId.trim(),
+      amount: selectedPlan.monthlyPrice,
+    });
+  };
+
+  const pendingRequest = myPayments?.find((p: any) => p.status === "pending");
+  const lastApproved = myPayments?.find((p: any) => p.status === "approved");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-12 px-4">
@@ -125,6 +151,7 @@ export default function SubscriptionPlans() {
             size="sm"
             onClick={() => setLocation(isAuthenticated ? "/dashboard" : "/")}
             className="text-gray-600 hover:text-gray-900"
+            data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
@@ -138,12 +165,32 @@ export default function SubscriptionPlans() {
           <p className="text-xl text-gray-500 max-w-2xl mx-auto">
             Start managing your fleet today. All plans include a 14-day free trial.
           </p>
+
+          <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-2 text-sm">
+            <Wallet className="h-4 w-4" />
+            Pay securely via <strong>Whish Money</strong> — Lebanon's trusted digital wallet
+          </div>
         </div>
+
+        {pendingRequest && (
+          <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+            <Clock className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="font-medium text-amber-900">Payment under review</p>
+              <p className="text-sm text-amber-700 mt-0.5">
+                Your Whish payment (TX: <span className="font-mono font-medium">{pendingRequest.transactionId}</span>) is being verified. We'll activate your subscription shortly.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {HARDCODED_PLANS.map((plan) => {
             const isCurrentPlan = currentPlan?.tier?.name === plan.name;
             const isProfessional = plan.name === "professional";
+            const hasPendingForPlan = myPayments?.some(
+              (p: any) => p.tierId === plan.id && p.status === "pending"
+            );
 
             return (
               <div key={plan.id} className="relative">
@@ -209,30 +256,32 @@ export default function SubscriptionPlans() {
                       <Button
                         disabled
                         className="w-full bg-gray-100 text-gray-500 cursor-not-allowed border border-gray-200"
+                        data-testid={`button-current-plan-${plan.id}`}
                       >
+                        <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
                         Current Plan
+                      </Button>
+                    ) : hasPendingForPlan ? (
+                      <Button
+                        disabled
+                        className="w-full bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
+                        data-testid={`button-pending-plan-${plan.id}`}
+                      >
+                        <Clock className="mr-2 h-4 w-4" />
+                        Payment Under Review
                       </Button>
                     ) : (
                       <Button
                         onClick={() => handleSelectPlan(plan)}
-                        disabled={isLoading && selectedPlanId === plan.id}
+                        data-testid={`button-select-plan-${plan.id}`}
                         className={`w-full h-12 text-base font-semibold ${
                           isProfessional
                             ? "bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
                             : "bg-blue-600 hover:bg-blue-700 text-white"
                         }`}
                       >
-                        {isLoading && selectedPlanId === plan.id ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Redirecting to Stripe...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="mr-2 h-4 w-4" />
-                            Subscribe — ${plan.monthlyPrice}/mo
-                          </>
-                        )}
+                        <Wallet className="mr-2 h-4 w-4" />
+                        Pay via Whish — ${plan.monthlyPrice}/mo
                       </Button>
                     )}
                   </CardContent>
@@ -250,7 +299,7 @@ export default function SubscriptionPlans() {
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
-              No credit card required to start
+              No credit card required
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
@@ -258,10 +307,85 @@ export default function SubscriptionPlans() {
             </span>
           </div>
           <p className="text-xs text-gray-400">
-            Payments are securely processed through Stripe. All plans are billed monthly.
+            Payments are processed via Whish Money and verified manually within 24 hours.
           </p>
         </div>
       </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="h-5 w-5 text-green-600" />
+              Pay via Whish Money
+            </DialogTitle>
+            <DialogDescription>
+              Follow these steps to subscribe to the <strong>{selectedPlan?.displayName}</strong> plan for <strong>${selectedPlan?.monthlyPrice}/month</strong>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 pt-2">
+            <div className="rounded-lg bg-green-50 border border-green-200 p-4 space-y-3">
+              <p className="text-sm font-semibold text-green-900">Step 1 — Send payment via Whish</p>
+              <div className="flex items-center justify-between bg-white rounded-md border border-green-200 px-3 py-2">
+                <div>
+                  <p className="text-xs text-gray-500 mb-0.5">Whish Number</p>
+                  <p className="font-mono font-bold text-gray-900 text-lg">{WHISH_PHONE_NUMBER}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={handleCopyNumber} data-testid="button-copy-whish">
+                  {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-green-800">Amount to send:</span>
+                <span className="font-bold text-green-900 text-base">${selectedPlan?.monthlyPrice}.00</span>
+              </div>
+              <p className="text-xs text-green-700">
+                Open your Whish app → Send Money → enter the number above → send <strong>${selectedPlan?.monthlyPrice}</strong>
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="txn-id" className="text-sm font-semibold">
+                Step 2 — Enter your Whish Transaction ID
+              </Label>
+              <Input
+                id="txn-id"
+                placeholder="e.g. WH1234567890"
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+                data-testid="input-transaction-id"
+              />
+              <p className="text-xs text-gray-500">
+                Find this in your Whish app under transaction history after sending the payment.
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setDialogOpen(false)}
+                data-testid="button-cancel-whish"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                onClick={handleSubmit}
+                disabled={!transactionId.trim() || submitMutation.isPending}
+                data-testid="button-submit-whish"
+              >
+                {submitMutation.isPending ? (
+                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                ) : (
+                  "Submit for Verification"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -36,6 +36,13 @@
       "when": 1774307161522,
       "tag": "0004_supreme_living_lightning",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1775759971174,
+      "tag": "0005_bright_madelyne_pryor",
+      "breakpoints": true
     }
   ]
 }

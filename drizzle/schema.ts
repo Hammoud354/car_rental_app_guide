@@ -701,3 +701,25 @@ export const numberingAudit = pgTable("numberingAudit", {
 
 export type NumberingAudit = typeof numberingAudit.$inferSelect;
 export type InsertNumberingAudit = typeof numberingAudit.$inferInsert;
+
+export const whishPaymentRequestStatusEnum = pgEnum("whishPaymentRequestStatus", ["pending", "approved", "rejected"]);
+
+/**
+ * Whish Money payment requests for subscriptions
+ */
+export const whishPaymentRequests = pgTable("whishPaymentRequests", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
+  tierId: integer("tierId").notNull(),
+  transactionId: varchar("transactionId", { length: 100 }).notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  status: whishPaymentRequestStatusEnum("status").default("pending").notNull(),
+  notes: text("notes"),
+  reviewedBy: integer("reviewedBy"),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type WhishPaymentRequest = typeof whishPaymentRequests.$inferSelect;
+export type InsertWhishPaymentRequest = typeof whishPaymentRequests.$inferInsert;

@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus, KeyRound, CreditCard } from "lucide-react";
+import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus, KeyRound, CreditCard, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
@@ -230,6 +230,12 @@ export default function AdminUsers() {
             <Button variant="outline" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               View Audit Logs
+            </Button>
+          </Link>
+          <Link href="/admin/payment-requests">
+            <Button variant="outline" className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50">
+              <Wallet className="h-4 w-4" />
+              Whish Payments
             </Button>
           </Link>
           <Dialog open={isAddUserDialogOpen} onOpenChange={setIsAddUserDialogOpen}>

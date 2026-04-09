@@ -3031,6 +3031,73 @@ export const appRouter = router({
         }
         return { success: true, subscription: result };
       }),
+    submitWhishPayment: protectedProcedure
+      .input(z.object({
+        tierId: z.number(),
+        transactionId: z.string().min(1),
+        amount: z.number().positive(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.createWhishPaymentRequest(
+          ctx.user.id,
+          input.tierId,
+          input.transactionId,
+          input.amount
+        );
+        if (!result) throw new Error("Failed to submit payment request");
+        return { success: true };
+      }),
+    getMyWhishPayments: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getUserWhishPaymentRequests(ctx.user.id);
+    }),
+    getWhishPaymentRequests: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "super_admin") throw new Error("Unauthorized");
+      const requests = await db.getAllWhishPaymentRequests();
+      const userIds = [...new Set(requests.map((r: any) => r.userId))];
+      let usersMap: Record<number, any> = {};
+      if (userIds.length > 0) {
+        const { users } = await import("../drizzle/schema");
+        const { inArray } = await import("drizzle-orm");
+        try {
+          const { getDb } = await import("./db");
+          const rawDb = await getDb();
+          if (rawDb) {
+            const usersData = await rawDb.select().from(users).where(inArray(users.id, userIds as number[]));
+            usersMap = Object.fromEntries(usersData.map((u: any) => [u.id, u]));
+          }
+        } catch {}
+      }
+      const tiers = await db.getAllSubscriptionTiers();
+      const tiersMap = Object.fromEntries((tiers as any[]).map((t: any) => [t.id, t]));
+      return requests.map((r: any) => ({
+        ...r,
+        user: usersMap[r.userId] ? {
+          id: usersMap[r.userId].id,
+          username: usersMap[r.userId].username,
+          email: usersMap[r.userId].email,
+          companyName: usersMap[r.userId].companyName,
+        } : null,
+        tier: tiersMap[r.tierId] || null,
+      }));
+    }),
+    approveWhishPayment: protectedProcedure
+      .input(z.object({ id: z.number(), notes: z.string().optional() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "super_admin") throw new Error("Unauthorized");
+        const request = await db.updateWhishPaymentRequestStatus(input.id, "approved", ctx.user.id, input.notes);
+        if (!request) throw new Error("Payment request not found");
+        await db.initializeSubscriptionTiers();
+        await db.createUserSubscription(request.userId, request.tierId, `Approved Whish payment - TX: ${request.transactionId}`);
+        return { success: true };
+      }),
+    rejectWhishPayment: protectedProcedure
+      .input(z.object({ id: z.number(), notes: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "super_admin") throw new Error("Unauthorized");
+        const request = await db.updateWhishPaymentRequestStatus(input.id, "rejected", ctx.user.id, input.notes);
+        if (!request) throw new Error("Payment request not found");
+        return { success: true };
+      }),
   }),
   contractTemplate: router({
     uploadTemplate: protectedProcedure
