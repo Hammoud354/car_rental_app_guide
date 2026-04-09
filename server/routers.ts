@@ -6,6 +6,13 @@ import { z } from "zod";
 import * as db from "./db";
 import { sql } from "drizzle-orm";
 import {
+  sendPasswordResetEmail,
+  sendWelcomeEmail,
+  sendSubscriptionApprovedEmail,
+  sendSubscriptionRejectedEmail,
+  sendPasswordResetByAdminEmail,
+} from "./email";
+import {
   getNextContractNumber,
   getNextInvoiceNumber,
   migrateContractNumber,
@@ -172,6 +179,12 @@ export const appRouter = router({
           console.error('Failed to auto-assign subscription on sign-up:', error);
         }
 
+        if (newUser.email) {
+          sendWelcomeEmail(newUser.email, newUser.username).catch(err =>
+            console.error("[Signup] Welcome email failed:", err)
+          );
+        }
+
         return {
           success: true,
           user: {
@@ -254,10 +267,14 @@ export const appRouter = router({
         // Save token to database
         await db.createPasswordResetToken(user.id, token, expiresAt);
         
-        // TODO: Send email with reset link
-        // For now, we'll just log it (in production, use nodemailer or notification API)
-        const resetLink = `${process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+        const appUrl = process.env.REPLIT_DEV_DOMAIN
+          ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+          : (process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000');
+        const resetLink = `${appUrl}/reset-password?token=${token}`;
         console.log(`[Password Reset] Reset link for ${user.email}: ${resetLink}`);
+        await sendPasswordResetEmail(user.email, resetLink).catch(err =>
+          console.error("[Password Reset] Email failed:", err)
+        );
         
         return { success: true, message: 'If the email exists, a reset link will be sent', token };
       }),
@@ -1868,6 +1885,12 @@ export const appRouter = router({
           details: `Password reset by super admin for user: ${targetUser.username}`,
         });
 
+        if (targetUser.email) {
+          sendPasswordResetByAdminEmail(targetUser.email, targetUser.username, input.newPassword).catch(err =>
+            console.error("[Admin] Password reset email failed:", err)
+          );
+        }
+
         return { success: true, message: `Password reset for ${targetUser.username}` };
       }),
 
@@ -3088,6 +3111,13 @@ export const appRouter = router({
         if (!request) throw new Error("Payment request not found");
         await db.initializeSubscriptionTiers();
         await db.createUserSubscription(request.userId, request.tierId, `Approved Whish payment - TX: ${request.transactionId}`);
+        const user = await db.getUserById(request.userId);
+        const tier = await db.getSubscriptionTier(request.tierId);
+        if (user?.email) {
+          sendSubscriptionApprovedEmail(user.email, user.username, tier?.displayName || "your plan").catch(err =>
+            console.error("[Subscription] Approval email failed:", err)
+          );
+        }
         return { success: true };
       }),
     rejectWhishPayment: protectedProcedure
@@ -3096,6 +3126,13 @@ export const appRouter = router({
         if (ctx.user.role !== "super_admin") throw new Error("Unauthorized");
         const request = await db.updateWhishPaymentRequestStatus(input.id, "rejected", ctx.user.id, input.notes);
         if (!request) throw new Error("Payment request not found");
+        const user = await db.getUserById(request.userId);
+        const tier = await db.getSubscriptionTier(request.tierId);
+        if (user?.email) {
+          sendSubscriptionRejectedEmail(user.email, user.username, tier?.displayName || "your plan", input.notes).catch(err =>
+            console.error("[Subscription] Rejection email failed:", err)
+          );
+        }
         return { success: true };
       }),
   }),
