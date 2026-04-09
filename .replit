@@ -50,3 +50,4 @@ build = ["npm", "run", "build"]
 
 [userenv.shared]
 VITE_APP_ID = "41441854-d220-4390-8b57-240072bee172"
+GMAIL_FROM_EMAIL = "fleetwizards.app@gmail.com"
