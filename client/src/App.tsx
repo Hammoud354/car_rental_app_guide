@@ -45,7 +45,7 @@ import AdminPaymentRequests from "./pages/AdminPaymentRequests";
 import SubscriptionPlans from "./pages/SubscriptionPlans";
 import ContractManagement from "./pages/ContractManagement";
 
-const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password"];
+const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans"];
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { loading, isAuthenticated } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/signin" });
@@ -80,6 +80,7 @@ function AppContent() {
         <Route path="/register" component={Register} />
         <Route path="/forgot-password" component={ForgotPassword} />
         <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/subscription-plans" component={SubscriptionPlans} />
       </Switch>
     );
   }
@@ -110,7 +111,6 @@ function AppContent() {
         <Route path="/admin/numbering" component={AdminNumberingManagement} />
         <Route path="/admin/analytics" component={AdminAnalytics} />
         <Route path="/admin/payment-requests" component={AdminPaymentRequests} />
-        <Route path="/subscription-plans" component={SubscriptionPlans} />
         <Route path="/analysis" component={Analysis} />
         <Route path="/reservations" component={Reservations} />
         <Route path="/company-settings" component={CompanySettings} />
