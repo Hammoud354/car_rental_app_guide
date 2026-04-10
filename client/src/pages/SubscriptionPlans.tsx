@@ -149,12 +149,12 @@ export default function SubscriptionPlans() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setLocation(isAuthenticated ? "/dashboard" : "/")}
+            onClick={() => setLocation(isAuthenticated && currentPlan?.status === "active" ? "/dashboard" : "/")}
             className="text-gray-600 hover:text-gray-900"
             data-testid="button-back"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            {isAuthenticated ? "Back to Dashboard" : "Back to Home"}
+            {isAuthenticated && currentPlan?.status === "active" ? "Back to Dashboard" : "Back to Home"}
           </Button>
         </div>
 

@@ -36,7 +36,7 @@ export default function SignUp() {
 
   const signUpMutation = trpc.auth.signUp.useMutation({
     onSuccess: () => {
-      toast.success("Account created! Please sign in.");
+      toast.success("Account created! Sign in to select your plan.");
       const countryData = getCountryData(formData.country);
       if (countryData) {
         localStorage.setItem('pendingCountryData', JSON.stringify(countryData));

@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import SidebarLayout from "./components/SidebarLayout";
 import { useAuth } from "./_core/hooks/useAuth";
+import { trpc } from "./lib/trpc";
 import Landing from "./pages/Landing";
 import Clients from "./pages/Clients";
 import RentalContracts from "./pages/RentalContracts";
@@ -48,9 +49,17 @@ import ContractManagement from "./pages/ContractManagement";
 const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans"];
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { loading, isAuthenticated } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/signin" });
+  const { loading, isAuthenticated, user } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/signin" });
 
-  if (loading) {
+  const isSuperAdmin = user?.role === "super_admin";
+
+  const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery(undefined, {
+    enabled: isAuthenticated && !isSuperAdmin,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
+  if (loading || (isAuthenticated && !isSuperAdmin && planLoading)) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -60,6 +69,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Super admins always get full access
+  if (isSuperAdmin) {
+    return <>{children}</>;
+  }
+
+  // If user has no active subscription, send them to subscription plans
+  const hasActivePlan = currentPlan && currentPlan.status === "active";
+  if (!hasActivePlan) {
+    return <SubscriptionPlans />;
   }
 
   return <>{children}</>;
