@@ -163,7 +163,7 @@ export default function SubscriptionPlans() {
             Choose the plan that fits your business
           </h1>
           <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-            Start managing your fleet today. All plans include a 14-day free trial.
+            Start managing your fleet today. Choose the plan that works for your agency.
           </p>
 
           <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-2 text-sm">
@@ -295,11 +295,11 @@ export default function SubscriptionPlans() {
           <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
-              14-day free trial
+              Secure Whish payment
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
-              No credit card required
+              Activated within 24 hours
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />

@@ -110,7 +110,7 @@ export default function SignUp() {
                 Start managing your<br />fleet today.
               </h2>
               <p className="text-gray-400 text-base leading-relaxed max-w-sm">
-                Create your account and get a 14-day free trial with full access to all features.
+                Create your account and start managing your fleet with full access to all features.
               </p>
             </div>
             <div className="space-y-4">
@@ -118,7 +118,7 @@ export default function SignUp() {
                 "Full fleet & contract management",
                 "Automated invoicing & P&L tracking",
                 "AI-powered maintenance predictions",
-                "No credit card required"
+                "Multi-language support"
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 text-gray-300 text-sm">
                   <CheckCircle2 className="h-4 w-4 text-blue-400 shrink-0" />
@@ -146,7 +146,7 @@ export default function SignUp() {
 
           <div className="mb-6">
             <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create your account</h1>
-            <p className="text-sm text-gray-500 mt-1">Get started with your 14-day free trial</p>
+            <p className="text-sm text-gray-500 mt-1">Fill in your details to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
