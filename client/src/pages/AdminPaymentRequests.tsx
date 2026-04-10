@@ -43,7 +43,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-const WHISH_PHONE_NUMBER = "+961 XX XXX XXX";
+const WHISH_PHONE_NUMBER = "+961 76 354 131";
 
 export default function AdminPaymentRequests() {
   const { user } = useAuth();

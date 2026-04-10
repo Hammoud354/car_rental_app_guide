@@ -17,7 +17,7 @@ import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
-const WHISH_PHONE_NUMBER = "+961 XX XXX XXX";
+const WHISH_PHONE_NUMBER = "+961 76 354 131";
 
 const HARDCODED_PLANS = [
   {
