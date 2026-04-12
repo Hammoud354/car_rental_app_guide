@@ -50,7 +50,14 @@ export function SubscriptionStatusCard() {
   }
 
   const tier = subscription?.tier;
-  
+
+  // Calculate expiry: use stored renewalDate or fall back to startDate + 30 days
+  const expiryDate = subscription?.renewalDate
+    ? new Date(subscription.renewalDate)
+    : subscription?.startDate
+    ? new Date(new Date(subscription.startDate).getTime() + 30 * 24 * 60 * 60 * 1000)
+    : null;
+
   if (!tier) {
     return (
       <Card className="border-amber-200 bg-amber-50">
@@ -150,17 +157,17 @@ export function SubscriptionStatusCard() {
             <div>
               <p className="text-xs text-gray-500">{t("subscription.expiryDate") || "Expiry Date"}</p>
               <p className={`font-semibold ${
-                subscription.renewalDate && new Date(subscription.renewalDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                expiryDate && expiryDate < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                   ? "text-red-600"
                   : "text-gray-800"
               }`}>
-                {subscription.renewalDate
-                  ? new Date(subscription.renewalDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                {expiryDate
+                  ? expiryDate.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
                   : "—"}
               </p>
             </div>
           </div>
-          {subscription.renewalDate && new Date(subscription.renewalDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
+          {expiryDate && expiryDate < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
             <p className="text-xs text-red-600 font-medium">⚠ Subscription expires soon — contact us to renew.</p>
           )}
         </div>
