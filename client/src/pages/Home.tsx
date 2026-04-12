@@ -357,7 +357,7 @@ export default function Home() {
               className="text-xs text-gray-400 flex items-center justify-center gap-4"
             >
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Free demo available</span>
-              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> No credit card required</span>
+              <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Pay via Whish Money</span>
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> Cancel anytime</span>
             </motion.p>
 
@@ -572,7 +572,7 @@ export default function Home() {
               Simple, transparent pricing
             </h2>
             <p className="text-gray-500 text-lg">
-              Start free for 14 days. No credit card required.
+              Transparent pricing. Pay securely via Whish Money.
             </p>
           </AnimatedSection>
 
@@ -607,7 +607,7 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/subscription-plans">
+                  <Link href="/signup">
                     <Button
                       className={`w-full h-11 font-semibold ${
                         plan.popular
