@@ -3373,7 +3373,7 @@ export async function getUserSubscription(userId: number) {
         tierId: row.tierId,
         status: row.status,
         startDate: row.startDate,
-        endDate: row.endDate,
+        renewalDate: row.renewalDate,
         tier: tierData
       };
     }
@@ -3402,13 +3402,15 @@ export async function createUserSubscription(userId: number, tierId: number, rea
     if (existing.length > 0) {
       // Update existing subscription
       const previousTierId = existing[0].tierId;
+      const renewalDate = new Date();
+      renewalDate.setDate(renewalDate.getDate() + 30);
       await db
         .update(userSubscriptions)
         .set({
           tierId,
           status: "active",
           startDate: new Date(),
-          renewalDate: null,
+          renewalDate,
           cancelledAt: null,
           reason: null,
           updatedAt: new Date(),
@@ -3425,11 +3427,14 @@ export async function createUserSubscription(userId: number, tierId: number, rea
       // Skipping audit log for now
     } else {
       // Create new subscription
+      const newRenewalDate = new Date();
+      newRenewalDate.setDate(newRenewalDate.getDate() + 30);
       await db.insert(userSubscriptions).values({
         userId,
         tierId,
         status: "active",
         startDate: new Date(),
+        renewalDate: newRenewalDate,
       });
 
       result = await db

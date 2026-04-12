@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, TrendingUp, Users, Car } from "lucide-react";
+import { AlertCircle, TrendingUp, Users, Car, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
@@ -131,6 +131,38 @@ export function SubscriptionStatusCard() {
               )}
             </div>
           </div>
+        </div>
+
+        <div className="rounded-lg bg-white/50 p-3 space-y-2">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="h-4 w-4" />
+            <span className="font-medium">{t("subscription.subscriptionDates") || "Subscription Period"}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <p className="text-xs text-gray-500">{t("subscription.startDate") || "Start Date"}</p>
+              <p className="font-semibold text-gray-800">
+                {subscription.startDate
+                  ? new Date(subscription.startDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                  : "—"}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">{t("subscription.expiryDate") || "Expiry Date"}</p>
+              <p className={`font-semibold ${
+                subscription.renewalDate && new Date(subscription.renewalDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                  ? "text-red-600"
+                  : "text-gray-800"
+              }`}>
+                {subscription.renewalDate
+                  ? new Date(subscription.renewalDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
+                  : "—"}
+              </p>
+            </div>
+          </div>
+          {subscription.renewalDate && new Date(subscription.renewalDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) && (
+            <p className="text-xs text-red-600 font-medium">⚠ Subscription expires soon — contact us to renew.</p>
+          )}
         </div>
 
         <div className="space-y-2 text-sm">
