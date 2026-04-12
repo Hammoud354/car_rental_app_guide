@@ -7,7 +7,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -96,6 +96,9 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
     initializeSubscriptionTiers().catch(err =>
       console.error("[Startup] Failed to initialize subscription tiers:", err)
+    );
+    initializeWhishPaymentRequestsTable().catch(err =>
+      console.error("[Startup] Failed to initialize whish payment requests table:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)

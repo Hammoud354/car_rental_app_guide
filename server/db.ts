@@ -3719,6 +3719,37 @@ export async function getGeneratedContract(rentalContractId: number) {
   return contract[0] || null;
 }
 
+export async function initializeWhishPaymentRequestsTable() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      DO $$ BEGIN
+        CREATE TYPE "whishPaymentRequestStatus" AS ENUM ('pending', 'approved', 'rejected');
+      EXCEPTION WHEN duplicate_object THEN null;
+      END $$;
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "whishPaymentRequests" (
+        "id" serial PRIMARY KEY,
+        "userId" integer NOT NULL,
+        "tierId" integer NOT NULL,
+        "transactionId" varchar(100) NOT NULL,
+        "amount" decimal(10, 2) NOT NULL,
+        "status" "whishPaymentRequestStatus" DEFAULT 'pending' NOT NULL,
+        "notes" text,
+        "reviewedBy" integer,
+        "reviewedAt" timestamp,
+        "createdAt" timestamp DEFAULT now() NOT NULL,
+        "updatedAt" timestamp DEFAULT now() NOT NULL
+      )
+    `);
+    console.log("[Startup] whishPaymentRequests table ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize whishPaymentRequests table:", err);
+  }
+}
+
 export async function createWhishPaymentRequest(
   userId: number,
   tierId: number,
