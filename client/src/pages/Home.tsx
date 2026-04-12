@@ -1,4 +1,5 @@
 import { useAuth } from "@/_core/hooks/useAuth";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { 
@@ -181,11 +182,28 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [scrolled, setScrolled] = useState(false);
 
+  const isSuperAdmin = user?.role === "super_admin";
+
+  const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery(undefined, {
+    enabled: isAuthenticated && !isSuperAdmin,
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
+
   useEffect(() => {
-    if (isAuthenticated && !loading) {
+    if (loading) return;
+    if (!isAuthenticated) return;
+    if (isSuperAdmin) {
       setLocation("/dashboard");
+      return;
     }
-  }, [isAuthenticated, loading, setLocation]);
+    if (planLoading) return;
+    if (currentPlan?.status === "active") {
+      setLocation("/dashboard");
+    } else {
+      setLocation("/subscription-plans");
+    }
+  }, [isAuthenticated, loading, isSuperAdmin, currentPlan, planLoading, setLocation]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
