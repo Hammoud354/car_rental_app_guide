@@ -200,9 +200,8 @@ export default function Home() {
     if (planLoading) return;
     if (currentPlan?.status === "active") {
       setLocation("/dashboard");
-    } else {
-      setLocation("/subscription-plans");
     }
+    // No redirect for users without a subscription — let them see the landing page
   }, [isAuthenticated, loading, isSuperAdmin, currentPlan, planLoading, setLocation]);
 
   useEffect(() => {
