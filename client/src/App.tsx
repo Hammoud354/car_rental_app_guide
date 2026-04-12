@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch, useLocation, Redirect } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import SidebarLayout from "./components/SidebarLayout";
@@ -76,10 +76,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  // If user has no active subscription, send them to subscription plans
+  // If user has no active subscription, redirect them to subscription plans
   const hasActivePlan = currentPlan && currentPlan.status === "active";
   if (!hasActivePlan) {
-    return <SubscriptionPlans />;
+    return <Redirect to="/subscription-plans" />;
   }
 
   return <>{children}</>;
