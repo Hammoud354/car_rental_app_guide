@@ -143,11 +143,11 @@ export function SubscriptionStatusCard() {
         <div className="rounded-lg bg-white/50 p-3 space-y-2">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="h-4 w-4" />
-            <span className="font-medium">{t("subscription.subscriptionDates") || "Subscription Period"}</span>
+            <span className="font-medium">Subscription Period</span>
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <p className="text-xs text-gray-500">{t("subscription.startDate") || "Start Date"}</p>
+              <p className="text-xs text-gray-500">Start Date</p>
               <p className="font-semibold text-gray-800">
                 {subscription.startDate
                   ? new Date(subscription.startDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
@@ -155,7 +155,7 @@ export function SubscriptionStatusCard() {
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-500">{t("subscription.expiryDate") || "Expiry Date"}</p>
+              <p className="text-xs text-gray-500">Expiry Date</p>
               <p className={`font-semibold ${
                 expiryDate && expiryDate < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                   ? "text-red-600"
