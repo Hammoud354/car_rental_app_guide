@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { InsuranceRenewalDialog } from "@/components/InsuranceRenewalDialog";
+import { RegistrationRenewalDialog } from "@/components/RegistrationRenewalDialog";
 import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
 import { MaintenanceModal } from "@/components/MaintenanceModal";
@@ -230,6 +231,103 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
       
       {selectedVehicle && (
         <InsuranceRenewalDialog
+          vehicle={selectedVehicle}
+          open={isRenewalDialogOpen}
+          onOpenChange={setIsRenewalDialogOpen}
+        />
+      )}
+    </>
+  );
+}
+
+function RegistrationAlertWidget({ filterUserId }: { filterUserId: number | null }) {
+  const { data: expiredVehicles } = trpc.fleet.getExpiredRegistration.useQuery(undefined, {
+    enabled: !filterUserId,
+  });
+  const { data: expiringVehicles } = trpc.fleet.getExpiringRegistration.useQuery(
+    { daysThreshold: 30 },
+    { enabled: !filterUserId }
+  );
+
+  const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
+  const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+
+  const expired = expiredVehicles || [];
+  const expiring = expiringVehicles || [];
+  const totalIssues = expired.length + expiring.length;
+
+  if (totalIssues === 0) return null;
+
+  const handleRenewClick = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
+    setIsRenewalDialogOpen(true);
+  };
+
+  return (
+    <>
+      <Card className="border-blue-200 bg-blue-50/50">
+        <CardContent className="pt-5 pb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <AlertTriangle className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-blue-900">Registration Alerts</h3>
+              <p className="text-xs text-blue-700">{totalIssues} vehicle{totalIssues > 1 ? 's' : ''} need attention</p>
+            </div>
+            <Link href="/fleet-management">
+              <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
+                View Fleet <ChevronRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-red-600">{expired.length}</div>
+              <div className="text-xs text-red-700">Expired</div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
+              <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
+              <div className="text-xs text-yellow-700">Expiring (30d)</div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {expired.slice(0, 2).map((vehicle: any) => (
+              <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                  <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.registrationExpiryDate).toLocaleDateString()}</div>
+                </div>
+                <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                  Renew
+                </Button>
+              </div>
+            ))}
+            {expiring.slice(0, 2).map((vehicle: any) => {
+              const daysLeft = Math.ceil((new Date(vehicle.registrationExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+              return (
+                <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                    <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
+                  </div>
+                  <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                    Renew
+                  </Button>
+                </div>
+              );
+            })}
+            {totalIssues > 4 && (
+              <p className="text-xs text-blue-600 text-center pt-1">+{totalIssues - 4} more vehicles need attention</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {selectedVehicle && (
+        <RegistrationRenewalDialog
           vehicle={selectedVehicle}
           open={isRenewalDialogOpen}
           onOpenChange={setIsRenewalDialogOpen}
@@ -539,6 +637,7 @@ export default function Dashboard() {
     overdueAlert: true,
     contractExpiryAlert: true,
     insuranceAlert: true,
+    registrationAlert: true,
     fleetStatus: true,
     fleetComposition: true,
   });
@@ -654,6 +753,7 @@ export default function Dashboard() {
                   { id: 'overdueAlert' as const, icon: Clock, label: 'Overdue Contracts Alert' },
                   { id: 'contractExpiryAlert' as const, icon: Clock, label: 'Contract Expiry Alert' },
                   { id: 'insuranceAlert' as const, icon: AlertTriangle, label: 'Insurance Expiry Alert' },
+                  { id: 'registrationAlert' as const, icon: AlertTriangle, label: 'Registration Expiry Alert' },
                   { id: 'fleetStatus' as const, icon: Eye, label: 'Fleet Status Chart' },
                   { id: 'fleetComposition' as const, icon: Eye, label: 'Fleet Composition' },
                 ].map(({ id, icon: Icon, label }) => (
@@ -687,6 +787,7 @@ export default function Dashboard() {
       {widgetVisibility.overdueAlert && <OverdueWidget filterUserId={selectedUserId} />}
       {widgetVisibility.contractExpiryAlert && <ContractExpiryWidget filterUserId={selectedUserId} />}
       {widgetVisibility.insuranceAlert && <InsuranceAlertWidget filterUserId={selectedUserId} />}
+      {widgetVisibility.registrationAlert && <RegistrationAlertWidget filterUserId={selectedUserId} />}
 
       <MaintenanceAlertsWidget />
       <KmMaintenanceAlertsWidget vehicles={vehicles || []} />

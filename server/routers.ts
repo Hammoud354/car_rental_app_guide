@@ -718,6 +718,32 @@ export const appRouter = router({
           input.policyNumber
         );
       }),
+
+    getExpiringRegistration: protectedProcedure
+      .input(z.object({ daysThreshold: z.number().default(30) }))
+      .query(async ({ input, ctx }) => {
+        return await db.getVehiclesWithExpiringRegistration(ctx.user.id, input.daysThreshold);
+      }),
+
+    getExpiredRegistration: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.getVehiclesWithExpiredRegistration(ctx.user.id);
+      }),
+
+    renewRegistration: protectedProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        newExpiryDate: z.date(),
+        registrationFee: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.renewVehicleRegistration(
+          input.vehicleId,
+          ctx.user.id,
+          input.newExpiryDate,
+          input.registrationFee
+        );
+      }),
   }),
 
   // Rental Contracts Router

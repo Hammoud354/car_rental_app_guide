@@ -3000,6 +3000,64 @@ export async function renewVehicleInsurance(
 }
 
 /**
+ * Get vehicles with registration expiring within daysThreshold days
+ */
+export async function getVehiclesWithExpiringRegistration(userId: number, daysThreshold: number = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  const today = new Date();
+  const futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + daysThreshold);
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    sql`${vehicles.registrationExpiryDate} IS NOT NULL`,
+    sql`${vehicles.registrationExpiryDate} > ${today}`,
+    sql`${vehicles.registrationExpiryDate} <= ${futureDate}`,
+  ];
+  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
+}
+
+/**
+ * Get vehicles with expired registration
+ */
+export async function getVehiclesWithExpiredRegistration(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const today = new Date();
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    sql`${vehicles.registrationExpiryDate} IS NOT NULL`,
+    sql`${vehicles.registrationExpiryDate} < ${today}`,
+  ];
+  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
+}
+
+/**
+ * Renew vehicle registration with new expiry date and fee
+ */
+export async function renewVehicleRegistration(
+  vehicleId: number,
+  userId: number,
+  newExpiryDate: Date,
+  registrationFee: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const admin = await isSuperAdmin(userId);
+  const condition = admin
+    ? eq(vehicles.id, vehicleId)
+    : and(eq(vehicles.id, vehicleId), eq(vehicles.userId, userId));
+  await db.update(vehicles).set({
+    registrationExpiryDate: newExpiryDate,
+    registrationFee,
+    updatedAt: new Date(),
+  }).where(condition);
+  return { success: true, message: "Registration renewed successfully" };
+}
+
+/**
  * Get all insurance policies for a vehicle
  */
 export async function getVehicleInsurancePolicies(vehicleId: number, userId: number) {
