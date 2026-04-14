@@ -1,0 +1,1 @@
+ALTER TABLE "vehicles" ADD COLUMN "registrationFee" numeric(10, 2);

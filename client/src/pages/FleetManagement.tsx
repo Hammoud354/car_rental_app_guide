@@ -315,6 +315,7 @@ export default function FleetManagement() {
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
       registrationExpiryDate: registrationExpiryDate || (formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined),
+      registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
       nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
       notes: formData.get("notes") as string || undefined,
       targetUserId: selectedTargetUserId || undefined, // For Super Admin to assign to specific user
@@ -369,6 +370,7 @@ export default function FleetManagement() {
         insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
+        registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
         notes: formData.get("notes") as string || undefined,
       },
     });
@@ -969,13 +971,23 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div>
-                  <Label>Registration Expiry Date</Label>
-                  <ModernDatePicker
-                    date={registrationExpiryDate}
-                    onDateChange={setRegistrationExpiryDate}
-                    placeholder="Select expiry date"
-                  />
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                  <h4 className="font-medium text-sm">Registration</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Expiry Date</Label>
+                      <ModernDatePicker
+                        date={registrationExpiryDate}
+                        onDateChange={setRegistrationExpiryDate}
+                        placeholder="Select expiry date"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="registrationFee">Annual Fee ($)</Label>
+                      <Input id="registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" />
+                      <p className="text-xs text-muted-foreground mt-1">Registration fees can vary each year</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div>
@@ -1588,13 +1600,23 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div>
-                  <Label>Registration Expiry Date</Label>
-                  <ModernDatePicker
-                    date={editRegistrationExpiryDate}
-                    onDateChange={setEditRegistrationExpiryDate}
-                    placeholder="Select expiry date"
-                  />
+                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
+                  <h4 className="font-medium text-sm">Registration</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Expiry Date</Label>
+                      <ModernDatePicker
+                        date={editRegistrationExpiryDate}
+                        onDateChange={setEditRegistrationExpiryDate}
+                        placeholder="Select expiry date"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-registrationFee">Annual Fee ($)</Label>
+                      <Input id="edit-registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).registrationFee || ""} />
+                      <p className="text-xs text-muted-foreground mt-1">Registration fees can vary each year</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

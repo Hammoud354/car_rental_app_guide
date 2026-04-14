@@ -425,6 +425,7 @@ export const appRouter = router({
         insuranceCost: z.string().optional(), // Legacy field
         purchaseCost: z.string().optional(),
         registrationExpiryDate: z.date().optional(),
+        registrationFee: z.string().optional(),
         nextMaintenanceDate: z.date().optional(),
         photoUrl: z.string().optional(),
         notes: z.string().optional(),
@@ -491,6 +492,7 @@ export const appRouter = router({
           insuranceAnnualPremium: z.string().optional(),
           insuranceCost: z.string().optional(),
           purchaseCost: z.string().optional(),
+          registrationFee: z.string().optional(),
           photoUrl: z.string().optional(),
           notes: z.string().optional(),
         }),

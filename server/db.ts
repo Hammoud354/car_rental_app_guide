@@ -281,6 +281,7 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (vehicle.insurancePolicyStartDate) insertData.insurancePolicyStartDate = vehicle.insurancePolicyStartDate;
   if (vehicle.insuranceCost && vehicle.insuranceCost !== '') insertData.insuranceCost = vehicle.insuranceCost;
   if (vehicle.purchaseCost && vehicle.purchaseCost !== '') insertData.purchaseCost = vehicle.purchaseCost;
+  if ((vehicle as any).registrationFee && (vehicle as any).registrationFee !== '') insertData.registrationFee = (vehicle as any).registrationFee;
   if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
   if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
   
@@ -3860,7 +3861,8 @@ export async function initializeHighSeasonTable() {
       ALTER TABLE vehicles
         ADD COLUMN IF NOT EXISTS "highSeasonDailyRate" decimal(10, 2),
         ADD COLUMN IF NOT EXISTS "highSeasonWeeklyRate" decimal(10, 2),
-        ADD COLUMN IF NOT EXISTS "highSeasonMonthlyRate" decimal(10, 2)
+        ADD COLUMN IF NOT EXISTS "highSeasonMonthlyRate" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "registrationFee" decimal(10, 2)
     `);
     // Create high season periods table
     await db.execute(sql`

@@ -125,6 +125,7 @@ export const vehicles = pgTable(
     insuranceCost: decimal("insuranceCost", { precision: 10, scale: 2 }),
     purchaseCost: decimal("purchaseCost", { precision: 10, scale: 2 }),
     registrationExpiryDate: timestamp("registrationExpiryDate"),
+    registrationFee: decimal("registrationFee", { precision: 10, scale: 2 }),
     engineType: varchar("engineType", { length: 50 }),
     transmission: varchar("transmission", { length: 50 }),
     fuelType: varchar("fuelType", { length: 50 }),
