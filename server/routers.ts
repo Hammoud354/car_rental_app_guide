@@ -412,6 +412,9 @@ export const appRouter = router({
         dailyRate: z.string(),
         weeklyRate: z.string().optional(),
         monthlyRate: z.string().optional(),
+        highSeasonDailyRate: z.string().optional(),
+        highSeasonWeeklyRate: z.string().optional(),
+        highSeasonMonthlyRate: z.string().optional(),
         mileage: z.number().int().optional(),
         vin: z.string().max(17).optional(),
         insurancePolicyNumber: z.string().max(100).optional(),
@@ -475,6 +478,9 @@ export const appRouter = router({
           dailyRate: z.string().optional(),
           weeklyRate: z.string().optional(),
           monthlyRate: z.string().optional(),
+          highSeasonDailyRate: z.string().optional(),
+          highSeasonWeeklyRate: z.string().optional(),
+          highSeasonMonthlyRate: z.string().optional(),
           mileage: z.number().int().optional(),
           vin: z.string().max(17).optional(),
           insurancePolicyNumber: z.string().max(100).optional(),
@@ -490,7 +496,7 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input, ctx }) => {
-        await db.updateVehicle(input.id, ctx.user?.id || 1, input.data);
+        await db.updateVehicle(input.id, ctx.user?.id || 1, input.data as any);
         return { success: true };
       }),
     
@@ -3206,6 +3212,45 @@ export const appRouter = router({
           throw new Error("Access denied");
         }
         return contract;
+      }),
+  }),
+
+  highSeason: router({
+    list: publicProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id || 1;
+      return await db.getHighSeasonPeriods(userId);
+    }),
+
+    create: publicProcedure
+      .input(z.object({
+        name: z.string().min(1).max(100),
+        startDate: z.string(),
+        endDate: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user?.id || 1;
+        return await db.createHighSeasonPeriod({ userId, ...input });
+      }),
+
+    update: publicProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).max(100).optional(),
+        startDate: z.string().optional(),
+        endDate: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user?.id || 1;
+        const { id, ...data } = input;
+        return await db.updateHighSeasonPeriod(id, userId, data);
+      }),
+
+    delete: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        const userId = ctx.user?.id || 1;
+        await db.deleteHighSeasonPeriod(input.id, userId);
+        return { success: true };
       }),
   }),
 });

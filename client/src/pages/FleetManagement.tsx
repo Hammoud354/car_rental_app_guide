@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle, Sun, Pencil } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -88,9 +88,45 @@ export default function FleetManagement() {
   const [lastServiceDate, setLastServiceDate] = useState<Date | undefined>();
   const [editLastServiceDate, setEditLastServiceDate] = useState<Date | undefined>();
 
+  // High season periods state
+  const [isHighSeasonDialogOpen, setIsHighSeasonDialogOpen] = useState(false);
+  const [editingPeriod, setEditingPeriod] = useState<any>(null);
+  const [hsName, setHsName] = useState("");
+  const [hsStartDate, setHsStartDate] = useState<Date | undefined>();
+  const [hsEndDate, setHsEndDate] = useState<Date | undefined>();
+
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
+
+  const { data: highSeasonPeriods, refetch: refetchHighSeason } = trpc.highSeason.list.useQuery();
+  const createHighSeasonMutation = trpc.highSeason.create.useMutation({
+    onSuccess: () => { toast.success("High season period added"); refetchHighSeason(); resetHsForm(); setIsHighSeasonDialogOpen(false); },
+    onError: (e) => toast.error(e.message),
+  });
+  const updateHighSeasonMutation = trpc.highSeason.update.useMutation({
+    onSuccess: () => { toast.success("High season period updated"); refetchHighSeason(); resetHsForm(); setIsHighSeasonDialogOpen(false); },
+    onError: (e) => toast.error(e.message),
+  });
+  const deleteHighSeasonMutation = trpc.highSeason.delete.useMutation({
+    onSuccess: () => { toast.success("High season period deleted"); refetchHighSeason(); },
+    onError: (e) => toast.error(e.message),
+  });
+
+  const resetHsForm = () => { setHsName(""); setHsStartDate(undefined); setHsEndDate(undefined); setEditingPeriod(null); };
+
+  const handleHighSeasonSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!hsStartDate || !hsEndDate) { toast.error("Please select both start and end dates"); return; }
+    if (hsEndDate < hsStartDate) { toast.error("End date must be after start date"); return; }
+    const startStr = hsStartDate.toISOString().split("T")[0];
+    const endStr = hsEndDate.toISOString().split("T")[0];
+    if (editingPeriod) {
+      updateHighSeasonMutation.mutate({ id: editingPeriod.id, name: hsName, startDate: startStr, endDate: endStr });
+    } else {
+      createHighSeasonMutation.mutate({ name: hsName, startDate: startStr, endDate: endStr });
+    }
+  };
   
   // Fetch all users for Super Admin
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, {
@@ -266,6 +302,9 @@ export default function FleetManagement() {
       dailyRate: formData.get("dailyRate") as string,
       weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
       monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
+      highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
+      highSeasonWeeklyRate: (formData.get("highSeasonWeeklyRate") as string)?.trim() || undefined,
+      highSeasonMonthlyRate: (formData.get("highSeasonMonthlyRate") as string)?.trim() || undefined,
       mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
       vin: formData.get("vin") as string || undefined,
       insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
@@ -317,6 +356,9 @@ export default function FleetManagement() {
         dailyRate: formData.get("dailyRate") as string,
         weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
         monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
+        highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
+        highSeasonWeeklyRate: (formData.get("highSeasonWeeklyRate") as string)?.trim() || undefined,
+        highSeasonMonthlyRate: (formData.get("highSeasonMonthlyRate") as string)?.trim() || undefined,
         mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
         vin: formData.get("vin") as string || undefined,
         insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
@@ -858,6 +900,29 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
+                {/* High Season Pricing */}
+                <div className="space-y-3 p-4 border border-amber-200 rounded-lg bg-amber-50/50">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4 text-amber-500" />
+                    <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
+                  </div>
+                  <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <Label htmlFor="highSeasonDailyRate">HS Daily Rate ($)</Label>
+                      <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" />
+                    </div>
+                    <div>
+                      <Label htmlFor="highSeasonWeeklyRate">HS Weekly Rate ($)</Label>
+                      <Input id="highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" />
+                    </div>
+                    <div>
+                      <Label htmlFor="highSeasonMonthlyRate">HS Monthly Rate ($)</Label>
+                      <Input id="highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
                   <h4 className="font-medium text-sm">Insurance Information</h4>
                   
@@ -1090,6 +1155,59 @@ export default function FleetManagement() {
             >
               <X className="h-4 w-4" />
             </button>
+          )}
+        </div>
+
+        {/* High Season Date Ranges Panel */}
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Sun className="h-4 w-4 text-amber-500" />
+              <h2 className="font-semibold text-sm text-amber-800">High Season Periods</h2>
+              <span className="text-xs text-amber-600">— vehicles with high season rates are priced automatically during these dates</span>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-amber-300 text-amber-700 hover:bg-amber-100 text-xs"
+              onClick={() => { resetHsForm(); setIsHighSeasonDialogOpen(true); }}
+            >
+              <Plus className="mr-1 h-3 w-3" />
+              Add Period
+            </Button>
+          </div>
+          {highSeasonPeriods && highSeasonPeriods.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {highSeasonPeriods.map((period) => (
+                <div key={period.id} className="flex items-center gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-xs">
+                  <Sun className="h-3 w-3 text-amber-400 shrink-0" />
+                  <div>
+                    <span className="font-semibold text-amber-900">{period.name}</span>
+                    <span className="text-amber-600 ml-2">{period.startDate} → {period.endDate}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setEditingPeriod(period);
+                      setHsName(period.name);
+                      setHsStartDate(new Date(period.startDate));
+                      setHsEndDate(new Date(period.endDate));
+                      setIsHighSeasonDialogOpen(true);
+                    }}
+                    className="text-amber-400 hover:text-amber-600 ml-1"
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => { if (confirm("Delete this high season period?")) deleteHighSeasonMutation.mutate({ id: period.id }); }}
+                    className="text-red-400 hover:text-red-600"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-amber-600">No high season periods set. Add date ranges to enable automatic high season pricing.</p>
           )}
         </div>
 
@@ -1402,6 +1520,29 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
+                {/* High Season Pricing */}
+                <div className="space-y-3 p-4 border border-amber-200 rounded-lg bg-amber-50/50">
+                  <div className="flex items-center gap-2">
+                    <Sun className="h-4 w-4 text-amber-500" />
+                    <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
+                  </div>
+                  <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <Label htmlFor="edit-highSeasonDailyRate">HS Daily Rate ($)</Label>
+                      <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-highSeasonWeeklyRate">HS Weekly Rate ($)</Label>
+                      <Input id="edit-highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonWeeklyRate || ""} />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-highSeasonMonthlyRate">HS Monthly Rate ($)</Label>
+                      <Input id="edit-highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonMonthlyRate || ""} />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
                   <h4 className="font-medium text-sm">Insurance Information</h4>
                   
@@ -1480,6 +1621,44 @@ export default function FleetManagement() {
         )}
       </div>
       
+      {/* High Season Period Dialog */}
+      <Dialog open={isHighSeasonDialogOpen} onOpenChange={(open) => { if (!open) resetHsForm(); setIsHighSeasonDialogOpen(open); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingPeriod ? "Edit High Season Period" : "Add High Season Period"}</DialogTitle>
+            <DialogDescription>Set a date range when high season pricing applies to all vehicles that have HS rates configured.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleHighSeasonSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="hs-name">Period Name *</Label>
+              <Input
+                id="hs-name"
+                value={hsName}
+                onChange={(e) => setHsName(e.target.value)}
+                placeholder="e.g., Summer 2025, Christmas Holiday"
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Start Date *</Label>
+                <ModernDatePicker date={hsStartDate} onDateChange={setHsStartDate} placeholder="Select start" />
+              </div>
+              <div>
+                <Label>End Date *</Label>
+                <ModernDatePicker date={hsEndDate} onDateChange={setHsEndDate} placeholder="Select end" />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => { resetHsForm(); setIsHighSeasonDialogOpen(false); }}>Cancel</Button>
+              <Button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white" disabled={createHighSeasonMutation.isPending || updateHighSeasonMutation.isPending}>
+                {createHighSeasonMutation.isPending || updateHighSeasonMutation.isPending ? "Saving..." : editingPeriod ? "Update Period" : "Add Period"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Custom Maker Dialog */}
       <Dialog open={isCustomMakerDialogOpen} onOpenChange={setIsCustomMakerDialogOpen}>
         <DialogContent>

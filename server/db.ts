@@ -1,7 +1,7 @@
 import { eq, and, or, lte, gte, lt, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -271,6 +271,9 @@ export async function createVehicle(vehicle: InsertVehicle) {
   // Only add optional fields if they have values (not empty string or undefined)
   if (vehicle.weeklyRate && vehicle.weeklyRate !== '') insertData.weeklyRate = vehicle.weeklyRate;
   if (vehicle.monthlyRate && vehicle.monthlyRate !== '') insertData.monthlyRate = vehicle.monthlyRate;
+  if ((vehicle as any).highSeasonDailyRate && (vehicle as any).highSeasonDailyRate !== '') insertData.highSeasonDailyRate = (vehicle as any).highSeasonDailyRate;
+  if ((vehicle as any).highSeasonWeeklyRate && (vehicle as any).highSeasonWeeklyRate !== '') insertData.highSeasonWeeklyRate = (vehicle as any).highSeasonWeeklyRate;
+  if ((vehicle as any).highSeasonMonthlyRate && (vehicle as any).highSeasonMonthlyRate !== '') insertData.highSeasonMonthlyRate = (vehicle as any).highSeasonMonthlyRate;
   if (vehicle.mileage !== undefined && vehicle.mileage !== null) insertData.mileage = vehicle.mileage;
   if (vehicle.vin && vehicle.vin !== '') insertData.vin = vehicle.vin;
   if (vehicle.insurancePolicyNumber && vehicle.insurancePolicyNumber !== '') insertData.insurancePolicyNumber = vehicle.insurancePolicyNumber;
@@ -3846,4 +3849,41 @@ export async function updateWhishPaymentRequestStatus(
     console.error("Error updating Whish payment request:", error);
     return null;
   }
+}
+
+// ─── High Season Periods ─────────────────────────────────────────────────────
+
+export async function getHighSeasonPeriods(userId: number): Promise<HighSeasonPeriod[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(highSeasonPeriods).where(eq(highSeasonPeriods.userId, userId)).orderBy(asc(highSeasonPeriods.startDate));
+}
+
+export async function createHighSeasonPeriod(data: { userId: number; name: string; startDate: string; endDate: string }): Promise<HighSeasonPeriod> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [row] = await db.insert(highSeasonPeriods).values({
+    userId: data.userId,
+    name: data.name,
+    startDate: data.startDate,
+    endDate: data.endDate,
+  }).returning();
+  return row;
+}
+
+export async function updateHighSeasonPeriod(id: number, userId: number, data: { name?: string; startDate?: string; endDate?: string }): Promise<HighSeasonPeriod | null> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const updates: any = { updatedAt: new Date() };
+  if (data.name !== undefined) updates.name = data.name;
+  if (data.startDate !== undefined) updates.startDate = data.startDate;
+  if (data.endDate !== undefined) updates.endDate = data.endDate;
+  const [row] = await db.update(highSeasonPeriods).set(updates).where(and(eq(highSeasonPeriods.id, id), eq(highSeasonPeriods.userId, userId))).returning();
+  return row || null;
+}
+
+export async function deleteHighSeasonPeriod(id: number, userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(highSeasonPeriods).where(and(eq(highSeasonPeriods.id, id), eq(highSeasonPeriods.userId, userId)));
 }

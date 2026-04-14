@@ -140,6 +140,9 @@ export const vehicles = pgTable(
     maintenanceIntervalKm: integer("maintenanceIntervalKm").default(5000),
     maintenanceIntervalMonths: integer("maintenanceIntervalMonths").default(6),
     aiMaintenanceEnabled: boolean("aiMaintenanceEnabled").default(true),
+    highSeasonDailyRate: decimal("highSeasonDailyRate", { precision: 10, scale: 2 }),
+    highSeasonWeeklyRate: decimal("highSeasonWeeklyRate", { precision: 10, scale: 2 }),
+    highSeasonMonthlyRate: decimal("highSeasonMonthlyRate", { precision: 10, scale: 2 }),
     photoUrl: text("photoUrl"),
     notes: text("notes"),
     createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -701,6 +704,22 @@ export const numberingAudit = pgTable("numberingAudit", {
 
 export type NumberingAudit = typeof numberingAudit.$inferSelect;
 export type InsertNumberingAudit = typeof numberingAudit.$inferInsert;
+
+/**
+ * High Season Periods table — per-user date ranges for high season pricing
+ */
+export const highSeasonPeriods = pgTable("highSeasonPeriods", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  startDate: date("startDate").notNull(),
+  endDate: date("endDate").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type HighSeasonPeriod = typeof highSeasonPeriods.$inferSelect;
+export type InsertHighSeasonPeriod = typeof highSeasonPeriods.$inferInsert;
 
 export const whishPaymentRequestStatusEnum = pgEnum("whishPaymentRequestStatus", ["pending", "approved", "rejected"]);
 
