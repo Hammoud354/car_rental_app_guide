@@ -907,17 +907,17 @@ export default function FleetManagement() {
                     <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
                   </div>
                   <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <Label htmlFor="highSeasonDailyRate">HS Daily Rate ($)</Label>
+                      <Label htmlFor="highSeasonDailyRate">HS Daily ($)</Label>
                       <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" />
                     </div>
                     <div>
-                      <Label htmlFor="highSeasonWeeklyRate">HS Weekly Rate ($)</Label>
+                      <Label htmlFor="highSeasonWeeklyRate">HS Weekly ($)</Label>
                       <Input id="highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" />
                     </div>
                     <div>
-                      <Label htmlFor="highSeasonMonthlyRate">HS Monthly Rate ($)</Label>
+                      <Label htmlFor="highSeasonMonthlyRate">HS Monthly ($)</Label>
                       <Input id="highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" />
                     </div>
                   </div>
@@ -1527,17 +1527,17 @@ export default function FleetManagement() {
                     <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
                   </div>
                   <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <Label htmlFor="edit-highSeasonDailyRate">HS Daily Rate ($)</Label>
+                      <Label htmlFor="edit-highSeasonDailyRate">HS Daily ($)</Label>
                       <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} />
                     </div>
                     <div>
-                      <Label htmlFor="edit-highSeasonWeeklyRate">HS Weekly Rate ($)</Label>
+                      <Label htmlFor="edit-highSeasonWeeklyRate">HS Weekly ($)</Label>
                       <Input id="edit-highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonWeeklyRate || ""} />
                     </div>
                     <div>
-                      <Label htmlFor="edit-highSeasonMonthlyRate">HS Monthly Rate ($)</Label>
+                      <Label htmlFor="edit-highSeasonMonthlyRate">HS Monthly ($)</Label>
                       <Input id="edit-highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonMonthlyRate || ""} />
                     </div>
                   </div>
