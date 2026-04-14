@@ -3851,6 +3851,35 @@ export async function updateWhishPaymentRequestStatus(
   }
 }
 
+export async function initializeHighSeasonTable() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    // Add high season rate columns to vehicles if they don't exist yet
+    await db.execute(sql`
+      ALTER TABLE vehicles
+        ADD COLUMN IF NOT EXISTS "highSeasonDailyRate" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "highSeasonWeeklyRate" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "highSeasonMonthlyRate" decimal(10, 2)
+    `);
+    // Create high season periods table
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "highSeasonPeriods" (
+        "id" serial PRIMARY KEY,
+        "userId" integer NOT NULL REFERENCES users("id") ON DELETE CASCADE,
+        "name" varchar(100) NOT NULL,
+        "startDate" date NOT NULL,
+        "endDate" date NOT NULL,
+        "createdAt" timestamp DEFAULT now() NOT NULL,
+        "updatedAt" timestamp DEFAULT now() NOT NULL
+      )
+    `);
+    console.log("[Startup] highSeasonPeriods table ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize high season table:", err);
+  }
+}
+
 // ─── High Season Periods ─────────────────────────────────────────────────────
 
 export async function getHighSeasonPeriods(userId: number): Promise<HighSeasonPeriod[]> {
