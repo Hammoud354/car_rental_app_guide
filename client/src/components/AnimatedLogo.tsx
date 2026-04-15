@@ -6,14 +6,14 @@ interface AnimatedLogoProps {
 
 export function AnimatedLogo({ size = "md", darkBg = false, showSubtext = false }: AnimatedLogoProps) {
   const sizeStyles = {
-    sm: { fleet: "text-lg", master: "text-lg", sub: "text-[8px]" },
-    md: { fleet: "text-xl", master: "text-xl", sub: "text-[9px]" },
-    lg: { fleet: "text-2xl", master: "text-2xl", sub: "text-[10px]" },
+    sm: { fleet: "text-lg", wizards: "text-lg", sub: "text-[8px]" },
+    md: { fleet: "text-xl", wizards: "text-xl", sub: "text-[9px]" },
+    lg: { fleet: "text-2xl", wizards: "text-2xl", sub: "text-[10px]" },
   };
 
   const s = sizeStyles[size];
   const fleetColor = darkBg ? "text-white" : "text-gray-900";
-  const masterColor = darkBg ? "text-blue-400" : "text-blue-600";
+  const wizardsColor = darkBg ? "text-blue-400" : "text-blue-600";
   const subColor = darkBg ? "text-blue-300/60" : "text-gray-400";
 
   return (
@@ -44,21 +44,15 @@ export function AnimatedLogo({ size = "md", darkBg = false, showSubtext = false 
         }
       `}</style>
       <div className="flex items-baseline gap-0">
-        <span
-          className={`${s.fleet} font-extrabold tracking-tight ${fleetColor} animate-slide-left`}
-        >
+        <span className={`${s.fleet} font-extrabold tracking-tight ${fleetColor} animate-slide-left`}>
           Fleet
         </span>
-        <span
-          className={`${s.master} font-extrabold tracking-tight ${masterColor} animate-slide-right`}
-        >
-          Master
+        <span className={`${s.wizards} font-extrabold tracking-tight ${wizardsColor} animate-slide-right`}>
+          Wizards
         </span>
       </div>
       {showSubtext && (
-        <span
-          className={`${s.sub} font-semibold uppercase tracking-[0.2em] ${subColor} -mt-0.5 animate-fade-in`}
-        >
+        <span className={`${s.sub} font-semibold uppercase tracking-[0.2em] ${subColor} -mt-0.5 animate-fade-in`}>
           Rental Management
         </span>
       )}
