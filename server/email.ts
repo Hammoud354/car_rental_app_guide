@@ -2,6 +2,19 @@ import nodemailer from "nodemailer";
 import { ENV } from "./_core/env";
 
 function createTransporter() {
+  // Use GoDaddy SMTP (info@fleetwizards.com) if configured
+  if (ENV.fleetEmailUser && ENV.fleetEmailPassword) {
+    return nodemailer.createTransport({
+      host: "smtpout.secureserver.net",
+      port: 465,
+      secure: true,
+      auth: {
+        user: ENV.fleetEmailUser,
+        pass: ENV.fleetEmailPassword,
+      },
+    });
+  }
+  // Fallback to Gmail
   return nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -11,20 +24,30 @@ function createTransporter() {
   });
 }
 
+function getSenderAddress() {
+  if (ENV.fleetEmailUser && ENV.fleetEmailPassword) {
+    return `FleetWizards <${ENV.fleetEmailUser}>`;
+  }
+  return `FleetWizards <${ENV.gmailFrom}>`;
+}
+
 async function sendEmail(to: string, subject: string, html: string) {
-  if (!ENV.gmailAppPassword) {
-    console.warn("[Email] GMAIL_APP_PASSWORD not set — skipping email send");
+  const hasFleetEmail = ENV.fleetEmailUser && ENV.fleetEmailPassword;
+  const hasGmail = !!ENV.gmailAppPassword;
+
+  if (!hasFleetEmail && !hasGmail) {
+    console.warn("[Email] No email credentials configured — skipping email send");
     return false;
   }
   try {
     const transporter = createTransporter();
     await transporter.sendMail({
-      from: `FleetWizards <${ENV.gmailFrom}>`,
+      from: getSenderAddress(),
       to,
       subject,
       html,
     });
-    console.log(`[Email] Sent "${subject}" to ${to}`);
+    console.log(`[Email] Sent "${subject}" to ${to} from ${getSenderAddress()}`);
     return true;
   } catch (error) {
     console.error(`[Email] Failed to send "${subject}" to ${to}:`, error);
