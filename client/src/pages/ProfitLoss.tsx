@@ -15,8 +15,6 @@ import {
 import { Loader2, DollarSign, TrendingUp, TrendingDown, Download, Calendar } from "lucide-react";
 import { Link } from "wouter";
 import { generateExcelBuffer, downloadExcel } from "@/lib/excelUtils";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
 import { useTranslation } from "react-i18next";
@@ -171,6 +169,8 @@ export default function ProfitLoss() {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // Use html2canvas to capture the SAFE CLONE (not the original)
+        const html2canvas = (await import("html2canvas")).default;
+        const { default: jsPDF } = await import("jspdf");
         const canvas = await html2canvas(safeClone, {
           scale: 2,
           useCORS: true,

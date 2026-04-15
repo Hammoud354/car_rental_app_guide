@@ -20,8 +20,6 @@ import { useUserFilter } from "@/contexts/UserFilterContext";
 import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
 import { parseTemplate, formatTemplateDate, formatTemplateCurrency, getDefaultTemplate } from "@/lib/templateParser";
 import { generateThumbnail } from "@/lib/thumbnailGenerator";
@@ -1846,6 +1844,8 @@ export default function RentalContracts() {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         
                         // Use html2canvas to capture the SAFE CLONE (not the original)
+                        const html2canvas = (await import("html2canvas")).default;
+                        const { default: jsPDF } = await import("jspdf");
                         const canvas = await html2canvas(safeClone, {
                           scale: 2,
                           useCORS: true,

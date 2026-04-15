@@ -22,8 +22,6 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { useTranslation } from "react-i18next";
 
 export default function Invoices() {
@@ -85,6 +83,8 @@ export default function Invoices() {
       // Brief pause so styles settle
       await new Promise(r => setTimeout(r, 120));
 
+      const html2canvas = (await import("html2canvas")).default;
+      const { default: jsPDF } = await import("jspdf");
       const canvas = await html2canvas(offscreen, {
         scale: 2,
         useCORS: true,

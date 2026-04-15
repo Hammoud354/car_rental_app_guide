@@ -1,6 +1,3 @@
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-
 function buildPrintHtml(content: string, title: string): string {
   return `<!DOCTYPE html>
 <html>
@@ -127,6 +124,9 @@ export async function exportElementToPDF(
   document.body.appendChild(offscreen);
 
   try {
+    const html2canvas = (await import("html2canvas")).default;
+    const { default: jsPDF } = await import("jspdf");
+
     await new Promise((r) => setTimeout(r, 150));
 
     const canvas = await html2canvas(offscreen, {
@@ -191,6 +191,8 @@ export async function exportTemplateOverlayToPDF(
   fileName: string = "contract.pdf",
   returnBase64 = false
 ): Promise<boolean | string> {
+  const html2canvas = (await import("html2canvas")).default;
+  const { default: jsPDF } = await import("jspdf");
   let container: HTMLDivElement | null = null;
   try {
     // Pre-load template image to get natural dimensions
@@ -325,7 +327,7 @@ export async function exportTemplateOverlayToPDF(
  * Appends a canvas to the PDF, slicing it into A4 pages as needed.
  */
 function appendCanvasToPDF(
-  pdf: InstanceType<typeof jsPDF>,
+  pdf: any,
   canvas: HTMLCanvasElement,
   isFirstPage: boolean
 ): void {
@@ -367,6 +369,8 @@ function appendCanvasToPDF(
  * so html2canvas can reliably measure and capture it.
  */
 export async function exportContractTemplateToPDF(fileName: string, returnBase64 = false): Promise<boolean | string> {
+  const html2canvas = (await import("html2canvas")).default;
+  const { default: jsPDF } = await import("jspdf");
   const template = document.getElementById("contract-pdf-template");
   if (!template) {
     console.error("exportContractTemplateToPDF: #contract-pdf-template not found in DOM");

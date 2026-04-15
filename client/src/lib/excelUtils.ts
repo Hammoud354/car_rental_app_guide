@@ -1,5 +1,3 @@
-import ExcelJS from "exceljs";
-
 export interface JsonSheetDef {
   name: string;
   type: "json";
@@ -17,6 +15,7 @@ export interface AoaSheetDef {
 export type SheetDef = JsonSheetDef | AoaSheetDef;
 
 export async function generateExcelBuffer(sheets: SheetDef[]): Promise<Uint8Array> {
+  const ExcelJS = (await import("exceljs")).default;
   const workbook = new ExcelJS.Workbook();
 
   for (const sheet of sheets) {
