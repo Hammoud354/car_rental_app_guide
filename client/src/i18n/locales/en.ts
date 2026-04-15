@@ -470,7 +470,7 @@ export default {
 
   dashboard: {
     title: "Dashboard",
-    subtitle: "Welcome to FleetMaster",
+    subtitle: "Welcome to FleetWizards",
     totalVehicles: "Total Vehicles",
     availableVehicles: "Available",
     rentedVehicles: "Rented",

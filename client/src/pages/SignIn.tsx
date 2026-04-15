@@ -70,7 +70,7 @@ export default function SignIn() {
           </div>
 
           <p className="text-xs text-gray-600">
-            &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
+            &copy; {new Date().getFullYear()} FleetWizards. All rights reserved.
           </p>
         </div>
       </div>

@@ -195,7 +195,7 @@ export default {
     critical: "حرج", needsAttention: "يحتاج اهتماماً", canWait: "يمكن الانتظار",
   },
   dashboard: {
-    title: "لوحة التحكم", subtitle: "مرحباً بك في FleetMaster",
+    title: "لوحة التحكم", subtitle: "مرحباً بك في FleetWizards",
     totalVehicles: "إجمالي المركبات", availableVehicles: "متاح", rentedVehicles: "مؤجر",
     maintenanceVehicles: "في الصيانة", activeContracts: "العقود النشطة", monthlyRevenue: "الإيرادات الشهرية",
     totalRevenue: "إجمالي الإيرادات", recentContracts: "العقود الأخيرة", recentActivity: "النشاط الأخير",

@@ -103,7 +103,7 @@ const testimonials = [
     name: "Ahmad Al-Hassan",
     role: "Managing Director",
     company: "Gulf Auto Rentals, UAE",
-    text: "FleetMaster transformed our operations. We went from spreadsheets to managing 300+ vehicles with complete visibility. Revenue grew 40% in the first year.",
+    text: "FleetWizards transformed our operations. We went from spreadsheets to managing 300+ vehicles with complete visibility. Revenue grew 40% in the first year.",
     avatar: "AH",
   },
   {
@@ -212,7 +212,7 @@ export default function Home() {
 
   const handleContactUs = () => {
     const message = encodeURIComponent(
-      "Hello! I'm interested in learning more about FleetMaster.\n\n" +
+      "Hello! I'm interested in learning more about FleetWizards.\n\n" +
       "Please share:\n" +
       "1. Business name:\n" +
       "2. Fleet size:\n" +
@@ -377,7 +377,7 @@ export default function Home() {
                 <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
                 <div className="flex-1 mx-8">
                   <div className="h-5 bg-white rounded-md border border-gray-200 max-w-xs mx-auto flex items-center justify-center">
-                    <span className="text-[10px] text-gray-500 font-semibold tracking-wide">FleetMaster</span>
+                    <span className="text-[10px] text-gray-500 font-semibold tracking-wide">FleetWizards</span>
                   </div>
                 </div>
               </div>
@@ -639,7 +639,7 @@ export default function Home() {
                   Ready to modernize your fleet operations?
                 </h2>
                 <p className="text-gray-400 text-lg max-w-xl mx-auto mb-8">
-                  Join hundreds of rental agencies already using FleetMaster to save time, reduce costs, and grow revenue.
+                  Join hundreds of rental agencies already using FleetWizards to save time, reduce costs, and grow revenue.
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                   <Link href="/signup">
@@ -674,7 +674,7 @@ export default function Home() {
               <Link href="/signup"><span className="hover:text-gray-600 transition-colors cursor-pointer">Sign Up</span></Link>
             </div>
             <p className="text-xs text-gray-400">
-              &copy; {new Date().getFullYear()} FleetMaster. All rights reserved.
+              &copy; {new Date().getFullYear()} FleetWizards. All rights reserved.
             </p>
           </div>
         </div>
