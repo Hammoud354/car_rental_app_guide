@@ -167,20 +167,6 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          if (id.includes("node_modules")) {
-            if (id.includes("react-dom") || id.includes("react/")) return "vendor-react";
-            if (id.includes("@radix-ui") || id.includes("@floating-ui")) return "vendor-radix";
-            if (id.includes("@tanstack")) return "vendor-query";
-            if (id.includes("lucide-react") || id.includes("react-icons")) return "vendor-icons";
-            if (id.includes("date-fns") || id.includes("zod") || id.includes("drizzle-zod")) return "vendor-utils";
-            return "vendor-misc";
-          }
-        },
-      },
-    },
   },
   server: {
     host: true,
