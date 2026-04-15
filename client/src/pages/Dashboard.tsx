@@ -794,16 +794,99 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {widgetVisibility.totalFleet && (
-          <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.totalFleet")}</span>
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <Car className="h-4 w-4 text-blue-500" />
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{t("dashboard.totalFleet")}</span>
+                  <div className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors">
+                    <Car className="h-4 w-4 text-blue-500" />
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">{totalFleet}</div>
+                <p className="text-xs text-blue-500 mt-1 font-medium">Click to view details</p>
               </div>
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{totalFleet}</div>
-            <p className="text-xs text-gray-400 mt-1">{available} {t("dashboard.availableCount")}</p>
-          </div>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Car className="h-5 w-5 text-blue-500" />
+                  Total Fleet — {totalFleet} Vehicles
+                </DialogTitle>
+                <DialogDescription>All vehicles categorized by current status</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-5 pt-2">
+                {/* Available */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                    <span className="text-sm font-semibold text-gray-700">Available ({available})</span>
+                  </div>
+                  {vehicles?.filter(v => v.status === "Available").length === 0 ? (
+                    <p className="text-xs text-gray-400 pl-5">No available vehicles</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {vehicles?.filter(v => v.status === "Available").map(v => (
+                        <div key={v.id} className="flex items-center justify-between bg-emerald-50 rounded-lg px-3 py-2">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                          </div>
+                          <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">Available</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Rented */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500" />
+                    <span className="text-sm font-semibold text-gray-700">Rented ({rented})</span>
+                  </div>
+                  {vehicles?.filter(v => v.status === "Rented").length === 0 ? (
+                    <p className="text-xs text-gray-400 pl-5">No vehicles currently rented</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {vehicles?.filter(v => v.status === "Rented").map(v => (
+                        <div key={v.id} className="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                          </div>
+                          <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Rented</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* In Maintenance */}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-block w-2.5 h-2.5 rounded-full bg-red-500" />
+                    <span className="text-sm font-semibold text-gray-700">In Maintenance ({maintenance})</span>
+                  </div>
+                  {vehicles?.filter(v => v.status === "Maintenance").length === 0 ? (
+                    <p className="text-xs text-gray-400 pl-5">No vehicles in maintenance</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {vehicles?.filter(v => v.status === "Maintenance").map(v => (
+                        <div key={v.id} className="flex items-center justify-between bg-red-50 rounded-lg px-3 py-2">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                          </div>
+                          <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">Maintenance</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         )}
 
         {widgetVisibility.totalRevenue && (
