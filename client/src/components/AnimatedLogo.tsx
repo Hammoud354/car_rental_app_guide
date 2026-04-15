@@ -18,41 +18,16 @@ export function AnimatedLogo({ size = "md", darkBg = false, showSubtext = false 
 
   return (
     <div className="flex flex-col">
-      <style>{`
-        @keyframes slideInLeft {
-          from { opacity: 0; transform: translateX(-8px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(8px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        .animate-slide-left {
-          animation: slideInLeft 0.4s ease-out forwards;
-        }
-        .animate-slide-right {
-          animation: slideInRight 0.4s ease-out 0.15s forwards;
-          opacity: 0;
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.3s ease-out 0.35s forwards;
-          opacity: 0;
-        }
-      `}</style>
       <div className="flex items-baseline gap-0">
-        <span className={`${s.fleet} font-extrabold tracking-tight ${fleetColor} animate-slide-left`}>
+        <span className={`${s.fleet} font-extrabold tracking-tight ${fleetColor}`}>
           Fleet
         </span>
-        <span className={`${s.wizards} font-extrabold tracking-tight ${wizardsColor} animate-slide-right`}>
+        <span className={`${s.wizards} font-extrabold tracking-tight ${wizardsColor}`}>
           Wizards
         </span>
       </div>
       {showSubtext && (
-        <span className={`${s.sub} font-semibold uppercase tracking-[0.2em] ${subColor} -mt-0.5 animate-fade-in`}>
+        <span className={`${s.sub} font-semibold uppercase tracking-[0.2em] ${subColor} -mt-0.5`}>
           Rental Management
         </span>
       )}
