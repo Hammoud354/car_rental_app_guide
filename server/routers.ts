@@ -11,6 +11,8 @@ import {
   sendSubscriptionApprovedEmail,
   sendSubscriptionRejectedEmail,
   sendPasswordResetByAdminEmail,
+  sendAdminNewUserNotification,
+  sendAdminPaymentNotification,
 } from "./email";
 import {
   getNextContractNumber,
@@ -160,6 +162,9 @@ export const appRouter = router({
         if (newUser.email) {
           sendWelcomeEmail(newUser.email, newUser.username).catch(err =>
             console.error("[Signup] Welcome email failed:", err)
+          );
+          sendAdminNewUserNotification(newUser.username, newUser.email, newUser.name || "").catch(err =>
+            console.error("[Signup] Admin notification email failed:", err)
           );
         }
 
@@ -3080,6 +3085,15 @@ export const appRouter = router({
           input.amount
         );
         if (!result) throw new Error("Failed to submit payment request");
+        const tier = await db.getSubscriptionTier(input.tierId);
+        sendAdminPaymentNotification(
+          ctx.user.username,
+          ctx.user.email || "",
+          (ctx.user as any).name || (ctx.user as any).companyName || "",
+          tier?.displayName || `Plan #${input.tierId}`,
+          input.transactionId,
+          input.amount
+        ).catch(err => console.error("[Payment] Admin notification email failed:", err));
         return { success: true };
       }),
     getMyWhishPayments: protectedProcedure.query(async ({ ctx }) => {

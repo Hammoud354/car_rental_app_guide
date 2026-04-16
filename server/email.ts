@@ -215,6 +215,59 @@ export async function sendSubscriptionRejectedEmail(to: string, username: string
   return sendEmail(to, `Payment verification failed — FleetWizards`, html);
 }
 
+const ADMIN_EMAIL = "info@fleetwizards.com";
+
+export async function sendAdminNewUserNotification(username: string, email: string, companyName: string) {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">New user registered</h1>
+        <p style="${pStyle}">A new user has just created an account and is waiting for a subscription.</p>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Username:</strong> ${username}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 0; font-size: 13px; color: #6b7280;"><strong>Company:</strong> ${companyName || "—"}</p>
+        </div>
+        <a href="https://fleetwizards.com/dashboard" style="${btnStyle()}">Go to Admin Dashboard</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(ADMIN_EMAIL, `New sign-up: ${username} (${companyName || email})`, html);
+}
+
+export async function sendAdminPaymentNotification(
+  username: string,
+  email: string,
+  companyName: string,
+  planName: string,
+  transactionId: string,
+  amount: number
+) {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">💰 New payment request — action required</h1>
+        <p style="${pStyle}">A user has submitted a Whish Money payment and is waiting for your approval.</p>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>User:</strong> ${username}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Email:</strong> ${email}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Company:</strong> ${companyName || "—"}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Plan:</strong> ${planName}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Amount:</strong> $${amount}</p>
+          <p style="margin: 0; font-size: 13px; color: #6b7280;"><strong>Transaction ID:</strong> ${transactionId}</p>
+        </div>
+        <p style="${pStyle}">Please log in to the admin panel to verify this payment and approve or reject the request.</p>
+        <a href="https://fleetwizards.com/dashboard" style="${btnStyle("#16a34a")}">Review Payment Now</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(ADMIN_EMAIL, `Payment request: ${username} — ${planName} plan ($${amount})`, html);
+}
+
 export async function sendPasswordResetByAdminEmail(to: string, username: string, temporaryPassword: string) {
   const html = `
     <div style="${baseStyle}">
