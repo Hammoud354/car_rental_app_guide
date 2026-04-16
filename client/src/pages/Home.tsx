@@ -6,7 +6,7 @@ import {
   ArrowRight, MessageCircle, Globe, ChevronRight,
   LogIn, UserPlus, CheckCircle2, Star, BarChart3, FileText, 
   Users, DollarSign, Wrench, Car, Clock, TrendingUp,
-  Activity
+  Activity, Phone, Mail, Menu, X
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
@@ -181,6 +181,12 @@ export default function Home() {
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    setMenuOpen(false);
+  };
 
   const isSuperAdmin = user?.role === "super_admin";
 
@@ -241,25 +247,37 @@ export default function Home() {
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled 
+          scrolled || menuOpen
             ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-100" 
             : "bg-transparent"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
-          <Link href="/">
+          {/* Logo */}
+          <button onClick={() => scrollTo("home")} className="flex-shrink-0">
             <AnimatedLogo size="md" showSubtext />
-          </Link>
+          </button>
+
+          {/* Desktop nav links */}
+          <div className="hidden md:flex items-center gap-1">
+            {[
+              { label: "Home", id: "home" },
+              { label: "About Us", id: "about" },
+              { label: "Features", id: "features" },
+              { label: "Contact", id: "contact" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollTo(item.id)}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/70 rounded-lg transition-colors"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Right: auth buttons + hamburger */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={handleContactUs} 
-              className="hidden lg:inline-flex text-gray-500 hover:text-gray-900 text-sm"
-            >
-              <MessageCircle className="h-4 w-4 mr-1.5" />
-              Contact
-            </Button>
             <Link href="/signin">
               <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm shadow-md shadow-emerald-700/20 px-5">
                 <LogIn className="h-4 w-4 sm:mr-1.5" />
@@ -272,12 +290,39 @@ export default function Home() {
                 <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
               </Button>
             </Link>
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile dropdown menu */}
+        {menuOpen && (
+          <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1">
+            {[
+              { label: "Home", id: "home" },
+              { label: "About Us", id: "about" },
+              { label: "Features", id: "features" },
+              { label: "Contact", id: "contact" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollTo(item.id)}
+                className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
+      <section id="home" className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
         <div className="absolute inset-0">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[600px] bg-gradient-to-b from-blue-50/80 via-white to-white rounded-full blur-3xl" />
           <div className="absolute top-20 right-0 w-[400px] h-[400px] bg-gradient-to-bl from-indigo-50/60 to-transparent rounded-full blur-3xl" />
@@ -449,6 +494,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* About Us Section */}
+      <section id="about" className="py-20 lg:py-28 bg-gradient-to-br from-blue-50/40 to-indigo-50/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">About Us</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Built for car rental businesses
+            </h2>
+            <p className="text-gray-500 text-lg leading-relaxed">
+              FleetWizards was founded by rental industry operators who got tired of juggling spreadsheets,
+              WhatsApp messages, and paper contracts. We built the platform we always wished existed —
+              one place to run every part of your business.
+            </p>
+          </AnimatedSection>
+          <AnimatedSection>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
+              {stats.map((stat, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                    <CountUp target={stat.value} suffix={stat.suffix} prefix={stat.prefix || ""} />
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1 font-medium">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
       {/* Trusted By Section */}
       <section className="py-12 border-y border-gray-100 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -468,7 +542,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-20 lg:py-28">
+      <section id="features" className="py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">Capabilities</p>
@@ -658,6 +732,64 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 lg:py-28 bg-gray-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <AnimatedSection className="text-center max-w-2xl mx-auto mb-12">
+            <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">Contact</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+              Get in touch
+            </h2>
+            <p className="text-gray-500 text-lg">
+              Have questions about FleetWizards? Our team is here to help.
+            </p>
+          </AnimatedSection>
+
+          <AnimatedSection>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+              {/* Phone */}
+              <a
+                href="tel:+96176354131"
+                className="flex items-center gap-5 p-6 bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
+                  <Phone className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Phone</p>
+                  <p className="text-base font-bold text-gray-900">+961 76 354 131</p>
+                </div>
+              </a>
+
+              {/* Email */}
+              <a
+                href="mailto:info@fleetwizards.com"
+                className="flex items-center gap-5 p-6 bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-100 transition-colors">
+                  <Mail className="h-5 w-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Email</p>
+                  <p className="text-base font-bold text-gray-900">info@fleetwizards.com</p>
+                </div>
+              </a>
+            </div>
+
+            {/* WhatsApp CTA */}
+            <div className="mt-8 text-center">
+              <button
+                onClick={handleContactUs}
+                className="inline-flex items-center gap-2.5 px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-green-600/20 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Chat with us on WhatsApp
+              </button>
             </div>
           </AnimatedSection>
         </div>
