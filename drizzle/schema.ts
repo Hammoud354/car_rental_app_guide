@@ -725,9 +725,10 @@ export type HighSeasonPeriod = typeof highSeasonPeriods.$inferSelect;
 export type InsertHighSeasonPeriod = typeof highSeasonPeriods.$inferInsert;
 
 export const whishPaymentRequestStatusEnum = pgEnum("whishPaymentRequestStatus", ["pending", "approved", "rejected"]);
+export const paymentMethodEnum = pgEnum("paymentMethod", ["whish", "omt"]);
 
 /**
- * Whish Money payment requests for subscriptions
+ * Payment requests for subscriptions (Whish Money or OMT)
  */
 export const whishPaymentRequests = pgTable("whishPaymentRequests", {
   id: serial("id").primaryKey(),
@@ -735,6 +736,7 @@ export const whishPaymentRequests = pgTable("whishPaymentRequests", {
   tierId: integer("tierId").notNull(),
   transactionId: varchar("transactionId", { length: 100 }).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  paymentMethod: paymentMethodEnum("paymentMethod").default("whish").notNull(),
   status: whishPaymentRequestStatusEnum("status").default("pending").notNull(),
   notes: text("notes"),
   reviewedBy: integer("reviewedBy"),

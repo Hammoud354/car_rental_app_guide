@@ -44,6 +44,13 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 const WHISH_PHONE_NUMBER = "+961 76 354 131";
+const OMT_PHONE_NUMBER = "+961 76 354 131";
+
+const paymentMethodBadge = (method: string) => {
+  if (method === "omt")
+    return <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-semibold">🟠 OMT</Badge>;
+  return <Badge className="bg-green-100 text-green-800 border-green-200 font-semibold">💚 Whish</Badge>;
+};
 
 export default function AdminPaymentRequests() {
   const { user } = useAuth();
@@ -111,8 +118,8 @@ export default function AdminPaymentRequests() {
             <div className="flex items-center gap-3">
               <Wallet className="h-6 w-6 text-green-600" />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">Whish Payment Requests</h1>
-                <p className="text-sm text-gray-500">Review and approve subscription payments</p>
+                <h1 className="text-xl font-bold text-gray-900">Payment Requests</h1>
+                <p className="text-sm text-gray-500">Review and approve Whish & OMT subscription payments</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -175,10 +182,9 @@ export default function AdminPaymentRequests() {
             <Card className="border-gray-200 bg-white">
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 font-medium">Your Whish Number</p>
-                    <p className="text-base font-mono font-bold text-gray-900">{WHISH_PHONE_NUMBER}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Update in SubscriptionPlans.tsx</p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-gray-500 font-medium">💚 Whish: <span className="font-mono font-bold text-gray-800">{WHISH_PHONE_NUMBER}</span></p>
+                    <p className="text-xs text-gray-500 font-medium">🟠 OMT: <span className="font-mono font-bold text-gray-800">{OMT_PHONE_NUMBER}</span></p>
                   </div>
                   <Wallet className="h-8 w-8 text-gray-300" />
                 </div>
@@ -235,6 +241,7 @@ export default function AdminPaymentRequests() {
                             <TableHead>User</TableHead>
                             <TableHead>Plan</TableHead>
                             <TableHead>Amount</TableHead>
+                            <TableHead>Method</TableHead>
                             <TableHead>Transaction ID</TableHead>
                             <TableHead>Submitted</TableHead>
                             <TableHead>Status</TableHead>
@@ -255,6 +262,7 @@ export default function AdminPaymentRequests() {
                                 <Badge variant="outline">{r.tier?.displayName || `Tier #${r.tierId}`}</Badge>
                               </TableCell>
                               <TableCell className="font-semibold">${r.amount}</TableCell>
+                              <TableCell>{paymentMethodBadge(r.paymentMethod || "whish")}</TableCell>
                               <TableCell>
                                 <span className="font-mono text-sm bg-gray-100 px-2 py-0.5 rounded">{r.transactionId}</span>
                               </TableCell>
@@ -313,6 +321,7 @@ export default function AdminPaymentRequests() {
                             <TableHead>User</TableHead>
                             <TableHead>Plan</TableHead>
                             <TableHead>Amount</TableHead>
+                            <TableHead>Method</TableHead>
                             <TableHead>Transaction ID</TableHead>
                             <TableHead>Submitted</TableHead>
                             <TableHead>Status</TableHead>
@@ -332,6 +341,7 @@ export default function AdminPaymentRequests() {
                                 <Badge variant="outline">{r.tier?.displayName || `Tier #${r.tierId}`}</Badge>
                               </TableCell>
                               <TableCell className="font-semibold">${r.amount}</TableCell>
+                              <TableCell>{paymentMethodBadge(r.paymentMethod || "whish")}</TableCell>
                               <TableCell>
                                 <span className="font-mono text-sm bg-gray-100 px-2 py-0.5 rounded">{r.transactionId}</span>
                               </TableCell>

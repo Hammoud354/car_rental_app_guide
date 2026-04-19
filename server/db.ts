@@ -3834,7 +3834,8 @@ export async function createWhishPaymentRequest(
   userId: number,
   tierId: number,
   transactionId: string,
-  amount: number
+  amount: number,
+  paymentMethod: "whish" | "omt" = "whish"
 ) {
   const db = await getDb();
   if (!db) return null;
@@ -3845,6 +3846,7 @@ export async function createWhishPaymentRequest(
       tierId,
       transactionId,
       amount: amount.toString(),
+      paymentMethod,
       status: "pending",
     });
     const { eq } = await import("drizzle-orm");

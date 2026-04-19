@@ -3087,6 +3087,7 @@ export const appRouter = router({
         tierId: z.number(),
         transactionId: z.string().min(1),
         amount: z.number().positive(),
+        paymentMethod: z.enum(["whish", "omt"]).default("whish"),
       }))
       .mutation(async ({ input, ctx }) => {
         // Reject if this transaction ID has already been used by anyone
@@ -3099,7 +3100,8 @@ export const appRouter = router({
           ctx.user.id,
           input.tierId,
           input.transactionId.trim(),
-          input.amount
+          input.amount,
+          input.paymentMethod
         );
         if (!result) throw new Error("Failed to submit payment request");
         const tier = await db.getSubscriptionTier(input.tierId);

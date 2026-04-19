@@ -12,12 +12,36 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Check, Loader2, ArrowLeft, Wallet, Copy, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Check, Loader2, ArrowLeft, Wallet, Copy, CheckCircle2, Clock, XCircle, ChevronRight } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 
 const WHISH_PHONE_NUMBER = "+961 76 354 131";
+const OMT_PHONE_NUMBER = "+961 76 354 131";
+
+type PaymentMethod = "whish" | "omt";
+
+const PAYMENT_METHODS: { id: PaymentMethod; label: string; color: string; bg: string; border: string; logo: string; description: string }[] = [
+  {
+    id: "whish",
+    label: "Whish Money",
+    color: "text-green-700",
+    bg: "bg-green-50",
+    border: "border-green-300",
+    logo: "💚",
+    description: "Lebanon's most popular digital wallet",
+  },
+  {
+    id: "omt",
+    label: "OMT",
+    color: "text-orange-700",
+    bg: "bg-orange-50",
+    border: "border-orange-300",
+    logo: "🟠",
+    description: "Pay via OMT transfer network",
+  },
+];
 
 const HARDCODED_PLANS = [
   {
@@ -84,6 +108,8 @@ const HARDCODED_PLANS = [
 export default function SubscriptionPlans() {
   const [, setLocation] = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<typeof HARDCODED_PLANS[0] | null>(null);
+  const [step, setStep] = useState<"method" | "payment">("method");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("whish");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [transactionId, setTransactionId] = useState("");
   const [copied, setCopied] = useState(false);
@@ -103,6 +129,7 @@ export default function SubscriptionPlans() {
       setDialogOpen(false);
       setTransactionId("");
       setSelectedPlan(null);
+      setStep("method");
     },
     onError: (err) => {
       toast.error(err.message || "Failed to submit payment request");
@@ -118,29 +145,39 @@ export default function SubscriptionPlans() {
     }
     setSelectedPlan(plan);
     setTransactionId("");
+    setStep("method");
     setDialogOpen(true);
   };
 
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setTransactionId("");
+    setStep("method");
+  };
+
+  const contactNumber = paymentMethod === "omt" ? OMT_PHONE_NUMBER : WHISH_PHONE_NUMBER;
+
   const handleCopyNumber = () => {
-    navigator.clipboard.writeText(WHISH_PHONE_NUMBER.replace(/\s/g, ""));
+    navigator.clipboard.writeText(contactNumber.replace(/\s/g, ""));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleSubmit = () => {
     if (!selectedPlan || !transactionId.trim()) {
-      toast.error("Please enter your Whish transaction ID");
+      toast.error(`Please enter your ${paymentMethod === "omt" ? "OMT" : "Whish"} transaction ID`);
       return;
     }
     submitMutation.mutate({
       tierId: selectedPlan.id,
       transactionId: transactionId.trim(),
       amount: selectedPlan.monthlyPrice,
+      paymentMethod,
     });
   };
 
   const pendingRequest = myPayments?.find((p: any) => p.status === "pending");
-  const lastApproved = myPayments?.find((p: any) => p.status === "approved");
+  const methodInfo = PAYMENT_METHODS.find((m) => m.id === paymentMethod)!;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30 py-12 px-4">
@@ -166,9 +203,11 @@ export default function SubscriptionPlans() {
             Start managing your fleet today. Choose the plan that works for your agency.
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-2 text-sm">
-            <Wallet className="h-4 w-4" />
-            Pay securely via <strong>Whish Money</strong> — Lebanon's trusted digital wallet
+          <div className="mt-4 inline-flex items-center gap-3 bg-white border border-gray-200 shadow-sm rounded-lg px-4 py-2.5 text-sm">
+            <span className="text-gray-500">Pay securely via</span>
+            <span className="flex items-center gap-1.5 font-semibold text-green-700">💚 Whish Money</span>
+            <span className="text-gray-300">|</span>
+            <span className="flex items-center gap-1.5 font-semibold text-orange-700">🟠 OMT</span>
           </div>
         </div>
 
@@ -178,7 +217,8 @@ export default function SubscriptionPlans() {
             <div>
               <p className="font-medium text-amber-900">Payment under review</p>
               <p className="text-sm text-amber-700 mt-0.5">
-                Your Whish payment (TX: <span className="font-mono font-medium">{pendingRequest.transactionId}</span>) is being verified. We'll activate your subscription shortly.
+                Your {pendingRequest.paymentMethod === "omt" ? "OMT" : "Whish"} payment (TX:{" "}
+                <span className="font-mono font-medium">{pendingRequest.transactionId}</span>) is being verified. We'll activate your subscription shortly.
               </p>
             </div>
           </div>
@@ -281,7 +321,7 @@ export default function SubscriptionPlans() {
                         }`}
                       >
                         <Wallet className="mr-2 h-4 w-4" />
-                        Pay via Whish — ${plan.monthlyPrice}/mo
+                        Subscribe — ${plan.monthlyPrice}/mo
                       </Button>
                     )}
                   </CardContent>
@@ -295,7 +335,7 @@ export default function SubscriptionPlans() {
           <div className="flex items-center justify-center gap-6 text-sm text-gray-500">
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
-              Secure Whish payment
+              Whish Money or OMT
             </span>
             <span className="flex items-center gap-1.5">
               <Check className="h-4 w-4 text-green-500" />
@@ -307,83 +347,134 @@ export default function SubscriptionPlans() {
             </span>
           </div>
           <p className="text-xs text-gray-400">
-            Payments are processed via Whish Money and verified manually within 24 hours.
+            Payments are processed via Whish Money or OMT and verified manually within 24 hours.
           </p>
         </div>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {/* Unified payment dialog */}
+      <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
         <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Wallet className="h-5 w-5 text-green-600" />
-              Pay via Whish Money
-            </DialogTitle>
-            <DialogDescription>
-              Follow these steps to subscribe to the <strong>{selectedPlan?.displayName}</strong> plan for <strong>${selectedPlan?.monthlyPrice}/month</strong>.
-            </DialogDescription>
-          </DialogHeader>
+          {step === "method" ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Wallet className="h-5 w-5 text-blue-600" />
+                  Choose Payment Method
+                </DialogTitle>
+                <DialogDescription>
+                  How would you like to pay for the <strong>{selectedPlan?.displayName}</strong> plan at <strong>${selectedPlan?.monthlyPrice}/month</strong>?
+                </DialogDescription>
+              </DialogHeader>
 
-          <div className="space-y-5 pt-2">
-            <div className="rounded-lg bg-green-50 border border-green-200 p-4 space-y-3">
-              <p className="text-sm font-semibold text-green-900">Step 1 — Send payment via Whish</p>
-              <div className="flex items-center justify-between bg-white rounded-md border border-green-200 px-3 py-2">
-                <div>
-                  <p className="text-xs text-gray-500 mb-0.5">Whish Number</p>
-                  <p className="font-mono font-bold text-gray-900 text-lg">{WHISH_PHONE_NUMBER}</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={handleCopyNumber} data-testid="button-copy-whish">
-                  {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+              <div className="space-y-3 pt-2">
+                {PAYMENT_METHODS.map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => { setPaymentMethod(method.id); setStep("payment"); }}
+                    data-testid={`button-method-${method.id}`}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-sm ${method.bg} ${method.border}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{method.logo}</span>
+                      <div className="text-left">
+                        <p className={`font-bold text-base ${method.color}`}>{method.label}</p>
+                        <p className="text-xs text-gray-500">{method.description}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                  </button>
+                ))}
+
+                <Button variant="outline" className="w-full mt-2" onClick={handleCloseDialog}>
+                  Cancel
                 </Button>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-green-800">Amount to send:</span>
-                <span className="font-bold text-green-900 text-base">${selectedPlan?.monthlyPrice}.00</span>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <span className="text-xl">{methodInfo.logo}</span>
+                  Pay via {methodInfo.label}
+                </DialogTitle>
+                <DialogDescription>
+                  Follow these steps to subscribe to the <strong>{selectedPlan?.displayName}</strong> plan for <strong>${selectedPlan?.monthlyPrice}/month</strong>.
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-5 pt-2">
+                <div className={`rounded-lg ${methodInfo.bg} border ${methodInfo.border} p-4 space-y-3`}>
+                  <p className={`text-sm font-semibold ${methodInfo.color}`}>
+                    Step 1 — Send payment via {methodInfo.label}
+                  </p>
+                  <div className="flex items-center justify-between bg-white rounded-md border border-gray-200 px-3 py-2">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">{methodInfo.label} Number</p>
+                      <p className="font-mono font-bold text-gray-900 text-lg">{contactNumber}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={handleCopyNumber} data-testid="button-copy-number">
+                      {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className={methodInfo.color}>Amount to send:</span>
+                    <span className={`font-bold text-base ${methodInfo.color}`}>${selectedPlan?.monthlyPrice}.00</span>
+                  </div>
+                  {paymentMethod === "whish" ? (
+                    <p className="text-xs text-green-700">
+                      Open your Whish app → Send Money → enter the number above → send <strong>${selectedPlan?.monthlyPrice}</strong>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-orange-700">
+                      Visit any OMT agent or use the OMT app → Transfer → enter the number above → send <strong>${selectedPlan?.monthlyPrice}</strong>
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="txn-id" className="text-sm font-semibold">
+                    Step 2 — Enter your {methodInfo.label} Transaction ID
+                  </Label>
+                  <Input
+                    id="txn-id"
+                    placeholder={paymentMethod === "omt" ? "e.g. OMT1234567890" : "e.g. WH1234567890"}
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    data-testid="input-transaction-id"
+                  />
+                  <p className="text-xs text-gray-500">
+                    {paymentMethod === "omt"
+                      ? "Find this in your OMT receipt or SMS confirmation after the transfer."
+                      : "Find this in your Whish app under transaction history after sending the payment."}
+                  </p>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setStep("method")}
+                    data-testid="button-back-method"
+                  >
+                    ← Back
+                  </Button>
+                  <Button
+                    className={`flex-1 text-white ${paymentMethod === "omt" ? "bg-orange-600 hover:bg-orange-700" : "bg-green-600 hover:bg-green-700"}`}
+                    onClick={handleSubmit}
+                    disabled={!transactionId.trim() || submitMutation.isPending}
+                    data-testid="button-submit-payment"
+                  >
+                    {submitMutation.isPending ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                    ) : (
+                      "Submit for Verification"
+                    )}
+                  </Button>
+                </div>
               </div>
-              <p className="text-xs text-green-700">
-                Open your Whish app → Send Money → enter the number above → send <strong>${selectedPlan?.monthlyPrice}</strong>
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="txn-id" className="text-sm font-semibold">
-                Step 2 — Enter your Whish Transaction ID
-              </Label>
-              <Input
-                id="txn-id"
-                placeholder="e.g. WH1234567890"
-                value={transactionId}
-                onChange={(e) => setTransactionId(e.target.value)}
-                data-testid="input-transaction-id"
-              />
-              <p className="text-xs text-gray-500">
-                Find this in your Whish app under transaction history after sending the payment.
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setDialogOpen(false)}
-                data-testid="button-cancel-whish"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                onClick={handleSubmit}
-                disabled={!transactionId.trim() || submitMutation.isPending}
-                data-testid="button-submit-whish"
-              >
-                {submitMutation.isPending ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
-                ) : (
-                  "Submit for Verification"
-                )}
-              </Button>
-            </div>
-          </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
