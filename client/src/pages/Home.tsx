@@ -251,7 +251,7 @@ export default function Home() {
 
           {/* Right: language selector + auth buttons + hamburger */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSelector />
+            <LanguageSelector compact />
             <Link href="/signin">
               <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm shadow-md shadow-emerald-700/20 px-5">
                 <LogIn className="h-4 w-4 sm:mr-1.5" />
