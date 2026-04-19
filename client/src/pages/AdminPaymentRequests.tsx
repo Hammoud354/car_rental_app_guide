@@ -48,8 +48,8 @@ const OMT_PHONE_NUMBER = "+961 76 354 131";
 
 const paymentMethodBadge = (method: string) => {
   if (method === "omt")
-    return <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-semibold">🟠 OMT</Badge>;
-  return <Badge className="bg-green-100 text-green-800 border-green-200 font-semibold">💚 Whish</Badge>;
+    return <Badge className="bg-orange-100 text-orange-800 border-orange-200 font-semibold flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />OMT</Badge>;
+  return <Badge className="bg-green-100 text-green-800 border-green-200 font-semibold flex items-center gap-1 w-fit"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Whish</Badge>;
 };
 
 export default function AdminPaymentRequests() {
@@ -182,9 +182,9 @@ export default function AdminPaymentRequests() {
             <Card className="border-gray-200 bg-white">
               <CardContent className="pt-4 pb-4">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-xs text-gray-500 font-medium">💚 Whish: <span className="font-mono font-bold text-gray-800">{WHISH_PHONE_NUMBER}</span></p>
-                    <p className="text-xs text-gray-500 font-medium">🟠 OMT: <span className="font-mono font-bold text-gray-800">{OMT_PHONE_NUMBER}</span></p>
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-gray-500 font-medium flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500 inline-block" />Whish: <span className="font-mono font-bold text-gray-800">{WHISH_PHONE_NUMBER}</span></p>
+                    <p className="text-xs text-gray-500 font-medium flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500 inline-block" />OMT: <span className="font-mono font-bold text-gray-800">{OMT_PHONE_NUMBER}</span></p>
                   </div>
                   <Wallet className="h-8 w-8 text-gray-300" />
                 </div>

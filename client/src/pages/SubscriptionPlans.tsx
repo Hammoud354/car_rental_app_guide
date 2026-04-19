@@ -22,14 +22,14 @@ const OMT_PHONE_NUMBER = "+961 76 354 131";
 
 type PaymentMethod = "whish" | "omt";
 
-const PAYMENT_METHODS: { id: PaymentMethod; label: string; color: string; bg: string; border: string; logo: string; description: string }[] = [
+const PAYMENT_METHODS: { id: PaymentMethod; label: string; color: string; bg: string; border: string; dot: string; description: string }[] = [
   {
     id: "whish",
     label: "Whish Money",
     color: "text-green-700",
     bg: "bg-green-50",
     border: "border-green-300",
-    logo: "💚",
+    dot: "bg-green-500",
     description: "Lebanon's most popular digital wallet",
   },
   {
@@ -38,7 +38,7 @@ const PAYMENT_METHODS: { id: PaymentMethod; label: string; color: string; bg: st
     color: "text-orange-700",
     bg: "bg-orange-50",
     border: "border-orange-300",
-    logo: "🟠",
+    dot: "bg-orange-500",
     description: "Pay via OMT transfer network",
   },
 ];
@@ -205,9 +205,9 @@ export default function SubscriptionPlans() {
 
           <div className="mt-4 inline-flex items-center gap-3 bg-white border border-gray-200 shadow-sm rounded-lg px-4 py-2.5 text-sm">
             <span className="text-gray-500">Pay securely via</span>
-            <span className="flex items-center gap-1.5 font-semibold text-green-700">💚 Whish Money</span>
+            <span className="flex items-center gap-1.5 font-semibold text-green-700"><span className="w-2.5 h-2.5 rounded-full bg-green-500 inline-block" />Whish Money</span>
             <span className="text-gray-300">|</span>
-            <span className="flex items-center gap-1.5 font-semibold text-orange-700">🟠 OMT</span>
+            <span className="flex items-center gap-1.5 font-semibold text-orange-700"><span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block" />OMT</span>
           </div>
         </div>
 
@@ -376,7 +376,7 @@ export default function SubscriptionPlans() {
                     className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all hover:shadow-sm ${method.bg} ${method.border}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl">{method.logo}</span>
+                      <span className={`w-4 h-4 rounded-full ${method.dot} shrink-0`} />
                       <div className="text-left">
                         <p className={`font-bold text-base ${method.color}`}>{method.label}</p>
                         <p className="text-xs text-gray-500">{method.description}</p>
@@ -395,7 +395,7 @@ export default function SubscriptionPlans() {
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <span className="text-xl">{methodInfo.logo}</span>
+                  <span className={`w-3.5 h-3.5 rounded-full ${methodInfo.dot} shrink-0`} />
                   Pay via {methodInfo.label}
                 </DialogTitle>
                 <DialogDescription>
