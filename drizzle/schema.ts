@@ -41,6 +41,8 @@ export const users = pgTable("users", {
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: roleEnum("role").default("user").notNull(),
   isInternal: boolean("isInternal").default(false).notNull(),
+  isTemporaryDemo: boolean("isTemporaryDemo").default(false).notNull(),
+  demoExpiresAt: timestamp("demoExpiresAt"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

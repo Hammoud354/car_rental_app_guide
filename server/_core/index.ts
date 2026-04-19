@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, cleanupExpiredTempDemoUsers } from "../db";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -109,6 +109,16 @@ async function startServer() {
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)
     );
+
+    // Run demo cleanup immediately on startup, then every 5 minutes
+    cleanupExpiredTempDemoUsers().catch(err =>
+      console.error("[Demo] Startup cleanup failed:", err)
+    );
+    setInterval(() => {
+      cleanupExpiredTempDemoUsers().catch(err =>
+        console.error("[Demo] Periodic cleanup failed:", err)
+      );
+    }, 5 * 60 * 1000);
   });
 }
 

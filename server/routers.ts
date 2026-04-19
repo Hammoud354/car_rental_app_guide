@@ -188,37 +188,22 @@ export const appRouter = router({
     }),
     loginDemo: publicProcedure.mutation(async ({ ctx }) => {
       const { seedDemoData } = await import('./seedDemoData');
-      
-      // Find or create demo user
-      let demoUser = await db.getUserByUsername('demo@system');
-      
-      if (!demoUser) {
-        // Create demo user if it doesn't exist
-        const bcrypt = await import('bcrypt');
-        const hashedPassword = await bcrypt.hash('demo123', 10);
-        
-        demoUser = await db.createUser({
-          username: 'demo@system',
-          password: hashedPassword,
-          name: 'Demo User',
-          email: 'demo@fleetmaster.com',
-          phone: '+1-555-0100',
-          country: 'US',
-        });
-      }
-      
-      // Always ensure demo data exists
+      const { createTempDemoUser } = await import('./db');
+
+      // Create a fresh isolated temp user for this demo session
+      const demoUser = await createTempDemoUser();
       await seedDemoData(demoUser.id);
-      
+
       // Create session cookie with 10-minute expiration
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.cookie(COOKIE_NAME, `user-${demoUser.id}`, {
         ...cookieOptions,
-        maxAge: 10 * 60 * 1000, // 10 minutes
+        maxAge: 10 * 60 * 1000,
       });
-      
+
       return {
         success: true,
+        userId: demoUser.id,
         user: {
           id: demoUser.id,
           name: demoUser.name,
@@ -226,6 +211,32 @@ export const appRouter = router({
           username: demoUser.username,
         },
       };
+    }),
+
+    cleanupDemo: publicProcedure.mutation(async ({ ctx }) => {
+      const { deleteTempDemoUser } = await import('./db');
+      const sessionCookie = ctx.req.cookies?.[COOKIE_NAME];
+      if (!sessionCookie) return { success: true };
+
+      const match = sessionCookie.match(/^user-(\d+)$/);
+      if (!match) return { success: true };
+
+      const userId = parseInt(match[1], 10);
+      const { getUserById } = await import('./db');
+      const user = await getUserById(userId);
+
+      if (user?.isTemporaryDemo) {
+        try {
+          await deleteTempDemoUser(userId);
+          console.log(`[Demo] Session ended — deleted temp demo user ${userId}`);
+        } catch (e) {
+          console.error(`[Demo] Failed to delete temp demo user ${userId}:`, e);
+        }
+      }
+
+      // Clear the session cookie
+      ctx.res.clearCookie(COOKIE_NAME);
+      return { success: true };
     }),
     requestPasswordReset: publicProcedure
       .input(z.object({
@@ -1935,26 +1946,26 @@ export const appRouter = router({
             COUNT(*) FILTER (WHERE "lastSignedIn" > NOW() - INTERVAL '7 days') as active_7d,
             COUNT(*) FILTER (WHERE "lastSignedIn" > NOW() - INTERVAL '30 days') as active_30d,
             COUNT(*) FILTER (WHERE "createdAt" > NOW() - INTERVAL '30 days') as new_30d
-          FROM users WHERE role != 'super_admin' AND username != 'demo@system'`),
+          FROM users WHERE role != 'super_admin' AND "isTemporaryDemo" = false`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COUNT(*) FILTER (WHERE status = 'Available') as available,
             COUNT(*) FILTER (WHERE status = 'Rented') as rented,
             COUNT(*) FILTER (WHERE status = 'Maintenance') as in_maintenance,
             COUNT(*) FILTER (WHERE status = 'Out of Service') as out_of_service
-          FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
-          dbInstance.execute(sql`SELECT COUNT(*) as total FROM clients WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
+          FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE "isTemporaryDemo" = true)`),
+          dbInstance.execute(sql`SELECT COUNT(*) as total FROM clients WHERE "userId" NOT IN (SELECT id FROM users WHERE "isTemporaryDemo" = true)`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COALESCE(SUM("totalAmount"), 0) as total_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'paid' THEN "totalAmount" ELSE 0 END), 0) as paid_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'pending' THEN "totalAmount" ELSE 0 END), 0) as pending_revenue,
             COALESCE(SUM(CASE WHEN "paymentStatus" = 'overdue' THEN "totalAmount" ELSE 0 END), 0) as overdue_revenue
-          FROM invoices WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
+          FROM invoices WHERE "userId" NOT IN (SELECT id FROM users WHERE "isTemporaryDemo" = true)`),
           dbInstance.execute(sql`SELECT 
             COUNT(*) as total,
             COALESCE(SUM(cost), 0) as total_cost
-          FROM "maintenanceRecords" WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system')`),
+          FROM "maintenanceRecords" WHERE "userId" NOT IN (SELECT id FROM users WHERE "isTemporaryDemo" = true)`),
           dbInstance.execute(sql`SELECT 
             COALESCE(st."displayName", 'No Plan') as plan_name,
             COUNT(u.id) as user_count,
@@ -1962,25 +1973,25 @@ export const appRouter = router({
           FROM users u
           LEFT JOIN "userSubscriptions" us ON u.id = us."userId"
           LEFT JOIN "subscriptionTiers" st ON us."tierId" = st.id
-          WHERE u.role != 'super_admin' AND u.username != 'demo@system'
+          WHERE u.role != 'super_admin' AND u."isTemporaryDemo" = false
           GROUP BY st."displayName", st."monthlyPrice"
           ORDER BY user_count DESC`),
           dbInstance.execute(sql`SELECT id, username, name, email, "createdAt", "lastSignedIn"
-          FROM users WHERE role != 'super_admin' AND username != 'demo@system'
+          FROM users WHERE role != 'super_admin' AND "isTemporaryDemo" = false
           ORDER BY "createdAt" DESC LIMIT 10`),
-          dbInstance.execute(sql`SELECT status, COUNT(*) as count FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE username = 'demo@system') GROUP BY status ORDER BY count DESC`),
+          dbInstance.execute(sql`SELECT status, COUNT(*) as count FROM vehicles WHERE "userId" NOT IN (SELECT id FROM users WHERE "isTemporaryDemo" = true) GROUP BY status ORDER BY count DESC`),
           dbInstance.execute(sql`SELECT 
             u.id, u.username, u.name,
             (SELECT COUNT(*) FROM vehicles v WHERE v."userId" = u.id) as vehicles,
             (SELECT COUNT(*) FROM clients c WHERE c."userId" = u.id) as clients,
             (SELECT COUNT(*) FROM invoices i WHERE i."userId" = u.id) as invoices,
             (SELECT COALESCE(SUM(i."totalAmount"), 0) FROM invoices i WHERE i."userId" = u.id) as revenue
-          FROM users u WHERE u.role != 'super_admin' AND u.username != 'demo@system'
+          FROM users u WHERE u.role != 'super_admin' AND u."isTemporaryDemo" = false
           ORDER BY revenue DESC LIMIT 10`),
           dbInstance.execute(sql`SELECT 
             TO_CHAR("createdAt", 'YYYY-MM') as month,
             COUNT(*) as signups
-          FROM users WHERE role != 'super_admin' AND username != 'demo@system'
+          FROM users WHERE role != 'super_admin' AND "isTemporaryDemo" = false
           GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
           ORDER BY month DESC LIMIT 12`),
         ]);

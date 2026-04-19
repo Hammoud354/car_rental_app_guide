@@ -3976,3 +3976,87 @@ export async function deleteHighSeasonPeriod(id: number, userId: number): Promis
   if (!db) throw new Error("Database not available");
   await db.delete(highSeasonPeriods).where(and(eq(highSeasonPeriods.id, id), eq(highSeasonPeriods.userId, userId)));
 }
+
+export async function deleteTempDemoUser(userId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.execute(sql`
+    DO $$
+    DECLARE uid INT := ${userId};
+    BEGIN
+      DELETE FROM "invoiceLineItems" WHERE "invoiceId" IN (SELECT id FROM invoices WHERE "userId" = uid);
+      DELETE FROM invoices WHERE "userId" = uid;
+      DELETE FROM "damageMarks" WHERE "userId" = uid;
+      DELETE FROM "contractAmendments" WHERE "contractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = uid);
+      DELETE FROM "generatedContracts" WHERE "contractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = uid);
+      DELETE FROM "rentalContracts" WHERE "userId" = uid;
+      DELETE FROM "maintenanceRecords" WHERE "userId" = uid;
+      DELETE FROM "maintenanceTasks" WHERE "userId" = uid;
+      DELETE FROM "vehicleImages" WHERE "vehicleId" IN (SELECT id FROM vehicles WHERE "userId" = uid);
+      DELETE FROM vehicles WHERE "userId" = uid;
+      DELETE FROM clients WHERE "userId" = uid;
+      DELETE FROM "companyProfiles" WHERE "userId" = uid;
+      DELETE FROM "companySettings" WHERE "userId" = uid;
+      DELETE FROM "dashboardPreferences" WHERE "userId" = uid;
+      DELETE FROM "whatsappTemplates" WHERE "userId" = uid;
+      DELETE FROM "numberingCounters" WHERE "userId" = uid;
+      DELETE FROM "numberingAudit" WHERE "userId" = uid;
+      DELETE FROM "highSeasonPeriods" WHERE "userId" = uid;
+      DELETE FROM "insurancePolicies" WHERE "userId" = uid;
+      DELETE FROM "userSubscriptions" WHERE "userId" = uid;
+      DELETE FROM "passwordResetTokens" WHERE "userId" = uid;
+      DELETE FROM "contractTemplates" WHERE "userId" = uid;
+      DELETE FROM "auditLogs" WHERE "userId" = uid;
+      DELETE FROM "whishPaymentRequests" WHERE "userId" = uid;
+      DELETE FROM users WHERE id = uid AND "isTemporaryDemo" = true;
+    END $$;
+  `);
+}
+
+export async function cleanupExpiredTempDemoUsers(): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const expired = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(and(
+      eq(users.isTemporaryDemo, true),
+      lte(users.demoExpiresAt, new Date())
+    ));
+
+  for (const u of expired) {
+    try {
+      await deleteTempDemoUser(u.id);
+      console.log(`[Demo] Cleaned up expired temp demo user ${u.id}`);
+    } catch (e) {
+      console.error(`[Demo] Failed to clean up temp demo user ${u.id}:`, e);
+    }
+  }
+
+  return expired.length;
+}
+
+export async function createTempDemoUser(): Promise<typeof users.$inferSelect> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { randomUUID } = await import('crypto');
+  const sessionId = randomUUID().replace(/-/g, '').slice(0, 16);
+  const username = `demo_session_${sessionId}`;
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+  const [inserted] = await db.insert(users).values({
+    username,
+    name: 'Demo User',
+    email: `${username}@demo.local`,
+    role: 'user',
+    isTemporaryDemo: true,
+    demoExpiresAt: expiresAt,
+    loginMethod: 'demo',
+    lastSignedIn: new Date(),
+  }).returning();
+
+  return inserted;
+}

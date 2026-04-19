@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,10 @@ export default function Demo() {
   const [, setLocation] = useLocation();
   const [timeRemaining, setTimeRemaining] = useState(DEMO_DURATION_MS);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
-  
+  const cleaningUp = useRef(false);
+
   const loginDemoMutation = trpc.auth.loginDemo.useMutation();
+  const cleanupDemoMutation = trpc.auth.cleanupDemo.useMutation();
 
   useEffect(() => {
     handleStartDemo();
@@ -22,7 +24,7 @@ export default function Demo() {
   useEffect(() => {
     if (status !== "ready") return;
     if (timeRemaining <= 0) {
-      window.location.href = "/";
+      handleEndDemo("/");
       return;
     }
     const timer = setInterval(() => {
@@ -43,6 +45,17 @@ export default function Demo() {
       console.error("Demo login failed:", error);
       setStatus("error");
     }
+  };
+
+  const handleEndDemo = async (redirectTo: string) => {
+    if (cleaningUp.current) return;
+    cleaningUp.current = true;
+    try {
+      await cleanupDemoMutation.mutateAsync();
+    } catch (e) {
+      // Best effort — server background job will clean up anyway
+    }
+    window.location.href = redirectTo;
   };
 
   const formatTime = (ms: number) => {
@@ -127,7 +140,7 @@ export default function Demo() {
                 <Button
                   variant="outline"
                   className="h-10"
-                  onClick={() => setLocation("/")}
+                  onClick={() => handleEndDemo("/")}
                 >
                   Exit
                 </Button>
