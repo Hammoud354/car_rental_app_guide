@@ -3817,6 +3817,19 @@ export async function initializeWhishPaymentRequestsTable() {
   }
 }
 
+export async function findWhishPaymentByTransactionId(transactionId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const { whishPaymentRequests } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+  const result = await db
+    .select()
+    .from(whishPaymentRequests)
+    .where(eq(whishPaymentRequests.transactionId, transactionId))
+    .limit(1);
+  return result[0] || null;
+}
+
 export async function createWhishPaymentRequest(
   userId: number,
   tierId: number,

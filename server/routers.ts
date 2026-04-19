@@ -3089,10 +3089,16 @@ export const appRouter = router({
         amount: z.number().positive(),
       }))
       .mutation(async ({ input, ctx }) => {
+        // Reject if this transaction ID has already been used by anyone
+        const existing = await db.findWhishPaymentByTransactionId(input.transactionId.trim());
+        if (existing) {
+          throw new Error("This transaction ID has already been used. Each payment must have a unique transaction ID.");
+        }
+
         const result = await db.createWhishPaymentRequest(
           ctx.user.id,
           input.tierId,
-          input.transactionId,
+          input.transactionId.trim(),
           input.amount
         );
         if (!result) throw new Error("Failed to submit payment request");
