@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { printElement, exportElementToPDF } from "@/lib/printUtils";
@@ -31,6 +32,7 @@ export default function Invoices() {
   const utils = trpc.useUtils();
   const [selectedInvoice, setSelectedInvoice] = useState<number | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [invoiceSearch, setInvoiceSearch] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   
@@ -180,8 +182,16 @@ export default function Invoices() {
   });
 
   const filteredInvoices = invoices?.filter((invoice) => {
-    if (statusFilter === "all") return true;
-    return invoice.paymentStatus === statusFilter;
+    if (statusFilter !== "all" && invoice.paymentStatus !== statusFilter) return false;
+    const searchTerm = invoiceSearch.trim();
+    if (searchTerm) {
+      const num = invoice.invoiceNumber?.match(/INV-(\d+)$/i);
+      if (/^\d+$/.test(searchTerm) && num) {
+        return parseInt(num[1], 10) === parseInt(searchTerm, 10);
+      }
+      return invoice.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    }
+    return true;
   });
 
   const getStatusBadge = (status: string) => {
@@ -244,8 +254,8 @@ export default function Invoices() {
         {/* Filter */}
         <Card>
           <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center">
-              <label className="text-sm font-medium">Filter by Status:</label>
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+              <label className="text-sm font-medium shrink-0">Filter by Status:</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue />
@@ -258,6 +268,25 @@ export default function Invoices() {
                   <SelectItem value="cancelled">Cancelled</SelectItem>
                 </SelectContent>
               </Select>
+              <div className="relative sm:ml-auto sm:w-64">
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" /></svg>
+                <Input
+                  className="pl-8 h-9 text-sm"
+                  placeholder="Search by invoice #..."
+                  value={invoiceSearch}
+                  onChange={(e) => setInvoiceSearch(e.target.value)}
+                  data-testid="input-invoice-search"
+                />
+                {invoiceSearch && (
+                  <button
+                    onClick={() => setInvoiceSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -267,6 +296,14 @@ export default function Invoices() {
           <Card>
             <CardContent className="pt-6">
               <p className="text-center text-gray-600">Loading invoices...</p>
+            </CardContent>
+          </Card>
+        ) : invoiceSearch.trim() && filteredInvoices?.length === 0 ? (
+          <Card>
+            <CardContent className="pt-6 text-center py-12 text-gray-400">
+              <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">No invoice found matching <span className="font-mono font-semibold text-gray-600">"{invoiceSearch}"</span></p>
+              <button onClick={() => setInvoiceSearch("")} className="mt-2 text-xs text-blue-500 hover:underline">Clear search</button>
             </CardContent>
           </Card>
         ) : filteredInvoices && filteredInvoices.length > 0 ? (

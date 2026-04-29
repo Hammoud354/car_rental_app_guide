@@ -1943,14 +1943,17 @@ export async function generateInvoiceForContract(contractId: number, userId: num
     return existingInvoice;
   }
   
-  // Generate invoice number using max existing number to avoid collisions
-  const maxInvoice = await db.select({ maxNum: sql<string>`MAX("invoiceNumber")` }).from(invoices);
-  const lastNum = maxInvoice[0]?.maxNum ? parseInt(maxInvoice[0].maxNum.replace('INV-', '')) || 0 : 0;
-  let invoiceNumber = `INV-${String(lastNum + 1).padStart(5, "0")}`;
-  const existing = await db.select({ id: invoices.id }).from(invoices).where(sql`"invoiceNumber" = ${invoiceNumber}`).limit(1);
-  if (existing.length > 0) {
-    invoiceNumber = `INV-${String(lastNum + 2).padStart(5, "0")}`;
-  }
+  // Generate invoice number using global sequential counter (unique constraint is global)
+  const allInvoicesForNum = await db.select({ invoiceNumber: invoices.invoiceNumber }).from(invoices);
+  const maxNum = allInvoicesForNum.reduce((max, inv) => {
+    const match = inv.invoiceNumber?.match(/INV-(\d+)$/);
+    if (match) {
+      const n = parseInt(match[1], 10);
+      return n > max ? n : max;
+    }
+    return max;
+  }, 0);
+  const invoiceNumber = `INV-${String(maxNum + 1).padStart(3, '0')}`;
   
   // Calculate line items
   const lineItems: { description: string; quantity: number; unitPrice: number; amount: number }[] = [];
@@ -2048,23 +2051,23 @@ export async function generateInvoiceForContract(contractId: number, userId: num
 }
 
 /**
- * Generate invoice number in format INV-YYYYMMDD-HHMMSS-XXX
+ * Generate invoice number in format INV-001
  */
 async function generateInvoiceNumber(userId: number): Promise<string> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
-  
-  // Include timestamp in invoice number for uniqueness
-  return `INV-${year}${month}${day}-${hours}${minutes}${seconds}-${milliseconds}`;
+
+  // Use global max to respect the global UNIQUE constraint on invoiceNumber
+  const allInvoicesForNum = await db.select({ invoiceNumber: invoices.invoiceNumber }).from(invoices);
+  const maxNum = allInvoicesForNum.reduce((max, inv) => {
+    const match = inv.invoiceNumber?.match(/INV-(\d+)$/);
+    if (match) {
+      const n = parseInt(match[1], 10);
+      return n > max ? n : max;
+    }
+    return max;
+  }, 0);
+  return `INV-${String(maxNum + 1).padStart(3, '0')}`;
 }
 
 /**

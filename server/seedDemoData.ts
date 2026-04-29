@@ -165,7 +165,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     {
       userId,
       contractId: createdContracts[2].id,
-      invoiceNumber: `INV-${Date.now()}-001`,
+      invoiceNumber: `INV-001`,
       invoiceDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       dueDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       subtotal: "450.00",
@@ -177,7 +177,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     {
       userId,
       contractId: createdContracts[3].id,
-      invoiceNumber: `INV-${Date.now()}-002`,
+      invoiceNumber: `INV-002`,
       invoiceDate: new Date(now.getTime() - 28 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       dueDate: new Date(now.getTime() - 23 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       subtotal: "455.00",
@@ -189,7 +189,7 @@ export async function seedDemoData(userId: number): Promise<void> {
     {
       userId,
       contractId: createdContracts[0].id,
-      invoiceNumber: `INV-${Date.now()}-003`,
+      invoiceNumber: `INV-003`,
       invoiceDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       dueDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       subtotal: "600.00",

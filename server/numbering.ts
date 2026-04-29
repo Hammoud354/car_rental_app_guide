@@ -122,8 +122,8 @@ export async function getNextInvoiceNumber(userId: number): Promise<NumberingRes
       .set({ lastInvoiceNumber: newNumber })
       .where(eq(numberingCounters.userId, userId));
 
-    // Format the number: INVOICE-{USER_ID}-{SEQUENTIAL_NUMBER_PADDED}
-    const formattedNumber = `INVOICE-${userId}-${String(newNumber).padStart(6, "0")}`;
+    // Format the number: INV-{SEQUENTIAL_NUMBER_PADDED}
+    const formattedNumber = `INV-${String(newNumber).padStart(3, "0")}`;
 
     // Log to audit trail
     await logNumberingAudit({
