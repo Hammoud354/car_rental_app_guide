@@ -1277,10 +1277,15 @@ export default function RentalContracts() {
 
           {/* Select All Checkbox */}
           {(() => {
-            const filteredContracts = contractSearch.trim()
-              ? (contracts as any[]).filter(c =>
-                  c.contractNumber?.toLowerCase().includes(contractSearch.trim().toLowerCase())
-                )
+            const searchTerm = contractSearch.trim();
+            const filteredContracts = searchTerm
+              ? (contracts as any[]).filter(c => {
+                  const num = c.contractNumber?.match(/CTR-(\d+)/i);
+                  if (/^\d+$/.test(searchTerm) && num) {
+                    return parseInt(num[1], 10) === parseInt(searchTerm, 10);
+                  }
+                  return c.contractNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+                })
               : contracts as any[];
             return (
               <>
