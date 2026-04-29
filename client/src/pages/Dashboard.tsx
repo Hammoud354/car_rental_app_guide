@@ -5,6 +5,7 @@ import { RegistrationRenewalDialog } from "@/components/RegistrationRenewalDialo
 import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
 import { MaintenanceModal } from "@/components/MaintenanceModal";
+import { FleetStatusModal } from "@/components/FleetStatusModal";
 import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet, TrendingUp, ChevronRight } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
@@ -628,7 +629,8 @@ function ExpiringDocumentsCardWithModal() {
 export default function Dashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  
+  const [fleetStatusModalOpen, setFleetStatusModalOpen] = useState(false);
+
   const [widgetVisibility, setWidgetVisibility] = useState({
     totalFleet: true,
     totalRevenue: true,
@@ -913,10 +915,19 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {widgetVisibility.fleetStatus && (
-          <Card className="shadow-none border border-gray-200">
+          <Card
+            className="shadow-none border border-gray-200 cursor-pointer hover:shadow-md hover:border-blue-200 transition-all group"
+            onClick={() => setFleetStatusModalOpen(true)}
+            data-testid="card-fleet-status"
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-base font-semibold text-gray-900">{t("dashboard.fleetStatus")}</CardTitle>
-              <p className="text-xs text-gray-500">{t("dashboard.fleetStatusSubtitle")}</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-base font-semibold text-gray-900">{t("dashboard.fleetStatus")}</CardTitle>
+                  <p className="text-xs text-gray-500">{t("dashboard.fleetStatusSubtitle")}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-400 transition-colors" />
+              </div>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col items-center space-y-5">
@@ -958,6 +969,9 @@ export default function Dashboard() {
                     <span className="text-xs text-gray-600">{t("dashboard.maintenanceVehicles")} ({maintenance})</span>
                   </div>
                 </div>
+                <p className="text-[10px] text-gray-400 group-hover:text-blue-400 transition-colors">
+                  Click to browse vehicles →
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -999,6 +1013,12 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
+
+      <FleetStatusModal
+        isOpen={fleetStatusModalOpen}
+        onOpenChange={setFleetStatusModalOpen}
+        vehicles={vehicles || []}
+      />
     </div>
   );
 }
