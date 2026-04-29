@@ -76,6 +76,7 @@ export default function RentalContracts() {
   const [nationalityComboboxOpen, setNationalityComboboxOpen] = useState(false);
   const [selectedNationality, setSelectedNationality] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<"active" | "completed" | "overdue" | undefined>("active");
+  const [contractSearch, setContractSearch] = useState("");
   const [selectedContracts, setSelectedContracts] = useState<number[]>([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
@@ -1221,59 +1222,99 @@ export default function RentalContracts() {
             </div>
           )}
           
-          {/* Status Filter Tabs */}
-          <div className="flex gap-2 mb-6">
-            <Button
-              variant={statusFilter === "active" ? "default" : "outline"}
-              onClick={() => setStatusFilter("active")}
-            >
-              Active
-            </Button>
-            <Button
-              variant={statusFilter === "completed" ? "default" : "outline"}
-              onClick={() => setStatusFilter("completed")}
-            >
-              Completed
-            </Button>
-            <Button
-              variant={statusFilter === "overdue" ? "default" : "outline"}
-              onClick={() => setStatusFilter("overdue")}
-            >
-              Overdue
-            </Button>
-            <Button
-              variant={!statusFilter ? "default" : "outline"}
-              onClick={() => setStatusFilter(undefined)}
-            >
-              All
-            </Button>
+          {/* Status Filter Tabs + Contract Number Search */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                size="sm"
+                variant={statusFilter === "active" ? "default" : "outline"}
+                onClick={() => setStatusFilter("active")}
+              >
+                Active
+              </Button>
+              <Button
+                size="sm"
+                variant={statusFilter === "completed" ? "default" : "outline"}
+                onClick={() => setStatusFilter("completed")}
+              >
+                Completed
+              </Button>
+              <Button
+                size="sm"
+                variant={statusFilter === "overdue" ? "default" : "outline"}
+                onClick={() => setStatusFilter("overdue")}
+              >
+                Overdue
+              </Button>
+              <Button
+                size="sm"
+                variant={!statusFilter ? "default" : "outline"}
+                onClick={() => setStatusFilter(undefined)}
+              >
+                All
+              </Button>
+            </div>
+            <div className="relative sm:ml-auto sm:w-64">
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" /></svg>
+              <Input
+                className="pl-8 h-9 text-sm"
+                placeholder="Search by contract #..."
+                value={contractSearch}
+                onChange={(e) => setContractSearch(e.target.value)}
+                data-testid="input-contract-search"
+              />
+              {contractSearch && (
+                <button
+                  onClick={() => setContractSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Select All Checkbox */}
-          {contracts.length > 0 && (
-            <div className="flex items-center gap-2 mb-4">
-              <input
-                type="checkbox"
-                id="select-all"
-                className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                checked={selectedContracts.length === contracts.length && contracts.length > 0}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    setSelectedContracts(contracts.map((c: any) => c.id));
-                  } else {
-                    setSelectedContracts([]);
-                  }
-                }}
-              />
-              <label htmlFor="select-all" className="text-sm font-medium text-gray-700 cursor-pointer">
-                Select All ({contracts.length})
-              </label>
-            </div>
-          )}
-          
-          {/* Contracts List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {contracts.map((contract: any) => {
+          {(() => {
+            const filteredContracts = contractSearch.trim()
+              ? (contracts as any[]).filter(c =>
+                  c.contractNumber?.toLowerCase().includes(contractSearch.trim().toLowerCase())
+                )
+              : contracts as any[];
+            return (
+              <>
+                {filteredContracts.length > 0 && (
+                  <div className="flex items-center gap-2 mb-4">
+                    <input
+                      type="checkbox"
+                      id="select-all"
+                      className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
+                      checked={selectedContracts.length === filteredContracts.length && filteredContracts.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedContracts(filteredContracts.map((c: any) => c.id));
+                        } else {
+                          setSelectedContracts([]);
+                        }
+                      }}
+                    />
+                    <label htmlFor="select-all" className="text-sm font-medium text-gray-700 cursor-pointer">
+                      Select All ({filteredContracts.length}{contractSearch.trim() ? ` of ${contracts.length}` : ""})
+                    </label>
+                  </div>
+                )}
+                {contractSearch.trim() && filteredContracts.length === 0 && (
+                  <div className="text-center py-12 text-gray-400">
+                    <FileText className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No contract found matching <span className="font-mono font-semibold text-gray-600">"{contractSearch}"</span></p>
+                    <button onClick={() => setContractSearch("")} className="mt-2 text-xs text-blue-500 hover:underline">Clear search</button>
+                  </div>
+                )}
+
+                {/* Contracts List */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredContracts.map((contract: any) => {
               const vehicle = vehicles.find((v) => v.id === contract.vehicleId);
               return (
                 <Card key={contract.id} className={`hover:shadow-lg transition-shadow ${
@@ -1377,20 +1418,22 @@ export default function RentalContracts() {
                   </CardContent>
                 </Card>
               );
-            })}
-          </div>
-
-          {contracts.length === 0 && (
-            <Card className="p-12 text-center">
-              <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
-              <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
-              <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Contract
-              </Button>
-            </Card>
-          )}
+                  })}
+                </div>
+                {!contractSearch.trim() && contracts.length === 0 && (
+                  <Card className="p-12 text-center">
+                    <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-gray-700 mb-2">No Contracts Yet</h3>
+                    <p className="text-gray-500 mb-6">Create your first rental contract to get started</p>
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Contract
+                    </Button>
+                  </Card>
+                )}
+              </>
+            );
+          })()}
           </>
           )}
 
