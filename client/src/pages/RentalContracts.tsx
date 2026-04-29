@@ -1355,6 +1355,14 @@ export default function RentalContracts() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
+                      {contract.contractNumber && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-500 uppercase tracking-wide">Contract</span>
+                          <span className="font-mono text-sm font-semibold text-gray-800 bg-gray-100 px-2 py-0.5 rounded">
+                            {contract.contractNumber}
+                          </span>
+                        </div>
+                      )}
                       <div>
                         <div className="text-sm text-gray-600">Vehicle</div>
                         <div className="font-semibold">
