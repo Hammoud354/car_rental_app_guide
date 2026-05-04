@@ -521,30 +521,32 @@ function MaintenanceAlertsWidget() {
   return (
     <Card className="shadow-none border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
       <CardContent className="p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-orange-100 rounded-lg">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="p-2 bg-orange-100 rounded-lg shrink-0">
             <Wrench className="h-5 w-5 text-orange-600" />
           </div>
-          <div className="flex-1">
-            <h3 className="text-sm font-semibold text-orange-900">Maintenance Alerts</h3>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold text-orange-900">Maintenance Alerts</h3>
+              <Link href="/maintenance">
+                <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100 shrink-0">
+                  View All <ChevronRight className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
             <p className="text-xs text-orange-700">{alertData.summary.total} item{alertData.summary.total !== 1 ? "s" : ""} requiring attention</p>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {alertData.summary.critical > 0 && (
+                <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{alertData.summary.critical} Critical</span>
+              )}
+              {alertData.summary.attention > 0 && (
+                <span className="px-2 py-0.5 text-xs font-bold text-white bg-amber-500 rounded-full">{alertData.summary.attention} Attention</span>
+              )}
+              {alertData.summary.canwait > 0 && (
+                <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">{alertData.summary.canwait} Later</span>
+              )}
+            </div>
           </div>
-          <div className="flex gap-2">
-            {alertData.summary.critical > 0 && (
-              <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{alertData.summary.critical} Critical</span>
-            )}
-            {alertData.summary.attention > 0 && (
-              <span className="px-2 py-0.5 text-xs font-bold text-white bg-amber-500 rounded-full">{alertData.summary.attention} Attention</span>
-            )}
-            {alertData.summary.canwait > 0 && (
-              <span className="px-2 py-0.5 text-xs font-bold text-white bg-blue-500 rounded-full">{alertData.summary.canwait} Later</span>
-            )}
-          </div>
-          <Link href="/maintenance">
-            <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
-              View All <ChevronRight className="ml-1 h-3 w-3" />
-            </Button>
-          </Link>
         </div>
         <div className="space-y-2 max-h-48 overflow-y-auto">
           {alertData.alerts.slice(0, 6).map((alert) => {
