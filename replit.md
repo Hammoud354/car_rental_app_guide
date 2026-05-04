@@ -8,6 +8,7 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - **Frontend**: React + Vite with Tailwind CSS v4 (`client/`)
 - **Database**: PostgreSQL via Drizzle ORM
 - **Shared**: Common types, constants, and data (`shared/`)
+- **Real-time**: WebSocket server (`server/websocket.ts`) at `/ws` — uses `noServer` mode to coexist with Vite HMR; broadcasts vehicle status, contract, invoice, and stats events to authenticated clients
 
 ## Key Files
 - `server/_core/index.ts` - Main server entry point
@@ -15,7 +16,10 @@ Full-stack car rental management application built with Express + React/Vite, tR
 - `server/routers.ts` - tRPC API routes
 - `server/seedDemoData.ts` - Demo data seeder (vehicles, clients, contracts, invoices, maintenance, company profile)
 - `server/carData.ts` - Global car makers/models data (70+ brands, country-specific lists)
-- `client/src/App.tsx` - Main app with route definitions and SidebarLayout wrapper
+- `client/src/App.tsx` - Main app with route definitions, SidebarLayout wrapper, and `useRealtimeSync()` for WebSocket
+- `server/websocket.ts` - WebSocket manager singleton; `wsManager.broadcast()` used after key mutations
+- `client/src/lib/websocket.ts` - Client-side WS singleton with auto-reconnect and exponential backoff
+- `client/src/hooks/useRealtimeSync.ts` - React hook connecting WS events to TanStack Query cache invalidation + toasts
 - `client/src/pages/Home.tsx` - Landing page with framer-motion animations
 - `client/src/pages/SignUp.tsx` - Sign-up with country-based phone formatting
 - `client/src/components/SidebarLayout.tsx` - Persistent sidebar navigation

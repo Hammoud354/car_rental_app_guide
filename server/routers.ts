@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, superAdminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { wsManager } from "./websocket";
 import { sql } from "drizzle-orm";
 import {
   sendPasswordResetEmail,
@@ -515,6 +516,19 @@ export const appRouter = router({
       }))
       .mutation(async ({ input, ctx }) => {
         await db.updateVehicle(input.id, ctx.user?.id || 1, input.data as any);
+        const userId = ctx.user?.id || 1;
+        const updatedVehicle = await db.getVehicleById(input.id, userId);
+        if (updatedVehicle) {
+          wsManager.broadcast({
+            type: "vehicle_status_changed",
+            vehicleId: input.id,
+            status: updatedVehicle.status,
+            plateNumber: updatedVehicle.plateNumber,
+            brand: updatedVehicle.brand,
+            model: updatedVehicle.model,
+            userId,
+          });
+        }
         return { success: true };
       }),
     
@@ -1009,7 +1023,18 @@ export const appRouter = router({
         // Update vehicle status to "Rented"
         const { updateVehicleStatus } = await import("./updateVehicleStatus");
         await updateVehicleStatus(input.vehicleId);
-        
+
+        // Broadcast real-time events
+        wsManager.broadcast({ type: "contract_created", contractId: contract.id, contractNumber: contract.contractNumber, clientName: contract.clientName || "", userId });
+        if (invoice) {
+          wsManager.broadcast({ type: "invoice_created", invoiceId: (invoice as any).id, invoiceNumber: (invoice as any).invoiceNumber || "", userId });
+        }
+        const rentedVehicle = await db.getVehicleById(input.vehicleId, userId);
+        if (rentedVehicle) {
+          wsManager.broadcast({ type: "vehicle_status_changed", vehicleId: input.vehicleId, status: rentedVehicle.status, plateNumber: rentedVehicle.plateNumber, brand: rentedVehicle.brand, model: rentedVehicle.model, userId });
+        }
+        wsManager.broadcast({ type: "stats_updated", userId });
+
         return { ...contract, invoice };
       }),
     
@@ -1082,6 +1107,18 @@ export const appRouter = router({
           if (input.returnKm) {
             await db.updateVehicleMileage(contract.vehicleId, input.returnKm);
           }
+
+          // Broadcast real-time events
+          const userId = ctx.user.id;
+          wsManager.broadcast({ type: "contract_completed", contractId: input.contractId, contractNumber: contract.contractNumber || "", userId });
+          const freedVehicle = await db.getVehicleById(contract.vehicleId, userId);
+          if (freedVehicle) {
+            wsManager.broadcast({ type: "vehicle_status_changed", vehicleId: contract.vehicleId, status: freedVehicle.status, plateNumber: freedVehicle.plateNumber, brand: freedVehicle.brand, model: freedVehicle.model, userId });
+          }
+          if ((result as any)?.invoice) {
+            wsManager.broadcast({ type: "invoice_created", invoiceId: (result as any).invoice.id, invoiceNumber: (result as any).invoice.invoiceNumber || "", userId });
+          }
+          wsManager.broadcast({ type: "stats_updated", userId });
         }
         
         return result;

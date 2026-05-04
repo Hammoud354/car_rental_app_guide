@@ -6,6 +6,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { useAuth } from "./_core/hooks/useAuth";
 import { trpc } from "./lib/trpc";
 import { lazy, Suspense } from "react";
+import { useRealtimeSync } from "./hooks/useRealtimeSync";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const SidebarLayout = lazy(() => import("./components/SidebarLayout"));
@@ -91,6 +92,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppContent() {
   const [location] = useLocation();
+  useRealtimeSync();
   const isPublicRoute = PUBLIC_ROUTES.some(route => location === route);
 
   if (isPublicRoute) {
