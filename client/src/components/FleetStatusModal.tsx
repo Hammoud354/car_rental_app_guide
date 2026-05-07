@@ -9,7 +9,7 @@ import { format, differenceInDays } from "date-fns";
 
 interface Vehicle {
   id: number;
-  make: string;
+  brand: string;
   model: string;
   year: number;
   plateNumber: string;
@@ -76,7 +76,7 @@ function MiniBarChart({ data, color }: { data: { label: string; value: number }[
 
 function VehicleDetail({ vehicle, onBack }: { vehicle: Vehicle; onBack: () => void }) {
   const [, navigate] = useLocation();
-  const { data: analysis, isLoading } = trpc.fleet.getVehicleAnalysis.useQuery(
+  const { data: analysis, isLoading } = trpc.fleet.getAnalysis.useQuery(
     { vehicleId: vehicle.id },
     { staleTime: 30_000 }
   );
@@ -121,7 +121,7 @@ function VehicleDetail({ vehicle, onBack }: { vehicle: Vehicle; onBack: () => vo
         </Button>
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-gray-900 truncate">
-            {vehicle.year} {vehicle.make} {vehicle.model}
+            {vehicle.year} {vehicle.brand} {vehicle.model}
           </h3>
           <p className="text-xs text-gray-500">{vehicle.plateNumber} · {vehicle.color} · {vehicle.category}</p>
         </div>
@@ -327,7 +327,7 @@ export function FleetStatusModal({ isOpen, onOpenChange, vehicles }: FleetStatus
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <p className="font-semibold text-sm text-gray-900 truncate">
-                                {v.year} {v.make} {v.model}
+                                {v.year} {v.brand} {v.model}
                               </p>
                               {hasAlert && (
                                 <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-orange-400" title="Document expiring soon" />

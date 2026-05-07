@@ -267,7 +267,7 @@ export const appRouter = router({
           : (process.env.VITE_FRONTEND_FORGE_API_URL || 'http://localhost:3000');
         const resetLink = `${appUrl}/reset-password?token=${token}`;
         console.log(`[Password Reset] Reset link for ${user.email}: ${resetLink}`);
-        await sendPasswordResetEmail(user.email, resetLink).catch(err =>
+        await sendPasswordResetEmail(user.email || '', resetLink).catch(err =>
           console.error("[Password Reset] Email failed:", err)
         );
         
@@ -3158,7 +3158,7 @@ export const appRouter = router({
     getWhishPaymentRequests: protectedProcedure.query(async ({ ctx }) => {
       if (ctx.user.role !== "super_admin") throw new Error("Unauthorized");
       const requests = await db.getAllWhishPaymentRequests();
-      const userIds = [...new Set(requests.map((r: any) => r.userId))];
+      const userIds = Array.from(new Set(requests.map((r: any) => r.userId)));
       let usersMap: Record<number, any> = {};
       if (userIds.length > 0) {
         const { users } = await import("../drizzle/schema");

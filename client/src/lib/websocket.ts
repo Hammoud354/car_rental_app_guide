@@ -38,7 +38,7 @@ class RealtimeClient {
         try {
           const event: WSEvent = JSON.parse(e.data);
           if (event.type === "pong") return;
-          for (const listener of this.listeners) listener(event);
+          for (const listener of Array.from(this.listeners)) listener(event);
         } catch {}
       };
 

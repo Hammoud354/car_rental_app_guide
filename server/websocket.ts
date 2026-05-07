@@ -94,7 +94,7 @@ class WebSocketManager {
   }
 
   broadcast(event: WSEvent & { userId: number }) {
-    for (const client of this.clients) {
+    for (const client of Array.from(this.clients)) {
       if (client.userId === event.userId || client.role === "super_admin") {
         this.sendToClient(client, event);
       }
@@ -102,7 +102,7 @@ class WebSocketManager {
   }
 
   broadcastToAll(event: WSEvent) {
-    for (const client of this.clients) {
+    for (const client of Array.from(this.clients)) {
       this.sendToClient(client, event);
     }
   }

@@ -31,7 +31,7 @@ export async function generateExcelBuffer(sheets: SheetDef[]): Promise<Uint8Arra
       }
     } else {
       for (const row of sheet.data) {
-        ws.addRow(row as ExcelJS.CellValue[]);
+        ws.addRow(row as any[]);
       }
     }
 

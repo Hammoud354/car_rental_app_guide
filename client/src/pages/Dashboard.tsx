@@ -833,8 +833,8 @@ export default function Dashboard() {
                       {vehicles?.filter(v => v.status === "Available").map(v => (
                         <div key={v.id} className="flex items-center justify-between bg-emerald-50 rounded-lg px-3 py-2">
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
-                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.brand} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.plateNumber} · {v.category}</p>
                           </div>
                           <span className="text-xs font-medium text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">Available</span>
                         </div>
@@ -856,8 +856,8 @@ export default function Dashboard() {
                       {vehicles?.filter(v => v.status === "Rented").map(v => (
                         <div key={v.id} className="flex items-center justify-between bg-blue-50 rounded-lg px-3 py-2">
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
-                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.brand} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.plateNumber} · {v.category}</p>
                           </div>
                           <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Rented</span>
                         </div>
@@ -879,8 +879,8 @@ export default function Dashboard() {
                       {vehicles?.filter(v => v.status === "Maintenance").map(v => (
                         <div key={v.id} className="flex items-center justify-between bg-red-50 rounded-lg px-3 py-2">
                           <div>
-                            <p className="text-sm font-medium text-gray-800">{v.year} {v.make} {v.model}</p>
-                            <p className="text-xs text-gray-500">{v.licensePlate} · {v.category}</p>
+                            <p className="text-sm font-medium text-gray-800">{v.year} {v.brand} {v.model}</p>
+                            <p className="text-xs text-gray-500">{v.plateNumber} · {v.category}</p>
                           </div>
                           <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">Maintenance</span>
                         </div>
