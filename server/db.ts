@@ -1,4 +1,4 @@
-import { eq, and, or, lte, gte, lt, sql, desc, asc } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, ne, sql, desc, asc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod } from "../drizzle/schema";
@@ -214,8 +214,8 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
   const allVehicles = effectiveFilter != null
-    ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
-    : await db.select().from(vehicles);
+    ? await db.select().from(vehicles).where(and(eq(vehicles.userId, effectiveFilter), ne(vehicles.status, 'Sold')))
+    : await db.select().from(vehicles).where(ne(vehicles.status, 'Sold'));
   
   const availableVehicles = await Promise.all(
     allVehicles.map(async (vehicle) => {

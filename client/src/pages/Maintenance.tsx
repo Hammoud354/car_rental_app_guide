@@ -81,8 +81,9 @@ export default function Maintenance() {
   const summaryStats = useMemo(() => {
     if (!vehicles) return { total: 0, inMaintenance: 0, available: 0, totalCost: 0 };
     const inMaintenance = vehicles.filter(v => v.status === "Maintenance").length;
+    const available = vehicles.filter(v => v.status === "Available").length;
     const totalCost = vehicles.reduce((sum, v) => sum + (parseFloat((v as any).totalMaintenanceCost || "0")), 0);
-    return { total: vehicles.length, inMaintenance, available: vehicles.length - inMaintenance, totalCost };
+    return { total: vehicles.length, inMaintenance, available, totalCost };
   }, [vehicles]);
 
   const addMaintenanceMutation = trpc.fleet.addMaintenanceRecord.useMutation({
