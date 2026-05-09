@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, cleanupExpiredTempDemoUsers } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, cleanupExpiredTempDemoUsers } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -112,6 +112,9 @@ async function startServer() {
     );
     initializePurchaseDetailsColumns().catch(err =>
       console.error("[Startup] Failed to initialize purchase detail columns:", err)
+    );
+    initializeSoldStatusEnum().catch(err =>
+      console.error("[Startup] Failed to initialize Sold enum value:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)

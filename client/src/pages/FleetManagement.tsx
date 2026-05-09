@@ -367,6 +367,7 @@ export default function FleetManagement() {
         year: parseInt(formData.get("year") as string),
         color: formData.get("color") as string,
         category: formData.get("category") as any,
+        status: (formData.get("status") as any) || undefined,
         dailyRate: formData.get("dailyRate") as string,
         weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
         monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
@@ -447,6 +448,8 @@ export default function FleetManagement() {
         return "bg-orange-500/10 text-orange-500 border-orange-500/20";
       case "Out of Service":
         return "bg-red-500/10 text-red-500 border-red-500/20";
+      case "Sold":
+        return "bg-purple-500/10 text-purple-600 border-purple-500/20";
       default:
         return "";
     }
@@ -1588,7 +1591,7 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="edit-color">Color *</Label>
                     <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client" />
@@ -1607,6 +1610,21 @@ export default function FleetManagement() {
                         <SelectItem value="Luxury">Luxury</SelectItem>
                         <SelectItem value="Van">Van</SelectItem>
                         <SelectItem value="Truck">Truck</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-status">Status</Label>
+                    <Select name="status" defaultValue={selectedVehicle.status}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Available">Available</SelectItem>
+                        <SelectItem value="Rented">Rented</SelectItem>
+                        <SelectItem value="Maintenance">Maintenance</SelectItem>
+                        <SelectItem value="Out of Service">Out of Service</SelectItem>
+                        <SelectItem value="Sold">Sold</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

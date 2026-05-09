@@ -4,7 +4,7 @@ import { integer, pgEnum, pgTable, text, timestamp, varchar, decimal, boolean, d
 export const roleEnum = pgEnum("role", ["user", "admin", "super_admin"]);
 export const defaultCurrencyEnum = pgEnum("defaultCurrency", ["USD", "LOCAL"]);
 export const vehicleCategoryEnum = pgEnum("category", ["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]);
-export const vehicleStatusEnum = pgEnum("vehicleStatus", ["Available", "Rented", "Maintenance", "Out of Service"]);
+export const vehicleStatusEnum = pgEnum("vehicleStatus", ["Available", "Rented", "Maintenance", "Out of Service", "Sold"]);
 export const maintenanceTypeEnum = pgEnum("maintenanceType", ["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"]);
 export const priorityEnum = pgEnum("priority", ["Critical", "Important", "Recommended", "Optional"]);
 export const triggerTypeEnum = pgEnum("triggerType", ["Mileage", "Time", "Both"]);

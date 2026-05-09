@@ -425,7 +425,7 @@ export const appRouter = router({
         year: z.number().int().min(1900).max(2100),
         color: z.string().min(1).max(50),
         category: z.enum(["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]),
-        status: z.enum(["Available", "Rented", "Maintenance", "Out of Service"]).default("Available"),
+        status: z.enum(["Available", "Rented", "Maintenance", "Out of Service", "Sold"]).default("Available"),
         dailyRate: z.string(),
         weeklyRate: z.string().optional(),
         monthlyRate: z.string().optional(),
@@ -499,7 +499,7 @@ export const appRouter = router({
           year: z.number().int().min(1900).max(2100).optional(),
           color: z.string().min(1).max(50).optional(),
           category: z.enum(["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]).optional(),
-          status: z.enum(["Available", "Rented", "Maintenance", "Out of Service"]).optional(),
+          status: z.enum(["Available", "Rented", "Maintenance", "Out of Service", "Sold"]).optional(),
           dailyRate: z.string().optional(),
           weeklyRate: z.string().optional(),
           monthlyRate: z.string().optional(),
@@ -933,6 +933,9 @@ export const appRouter = router({
         }
         if (vehicleData.status === "Out of Service") {
           throw new Error("Vehicle is out of service and cannot be rented.");
+        }
+        if (vehicleData.status === "Sold") {
+          throw new Error("Vehicle has been sold and cannot be rented.");
         }
         
         // Check if vehicle already has an active contract

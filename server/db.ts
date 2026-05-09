@@ -3935,6 +3935,17 @@ export async function updateWhishPaymentRequestStatus(
   }
 }
 
+export async function initializeSoldStatusEnum() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`ALTER TYPE "vehicleStatus" ADD VALUE IF NOT EXISTS 'Sold'`);
+    console.log("[Startup] vehicleStatus enum 'Sold' value ready");
+  } catch (err) {
+    console.error("[Startup] Failed to add Sold to vehicleStatus enum:", err);
+  }
+}
+
 export async function initializePurchaseDetailsColumns() {
   const db = await getDb();
   if (!db) return;
