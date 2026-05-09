@@ -980,7 +980,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-5">
+                <div className="flex flex-wrap gap-3 justify-center">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full"></div>
                     <span className="text-xs text-gray-600">{t("dashboard.availableVehicles")} ({available})</span>

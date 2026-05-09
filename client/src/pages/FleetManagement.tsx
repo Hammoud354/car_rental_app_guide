@@ -626,7 +626,7 @@ export default function FleetManagement() {
               </Select>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label htmlFor="maint-mileage">Current Mileage (km)</Label>
                 <Input
@@ -649,7 +649,7 @@ export default function FleetManagement() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label>Entry Date *</Label>
                 <ModernDatePicker
@@ -1012,7 +1012,7 @@ export default function FleetManagement() {
                     <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
                   </div>
                   <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <Label htmlFor="highSeasonDailyRate">HS Daily ($)</Label>
                       <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" />
@@ -1359,16 +1359,18 @@ export default function FleetManagement() {
 
         {/* High Season Date Ranges Panel */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Sun className="h-4 w-4 text-amber-500" />
-              <h2 className="font-semibold text-sm text-amber-800">High Season Periods</h2>
-              <span className="text-xs text-amber-600">— vehicles with high season rates are priced automatically during these dates</span>
+          <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Sun className="h-4 w-4 text-amber-500 shrink-0" />
+                <h2 className="font-semibold text-sm text-amber-800">High Season Periods</h2>
+              </div>
+              <p className="text-xs text-amber-600 mt-0.5">Vehicles with high season rates are priced automatically during these dates</p>
             </div>
             <Button
               size="sm"
               variant="outline"
-              className="border-amber-300 text-amber-700 hover:bg-amber-100 text-xs"
+              className="border-amber-300 text-amber-700 hover:bg-amber-100 text-xs shrink-0"
               onClick={() => { resetHsForm(); setIsHighSeasonDialogOpen(true); }}
             >
               <Plus className="mr-1 h-3 w-3" />
@@ -1854,7 +1856,7 @@ export default function FleetManagement() {
                     <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
                   </div>
                   <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                       <Label htmlFor="edit-highSeasonDailyRate">HS Daily ($)</Label>
                       <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} />
@@ -2095,7 +2097,7 @@ export default function FleetManagement() {
                 required
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label>Start Date *</Label>
                 <ModernDatePicker date={hsStartDate} onDateChange={setHsStartDate} placeholder="Select start" />

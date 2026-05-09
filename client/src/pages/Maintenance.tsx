@@ -271,7 +271,7 @@ export default function Maintenance() {
                   </Select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Type *</Label>
                     <Select name="maintenanceType" required>
@@ -298,7 +298,7 @@ export default function Maintenance() {
                   <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
                     <Input name="garageLocation" placeholder="e.g., Downtown Auto" className="mt-1 text-sm" />
@@ -309,7 +309,7 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
                     <div className="mt-1">
@@ -324,7 +324,7 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">
                       KM Reading
@@ -522,7 +522,7 @@ export default function Maintenance() {
                 <DialogDescription>Update the record details below.</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 mt-2">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Type *</Label>
                     <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
@@ -551,7 +551,7 @@ export default function Maintenance() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
                     <Input
@@ -572,7 +572,7 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
                     <div className="mt-1">
@@ -587,7 +587,7 @@ export default function Maintenance() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs font-medium text-gray-700">KM Reading</Label>
                     <Input

@@ -400,10 +400,10 @@ export default function AIMaintenance() {
           {/* By Vehicle Tab */}
           <TabsContent value="vehicles" className="space-y-6">
             {/* Vehicle Filter */}
-            <div className="flex items-center gap-4 mb-6">
-              <Filter className="h-5 w-5 text-muted-foreground" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+              <Filter className="h-5 w-5 text-muted-foreground shrink-0" />
               <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
-                <SelectTrigger className="w-[300px]">
+                <SelectTrigger className="w-full sm:w-[300px]">
                   <SelectValue placeholder="Filter by vehicle" />
                 </SelectTrigger>
                 <SelectContent>

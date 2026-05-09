@@ -36,7 +36,7 @@ function InfoSection({ title, icon: Icon, children, className }: { title: string
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
           {children}
         </div>
       </CardContent>
@@ -314,7 +314,7 @@ export default function VehicleDetails() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
                   <InfoRow label="Sale Price" value={v.salePrice ? `$${parseFloat(v.salePrice).toLocaleString()}` : undefined} />
                   <InfoRow label="Sale Date" value={v.saleDate ? new Date(v.saleDate).toLocaleDateString() : undefined} />
                   <InfoRow label="Buyer Name" value={v.buyerName} />

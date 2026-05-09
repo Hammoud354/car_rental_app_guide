@@ -1180,7 +1180,7 @@ export default function RentalContracts() {
           
           {/* Bulk Actions Bar */}
           {selectedContracts.length > 0 && (
-            <div className="flex items-center justify-between mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center gap-4">
                 <span className="font-semibold text-blue-900">
                   {selectedContracts.length} contract(s) selected
@@ -1463,7 +1463,7 @@ export default function RentalContracts() {
                 <div id="contract-content" className="contract-details-content print-content space-y-6 pr-2 overflow-y-auto flex-1">
                   {/* Company Branding Header */}
                   {companyProfile && (
-                    <div className="bg-white border border-gray-300 p-6 rounded-lg flex items-center justify-between">
+                    <div className="bg-white border border-gray-300 p-6 rounded-lg flex flex-wrap items-center justify-between gap-4">
                       <div className="flex items-center gap-4">
                         {companyProfile.logoUrl && (
                           <img 
@@ -1628,7 +1628,7 @@ export default function RentalContracts() {
                             <div className="text-sm text-red-400">Late Fee (100% of daily rate)</div>
                             <div className="text-2xl font-bold text-red-500">${selectedContract.lateFee || "0.00"}</div>
                           </div>
-                          <div className="col-span-4 border-t border-border/50 pt-4 mt-4">
+                          <div className="col-span-2 border-t border-border/50 pt-4 mt-4">
                             <div className="text-sm text-muted-foreground">Total Amount Due (Rental + Late Fee)</div>
                             <div className="text-3xl font-bold text-red-500">
                               ${(parseFloat(selectedContract.finalAmount) + parseFloat(selectedContract.lateFee || "0")).toFixed(2)}
