@@ -281,6 +281,13 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (vehicle.insurancePolicyStartDate) insertData.insurancePolicyStartDate = vehicle.insurancePolicyStartDate;
   if (vehicle.insuranceCost && vehicle.insuranceCost !== '') insertData.insuranceCost = vehicle.insuranceCost;
   if (vehicle.purchaseCost && vehicle.purchaseCost !== '') insertData.purchaseCost = vehicle.purchaseCost;
+  if ((vehicle as any).purchaseType) insertData.purchaseType = (vehicle as any).purchaseType;
+  if ((vehicle as any).downPayment && (vehicle as any).downPayment !== '') insertData.downPayment = (vehicle as any).downPayment;
+  if ((vehicle as any).interestRate && (vehicle as any).interestRate !== '') insertData.interestRate = (vehicle as any).interestRate;
+  if ((vehicle as any).monthlyInstallmentAmount && (vehicle as any).monthlyInstallmentAmount !== '') insertData.monthlyInstallmentAmount = (vehicle as any).monthlyInstallmentAmount;
+  if ((vehicle as any).numberOfInstallments !== undefined && (vehicle as any).numberOfInstallments !== null) insertData.numberOfInstallments = (vehicle as any).numberOfInstallments;
+  if ((vehicle as any).remainingBalance && (vehicle as any).remainingBalance !== '') insertData.remainingBalance = (vehicle as any).remainingBalance;
+  if ((vehicle as any).sellerName && (vehicle as any).sellerName !== '') insertData.sellerName = (vehicle as any).sellerName;
   if ((vehicle as any).registrationFee && (vehicle as any).registrationFee !== '') insertData.registrationFee = (vehicle as any).registrationFee;
   if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
   if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
@@ -3925,6 +3932,26 @@ export async function updateWhishPaymentRequestStatus(
   } catch (error) {
     console.error("Error updating Whish payment request:", error);
     return null;
+  }
+}
+
+export async function initializePurchaseDetailsColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE vehicles
+        ADD COLUMN IF NOT EXISTS "purchaseType" varchar(20),
+        ADD COLUMN IF NOT EXISTS "downPayment" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "interestRate" decimal(5, 2),
+        ADD COLUMN IF NOT EXISTS "monthlyInstallmentAmount" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "numberOfInstallments" integer,
+        ADD COLUMN IF NOT EXISTS "remainingBalance" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "sellerName" varchar(200)
+    `);
+    console.log("[Startup] Vehicle purchase detail columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize purchase detail columns:", err);
   }
 }
 

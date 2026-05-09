@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle, Sun, Pencil } from "lucide-react";
+import { Plus, Edit, Trash2, Wrench, Calendar, Car, Search, X, Upload, Download, AlertTriangle, Sun, Pencil, DollarSign, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -87,6 +87,12 @@ export default function FleetManagement() {
   const [editPurchaseDate, setEditPurchaseDate] = useState<Date | undefined>();
   const [lastServiceDate, setLastServiceDate] = useState<Date | undefined>();
   const [editLastServiceDate, setEditLastServiceDate] = useState<Date | undefined>();
+
+  // Purchase details state
+  const [purchaseType, setPurchaseType] = useState<"Cash" | "Installments" | "">("");
+  const [editPurchaseType, setEditPurchaseType] = useState<"Cash" | "Installments" | "">("");
+  const [showPurchaseSection, setShowPurchaseSection] = useState(false);
+  const [showEditPurchaseSection, setShowEditPurchaseSection] = useState(false);
 
   // High season periods state
   const [isHighSeasonDialogOpen, setIsHighSeasonDialogOpen] = useState(false);
@@ -314,6 +320,13 @@ export default function FleetManagement() {
       insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
       insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
       purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
+      purchaseType: (purchaseType || undefined) as any,
+      downPayment: (formData.get("downPayment") as string)?.trim() || undefined,
+      interestRate: (formData.get("interestRate") as string)?.trim() || undefined,
+      monthlyInstallmentAmount: (formData.get("monthlyInstallmentAmount") as string)?.trim() || undefined,
+      numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
+      remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
+      sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
       registrationExpiryDate: registrationExpiryDate || (formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined),
       registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
       nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
@@ -323,7 +336,7 @@ export default function FleetManagement() {
       engineType: formData.get("engineType") as string || undefined,
       transmissionType: formData.get("transmissionType") as string || undefined,
       fuelType: formData.get("fuelType") as string || undefined,
-      purchaseDate: formData.get("purchaseDate") ? new Date(formData.get("purchaseDate") as string) : undefined,
+      purchaseDate: purchaseDate,
       averageDailyKm: formData.get("averageDailyKm") ? parseInt(formData.get("averageDailyKm") as string) : undefined,
       primaryUse: formData.get("primaryUse") as string || undefined,
       operatingClimate: formData.get("operatingClimate") as string || undefined,
@@ -370,6 +383,13 @@ export default function FleetManagement() {
         insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
         insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
         purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
+        purchaseType: (editPurchaseType || undefined) as any,
+        downPayment: (formData.get("downPayment") as string)?.trim() || undefined,
+        interestRate: (formData.get("interestRate") as string)?.trim() || undefined,
+        monthlyInstallmentAmount: (formData.get("monthlyInstallmentAmount") as string)?.trim() || undefined,
+        numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
+        remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
+        sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
         registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
         notes: formData.get("notes") as string || undefined,
       },
@@ -999,9 +1019,89 @@ export default function FleetManagement() {
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="purchaseCost">Vehicle Purchase Cost ($)</Label>
-                  <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" className="input-client" />
+                {/* Vehicle Purchase Details */}
+                <div className="border rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowPurchaseSection(v => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
+                      <span className="text-xs text-blue-600 font-normal">(Optional)</span>
+                    </div>
+                    {showPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
+                  </button>
+
+                  {showPurchaseSection && (
+                    <div className="p-4 space-y-4 bg-white">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Purchase Type</Label>
+                          <Select onValueChange={(v) => setPurchaseType(v as any)}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Cash or Installments" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Cash">Cash</SelectItem>
+                              <SelectItem value="Installments">Installments</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="purchaseCost">Purchase Price</Label>
+                          <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="downPayment">Down Payment</Label>
+                          <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" />
+                        </div>
+                        <div>
+                          <Label htmlFor="sellerName">Seller / Dealer Name</Label>
+                          <Input id="sellerName" name="sellerName" placeholder="e.g. ABC Motors" />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label>Purchase Date</Label>
+                        <ModernDatePicker
+                          date={purchaseDate}
+                          onDateChange={setPurchaseDate}
+                          placeholder="Select purchase date"
+                        />
+                      </div>
+
+                      {purchaseType === "Installments" && (
+                        <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
+                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                              <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" />
+                            </div>
+                            <div>
+                              <Label htmlFor="monthlyInstallmentAmount">Monthly Installment</Label>
+                              <Input id="monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="numberOfInstallments">Number of Installments</Label>
+                              <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" />
+                            </div>
+                            <div>
+                              <Label htmlFor="remainingBalance">Remaining Balance</Label>
+                              <Input id="remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" placeholder="0.00" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -1619,9 +1719,92 @@ export default function FleetManagement() {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="edit-purchaseCost">Vehicle Purchase Cost ($)</Label>
-                  <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""} />
+                {/* Vehicle Purchase Details */}
+                <div className="border rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setShowEditPurchaseSection(v => !v)}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
+                      <span className="text-xs text-blue-600 font-normal">(Optional)</span>
+                    </div>
+                    {showEditPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
+                  </button>
+
+                  {showEditPurchaseSection && (
+                    <div className="p-4 space-y-4 bg-white">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label>Purchase Type</Label>
+                          <Select
+                            defaultValue={(selectedVehicle as any).purchaseType || undefined}
+                            onValueChange={(v) => setEditPurchaseType(v as any)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Cash or Installments" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Cash">Cash</SelectItem>
+                              <SelectItem value="Installments">Installments</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-purchaseCost">Purchase Price</Label>
+                          <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""} />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="edit-downPayment">Down Payment</Label>
+                          <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""} />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-sellerName">Seller / Dealer Name</Label>
+                          <Input id="edit-sellerName" name="sellerName" placeholder="e.g. ABC Motors" defaultValue={(selectedVehicle as any).sellerName || ""} />
+                        </div>
+                      </div>
+
+                      <div>
+                        <Label>Purchase Date</Label>
+                        <ModernDatePicker
+                          date={editPurchaseDate}
+                          onDateChange={setEditPurchaseDate}
+                          placeholder="Select purchase date"
+                        />
+                      </div>
+
+                      {(editPurchaseType === "Installments" || (!(editPurchaseType) && (selectedVehicle as any).purchaseType === "Installments")) && (
+                        <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
+                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="edit-interestRate">Interest Rate (%)</Label>
+                              <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" defaultValue={(selectedVehicle as any).interestRate || ""} />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-monthlyInstallmentAmount">Monthly Installment</Label>
+                              <Input id="edit-monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).monthlyInstallmentAmount || ""} />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="edit-numberOfInstallments">Number of Installments</Label>
+                              <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" defaultValue={(selectedVehicle as any).numberOfInstallments || ""} />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-remainingBalance">Remaining Balance</Label>
+                              <Input id="edit-remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).remainingBalance || ""} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>
