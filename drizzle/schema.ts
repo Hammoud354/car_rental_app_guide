@@ -133,6 +133,7 @@ export const vehicles = pgTable(
     numberOfInstallments: integer("numberOfInstallments"),
     remainingBalance: decimal("remainingBalance", { precision: 10, scale: 2 }),
     sellerName: varchar("sellerName", { length: 200 }),
+    vehicleRegistrationNumber: varchar("vehicleRegistrationNumber", { length: 100 }),
     salePrice: decimal("salePrice", { precision: 10, scale: 2 }),
     saleDate: timestamp("saleDate"),
     buyerName: varchar("buyerName", { length: 200 }),

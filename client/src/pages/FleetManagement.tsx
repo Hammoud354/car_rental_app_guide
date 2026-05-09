@@ -349,6 +349,7 @@ export default function FleetManagement() {
       numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
       remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
       sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
+      vehicleRegistrationNumber: (formData.get("vehicleRegistrationNumber") as string)?.trim() || undefined,
       registrationExpiryDate: registrationExpiryDate || (formData.get("registrationExpiryDate") ? new Date(formData.get("registrationExpiryDate") as string) : undefined),
       registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
       nextMaintenanceDate: formData.get("nextMaintenanceDate") ? new Date(formData.get("nextMaintenanceDate") as string) : undefined,
@@ -412,6 +413,7 @@ export default function FleetManagement() {
       numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
       remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
       sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
+      vehicleRegistrationNumber: (formData.get("vehicleRegistrationNumber") as string)?.trim() || undefined,
       salePrice: (formData.get("salePrice") as string)?.trim() || undefined,
       saleDate: editSaleDate,
       buyerName: (formData.get("buyerName") as string)?.trim() || undefined,
@@ -1074,6 +1076,10 @@ export default function FleetManagement() {
 
                 <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
                   <h4 className="font-medium text-sm">Registration</h4>
+                  <div>
+                    <Label htmlFor="vehicleRegistrationNumber">Registration Number</Label>
+                    <Input id="vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label>Expiry Date</Label>
@@ -1911,6 +1917,10 @@ export default function FleetManagement() {
 
                 <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
                   <h4 className="font-medium text-sm">Registration</h4>
+                  <div>
+                    <Label htmlFor="edit-vehicleRegistrationNumber">Registration Number</Label>
+                    <Input id="edit-vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" defaultValue={(selectedVehicle as any).vehicleRegistrationNumber || ""} />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label>Expiry Date</Label>

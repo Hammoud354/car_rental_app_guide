@@ -289,6 +289,7 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if ((vehicle as any).numberOfInstallments !== undefined && (vehicle as any).numberOfInstallments !== null) insertData.numberOfInstallments = (vehicle as any).numberOfInstallments;
   if ((vehicle as any).remainingBalance && (vehicle as any).remainingBalance !== '') insertData.remainingBalance = (vehicle as any).remainingBalance;
   if ((vehicle as any).sellerName && (vehicle as any).sellerName !== '') insertData.sellerName = (vehicle as any).sellerName;
+  if ((vehicle as any).vehicleRegistrationNumber && (vehicle as any).vehicleRegistrationNumber !== '') insertData.vehicleRegistrationNumber = (vehicle as any).vehicleRegistrationNumber;
   if ((vehicle as any).registrationFee && (vehicle as any).registrationFee !== '') insertData.registrationFee = (vehicle as any).registrationFee;
   if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
   if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
@@ -3956,7 +3957,8 @@ export async function initializeSaleColumns() {
         ADD COLUMN IF NOT EXISTS "salePrice" decimal(10, 2),
         ADD COLUMN IF NOT EXISTS "saleDate" timestamp,
         ADD COLUMN IF NOT EXISTS "buyerName" varchar(200),
-        ADD COLUMN IF NOT EXISTS "saleNotes" text
+        ADD COLUMN IF NOT EXISTS "saleNotes" text,
+        ADD COLUMN IF NOT EXISTS "vehicleRegistrationNumber" varchar(100)
     `);
     console.log("[Startup] Vehicle sale columns ready");
   } catch (err) {
