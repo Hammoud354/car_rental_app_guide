@@ -94,6 +94,13 @@ export default function FleetManagement() {
   const [showPurchaseSection, setShowPurchaseSection] = useState(false);
   const [showEditPurchaseSection, setShowEditPurchaseSection] = useState(false);
 
+  // Sold/archive state
+  const [activeTab, setActiveTab] = useState<"active" | "sold">("active");
+  const [isSellConfirmOpen, setIsSellConfirmOpen] = useState(false);
+  const [pendingSellData, setPendingSellData] = useState<any>(null);
+  const [editStatusValue, setEditStatusValue] = useState<string>("");
+  const [editSaleDate, setEditSaleDate] = useState<Date | undefined>();
+
   // High season periods state
   const [isHighSeasonDialogOpen, setIsHighSeasonDialogOpen] = useState(false);
   const [editingPeriod, setEditingPeriod] = useState<any>(null);
@@ -102,6 +109,9 @@ export default function FleetManagement() {
   const [hsEndDate, setHsEndDate] = useState<Date | undefined>();
 
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
+  const { data: soldVehicles, isLoading: soldLoading } = trpc.fleet.listSold.useQuery(
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
 
@@ -174,12 +184,14 @@ export default function FleetManagement() {
     }
   }, [selectedVehicle, editCarModels, editSelectedMakerId]);
   
-  // Initialize insurance and registration dates when vehicle is selected for editing
+  // Initialize insurance, registration, sale dates and status when vehicle is selected for editing
   useEffect(() => {
     if (selectedVehicle) {
       setEditInsuranceStartDate(selectedVehicle.insurancePolicyStartDate ? new Date(selectedVehicle.insurancePolicyStartDate) : undefined);
       setEditInsuranceExpiryDate(selectedVehicle.insuranceExpiryDate ? new Date(selectedVehicle.insuranceExpiryDate) : undefined);
       setEditRegistrationExpiryDate(selectedVehicle.registrationExpiryDate ? new Date(selectedVehicle.registrationExpiryDate) : undefined);
+      setEditStatusValue(selectedVehicle.status || "");
+      setEditSaleDate((selectedVehicle as any).saleDate ? new Date((selectedVehicle as any).saleDate) : undefined);
     }
   }, [selectedVehicle]);
   
@@ -194,6 +206,16 @@ export default function FleetManagement() {
   
   // Filter vehicles based on search query
   const filteredVehicles = vehicles?.filter((vehicle) => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      vehicle.plateNumber.toLowerCase().includes(query) ||
+      vehicle.model.toLowerCase().includes(query) ||
+      vehicle.brand.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredSoldVehicles = soldVehicles?.filter((vehicle) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -349,7 +371,6 @@ export default function FleetManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    // Get brand and model names from selected IDs
     const selectedMaker = carMakers?.find(m => m.id === editSelectedMakerId);
     const selectedModel = editCarModels?.find(m => m.id === editSelectedModelId);
     
@@ -357,44 +378,64 @@ export default function FleetManagement() {
       toast.error(t("fleet.selectMakerAndModel"));
       return;
     }
-    
-    updateMutation.mutate({
-      id: selectedVehicle.id,
-      data: {
-        plateNumber: formData.get("plateNumber") as string,
-        brand: selectedMaker.name,
-        model: selectedModel.modelName,
-        year: parseInt(formData.get("year") as string),
-        color: formData.get("color") as string,
-        category: formData.get("category") as any,
-        status: (formData.get("status") as any) || undefined,
-        dailyRate: formData.get("dailyRate") as string,
-        weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
-        monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
-        highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
-        highSeasonWeeklyRate: (formData.get("highSeasonWeeklyRate") as string)?.trim() || undefined,
-        highSeasonMonthlyRate: (formData.get("highSeasonMonthlyRate") as string)?.trim() || undefined,
-        mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
-        vin: formData.get("vin") as string || undefined,
-        insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
-        insuranceProvider: formData.get("insuranceProvider") as string || undefined,
-        insurancePolicyStartDate: editInsuranceStartDate,
-        insuranceExpiryDate: editInsuranceExpiryDate,
+
+    const newStatus = (formData.get("status") as string) || selectedVehicle.status;
+
+    const vehicleData: any = {
+      plateNumber: formData.get("plateNumber") as string,
+      brand: selectedMaker.name,
+      model: selectedModel.modelName,
+      year: parseInt(formData.get("year") as string),
+      color: formData.get("color") as string,
+      category: formData.get("category") as any,
+      status: newStatus as any,
+      dailyRate: formData.get("dailyRate") as string,
+      weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
+      monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
+      highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
+      highSeasonWeeklyRate: (formData.get("highSeasonWeeklyRate") as string)?.trim() || undefined,
+      highSeasonMonthlyRate: (formData.get("highSeasonMonthlyRate") as string)?.trim() || undefined,
+      mileage: formData.get("mileage") ? parseInt(formData.get("mileage") as string) : undefined,
+      vin: formData.get("vin") as string || undefined,
+      insurancePolicyNumber: formData.get("insurancePolicyNumber") as string || undefined,
+      insuranceProvider: formData.get("insuranceProvider") as string || undefined,
+      insurancePolicyStartDate: editInsuranceStartDate,
+      insuranceExpiryDate: editInsuranceExpiryDate,
       registrationExpiryDate: editRegistrationExpiryDate,
-        insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
-        insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
-        purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
-        purchaseType: (editPurchaseType || undefined) as any,
-        downPayment: (formData.get("downPayment") as string)?.trim() || undefined,
-        interestRate: (formData.get("interestRate") as string)?.trim() || undefined,
-        monthlyInstallmentAmount: (formData.get("monthlyInstallmentAmount") as string)?.trim() || undefined,
-        numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
-        remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
-        sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
-        registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
-        notes: formData.get("notes") as string || undefined,
-      },
-    });
+      insuranceAnnualPremium: (formData.get("insuranceAnnualPremium") as string)?.trim() || undefined,
+      insuranceCost: (formData.get("insuranceCost") as string)?.trim() || undefined,
+      purchaseCost: (formData.get("purchaseCost") as string)?.trim() || undefined,
+      purchaseType: (editPurchaseType || undefined) as any,
+      downPayment: (formData.get("downPayment") as string)?.trim() || undefined,
+      interestRate: (formData.get("interestRate") as string)?.trim() || undefined,
+      monthlyInstallmentAmount: (formData.get("monthlyInstallmentAmount") as string)?.trim() || undefined,
+      numberOfInstallments: formData.get("numberOfInstallments") ? parseInt(formData.get("numberOfInstallments") as string) : undefined,
+      remainingBalance: (formData.get("remainingBalance") as string)?.trim() || undefined,
+      sellerName: (formData.get("sellerName") as string)?.trim() || undefined,
+      salePrice: (formData.get("salePrice") as string)?.trim() || undefined,
+      saleDate: editSaleDate,
+      buyerName: (formData.get("buyerName") as string)?.trim() || undefined,
+      saleNotes: (formData.get("saleNotes") as string)?.trim() || undefined,
+      registrationFee: (formData.get("registrationFee") as string)?.trim() || undefined,
+      notes: formData.get("notes") as string || undefined,
+    };
+
+    // Show confirmation when marking as sold for the first time
+    if (newStatus === "Sold" && selectedVehicle.status !== "Sold") {
+      setPendingSellData(vehicleData);
+      setIsSellConfirmOpen(true);
+      return;
+    }
+
+    updateMutation.mutate({ id: selectedVehicle.id, data: vehicleData });
+  };
+
+  const confirmSale = () => {
+    if (pendingSellData && selectedVehicle) {
+      updateMutation.mutate({ id: selectedVehicle.id, data: pendingSellData });
+    }
+    setIsSellConfirmOpen(false);
+    setPendingSellData(null);
   };
 
   const handleDeleteVehicle = (id: number) => {
@@ -457,6 +498,43 @@ export default function FleetManagement() {
 
   return (
     <>
+      {/* Sell Confirmation Modal */}
+      <AlertDialog open={isSellConfirmOpen} onOpenChange={(open) => { if (!open) { setIsSellConfirmOpen(false); setPendingSellData(null); } }}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-full">
+                <DollarSign className="h-5 w-5 text-purple-600" />
+              </div>
+              <AlertDialogTitle>Confirm Vehicle Sale</AlertDialogTitle>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogDescription className="space-y-3">
+            <p className="text-sm">
+              This vehicle will be removed from active fleet operations and moved to archived vehicles.
+              All historical records — contracts, maintenance, and revenue — will remain preserved.
+            </p>
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 text-sm text-purple-900">
+              <p className="font-semibold">{selectedVehicle?.plateNumber} — {selectedVehicle?.brand} {selectedVehicle?.model}</p>
+              {pendingSellData?.salePrice && <p className="mt-1">Sale Price: <span className="font-medium">${parseFloat(pendingSellData.salePrice).toLocaleString()}</span></p>}
+              {pendingSellData?.buyerName && <p>Buyer: <span className="font-medium">{pendingSellData.buyerName}</span></p>}
+              {pendingSellData?.saleDate && <p>Sale Date: <span className="font-medium">{new Date(pendingSellData.saleDate).toLocaleDateString()}</span></p>}
+            </div>
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setIsSellConfirmOpen(false); setPendingSellData(null); }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmSale}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              Confirm Sale
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Subscription Limit Error Modal */}
       <AlertDialog open={subscriptionLimitError.show} onOpenChange={(open) => {
         if (!open) {
@@ -1326,12 +1404,42 @@ export default function FleetManagement() {
           )}
         </div>
 
-        {isLoading ? (
+        {/* Tab strip */}
+        <div className="flex items-center gap-0 border-b border-gray-200 mb-4">
+          <button
+            onClick={() => setActiveTab("active")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "active"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Active Fleet
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === "active" ? "bg-blue-100 text-blue-700" : "bg-gray-100 text-gray-500"}`}>
+              {filteredVehicles?.length ?? 0}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab("sold")}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "sold"
+                ? "border-purple-600 text-purple-600"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Sold / Archived
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${activeTab === "sold" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-500"}`}>
+              {soldVehicles?.length ?? 0}
+            </span>
+          </button>
+        </div>
+
+        {activeTab === "active" && isLoading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <p className="mt-4 text-sm text-gray-500">Loading vehicles...</p>
           </div>
-        ) : filteredVehicles && filteredVehicles.length > 0 ? (
+        ) : activeTab === "active" && filteredVehicles && filteredVehicles.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredVehicles.map((vehicle) => (
               <div key={vehicle.id} className="bg-white rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all">
@@ -1428,16 +1536,16 @@ export default function FleetManagement() {
               </div>
             ))}
           </div>
-        ) : searchQuery ? (
+        ) : activeTab === "active" && searchQuery ? (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
             <Search className="h-10 w-10 mx-auto text-gray-300 mb-3" />
             <h3 className="text-base font-semibold text-gray-700 mb-1">No Results Found</h3>
-            <p className="text-sm text-gray-400 mb-4">t("fleet.noVehicles") + " \"{searchQuery}"</p>
+            <p className="text-sm text-gray-400 mb-4">No vehicles match "{searchQuery}"</p>
             <Button onClick={() => setSearchQuery("")} variant="outline" size="sm">
               Clear Search
             </Button>
           </div>
-        ) : (
+        ) : activeTab === "active" ? (
           <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
             <Car className="h-10 w-10 mx-auto text-gray-300 mb-3" />
             <h3 className="text-base font-semibold text-gray-700 mb-1">No Vehicles Yet</h3>
@@ -1447,6 +1555,89 @@ export default function FleetManagement() {
               Add First Vehicle
             </Button>
           </div>
+        ) : null}
+
+        {/* Sold / Archived Tab */}
+        {activeTab === "sold" && (
+          soldLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+              <p className="mt-4 text-sm text-gray-500">Loading archived vehicles...</p>
+            </div>
+          ) : filteredSoldVehicles && filteredSoldVehicles.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredSoldVehicles.map((vehicle) => (
+                <div key={vehicle.id} className="bg-gray-50 rounded-xl border border-gray-200 opacity-90 hover:opacity-100 transition-opacity">
+                  <div className="p-5">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 className="text-base font-bold text-gray-600">{vehicle.plateNumber}</h3>
+                        <p className="text-sm text-gray-400">{vehicle.brand} {vehicle.model} ({vehicle.year})</p>
+                      </div>
+                      <Badge className="bg-purple-100 text-purple-700 border-purple-200">Sold</Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mt-3">
+                      {(vehicle as any).saleDate && (
+                        <div>
+                          <span className="text-xs text-gray-400">Sale Date</span>
+                          <p className="font-medium text-gray-600">{new Date((vehicle as any).saleDate).toLocaleDateString()}</p>
+                        </div>
+                      )}
+                      {(vehicle as any).salePrice && (
+                        <div>
+                          <span className="text-xs text-gray-400">Sale Price</span>
+                          <p className="font-medium text-gray-600">${parseFloat((vehicle as any).salePrice).toLocaleString()}</p>
+                        </div>
+                      )}
+                      {(vehicle as any).buyerName && (
+                        <div className="col-span-2">
+                          <span className="text-xs text-gray-400">Buyer</span>
+                          <p className="font-medium text-gray-600">{(vehicle as any).buyerName}</p>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-xs text-gray-400">Category</span>
+                        <p className="font-medium text-gray-600">{vehicle.category}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-gray-400">Color</span>
+                        <p className="font-medium text-gray-600">{vehicle.color}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                      <Link href={`/vehicle/${vehicle.id}`} className="flex-1">
+                        <Button size="sm" variant="outline" className="w-full text-xs text-gray-600">
+                          <Car className="mr-1.5 h-3 w-3" />
+                          View History
+                        </Button>
+                      </Link>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs text-blue-600 hover:bg-blue-50"
+                        onClick={() => { setSelectedVehicle(vehicle as any); setIsEditDialogOpen(true); }}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : searchQuery ? (
+            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+              <Search className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+              <h3 className="text-base font-semibold text-gray-700 mb-1">No Results Found</h3>
+              <p className="text-sm text-gray-400 mb-4">No sold vehicles match "{searchQuery}"</p>
+              <Button onClick={() => setSearchQuery("")} variant="outline" size="sm">Clear Search</Button>
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+              <DollarSign className="h-10 w-10 mx-auto text-gray-300 mb-3" />
+              <h3 className="text-base font-semibold text-gray-700 mb-1">No Sold Vehicles</h3>
+              <p className="text-sm text-gray-400">Vehicles you mark as "Sold" will appear here for archive reference.</p>
+            </div>
+          )
         )}
 
         {/* Edit Dialog */}
@@ -1615,7 +1806,7 @@ export default function FleetManagement() {
                   </div>
                   <div>
                     <Label htmlFor="edit-status">Status</Label>
-                    <Select name="status" defaultValue={selectedVehicle.status}>
+                    <Select name="status" defaultValue={selectedVehicle.status} onValueChange={setEditStatusValue}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -1824,6 +2015,38 @@ export default function FleetManagement() {
                     </div>
                   )}
                 </div>
+
+                {/* Sale Details — visible when status is Sold */}
+                {(editStatusValue === "Sold" || (editStatusValue === "" && selectedVehicle?.status === "Sold")) && (
+                  <div className="space-y-4 p-4 border border-purple-200 rounded-lg bg-purple-50/40">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4 text-purple-600" />
+                      <h4 className="text-sm font-semibold text-purple-900">Sale Details</h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="edit-salePrice">Sale Price</Label>
+                        <Input id="edit-salePrice" name="salePrice" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).salePrice || ""} />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-buyerName">Buyer Name</Label>
+                        <Input id="edit-buyerName" name="buyerName" placeholder="e.g. John Smith" defaultValue={(selectedVehicle as any).buyerName || ""} />
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Sale Date</Label>
+                      <ModernDatePicker
+                        date={editSaleDate}
+                        onDateChange={setEditSaleDate}
+                        placeholder="Select sale date"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-saleNotes">Sale Notes</Label>
+                      <Textarea id="edit-saleNotes" name="saleNotes" rows={2} placeholder="e.g. Sold via auction, cash payment..." defaultValue={(selectedVehicle as any).saleNotes || ""} />
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <Label htmlFor="edit-notes">Notes</Label>

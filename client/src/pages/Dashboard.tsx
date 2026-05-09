@@ -653,6 +653,7 @@ export default function Dashboard() {
   const utils = trpc.useUtils();
   const { data: allUsers } = trpc.admin.listUsers.useQuery(undefined, { enabled: isSuperAdmin });
   const { data: vehicles, isLoading } = trpc.fleet.list.useQuery({ filterUserId: selectedUserId || undefined });
+  const { data: soldVehicles } = trpc.fleet.listSold.useQuery({ filterUserId: selectedUserId || undefined });
   const { data: contractStats } = trpc.contracts.getDashboardStatistics.useQuery({ filterUserId: selectedUserId || undefined });
   const { data: companyProfile } = trpc.company.getProfile.useQuery();
   const selectPlanMutation = trpc.subscription.selectPlan.useMutation();
@@ -912,6 +913,28 @@ export default function Dashboard() {
 
         {widgetVisibility.expiringDocs && (
           <ExpiringDocumentsCardWithModal />
+        )}
+
+        {(soldVehicles?.length ?? 0) > 0 && (
+          <Link href="/fleet-management" onClick={() => {}}>
+            <div className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-sm transition-shadow cursor-pointer group col-span-2 lg:col-span-1">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Sold Vehicles</span>
+                <div className="p-2 bg-purple-50 rounded-lg group-hover:bg-purple-100 transition-colors">
+                  <DollarSign className="h-4 w-4 text-purple-500" />
+                </div>
+              </div>
+              <div className="text-3xl font-bold text-gray-900">{soldVehicles?.length || 0}</div>
+              {soldVehicles && soldVehicles.some((v: any) => v.salePrice) && (
+                <p className="text-xs text-purple-500 mt-1 font-medium">
+                  Total: ${soldVehicles.reduce((sum: number, v: any) => sum + (v.salePrice ? parseFloat(v.salePrice) : 0), 0).toLocaleString()}
+                </p>
+              )}
+              {!soldVehicles?.some((v: any) => v.salePrice) && (
+                <p className="text-xs text-gray-400 mt-1">Click to view archive</p>
+              )}
+            </div>
+          </Link>
         )}
       </div>
 

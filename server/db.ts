@@ -121,7 +121,7 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // Vehicle Management Queries
-export async function getAllVehicles(userId: number, filterUserId?: number | null) {
+export async function getAllVehicles(userId: number, filterUserId?: number | null, excludeSold = true) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicles: database not available");
@@ -130,9 +130,10 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
   
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
-  const allVehicles = effectiveFilter != null
+  const rawVehicles = effectiveFilter != null
     ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
     : await db.select().from(vehicles);
+  const allVehicles = excludeSold ? rawVehicles.filter(v => v.status !== 'Sold') : rawVehicles;
   
   const now = new Date();
   const vehiclesWithCosts = await Promise.all(
@@ -3932,6 +3933,34 @@ export async function updateWhishPaymentRequestStatus(
   } catch (error) {
     console.error("Error updating Whish payment request:", error);
     return null;
+  }
+}
+
+export async function getSoldVehicles(userId: number, filterUserId?: number | null) {
+  const db = await getDb();
+  if (!db) return [];
+  const admin = await isSuperAdmin(userId);
+  const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const rawVehicles = effectiveFilter != null
+    ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
+    : await db.select().from(vehicles);
+  return rawVehicles.filter(v => v.status === 'Sold');
+}
+
+export async function initializeSaleColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE vehicles
+        ADD COLUMN IF NOT EXISTS "salePrice" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "saleDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "buyerName" varchar(200),
+        ADD COLUMN IF NOT EXISTS "saleNotes" text
+    `);
+    console.log("[Startup] Vehicle sale columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize sale columns:", err);
   }
 }
 

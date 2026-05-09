@@ -396,7 +396,14 @@ export const appRouter = router({
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
         const userId = ctx.user?.id || 1;
-        return await db.getAllVehicles(userId, input?.filterUserId);
+        return await db.getAllVehicles(userId, input?.filterUserId, true);
+      }),
+
+    listSold: publicProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        const userId = ctx.user?.id || 1;
+        return await db.getSoldVehicles(userId, input?.filterUserId);
       }),
     
     getVehicleCount: protectedProcedure
@@ -405,7 +412,7 @@ export const appRouter = router({
         const database = await db.getDb();
         if (!database) return 0;
         const result = await database.execute(
-          sql`SELECT COUNT(*) as count FROM vehicles WHERE "userId" = ${userId}`
+          sql`SELECT COUNT(*) as count FROM vehicles WHERE "userId" = ${userId} AND status != 'Sold'`
         ) as any;
         const rows = result?.rows || (Array.isArray(result) && result[0]) || [];
         return rows.length > 0 ? Number(rows[0].count) : 0;
@@ -523,6 +530,10 @@ export const appRouter = router({
           numberOfInstallments: z.number().int().optional(),
           remainingBalance: z.string().optional(),
           sellerName: z.string().max(200).optional(),
+          salePrice: z.string().optional(),
+          saleDate: z.date().optional(),
+          buyerName: z.string().max(200).optional(),
+          saleNotes: z.string().optional(),
           registrationFee: z.string().optional(),
           photoUrl: z.string().optional(),
           notes: z.string().optional(),
