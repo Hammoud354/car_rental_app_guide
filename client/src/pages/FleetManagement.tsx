@@ -93,6 +93,10 @@ export default function FleetManagement() {
   const [editPurchaseType, setEditPurchaseType] = useState<"Cash" | "Installments" | "">("");
   const [showPurchaseSection, setShowPurchaseSection] = useState(false);
   const [showEditPurchaseSection, setShowEditPurchaseSection] = useState(false);
+  const [addPurchaseCost, setAddPurchaseCost] = useState<number>(0);
+  const [addDownPayment, setAddDownPayment] = useState<number>(0);
+  const [editPurchaseCost, setEditPurchaseCost] = useState<number>(0);
+  const [editDownPayment, setEditDownPayment] = useState<number>(0);
 
   // Sold/archive state
   const [activeTab, setActiveTab] = useState<"active" | "sold">("active");
@@ -1138,14 +1142,16 @@ export default function FleetManagement() {
                         </div>
                         <div>
                           <Label htmlFor="purchaseCost">Purchase Price</Label>
-                          <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" />
+                          <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00"
+                            onChange={(e) => setAddPurchaseCost(parseFloat(e.target.value) || 0)} />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="downPayment">Down Payment</Label>
-                          <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" />
+                          <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00"
+                            onChange={(e) => setAddDownPayment(parseFloat(e.target.value) || 0)} />
                         </div>
                         <div>
                           <Label htmlFor="sellerName">Seller / Dealer Name</Label>
@@ -1182,7 +1188,19 @@ export default function FleetManagement() {
                             </div>
                             <div>
                               <Label htmlFor="remainingBalance">Remaining Balance</Label>
-                              <Input id="remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" placeholder="0.00" />
+                              <div className="relative">
+                                <Input
+                                  id="remainingBalance"
+                                  name="remainingBalance"
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  readOnly
+                                  value={Math.max(0, addPurchaseCost - addDownPayment).toFixed(2)}
+                                  className="bg-gray-50 text-gray-700 cursor-default pr-20"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1493,6 +1511,8 @@ export default function FleetManagement() {
                       className="flex-1 text-xs"
                       onClick={() => {
                         setSelectedVehicle(vehicle);
+                        setEditPurchaseCost(parseFloat((vehicle as any).purchaseCost || "0"));
+                        setEditDownPayment(parseFloat((vehicle as any).downPayment || "0"));
                         setIsEditDialogOpen(true);
                       }}
                     >
@@ -1623,7 +1643,7 @@ export default function FleetManagement() {
                         size="sm"
                         variant="outline"
                         className="text-xs text-blue-600 hover:bg-blue-50"
-                        onClick={() => { setSelectedVehicle(vehicle as any); setIsEditDialogOpen(true); }}
+                        onClick={() => { setSelectedVehicle(vehicle as any); setEditPurchaseCost(parseFloat((vehicle as any).purchaseCost || "0")); setEditDownPayment(parseFloat((vehicle as any).downPayment || "0")); setIsEditDialogOpen(true); }}
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
@@ -1975,14 +1995,16 @@ export default function FleetManagement() {
                         </div>
                         <div>
                           <Label htmlFor="edit-purchaseCost">Purchase Price</Label>
-                          <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""} />
+                          <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""}
+                            onChange={(e) => setEditPurchaseCost(parseFloat(e.target.value) || 0)} />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="edit-downPayment">Down Payment</Label>
-                          <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""} />
+                          <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""}
+                            onChange={(e) => setEditDownPayment(parseFloat(e.target.value) || 0)} />
                         </div>
                         <div>
                           <Label htmlFor="edit-sellerName">Seller / Dealer Name</Label>
@@ -2019,7 +2041,19 @@ export default function FleetManagement() {
                             </div>
                             <div>
                               <Label htmlFor="edit-remainingBalance">Remaining Balance</Label>
-                              <Input id="edit-remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).remainingBalance || ""} />
+                              <div className="relative">
+                                <Input
+                                  id="edit-remainingBalance"
+                                  name="remainingBalance"
+                                  type="number"
+                                  step="0.01"
+                                  min="0"
+                                  readOnly
+                                  value={Math.max(0, editPurchaseCost - editDownPayment).toFixed(2)}
+                                  className="bg-gray-50 text-gray-700 cursor-default pr-20"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                              </div>
                             </div>
                           </div>
                         </div>
