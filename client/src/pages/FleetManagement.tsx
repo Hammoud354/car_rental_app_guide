@@ -95,8 +95,14 @@ export default function FleetManagement() {
   const [showEditPurchaseSection, setShowEditPurchaseSection] = useState(false);
   const [addPurchaseCost, setAddPurchaseCost] = useState<number>(0);
   const [addDownPayment, setAddDownPayment] = useState<number>(0);
+  const [addInterestRate, setAddInterestRate] = useState<number>(0);
+  const [addNumInstallments, setAddNumInstallments] = useState<number>(0);
+  const [addMonthlyManual, setAddMonthlyManual] = useState<number | null>(null);
   const [editPurchaseCost, setEditPurchaseCost] = useState<number>(0);
   const [editDownPayment, setEditDownPayment] = useState<number>(0);
+  const [editInterestRate, setEditInterestRate] = useState<number>(0);
+  const [editNumInstallments, setEditNumInstallments] = useState<number>(0);
+  const [editMonthlyManual, setEditMonthlyManual] = useState<number | null>(null);
 
   // Sold/archive state
   const [activeTab, setActiveTab] = useState<"active" | "sold">("active");
@@ -1143,7 +1149,7 @@ export default function FleetManagement() {
                         <div>
                           <Label htmlFor="purchaseCost">Purchase Price</Label>
                           <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00"
-                            onChange={(e) => setAddPurchaseCost(parseFloat(e.target.value) || 0)} />
+                            onChange={(e) => { setAddPurchaseCost(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
                         </div>
                       </div>
 
@@ -1151,7 +1157,7 @@ export default function FleetManagement() {
                         <div>
                           <Label htmlFor="downPayment">Down Payment</Label>
                           <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00"
-                            onChange={(e) => setAddDownPayment(parseFloat(e.target.value) || 0)} />
+                            onChange={(e) => { setAddDownPayment(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
                         </div>
                         <div>
                           <Label htmlFor="sellerName">Seller / Dealer Name</Label>
@@ -1168,43 +1174,64 @@ export default function FleetManagement() {
                         />
                       </div>
 
-                      {purchaseType === "Installments" && (
-                        <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
-                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="interestRate">Interest Rate (%)</Label>
-                              <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" />
+                      {purchaseType === "Installments" && (() => {
+                        const loanAmount = Math.max(0, addPurchaseCost - addDownPayment);
+                        const remaining = loanAmount * (1 + addInterestRate / 100);
+                        const computedMonthly = addNumInstallments > 0 ? remaining / addNumInstallments : 0;
+                        const monthlyDisplay = addMonthlyManual !== null ? addMonthlyManual : computedMonthly;
+                        return (
+                          <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
+                            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                                <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
+                                  onChange={(e) => { setAddInterestRate(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                              </div>
+                              <div>
+                                <Label htmlFor="numberOfInstallments">Number of Installments</Label>
+                                <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
+                                  onChange={(e) => { setAddNumInstallments(parseInt(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                              </div>
                             </div>
-                            <div>
-                              <Label htmlFor="monthlyInstallmentAmount">Monthly Installment</Label>
-                              <Input id="monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00" />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="numberOfInstallments">Number of Installments</Label>
-                              <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" />
-                            </div>
-                            <div>
-                              <Label htmlFor="remainingBalance">Remaining Balance</Label>
-                              <div className="relative">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="monthlyInstallmentAmount">
+                                  Monthly Installment
+                                  {addMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
+                                </Label>
                                 <Input
-                                  id="remainingBalance"
-                                  name="remainingBalance"
+                                  id="monthlyInstallmentAmount"
+                                  name="monthlyInstallmentAmount"
                                   type="number"
                                   step="0.01"
                                   min="0"
-                                  readOnly
-                                  value={Math.max(0, addPurchaseCost - addDownPayment).toFixed(2)}
-                                  className="bg-gray-50 text-gray-700 cursor-default pr-20"
+                                  placeholder="0.00"
+                                  value={monthlyDisplay.toFixed(2)}
+                                  onChange={(e) => setAddMonthlyManual(parseFloat(e.target.value) || 0)}
+                                  className={addMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}
                                 />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                              </div>
+                              <div>
+                                <Label htmlFor="remainingBalance">Remaining Balance</Label>
+                                <div className="relative">
+                                  <Input
+                                    id="remainingBalance"
+                                    name="remainingBalance"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    readOnly
+                                    value={remaining.toFixed(2)}
+                                    className="bg-gray-50 text-gray-700 cursor-default pr-20"
+                                  />
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
                   )}
                 </div>
@@ -1513,6 +1540,9 @@ export default function FleetManagement() {
                         setSelectedVehicle(vehicle);
                         setEditPurchaseCost(parseFloat((vehicle as any).purchaseCost || "0"));
                         setEditDownPayment(parseFloat((vehicle as any).downPayment || "0"));
+                        setEditInterestRate(parseFloat((vehicle as any).interestRate || "0"));
+                        setEditNumInstallments(parseInt((vehicle as any).numberOfInstallments || "0"));
+                        setEditMonthlyManual(parseFloat((vehicle as any).monthlyInstallmentAmount || "0") || null);
                         setIsEditDialogOpen(true);
                       }}
                     >
@@ -1643,7 +1673,7 @@ export default function FleetManagement() {
                         size="sm"
                         variant="outline"
                         className="text-xs text-blue-600 hover:bg-blue-50"
-                        onClick={() => { setSelectedVehicle(vehicle as any); setEditPurchaseCost(parseFloat((vehicle as any).purchaseCost || "0")); setEditDownPayment(parseFloat((vehicle as any).downPayment || "0")); setIsEditDialogOpen(true); }}
+                        onClick={() => { setSelectedVehicle(vehicle as any); setEditPurchaseCost(parseFloat((vehicle as any).purchaseCost || "0")); setEditDownPayment(parseFloat((vehicle as any).downPayment || "0")); setEditInterestRate(parseFloat((vehicle as any).interestRate || "0")); setEditNumInstallments(parseInt((vehicle as any).numberOfInstallments || "0")); setEditMonthlyManual(parseFloat((vehicle as any).monthlyInstallmentAmount || "0") || null); setIsEditDialogOpen(true); }}
                       >
                         <Edit className="h-3 w-3" />
                       </Button>
@@ -2021,43 +2051,66 @@ export default function FleetManagement() {
                         />
                       </div>
 
-                      {(editPurchaseType === "Installments" || (!(editPurchaseType) && (selectedVehicle as any).purchaseType === "Installments")) && (
-                        <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
-                          <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="edit-interestRate">Interest Rate (%)</Label>
-                              <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" defaultValue={(selectedVehicle as any).interestRate || ""} />
-                            </div>
-                            <div>
-                              <Label htmlFor="edit-monthlyInstallmentAmount">Monthly Installment</Label>
-                              <Input id="edit-monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).monthlyInstallmentAmount || ""} />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="edit-numberOfInstallments">Number of Installments</Label>
-                              <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" defaultValue={(selectedVehicle as any).numberOfInstallments || ""} />
-                            </div>
-                            <div>
-                              <Label htmlFor="edit-remainingBalance">Remaining Balance</Label>
-                              <div className="relative">
-                                <Input
-                                  id="edit-remainingBalance"
-                                  name="remainingBalance"
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  readOnly
-                                  value={Math.max(0, editPurchaseCost - editDownPayment).toFixed(2)}
-                                  className="bg-gray-50 text-gray-700 cursor-default pr-20"
-                                />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                      {(editPurchaseType === "Installments" || (!(editPurchaseType) && (selectedVehicle as any).purchaseType === "Installments")) && (() => {
+                          const loanAmount = Math.max(0, editPurchaseCost - editDownPayment);
+                          const remaining = loanAmount * (1 + editInterestRate / 100);
+                          const computedMonthly = editNumInstallments > 0 ? remaining / editNumInstallments : 0;
+                          const monthlyDisplay = editMonthlyManual !== null ? editMonthlyManual : computedMonthly;
+                          return (
+                            <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
+                              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="edit-interestRate">Interest Rate (%)</Label>
+                                  <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
+                                    defaultValue={(selectedVehicle as any).interestRate || ""}
+                                    onChange={(e) => { setEditInterestRate(parseFloat(e.target.value) || 0); setEditMonthlyManual(null); }} />
+                                </div>
+                                <div>
+                                  <Label htmlFor="edit-numberOfInstallments">Number of Installments</Label>
+                                  <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
+                                    defaultValue={(selectedVehicle as any).numberOfInstallments || ""}
+                                    onChange={(e) => { setEditNumInstallments(parseInt(e.target.value) || 0); setEditMonthlyManual(null); }} />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="edit-monthlyInstallmentAmount">
+                                    Monthly Installment
+                                    {editMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
+                                  </Label>
+                                  <Input
+                                    id="edit-monthlyInstallmentAmount"
+                                    name="monthlyInstallmentAmount"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    placeholder="0.00"
+                                    value={monthlyDisplay.toFixed(2)}
+                                    onChange={(e) => setEditMonthlyManual(parseFloat(e.target.value) || 0)}
+                                    className={editMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="edit-remainingBalance">Remaining Balance</Label>
+                                  <div className="relative">
+                                    <Input
+                                      id="edit-remainingBalance"
+                                      name="remainingBalance"
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      readOnly
+                                      value={remaining.toFixed(2)}
+                                      className="bg-gray-50 text-gray-700 cursor-default pr-20"
+                                    />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </div>
-                      )}
+                          );
+                        })()}
                     </div>
                   )}
                 </div>
