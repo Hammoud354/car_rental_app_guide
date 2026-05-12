@@ -4068,37 +4068,31 @@ export async function deleteTempDemoUser(userId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
 
-  await db.execute(sql`
-    DO $$
-    DECLARE uid INT := ${userId};
-    BEGIN
-      DELETE FROM "invoiceLineItems" WHERE "invoiceId" IN (SELECT id FROM invoices WHERE "userId" = uid);
-      DELETE FROM invoices WHERE "userId" = uid;
-      DELETE FROM "damageMarks" WHERE "userId" = uid;
-      DELETE FROM "contractAmendments" WHERE "contractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = uid);
-      DELETE FROM "generatedContracts" WHERE "contractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = uid);
-      DELETE FROM "rentalContracts" WHERE "userId" = uid;
-      DELETE FROM "maintenanceRecords" WHERE "userId" = uid;
-      DELETE FROM "maintenanceTasks" WHERE "userId" = uid;
-      DELETE FROM "vehicleImages" WHERE "vehicleId" IN (SELECT id FROM vehicles WHERE "userId" = uid);
-      DELETE FROM vehicles WHERE "userId" = uid;
-      DELETE FROM clients WHERE "userId" = uid;
-      DELETE FROM "companyProfiles" WHERE "userId" = uid;
-      DELETE FROM "companySettings" WHERE "userId" = uid;
-      DELETE FROM "dashboardPreferences" WHERE "userId" = uid;
-      DELETE FROM "whatsappTemplates" WHERE "userId" = uid;
-      DELETE FROM "numberingCounters" WHERE "userId" = uid;
-      DELETE FROM "numberingAudit" WHERE "userId" = uid;
-      DELETE FROM "highSeasonPeriods" WHERE "userId" = uid;
-      DELETE FROM "insurancePolicies" WHERE "userId" = uid;
-      DELETE FROM "userSubscriptions" WHERE "userId" = uid;
-      DELETE FROM "passwordResetTokens" WHERE "userId" = uid;
-      DELETE FROM "contractTemplates" WHERE "userId" = uid;
-      DELETE FROM "auditLogs" WHERE "userId" = uid;
-      DELETE FROM "whishPaymentRequests" WHERE "userId" = uid;
-      DELETE FROM users WHERE id = uid AND "isTemporaryDemo" = true;
-    END $$;
-  `);
+  await db.execute(sql`DELETE FROM "invoiceLineItems" WHERE "invoiceId" IN (SELECT id FROM invoices WHERE "userId" = ${userId})`);
+  await db.execute(sql`DELETE FROM invoices WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "damageMarks" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "contractAmendments" WHERE "contractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = ${userId})`);
+  await db.execute(sql`DELETE FROM "generatedContracts" WHERE "rentalContractId" IN (SELECT id FROM "rentalContracts" WHERE "userId" = ${userId})`);
+  await db.execute(sql`DELETE FROM "rentalContracts" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "maintenanceRecords" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "maintenanceTasks" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "vehicleImages" WHERE "vehicleId" IN (SELECT id FROM vehicles WHERE "userId" = ${userId})`);
+  await db.execute(sql`DELETE FROM vehicles WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM clients WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "companyProfiles" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "companySettings" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "dashboardPreferences" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "whatsappTemplates" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "numberingCounters" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "numberingAudit" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "highSeasonPeriods" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "insurancePolicies" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "userSubscriptions" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "passwordResetTokens" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "contractTemplates" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "auditLogs" WHERE "actorId" = ${userId}`);
+  await db.execute(sql`DELETE FROM "whishPaymentRequests" WHERE "userId" = ${userId}`);
+  await db.execute(sql`DELETE FROM users WHERE id = ${userId} AND "isTemporaryDemo" = true`);
 }
 
 export async function cleanupExpiredTempDemoUsers(): Promise<number> {
