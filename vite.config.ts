@@ -171,7 +171,8 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("html2canvas") || id.includes("html2pdf") || id.includes("jspdf") || id.includes("canvg") || id.includes("dompurify") || id.includes("svg-pathdata") || id.includes("fflate")) return "vendor-pdf";
+            if (id.includes("exceljs") || id.includes("archiver") || id.includes("jszip")) return "vendor-excel";
             if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) return "vendor-charts";
             if (id.includes("react-dom") || id.includes("react/") || id.includes("scheduler")) return "vendor-react";
             if (id.includes("@tanstack") || id.includes("@trpc")) return "vendor-query";
@@ -180,7 +181,6 @@ export default defineConfig({
             if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) return "vendor-forms";
             if (id.includes("@radix-ui") || id.includes("lucide-react") || id.includes("class-variance-authority") || id.includes("clsx") || id.includes("tailwind-merge") || id.includes("cmdk") || id.includes("sonner") || id.includes("vaul")) return "vendor-ui";
             if (id.includes("drizzle-orm") || id.includes("drizzle-zod")) return "vendor-db";
-            return "vendor-misc";
           }
         },
       },

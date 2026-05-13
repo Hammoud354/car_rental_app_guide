@@ -9,26 +9,10 @@
  * PHASE 0: Log exact PDF engine being used
  */
 export function logPdfEngine(): void {
-  console.group('📦 PDF Engine Detection');
+  console.group('PDF Engine Detection');
   console.log('jsPDF:', typeof (window as any).jsPDF !== 'undefined' ? 'LOADED' : 'NOT LOADED');
   console.log('html2canvas:', typeof (window as any).html2canvas !== 'undefined' ? 'LOADED' : 'NOT LOADED');
   console.log('html2pdf:', typeof (window as any).html2pdf !== 'undefined' ? 'LOADED' : 'NOT LOADED');
-  
-  // Check imports
-  try {
-    const jsPDF = require('jspdf');
-    console.log('jsPDF (via import):', 'AVAILABLE');
-  } catch (e) {
-    console.log('jsPDF (via import):', 'NOT AVAILABLE');
-  }
-  
-  try {
-    const html2canvas = require('html2canvas');
-    console.log('html2canvas (via import):', 'AVAILABLE');
-  } catch (e) {
-    console.log('html2canvas (via import):', 'NOT AVAILABLE');
-  }
-  
   console.groupEnd();
 }
 
