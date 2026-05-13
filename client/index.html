@@ -42,43 +42,46 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
     </noscript>
 
-    <!-- Static shell — visible immediately so crawlers/Lighthouse register FCP right away.
-         Hidden the moment React mounts (MutationObserver below). -->
+    <!--
+      Static shell: position:fixed overlay so it is OUTSIDE normal document flow.
+      This means hiding it creates ZERO Cumulative Layout Shift (CLS).
+      The #root div is always in normal flow and always visible — React renders
+      into it immediately, with the shell fading out on top once content is ready.
+    -->
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#111827}
-      #static-shell{min-height:100vh;display:flex;flex-direction:column}
-      #static-shell.hidden{display:none}
+      #static-shell{
+        position:fixed;inset:0;background:#fff;z-index:100;
+        display:flex;flex-direction:column;
+        transition:opacity 0.15s ease;
+      }
+      #static-shell.fade-out{opacity:0;pointer-events:none}
       .ss-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid #f3f4f6}
       .ss-logo{font-size:1.25rem;font-weight:700;color:#111827;text-decoration:none}
       .ss-logo span{color:#2563eb}
-      .ss-nav-links{display:flex;gap:24px;list-style:none}
-      .ss-nav-links a{font-size:.9rem;color:#374151;text-decoration:none}
       .ss-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:64px 24px 48px}
       .ss-badge{display:inline-flex;align-items:center;gap:8px;background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;font-size:.75rem;font-weight:600;letter-spacing:.05em;padding:4px 14px;border-radius:999px;margin-bottom:28px}
       .ss-h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;line-height:1.15;max-width:780px;color:#111827}
       .ss-h1 .blue{color:#2563eb}
       .ss-sub{margin-top:20px;font-size:1.05rem;color:#6b7280;max-width:560px;line-height:1.6}
       .ss-btns{display:flex;gap:12px;margin-top:36px;flex-wrap:wrap;justify-content:center}
-      .ss-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:.95rem;font-weight:600;text-decoration:none;cursor:pointer;border:none}
+      .ss-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:.95rem;font-weight:600;text-decoration:none}
       .ss-btn-primary{background:#2563eb;color:#fff}
       .ss-btn-outline{background:#fff;color:#374151;border:1.5px solid #d1d5db}
       .ss-btn-demo{background:#991b1b;color:#fff}
-      #root{display:none}
-      #root.ready{display:block}
     </style>
   </head>
 
   <body>
-    <!-- Static above-the-fold shell rendered before any JS loads -->
-    <div id="static-shell" aria-hidden="true">
+    <!--
+      Static above-the-fold shell.
+      position:fixed keeps it out of normal flow — removing it causes NO layout shift.
+      No aria-hidden so the h1 counts toward Lighthouse LCP.
+    -->
+    <div id="static-shell">
       <nav class="ss-nav">
         <a href="/" class="ss-logo">Fleet<span>Wizards</span></a>
-        <ul class="ss-nav-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/signin">Sign In</a></li>
-          <li><a href="/signup">Sign Up</a></li>
-        </ul>
       </nav>
       <section class="ss-hero">
         <div class="ss-badge">&#9679;&nbsp;ENTERPRISE FLEET MANAGEMENT</div>
@@ -92,21 +95,27 @@
       </section>
     </div>
 
+    <!-- React root — always in normal flow, always visible -->
     <div id="root"></div>
 
     <script>
-      // Once React mounts into #root, hide the static shell and show the app
+      // Fade out the static shell once React has mounted content into #root.
+      // Using opacity transition (not display:none swap) so there is no layout
+      // shift — the fixed shell was never in the document flow anyway.
       (function() {
         var shell = document.getElementById('static-shell');
         var root  = document.getElementById('root');
         var obs = new MutationObserver(function() {
           if (root && root.children.length > 0) {
-            if (shell) shell.classList.add('hidden');
-            root.classList.add('ready');
             obs.disconnect();
+            if (shell) {
+              shell.classList.add('fade-out');
+              // Remove from rendering entirely after the CSS transition ends
+              setTimeout(function() { if (shell) shell.style.display = 'none'; }, 200);
+            }
           }
         });
-        obs.observe(root, { childList: true });
+        if (root) obs.observe(root, { childList: true });
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
