@@ -1,5 +1,3 @@
-import html2canvas from "html2canvas";
-
 /**
  * Generate a thumbnail image from an HTML element
  * @param element - HTML element to capture
@@ -12,6 +10,7 @@ export async function generateThumbnail(
   maxWidth: number = 300,
   maxHeight: number = 400
 ): Promise<string> {
+  const html2canvas = (await import("html2canvas")).default;
   // Capture the element as canvas
   const canvas = await html2canvas(element, {
     scale: 1, // Lower scale for thumbnail

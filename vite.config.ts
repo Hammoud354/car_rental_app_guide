@@ -167,6 +167,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("framer-motion")) return "vendor-motion";
+            if (id.includes("recharts") || id.includes("d3-") || id.includes("victory-vendor")) return "vendor-charts";
+            if (id.includes("react-dom") || id.includes("react/") || id.includes("scheduler")) return "vendor-react";
+            if (id.includes("@tanstack") || id.includes("@trpc")) return "vendor-query";
+            if (id.includes("i18next") || id.includes("react-i18next")) return "vendor-i18n";
+            if (id.includes("date-fns")) return "vendor-date";
+            if (id.includes("react-hook-form") || id.includes("@hookform") || id.includes("zod")) return "vendor-forms";
+            if (id.includes("@radix-ui") || id.includes("lucide-react") || id.includes("class-variance-authority") || id.includes("clsx") || id.includes("tailwind-merge") || id.includes("cmdk") || id.includes("sonner") || id.includes("vaul")) return "vendor-ui";
+            if (id.includes("drizzle-orm") || id.includes("drizzle-zod")) return "vendor-db";
+            return "vendor-misc";
+          }
+        },
+      },
+    },
   },
   server: {
     host: true,

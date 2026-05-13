@@ -12,33 +12,45 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
+
+function useInView(options?: IntersectionObserverInit) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setInView(true); obs.disconnect(); }
+    }, options);
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, inView };
+}
 
 function AnimatedSection({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-  
+  const { ref, inView } = useInView({ rootMargin: "-60px" });
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
       className={className}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(30px)",
+        transition: `opacity 0.6s cubic-bezier(0.25,0.46,0.45,0.94) ${delay}s, transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94) ${delay}s`,
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
+  const { ref, inView } = useInView();
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!isInView) return;
-    let start = 0;
+    if (!inView) return;
     const duration = 2000;
     const startTime = Date.now();
     const animate = () => {
@@ -49,7 +61,7 @@ function CountUp({ target, suffix = "", prefix = "" }: { target: number; suffix?
       if (progress < 1) requestAnimationFrame(animate);
     };
     animate();
-  }, [isInView, target]);
+  }, [inView, target]);
 
   return <span ref={ref}>{prefix}{count}{suffix}</span>;
 }
@@ -203,11 +215,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full"
-        />
+        <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -215,10 +223,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+      <nav
+        style={{ animation: "slideDown 0.5s ease-out both" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled || menuOpen
             ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-100" 
@@ -293,7 +299,7 @@ export default function Home() {
             ))}
           </div>
         )}
-      </motion.nav>
+      </nav>
 
       {/* Hero Section */}
       <section id="home" className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
@@ -304,20 +310,16 @@ export default function Home() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+            <div
+              style={{ animation: "fadeUp 0.5s ease-out both" }}
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50/80 border border-blue-100 mb-6"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
               <span className="text-xs font-semibold text-blue-700 tracking-wide uppercase">{t("landing.hero.badge")}</span>
-            </motion.div>
+            </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+            <h1
+              style={{ animation: "fadeUp 0.5s ease-out 0.1s both" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6"
             >
               {t("landing.hero.titlePart1")}{" "}
@@ -327,21 +329,17 @@ export default function Home() {
                 {t("landing.hero.titleHighlight")}
               </span>{" "}
               {t("landing.hero.titlePart2")}
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+            <p
+              style={{ animation: "fadeUp 0.5s ease-out 0.2s both" }}
               className="text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed"
             >
               {t("landing.hero.subtitle")}
-            </motion.p>
+            </p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+            <div
+              style={{ animation: "fadeUp 0.5s ease-out 0.3s both" }}
               className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6"
             >
               <Link href="/signin">
@@ -366,26 +364,22 @@ export default function Home() {
                   <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </Link>
-            </motion.div>
+            </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+            <p
+              style={{ animation: "fadeUp 0.5s ease-out 0.4s both" }}
               className="text-xs text-gray-400 flex items-center justify-center gap-4"
             >
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> {t("landing.hero.freeDemo")}</span>
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> {t("landing.hero.payWhish")}</span>
               <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> {t("landing.hero.cancelAnytime")}</span>
-            </motion.p>
+            </p>
 
           </div>
 
           {/* Dashboard Preview */}
-          <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+          <div
+            style={{ animation: "fadeUp 0.8s ease-out 0.5s both" }}
             className="mt-16 mx-auto max-w-5xl"
           >
             <div className="relative rounded-xl border border-gray-200 bg-gradient-to-b from-gray-50 to-white shadow-2xl shadow-gray-200/50 overflow-hidden">
@@ -453,7 +447,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
