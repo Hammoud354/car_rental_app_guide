@@ -41,7 +41,7 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx?v=${nanoid()}"`
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      res.status(200).set({ "Content-Type": "text/html", "X-Robots-Tag": "index, follow" }).end(page);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);
@@ -66,12 +66,13 @@ export function serveStatic(app: Express) {
     immutable: true,
   }));
 
-  // Serve everything else (favicon, etc.) with short cache, no-cache for HTML
+  // Serve everything else (favicon, robots.txt, etc.) with short cache, no-cache for HTML
   app.use(express.static(distPath, {
     maxAge: "1h",
     setHeaders(res, filePath) {
       if (filePath.endsWith(".html")) {
         res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("X-Robots-Tag", "index, follow");
       }
     },
   }));
@@ -79,6 +80,7 @@ export function serveStatic(app: Express) {
   // fall through to index.html if the file doesn't exist
   app.use("*", (_req, res) => {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("X-Robots-Tag", "index, follow");
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
