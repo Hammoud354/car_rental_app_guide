@@ -1,13 +1,21 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import { type Server } from "http";
-import { nanoid } from "nanoid";
 import path from "path";
 
 export async function setupVite(app: Express, server: Server) {
   const viteModule = await import("vite");
   const createViteServer = viteModule.createServer;
-  const viteConfig = (await import("../../vite.config")).default;
+  const viteConfigOrFn = (await import("../../vite.config")).default;
+
+  // vite.config.ts may export either a plain object or a function (defineConfig(fn) form)
+  const viteConfig = typeof viteConfigOrFn === "function"
+    ? await (viteConfigOrFn as (env: { mode: string; command: string; isSsrBuild: boolean }) => unknown)({
+        mode: "development",
+        command: "serve",
+        isSsrBuild: false,
+      })
+    : viteConfigOrFn;
 
   const serverOptions = {
     middlewareMode: true,
@@ -16,7 +24,7 @@ export async function setupVite(app: Express, server: Server) {
   };
 
   const vite = await createViteServer({
-    ...viteConfig,
+    ...(viteConfig as object),
     configFile: false,
     server: serverOptions,
     appType: "custom",
@@ -35,11 +43,7 @@ export async function setupVite(app: Express, server: Server) {
       );
 
       // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${nanoid()}"`
-      );
+      const template = await fs.promises.readFile(clientTemplate, "utf-8");
       const page = await vite.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html", "X-Robots-Tag": "index, follow" }).end(page);
     } catch (e) {

@@ -6,7 +6,7 @@ import { SubscriptionStatusCard } from "@/components/SubscriptionStatusCard";
 import { ExpiringDocumentsModal } from "@/components/ExpiringDocumentsModal";
 import { MaintenanceModal } from "@/components/MaintenanceModal";
 import { FleetStatusModal } from "@/components/FleetStatusModal";
-import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet, TrendingUp, ChevronRight } from "lucide-react";
+import { Car, DollarSign, Wrench, AlertTriangle, Clock, Crown, FileSpreadsheet, TrendingUp, ChevronRight, ChevronDown } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -153,6 +153,7 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
   
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   
   if (loadingExpired || loadingExpiring) return null;
   
@@ -171,61 +172,72 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
     <>
       <Card className="border-orange-200 bg-orange-50/50">
         <CardContent className="pt-5 pb-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-orange-100 rounded-lg">
+          <div
+            className="flex items-center gap-3 cursor-pointer select-none"
+            onClick={() => setIsExpanded(v => !v)}
+          >
+            <div className="p-2 bg-orange-100 rounded-lg shrink-0">
               <AlertTriangle className="h-4 w-4 text-orange-600" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-orange-900">Insurance Alerts</h3>
               <p className="text-xs text-orange-700">{totalIssues} vehicle{totalIssues > 1 ? 's' : ''} need attention</p>
             </div>
-            <Link href="/fleet-management">
-              <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
-                View Fleet <ChevronRight className="ml-1 h-3 w-3" />
-              </Button>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
-              <div className="text-2xl font-bold text-red-600">{expired.length}</div>
-              <div className="text-xs text-red-700">Expired</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
-              <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
-              <div className="text-xs text-yellow-700">Expiring (30d)</div>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            {expired.slice(0, 2).map((vehicle: any) => (
-              <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                  <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</div>
-                </div>
-                <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
-                  Renew
+            <div onClick={e => e.stopPropagation()}>
+              <Link href="/fleet-management">
+                <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
+                  View Fleet <ChevronRight className="ml-1 h-3 w-3" />
                 </Button>
-              </div>
-            ))}
-            {expiring.slice(0, 2).map((vehicle: any) => {
-              const daysLeft = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-              return (
-                <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                    <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
+              </Link>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-orange-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+          </div>
+
+          <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+            <div className="overflow-hidden">
+              <div className="pt-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
+                    <div className="text-2xl font-bold text-red-600">{expired.length}</div>
+                    <div className="text-xs text-red-700">Expired</div>
                   </div>
-                  <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
-                    Renew
-                  </Button>
+                  <div className="text-center p-3 bg-white rounded-lg border border-orange-200">
+                    <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
+                    <div className="text-xs text-yellow-700">Expiring (30d)</div>
+                  </div>
                 </div>
-              );
-            })}
-            {(expired.length + expiring.length) > 4 && (
-              <p className="text-xs text-orange-600 text-center pt-1">+{(expired.length + expiring.length) - 4} more vehicles need attention</p>
-            )}
+                <div className="space-y-2">
+                  {expired.slice(0, 2).map((vehicle: any) => (
+                    <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                        <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                        Renew
+                      </Button>
+                    </div>
+                  ))}
+                  {expiring.slice(0, 2).map((vehicle: any) => {
+                    const daysLeft = Math.ceil((new Date(vehicle.insuranceExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                    return (
+                      <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                          <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                          Renew
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  {(expired.length + expiring.length) > 4 && (
+                    <p className="text-xs text-orange-600 text-center pt-1">+{(expired.length + expiring.length) - 4} more vehicles need attention</p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -252,6 +264,7 @@ function RegistrationAlertWidget({ filterUserId }: { filterUserId: number | null
 
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
   const [isRenewalDialogOpen, setIsRenewalDialogOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const expired = expiredVehicles || [];
   const expiring = expiringVehicles || [];
@@ -268,61 +281,72 @@ function RegistrationAlertWidget({ filterUserId }: { filterUserId: number | null
     <>
       <Card className="border-blue-200 bg-blue-50/50">
         <CardContent className="pt-5 pb-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
+          <div
+            className="flex items-center gap-3 cursor-pointer select-none"
+            onClick={() => setIsExpanded(v => !v)}
+          >
+            <div className="p-2 bg-blue-100 rounded-lg shrink-0">
               <AlertTriangle className="h-4 w-4 text-blue-600" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold text-blue-900">Registration Alerts</h3>
               <p className="text-xs text-blue-700">{totalIssues} vehicle{totalIssues > 1 ? 's' : ''} need attention</p>
             </div>
-            <Link href="/fleet-management">
-              <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
-                View Fleet <ChevronRight className="ml-1 h-3 w-3" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-red-600">{expired.length}</div>
-              <div className="text-xs text-red-700">Expired</div>
-            </div>
-            <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
-              <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
-              <div className="text-xs text-yellow-700">Expiring (30d)</div>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            {expired.slice(0, 2).map((vehicle: any) => (
-              <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                  <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.registrationExpiryDate).toLocaleDateString()}</div>
-                </div>
-                <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
-                  Renew
+            <div onClick={e => e.stopPropagation()}>
+              <Link href="/fleet-management">
+                <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
+                  View Fleet <ChevronRight className="ml-1 h-3 w-3" />
                 </Button>
-              </div>
-            ))}
-            {expiring.slice(0, 2).map((vehicle: any) => {
-              const daysLeft = Math.ceil((new Date(vehicle.registrationExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-              return (
-                <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
-                    <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
+              </Link>
+            </div>
+            <ChevronDown className={`h-4 w-4 text-blue-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+          </div>
+
+          <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+            <div className="overflow-hidden">
+              <div className="pt-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
+                    <div className="text-2xl font-bold text-red-600">{expired.length}</div>
+                    <div className="text-xs text-red-700">Expired</div>
                   </div>
-                  <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
-                    Renew
-                  </Button>
+                  <div className="text-center p-3 bg-white rounded-lg border border-blue-200">
+                    <div className="text-2xl font-bold text-yellow-600">{expiring.length}</div>
+                    <div className="text-xs text-yellow-700">Expiring (30d)</div>
+                  </div>
                 </div>
-              );
-            })}
-            {totalIssues > 4 && (
-              <p className="text-xs text-blue-600 text-center pt-1">+{totalIssues - 4} more vehicles need attention</p>
-            )}
+                <div className="space-y-2">
+                  {expired.slice(0, 2).map((vehicle: any) => (
+                    <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-red-50 rounded-lg border border-red-200">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-xs text-red-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                        <div className="text-[11px] text-red-700">Expired: {new Date(vehicle.registrationExpiryDate).toLocaleDateString()}</div>
+                      </div>
+                      <Button size="sm" variant="outline" className="border-red-300 text-red-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                        Renew
+                      </Button>
+                    </div>
+                  ))}
+                  {expiring.slice(0, 2).map((vehicle: any) => {
+                    const daysLeft = Math.ceil((new Date(vehicle.registrationExpiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                    return (
+                      <div key={vehicle.id} className="flex items-center justify-between p-2.5 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-xs text-yellow-900 truncate">{vehicle.plateNumber} - {vehicle.brand} {vehicle.model}</div>
+                          <div className="text-[11px] text-yellow-700">{daysLeft} days remaining</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-yellow-300 text-yellow-700 text-xs h-7 ml-2" onClick={() => handleRenewClick(vehicle)}>
+                          Renew
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  {totalIssues > 4 && (
+                    <p className="text-xs text-blue-600 text-center pt-1">+{totalIssues - 4} more vehicles need attention</p>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -343,6 +367,7 @@ function ContractExpiryWidget({ filterUserId }: { filterUserId: number | null })
     { daysAhead: 3, filterUserId: filterUserId || undefined },
     { enabled: true }
   );
+  const [isExpanded, setIsExpanded] = useState(true);
   
   if (isLoading || !expiringContracts || expiringContracts.length === 0) return null;
   
@@ -357,43 +382,56 @@ function ContractExpiryWidget({ filterUserId }: { filterUserId: number | null })
   return (
     <Card className="border-blue-200 bg-blue-50/50">
       <CardContent className="pt-5 pb-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-blue-100 rounded-lg">
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={() => setIsExpanded(v => !v)}
+        >
+          <div className="p-2 bg-blue-100 rounded-lg shrink-0">
             <Clock className="h-4 w-4 text-blue-600" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-blue-900">Contracts Expiring Soon</h3>
             <p className="text-xs text-blue-700">{expiringContracts.length} contract{expiringContracts.length > 1 ? 's' : ''} within 3 days</p>
           </div>
-          <Link href="/rental-contracts">
-            <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
-              View All <ChevronRight className="ml-1 h-3 w-3" />
-            </Button>
-          </Link>
+          <div onClick={e => e.stopPropagation()}>
+            <Link href="/rental-contracts">
+              <Button variant="ghost" size="sm" className="text-blue-700 hover:text-blue-900 hover:bg-blue-100">
+                View All <ChevronRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-blue-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
         </div>
-        <div className="space-y-2">
-          {expiringContracts.map((contract: any) => {
-            const daysRemaining = getDaysRemaining(contract.rentalEndDate);
-            const isUrgent = daysRemaining <= 1;
-            return (
-              <div key={contract.id} className={`flex items-center justify-between p-2.5 rounded-lg border ${isUrgent ? 'bg-red-50 border-red-200' : 'bg-white border-blue-200'}`}>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-xs">{contract.contractNumber}</span>
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isUrgent ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                      {daysRemaining === 0 ? 'Today' : `${daysRemaining}d left`}
-                    </span>
+
+        <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+          <div className="overflow-hidden">
+            <div className="pt-4 space-y-2">
+              {expiringContracts.map((contract: any) => {
+                const daysRemaining = getDaysRemaining(contract.rentalEndDate);
+                const isUrgent = daysRemaining <= 1;
+                return (
+                  <div key={contract.id} className={`flex items-center justify-between p-2.5 rounded-lg border ${isUrgent ? 'bg-red-50 border-red-200' : 'bg-white border-blue-200'}`}>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-xs">{contract.contractNumber}</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${isUrgent ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                          {daysRemaining === 0 ? 'Today' : `${daysRemaining}d left`}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-gray-600 truncate">
+                        {contract.clientFirstName} {contract.clientLastName}
+                      </div>
+                    </div>
+                    <div onClick={e => e.stopPropagation()}>
+                      <Link href={`/rental-contracts?contract=${contract.id}`}>
+                        <Button size="sm" variant="ghost" className="text-xs h-7">View</Button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="text-[11px] text-gray-600 truncate">
-                    {contract.clientFirstName} {contract.clientLastName}
-                  </div>
-                </div>
-                <Link href={`/rental-contracts?contract=${contract.id}`}>
-                  <Button size="sm" variant="ghost" className="text-xs h-7">View</Button>
-                </Link>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -402,38 +440,50 @@ function ContractExpiryWidget({ filterUserId }: { filterUserId: number | null })
 
 function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
   const { data: stats, isLoading } = trpc.contracts.getOverdueStatistics.useQuery({ filterUserId: filterUserId || undefined });
+  const [isExpanded, setIsExpanded] = useState(true);
   
   if (isLoading || !stats || stats.count === 0) return null;
   
   return (
     <Card className="border-red-200 bg-red-50/50">
       <CardContent className="pt-5 pb-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-red-100 rounded-lg">
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={() => setIsExpanded(v => !v)}
+        >
+          <div className="p-2 bg-red-100 rounded-lg shrink-0">
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-red-900">Overdue Contracts</h3>
             <p className="text-xs text-red-700">Action required - contact clients immediately</p>
           </div>
-          <Link href="/rental-contracts">
-            <Button variant="ghost" size="sm" className="text-red-700 hover:text-red-900 hover:bg-red-100">
-              View All <ChevronRight className="ml-1 h-3 w-3" />
-            </Button>
-          </Link>
+          <div onClick={e => e.stopPropagation()}>
+            <Link href="/rental-contracts">
+              <Button variant="ghost" size="sm" className="text-red-700 hover:text-red-900 hover:bg-red-100">
+                View All <ChevronRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-red-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-            <div className="text-2xl font-bold text-red-600">{stats.count}</div>
-            <div className="text-xs text-red-700">Overdue</div>
-          </div>
-          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-            <div className="text-2xl font-bold text-red-600">${stats.totalLateFees}</div>
-            <div className="text-xs text-red-700">Late Fees</div>
-          </div>
-          <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-            <div className="text-2xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
-            <div className="text-xs text-red-700">Avg Days</div>
+
+        <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+          <div className="overflow-hidden">
+            <div className="pt-4 grid grid-cols-3 gap-3">
+              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+                <div className="text-2xl font-bold text-red-600">{stats.count}</div>
+                <div className="text-xs text-red-700">Overdue</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+                <div className="text-2xl font-bold text-red-600">${stats.totalLateFees}</div>
+                <div className="text-xs text-red-700">Late Fees</div>
+              </div>
+              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
+                <div className="text-2xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
+                <div className="text-xs text-red-700">Avg Days</div>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
@@ -451,56 +501,69 @@ function KmMaintenanceAlertsWidget({ vehicles }: { vehicles: any[] }) {
     .filter(v => v.kmLeft <= 500)
     .sort((a, b) => a.kmLeft - b.kmLeft);
 
+  const [isExpanded, setIsExpanded] = useState(true);
+
   if (alerts.length === 0) return null;
 
   return (
     <Card className="shadow-none border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
       <CardContent className="p-4">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-orange-100 rounded-lg">
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={() => setIsExpanded(v => !v)}
+        >
+          <div className="p-2 bg-orange-100 rounded-lg shrink-0">
             <Wrench className="h-5 w-5 text-orange-600" />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h3 className="text-sm font-semibold text-orange-900">Upcoming Maintenance by Mileage</h3>
             <p className="text-xs text-orange-700">{alerts.length} vehicle{alerts.length !== 1 ? "s" : ""} approaching scheduled service</p>
           </div>
-          <Link href="/fleet-management">
-            <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
-              View Fleet <ChevronRight className="ml-1 h-3 w-3" />
-            </Button>
-          </Link>
+          <div onClick={e => e.stopPropagation()}>
+            <Link href="/fleet-management">
+              <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100">
+                View Fleet <ChevronRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-orange-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
         </div>
-        <div className="space-y-2">
-          {alerts.map(v => {
-            const isOverdue = v.kmLeft <= 0;
-            const isCritical = v.kmLeft <= 200 && !isOverdue;
-            const bg = isOverdue ? "bg-red-50 border-red-200" : isCritical ? "bg-amber-50 border-amber-200" : "bg-yellow-50 border-yellow-200";
-            const textColor = isOverdue ? "text-red-800" : isCritical ? "text-amber-800" : "text-yellow-800";
-            const iconColor = isOverdue ? "text-red-600" : isCritical ? "text-amber-600" : "text-yellow-600";
-            const badge = isOverdue
-              ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded">OVERDUE</span>
-              : isCritical
-              ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-amber-500 rounded">SOON</span>
-              : <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-yellow-500 rounded">UPCOMING</span>;
-            return (
-              <div key={v.id} className={`flex items-center gap-3 p-2.5 rounded-lg border ${bg}`}>
-                <AlertTriangle className={`h-4 w-4 shrink-0 ${iconColor}`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-semibold ${textColor}`}>
-                      {v.plateNumber} — {v.brand} {v.model}
-                    </span>
-                    {badge}
+
+        <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+          <div className="overflow-hidden">
+            <div className="pt-3 space-y-2">
+              {alerts.map(v => {
+                const isOverdue = v.kmLeft <= 0;
+                const isCritical = v.kmLeft <= 200 && !isOverdue;
+                const bg = isOverdue ? "bg-red-50 border-red-200" : isCritical ? "bg-amber-50 border-amber-200" : "bg-yellow-50 border-yellow-200";
+                const textColor = isOverdue ? "text-red-800" : isCritical ? "text-amber-800" : "text-yellow-800";
+                const iconColor = isOverdue ? "text-red-600" : isCritical ? "text-amber-600" : "text-yellow-600";
+                const badge = isOverdue
+                  ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded">OVERDUE</span>
+                  : isCritical
+                  ? <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-amber-500 rounded">SOON</span>
+                  : <span className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-yellow-500 rounded">UPCOMING</span>;
+                return (
+                  <div key={v.id} className={`flex items-center gap-3 p-2.5 rounded-lg border ${bg}`}>
+                    <AlertTriangle className={`h-4 w-4 shrink-0 ${iconColor}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-semibold ${textColor}`}>
+                          {v.plateNumber} — {v.brand} {v.model}
+                        </span>
+                        {badge}
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        {isOverdue
+                          ? `Overdue by ${Math.abs(v.kmLeft).toLocaleString()} km (due at ${v.nextMaintenanceKm.toLocaleString()} km, current: ${v.mileage.toLocaleString()} km)`
+                          : `Next maintenance due in ${v.kmLeft.toLocaleString()} km (at ${v.nextMaintenanceKm.toLocaleString()} km)`}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600">
-                    {isOverdue
-                      ? `Overdue by ${Math.abs(v.kmLeft).toLocaleString()} km (due at ${v.nextMaintenanceKm.toLocaleString()} km, current: ${v.mileage.toLocaleString()} km)`
-                      : `Next maintenance due in ${v.kmLeft.toLocaleString()} km (at ${v.nextMaintenanceKm.toLocaleString()} km)`}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -509,6 +572,7 @@ function KmMaintenanceAlertsWidget({ vehicles }: { vehicles: any[] }) {
 
 function MaintenanceAlertsWidget() {
   const { data: alertData, isLoading } = trpc.aiMaintenance.getMaintenanceAlerts.useQuery();
+  const [isExpanded, setIsExpanded] = useState(true);
   
   if (isLoading || !alertData || !alertData.hasAiTasks || alertData.summary.total === 0) return null;
 
@@ -521,21 +585,17 @@ function MaintenanceAlertsWidget() {
   return (
     <Card className="shadow-none border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50">
       <CardContent className="p-4">
-        <div className="flex items-start gap-3 mb-4">
+        <div
+          className="flex items-center gap-3 cursor-pointer select-none"
+          onClick={() => setIsExpanded(v => !v)}
+        >
           <div className="p-2 bg-orange-100 rounded-lg shrink-0">
             <Wrench className="h-5 w-5 text-orange-600" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold text-orange-900">Maintenance Alerts</h3>
-              <Link href="/maintenance">
-                <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100 shrink-0">
-                  View All <ChevronRight className="ml-1 h-3 w-3" />
-                </Button>
-              </Link>
-            </div>
+            <h3 className="text-sm font-semibold text-orange-900">Maintenance Alerts</h3>
             <p className="text-xs text-orange-700">{alertData.summary.total} item{alertData.summary.total !== 1 ? "s" : ""} requiring attention</p>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
+            <div className="flex flex-wrap gap-1.5 mt-1">
               {alertData.summary.critical > 0 && (
                 <span className="px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">{alertData.summary.critical} Critical</span>
               )}
@@ -547,31 +607,46 @@ function MaintenanceAlertsWidget() {
               )}
             </div>
           </div>
+          <div onClick={e => e.stopPropagation()}>
+            <Link href="/maintenance">
+              <Button variant="ghost" size="sm" className="text-orange-700 hover:text-orange-900 hover:bg-orange-100 shrink-0">
+                View All <ChevronRight className="ml-1 h-3 w-3" />
+              </Button>
+            </Link>
+          </div>
+          <ChevronDown className={`h-4 w-4 text-orange-500 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
         </div>
-        <div className="space-y-2 max-h-48 overflow-y-auto">
-          {alertData.alerts.slice(0, 6).map((alert) => {
-            const config = levelConfig[alert.level];
-            const fixHref = alert.type === "insurance"
-              ? `/fleet-management?vehicle=${alert.vehicleId}`
-              : "/maintenance";
-            return (
-              <div key={alert.id} className={`flex items-center gap-3 p-2.5 rounded-lg ${config.bg} ${config.border} border`}>
-                <AlertTriangle className={`h-4 w-4 shrink-0 ${config.icon}`} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs font-semibold ${config.text}`}>{alert.title}</span>
-                    <span className={`px-1.5 py-0.5 text-[10px] font-bold text-white rounded ${config.badge}`}>{config.label}</span>
+
+        <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
+          <div className="overflow-hidden">
+            <div className="pt-3 space-y-2">
+              {alertData.alerts.slice(0, 6).map((alert) => {
+                const config = levelConfig[alert.level];
+                const fixHref = alert.type === "insurance"
+                  ? `/fleet-management?vehicle=${alert.vehicleId}`
+                  : "/maintenance";
+                return (
+                  <div key={alert.id} className={`flex items-center gap-3 p-2.5 rounded-lg ${config.bg} ${config.border} border`}>
+                    <AlertTriangle className={`h-4 w-4 shrink-0 ${config.icon}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-semibold ${config.text}`}>{alert.title}</span>
+                        <span className={`px-1.5 py-0.5 text-[10px] font-bold text-white rounded ${config.badge}`}>{config.label}</span>
+                      </div>
+                      <p className="text-xs text-gray-600 truncate">{alert.vehicleName} ({alert.plateNumber}) - {alert.description}</p>
+                    </div>
+                    <div onClick={e => e.stopPropagation()}>
+                      <Link href={fixHref}>
+                        <Button variant="ghost" size="sm" className="h-7 text-xs">
+                          <Wrench className="h-3 w-3 mr-1" /> Fix
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600 truncate">{alert.vehicleName} ({alert.plateNumber}) - {alert.description}</p>
-                </div>
-                <Link href={fixHref}>
-                  <Button variant="ghost" size="sm" className="h-7 text-xs">
-                    <Wrench className="h-3 w-3 mr-1" /> Fix
-                  </Button>
-                </Link>
-              </div>
-            );
-          })}
+                );
+              })}
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
