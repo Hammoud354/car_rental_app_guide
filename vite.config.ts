@@ -150,9 +150,19 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+export default defineConfig(({ mode }) => {
+  const isProd = mode === "production";
+  const plugins = [
+    react(),
+    tailwindcss(),
+    jsxLocPlugin(),
+    // Only inject the Manus dev-tool runtime in development — it adds a 370 KB
+    // blocking inline script that prevents any first paint in production.
+    ...(!isProd ? [vitePluginManusRuntime()] : []),
+    vitePluginManusDebugCollector(),
+  ];
 
-export default defineConfig({
+  return {
   plugins,
   resolve: {
     alias: {
@@ -197,4 +207,5 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  };
 });
