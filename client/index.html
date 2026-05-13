@@ -52,11 +52,9 @@
       *{box-sizing:border-box;margin:0;padding:0}
       body{font-family:Inter,system-ui,-apple-system,sans-serif;background:#fff;color:#111827}
       #static-shell{
-        position:fixed;inset:0;background:#fff;z-index:100;
+        position:fixed;inset:0;background:#fff;z-index:9999;
         display:flex;flex-direction:column;
-        transition:opacity 0.15s ease;
       }
-      #static-shell.fade-out{opacity:0;pointer-events:none}
       .ss-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-bottom:1px solid #f3f4f6}
       .ss-logo{font-size:1.25rem;font-weight:700;color:#111827;text-decoration:none}
       .ss-logo span{color:#2563eb}
@@ -108,11 +106,13 @@
         var obs = new MutationObserver(function() {
           if (root && root.children.length > 0) {
             obs.disconnect();
-            if (shell) {
-              shell.classList.add('fade-out');
-              // Remove from rendering entirely after the CSS transition ends
-              setTimeout(function() { if (shell) shell.style.display = 'none'; }, 200);
-            }
+            // Double rAF: ensures React has completed at least one full paint
+            // cycle before we remove the shell — no overlap, no flash.
+            requestAnimationFrame(function() {
+              requestAnimationFrame(function() {
+                if (shell) shell.style.display = 'none';
+              });
+            });
           }
         });
         if (root) obs.observe(root, { childList: true });
