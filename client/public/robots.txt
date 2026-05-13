@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /fleet
+Disallow: /clients
+Disallow: /contracts
+Disallow: /invoices
+Disallow: /maintenance
+Disallow: /ai-maintenance
+Disallow: /vehicle/
+Disallow: /my-profile
+Disallow: /company-profile
+Disallow: /admin/
+Disallow: /demo
+
+Sitemap: https://fleetwizards.com/sitemap.xml
