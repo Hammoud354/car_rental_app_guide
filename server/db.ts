@@ -328,12 +328,18 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if (vehicle.nextMaintenanceDate) insertData.nextMaintenanceDate = vehicle.nextMaintenanceDate;
   if (vehicle.nextMaintenanceKm !== undefined && vehicle.nextMaintenanceKm !== null) insertData.nextMaintenanceKm = vehicle.nextMaintenanceKm;
   
-  const [inserted] = await db.insert(vehicles).values(insertData).returning({ id: vehicles.id });
-  const created = await db.select().from(vehicles).where(eq(vehicles.id, inserted.id)).limit(1);
-  if (created.length === 0) {
-    throw new Error("Failed to retrieve created vehicle");
+  try {
+    const [inserted] = await db.insert(vehicles).values(insertData).returning({ id: vehicles.id });
+    const created = await db.select().from(vehicles).where(eq(vehicles.id, inserted.id)).limit(1);
+    if (created.length === 0) {
+      throw new Error("Failed to retrieve created vehicle");
+    }
+    return created[0];
+  } catch (err: any) {
+    console.error("[createVehicle] INSERT failed. Fields attempted:", Object.keys(insertData).join(", "));
+    console.error("[createVehicle] Error:", err?.message || err);
+    throw err;
   }
-  return created[0];
 }
 
 export async function updateVehicle(id: number, userId: number, vehicle: Partial<InsertVehicle>) {
@@ -3985,7 +3991,12 @@ export async function initializeAiMaintenanceColumns() {
         ADD COLUMN IF NOT EXISTS "usagePattern" varchar(50),
         ADD COLUMN IF NOT EXISTS "climate" varchar(50),
         ADD COLUMN IF NOT EXISTS "lastServiceDate" timestamp,
-        ADD COLUMN IF NOT EXISTS "lastServiceKm" integer
+        ADD COLUMN IF NOT EXISTS "lastServiceKm" integer,
+        ADD COLUMN IF NOT EXISTS "nextMaintenanceDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "nextMaintenanceKm" integer,
+        ADD COLUMN IF NOT EXISTS "maintenanceIntervalKm" integer DEFAULT 5000,
+        ADD COLUMN IF NOT EXISTS "maintenanceIntervalMonths" integer DEFAULT 6,
+        ADD COLUMN IF NOT EXISTS "aiMaintenanceEnabled" boolean DEFAULT true
     `);
     console.log("[Startup] Vehicle AI maintenance columns ready");
   } catch (err) {
