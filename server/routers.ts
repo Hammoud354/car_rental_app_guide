@@ -189,18 +189,28 @@ export const appRouter = router({
     }),
     loginDemo: publicProcedure.mutation(async ({ ctx }) => {
       const { seedDemoData } = await import('./seedDemoData');
-      const { createTempDemoUser } = await import('./db');
+      const { createTempDemoUser, deleteTempDemoUser } = await import('./db');
 
       // Create a fresh isolated temp user for this demo session
       const demoUser = await createTempDemoUser();
-      await seedDemoData(demoUser.id);
 
-      // Create session cookie with 10-minute expiration
+      // Set session cookie immediately so the user is authenticated even if
+      // seeding takes a moment — cookie expires in 10 minutes
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.cookie(COOKIE_NAME, `user-${demoUser.id}`, {
         ...cookieOptions,
         maxAge: 10 * 60 * 1000,
       });
+
+      // Seed demo data — if it fails, clean up the orphaned user and rethrow
+      try {
+        await seedDemoData(demoUser.id);
+      } catch (err) {
+        console.error(`[Demo] Seeding failed for user ${demoUser.id}, cleaning up:`, err);
+        ctx.res.clearCookie(COOKIE_NAME, cookieOptions);
+        await deleteTempDemoUser(demoUser.id).catch(() => {});
+        throw err;
+      }
 
       return {
         success: true,
