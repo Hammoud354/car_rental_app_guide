@@ -678,7 +678,10 @@ function MaintenanceCardWithModal({ maintenanceCount }: { maintenanceCount: numb
 function ExpiringDocumentsCardWithModal() {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: expiringDocuments } = trpc.dashboard.getExpiringDocuments.useQuery();
+  const { selectedUserId } = useUserFilter();
+  const { data: expiringDocuments } = trpc.dashboard.getExpiringDocuments.useQuery(
+    selectedUserId ? { filterUserId: selectedUserId } : {}
+  );
   const count = expiringDocuments?.length ?? 0;
 
   return (

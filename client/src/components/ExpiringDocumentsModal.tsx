@@ -4,6 +4,7 @@ import { AlertTriangle, Clock, FileText, Shield, Car, CreditCard } from "lucide-
 import { trpc } from "@/lib/trpc";
 import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 
 interface ExpiringDocumentsModalProps {
   isOpen: boolean;
@@ -11,9 +12,11 @@ interface ExpiringDocumentsModalProps {
 }
 
 export function ExpiringDocumentsModal({ isOpen, onOpenChange }: ExpiringDocumentsModalProps) {
-  const { data: expiringDocuments, isLoading } = trpc.dashboard.getExpiringDocuments.useQuery(undefined, {
-    enabled: isOpen,
-  });
+  const { selectedUserId } = useUserFilter();
+  const { data: expiringDocuments, isLoading } = trpc.dashboard.getExpiringDocuments.useQuery(
+    selectedUserId ? { filterUserId: selectedUserId } : {},
+    { enabled: isOpen }
+  );
   const [, navigate] = useLocation();
 
   const handleNavigate = (doc: any) => {

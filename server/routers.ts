@@ -2529,19 +2529,20 @@ export const appRouter = router({
       }),
 
     getExpiringDocuments: protectedProcedure
-      .input(z.object({ daysThreshold: z.number().default(30) }).optional())
+      .input(z.object({ daysThreshold: z.number().default(30), filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
         const userId = ctx.user.id;
         const daysThreshold = input?.daysThreshold || 30;
+        const filterUserId = input?.filterUserId;
         const expiringDocuments: any[] = [];
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const vehicles = await db.getAllVehicles(userId);
+        const vehicles = await db.getAllVehicles(userId, filterUserId);
         const seenInsurancePolicies = new Set<string>();
 
         // Check insurance policies from the dedicated insurancePolicies table first
-        const allPolicies = await db.getAllInsurancePolicies(userId);
+        const allPolicies = await db.getAllInsurancePolicies(userId, filterUserId);
         allPolicies.forEach((policy: any) => {
           if (!policy.policyEndDate) return;
           const vehicle = vehicles.find((v: any) => v.id === policy.vehicleId);
@@ -2604,7 +2605,7 @@ export const appRouter = router({
           }
         });
 
-        const clients = await db.getAllClients(userId);
+        const clients = await db.getAllClients(userId, filterUserId);
         clients.forEach((client: any) => {
           if (client.licenseExpiryDate) {
             const expiryDate = new Date(client.licenseExpiryDate);

@@ -3200,15 +3200,16 @@ export async function getAllInvoices(userId: number) {
   }
 }
 
-export async function getAllInsurancePolicies(userId: number) {
+export async function getAllInsurancePolicies(userId: number, filterUserId?: number | null) {
   const db = await getDb();
   if (!db) return [];
 
   try {
-    const result = await db
-      .select()
-      .from(insurancePolicies)
-      .where(eq(insurancePolicies.userId, userId));
+    const admin = await isSuperAdmin(userId);
+    const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+    const result = effectiveFilter != null
+      ? await db.select().from(insurancePolicies).where(eq(insurancePolicies.userId, effectiveFilter))
+      : await db.select().from(insurancePolicies);
     return result;
   } catch (error) {
     console.error("Error fetching insurance policies:", error);
