@@ -293,7 +293,27 @@ export async function createVehicle(vehicle: InsertVehicle) {
   if ((vehicle as any).registrationFee && (vehicle as any).registrationFee !== '') insertData.registrationFee = (vehicle as any).registrationFee;
   if (vehicle.photoUrl && vehicle.photoUrl !== '') insertData.photoUrl = vehicle.photoUrl;
   if (vehicle.notes && vehicle.notes !== '') insertData.notes = vehicle.notes;
-  
+
+  // AI maintenance fields — router sends transmissionType/primaryUse/operatingClimate
+  // which map to transmission/usagePattern/climate in the schema
+  if ((vehicle as any).insuranceAnnualPremium && (vehicle as any).insuranceAnnualPremium !== '') insertData.insuranceAnnualPremium = (vehicle as any).insuranceAnnualPremium;
+  if ((vehicle as any).engineType && (vehicle as any).engineType !== '') insertData.engineType = (vehicle as any).engineType;
+  // transmissionType (from form) maps to transmission (schema column)
+  const transmissionValue = (vehicle as any).transmissionType || (vehicle as any).transmission;
+  if (transmissionValue && transmissionValue !== '') insertData.transmission = transmissionValue;
+  if ((vehicle as any).fuelType && (vehicle as any).fuelType !== '') insertData.fuelType = (vehicle as any).fuelType;
+  if ((vehicle as any).engineSize && (vehicle as any).engineSize !== '') insertData.engineSize = (vehicle as any).engineSize;
+  if ((vehicle as any).purchaseDate) insertData.purchaseDate = (vehicle as any).purchaseDate;
+  if ((vehicle as any).averageDailyKm !== undefined && (vehicle as any).averageDailyKm !== null) insertData.averageDailyKm = (vehicle as any).averageDailyKm;
+  // primaryUse (from form) maps to usagePattern (schema column)
+  const usageValue = (vehicle as any).primaryUse || (vehicle as any).usagePattern;
+  if (usageValue && usageValue !== '') insertData.usagePattern = usageValue;
+  // operatingClimate (from form) maps to climate (schema column)
+  const climateValue = (vehicle as any).operatingClimate || (vehicle as any).climate;
+  if (climateValue && climateValue !== '') insertData.climate = climateValue;
+  if ((vehicle as any).lastServiceDate) insertData.lastServiceDate = (vehicle as any).lastServiceDate;
+  if ((vehicle as any).lastServiceKm !== undefined && (vehicle as any).lastServiceKm !== null) insertData.lastServiceKm = (vehicle as any).lastServiceKm;
+
   // For timestamp fields, only add if they exist
   // If insurance policy start date is provided, automatically calculate expiry date as 1 year later
   if (vehicle.insurancePolicyStartDate) {
@@ -3947,6 +3967,30 @@ export async function getSoldVehicles(userId: number, filterUserId?: number | nu
     ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
     : await db.select().from(vehicles);
   return rawVehicles.filter(v => v.status === 'Sold');
+}
+
+export async function initializeAiMaintenanceColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE vehicles
+        ADD COLUMN IF NOT EXISTS "insuranceAnnualPremium" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "engineType" varchar(50),
+        ADD COLUMN IF NOT EXISTS "transmission" varchar(50),
+        ADD COLUMN IF NOT EXISTS "fuelType" varchar(50),
+        ADD COLUMN IF NOT EXISTS "engineSize" varchar(20),
+        ADD COLUMN IF NOT EXISTS "purchaseDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "averageDailyKm" integer,
+        ADD COLUMN IF NOT EXISTS "usagePattern" varchar(50),
+        ADD COLUMN IF NOT EXISTS "climate" varchar(50),
+        ADD COLUMN IF NOT EXISTS "lastServiceDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "lastServiceKm" integer
+    `);
+    console.log("[Startup] Vehicle AI maintenance columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize AI maintenance columns:", err);
+  }
 }
 
 export async function initializeSaleColumns() {

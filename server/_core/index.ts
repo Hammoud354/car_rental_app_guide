@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, cleanupExpiredTempDemoUsers } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, cleanupExpiredTempDemoUsers } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -118,6 +118,9 @@ async function startServer() {
     );
     initializeSaleColumns().catch(err =>
       console.error("[Startup] Failed to initialize sale columns:", err)
+    );
+    initializeAiMaintenanceColumns().catch(err =>
+      console.error("[Startup] Failed to initialize AI maintenance columns:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)
