@@ -3357,23 +3357,23 @@ export const appRouter = router({
   }),
 
   highSeason: router({
-    list: publicProcedure.query(async ({ ctx }) => {
-      const userId = ctx.user?.id || 1;
-      return await db.getHighSeasonPeriods(userId);
-    }),
+    list: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getHighSeasonPeriods(ctx.user.id, input?.filterUserId);
+      }),
 
-    create: publicProcedure
+    create: protectedProcedure
       .input(z.object({
         name: z.string().min(1).max(100),
         startDate: z.string(),
         endDate: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const userId = ctx.user?.id || 1;
-        return await db.createHighSeasonPeriod({ userId, ...input });
+        return await db.createHighSeasonPeriod({ userId: ctx.user.id, ...input });
       }),
 
-    update: publicProcedure
+    update: protectedProcedure
       .input(z.object({
         id: z.number(),
         name: z.string().min(1).max(100).optional(),
@@ -3381,16 +3381,14 @@ export const appRouter = router({
         endDate: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        const userId = ctx.user?.id || 1;
         const { id, ...data } = input;
-        return await db.updateHighSeasonPeriod(id, userId, data);
+        return await db.updateHighSeasonPeriod(id, ctx.user.id, data);
       }),
 
-    delete: publicProcedure
+    delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input, ctx }) => {
-        const userId = ctx.user?.id || 1;
-        await db.deleteHighSeasonPeriod(input.id, userId);
+        await db.deleteHighSeasonPeriod(input.id, ctx.user.id);
         return { success: true };
       }),
   }),

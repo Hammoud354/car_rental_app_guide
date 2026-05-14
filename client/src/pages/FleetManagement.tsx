@@ -125,7 +125,9 @@ export default function FleetManagement() {
     selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
   );
 
-  const { data: highSeasonPeriods, refetch: refetchHighSeason } = trpc.highSeason.list.useQuery();
+  const { data: highSeasonPeriods, refetch: refetchHighSeason } = trpc.highSeason.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : {}
+  );
   const createHighSeasonMutation = trpc.highSeason.create.useMutation({
     onSuccess: () => { toast.success("High season period added"); refetchHighSeason(); resetHsForm(); setIsHighSeasonDialogOpen(false); },
     onError: (e) => toast.error(e.message),

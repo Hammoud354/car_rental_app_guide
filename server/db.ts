@@ -4102,10 +4102,15 @@ export async function initializeHighSeasonTable() {
 
 // ─── High Season Periods ─────────────────────────────────────────────────────
 
-export async function getHighSeasonPeriods(userId: number): Promise<HighSeasonPeriod[]> {
+export async function getHighSeasonPeriods(userId: number, filterUserId?: number): Promise<HighSeasonPeriod[]> {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(highSeasonPeriods).where(eq(highSeasonPeriods.userId, userId)).orderBy(asc(highSeasonPeriods.startDate));
+  const admin = await isSuperAdmin(userId);
+  const effectiveUserId = admin && filterUserId ? filterUserId : (!admin ? userId : null);
+  if (effectiveUserId != null) {
+    return db.select().from(highSeasonPeriods).where(eq(highSeasonPeriods.userId, effectiveUserId)).orderBy(asc(highSeasonPeriods.startDate));
+  }
+  return db.select().from(highSeasonPeriods).orderBy(asc(highSeasonPeriods.startDate));
 }
 
 export async function createHighSeasonPeriod(data: { userId: number; name: string; startDate: string; endDate: string }): Promise<HighSeasonPeriod> {
