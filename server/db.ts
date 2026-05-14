@@ -2930,7 +2930,7 @@ export async function getRentalContractsByVehicle(vehicleId: number, userId: num
 /**
  * Get vehicles with insurance expiring within specified days
  */
-export async function getVehiclesWithExpiringInsurance(userId: number, daysThreshold: number = 30) {
+export async function getVehiclesWithExpiringInsurance(userId: number, daysThreshold: number = 30, filterUserId?: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicles with expiring insurance: database not available");
@@ -2947,7 +2947,11 @@ export async function getVehiclesWithExpiringInsurance(userId: number, daysThres
     sql`${vehicles.insuranceExpiryDate} > ${today}`,
     sql`${vehicles.insuranceExpiryDate} <= ${futureDate}`
   ];
-  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  if (admin && filterUserId) {
+    conditions.push(eq(vehicles.userId, filterUserId));
+  } else if (!admin) {
+    conditions.push(eq(vehicles.userId, userId));
+  }
   
   return await db.select().from(vehicles)
     .where(and(...conditions))
@@ -2957,7 +2961,7 @@ export async function getVehiclesWithExpiringInsurance(userId: number, daysThres
 /**
  * Get vehicles with expired insurance
  */
-export async function getVehiclesWithExpiredInsurance(userId: number) {
+export async function getVehiclesWithExpiredInsurance(userId: number, filterUserId?: number) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicles with expired insurance: database not available");
@@ -2971,7 +2975,11 @@ export async function getVehiclesWithExpiredInsurance(userId: number) {
     sql`${vehicles.insuranceExpiryDate} IS NOT NULL`,
     sql`${vehicles.insuranceExpiryDate} < ${today}`
   ];
-  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  if (admin && filterUserId) {
+    conditions.push(eq(vehicles.userId, filterUserId));
+  } else if (!admin) {
+    conditions.push(eq(vehicles.userId, userId));
+  }
   
   return await db.select().from(vehicles)
     .where(and(...conditions))
@@ -3040,7 +3048,7 @@ export async function renewVehicleInsurance(
 /**
  * Get vehicles with registration expiring within daysThreshold days
  */
-export async function getVehiclesWithExpiringRegistration(userId: number, daysThreshold: number = 30) {
+export async function getVehiclesWithExpiringRegistration(userId: number, daysThreshold: number = 30, filterUserId?: number) {
   const db = await getDb();
   if (!db) return [];
   const today = new Date();
@@ -3052,14 +3060,18 @@ export async function getVehiclesWithExpiringRegistration(userId: number, daysTh
     sql`${vehicles.registrationExpiryDate} > ${today}`,
     sql`${vehicles.registrationExpiryDate} <= ${futureDate}`,
   ];
-  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  if (admin && filterUserId) {
+    conditions.push(eq(vehicles.userId, filterUserId));
+  } else if (!admin) {
+    conditions.push(eq(vehicles.userId, userId));
+  }
   return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
 }
 
 /**
  * Get vehicles with expired registration
  */
-export async function getVehiclesWithExpiredRegistration(userId: number) {
+export async function getVehiclesWithExpiredRegistration(userId: number, filterUserId?: number) {
   const db = await getDb();
   if (!db) return [];
   const today = new Date();
@@ -3068,7 +3080,11 @@ export async function getVehiclesWithExpiredRegistration(userId: number) {
     sql`${vehicles.registrationExpiryDate} IS NOT NULL`,
     sql`${vehicles.registrationExpiryDate} < ${today}`,
   ];
-  if (!admin) conditions.push(eq(vehicles.userId, userId));
+  if (admin && filterUserId) {
+    conditions.push(eq(vehicles.userId, filterUserId));
+  } else if (!admin) {
+    conditions.push(eq(vehicles.userId, userId));
+  }
   return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
 }
 

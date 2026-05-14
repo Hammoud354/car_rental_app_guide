@@ -143,12 +143,11 @@ function ExportToExcelButton() {
 }
 
 function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null }) {
-  const { data: expiredVehicles, isLoading: loadingExpired } = trpc.fleet.getExpiredInsurance.useQuery(undefined, {
-    enabled: !filterUserId,
-  });
+  const { data: expiredVehicles, isLoading: loadingExpired } = trpc.fleet.getExpiredInsurance.useQuery(
+    filterUserId ? { filterUserId } : {}
+  );
   const { data: expiringVehicles, isLoading: loadingExpiring } = trpc.fleet.getExpiringInsurance.useQuery(
-    { daysThreshold: 30 },
-    { enabled: !filterUserId }
+    filterUserId ? { daysThreshold: 30, filterUserId } : { daysThreshold: 30 }
   );
   
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);
@@ -254,12 +253,11 @@ function InsuranceAlertWidget({ filterUserId }: { filterUserId: number | null })
 }
 
 function RegistrationAlertWidget({ filterUserId }: { filterUserId: number | null }) {
-  const { data: expiredVehicles } = trpc.fleet.getExpiredRegistration.useQuery(undefined, {
-    enabled: !filterUserId,
-  });
+  const { data: expiredVehicles } = trpc.fleet.getExpiredRegistration.useQuery(
+    filterUserId ? { filterUserId } : {}
+  );
   const { data: expiringVehicles } = trpc.fleet.getExpiringRegistration.useQuery(
-    { daysThreshold: 30 },
-    { enabled: !filterUserId }
+    filterUserId ? { daysThreshold: 30, filterUserId } : { daysThreshold: 30 }
   );
 
   const [selectedVehicle, setSelectedVehicle] = useState<any>(null);

@@ -752,14 +752,15 @@ export const appRouter = router({
 
     // Insurance Tracking
     getExpiringInsurance: protectedProcedure
-      .input(z.object({ daysThreshold: z.number().default(30) }))
+      .input(z.object({ daysThreshold: z.number().default(30), filterUserId: z.number().optional() }))
       .query(async ({ input, ctx }) => {
-        return await db.getVehiclesWithExpiringInsurance(ctx.user.id, input.daysThreshold);
+        return await db.getVehiclesWithExpiringInsurance(ctx.user.id, input.daysThreshold, input.filterUserId);
       }),
 
     getExpiredInsurance: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getVehiclesWithExpiredInsurance(ctx.user.id);
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        return await db.getVehiclesWithExpiredInsurance(ctx.user.id, input?.filterUserId);
       }),
 
     renewInsurance: protectedProcedure
@@ -787,14 +788,15 @@ export const appRouter = router({
       }),
 
     getExpiringRegistration: protectedProcedure
-      .input(z.object({ daysThreshold: z.number().default(30) }))
+      .input(z.object({ daysThreshold: z.number().default(30), filterUserId: z.number().optional() }))
       .query(async ({ input, ctx }) => {
-        return await db.getVehiclesWithExpiringRegistration(ctx.user.id, input.daysThreshold);
+        return await db.getVehiclesWithExpiringRegistration(ctx.user.id, input.daysThreshold, input.filterUserId);
       }),
 
     getExpiredRegistration: protectedProcedure
-      .query(async ({ ctx }) => {
-        return await db.getVehiclesWithExpiredRegistration(ctx.user.id);
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        return await db.getVehiclesWithExpiredRegistration(ctx.user.id, input?.filterUserId);
       }),
 
     renewRegistration: protectedProcedure
