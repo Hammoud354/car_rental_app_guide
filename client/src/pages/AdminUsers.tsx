@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus, KeyRound, CreditCard, Wallet } from "lucide-react";
+import { Shield, Trash2, Crown, FileText, Home, Zap, Info, Check, Plus, KeyRound, CreditCard, Wallet, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Redirect, Link } from "wouter";
@@ -409,6 +409,7 @@ export default function AdminUsers() {
                     <TableHead>Email</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead>Subscription</TableHead>
+                    <TableHead>Plan Ends</TableHead>
                     <TableHead>Created At</TableHead>
                     <TableHead className="text-center">
                       <TooltipProvider>
@@ -469,6 +470,29 @@ export default function AdminUsers() {
                                 {sub.tierDisplayName}
                               </Badge>
                               <span className="text-[10px] text-gray-400">{sub.subStatus} · ${sub.monthlyPrice}/mo</span>
+                            </div>
+                          );
+                        })()}
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          if (u.role === 'super_admin' || u.isInternal) return <span className="text-xs text-gray-400">—</span>;
+                          const sub = getSubscriptionForUser(u.id);
+                          if (!sub?.renewalDate) return <span className="text-xs text-gray-400">—</span>;
+                          const end = new Date(sub.renewalDate);
+                          const today = new Date();
+                          const daysLeft = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                          const isPast = daysLeft < 0;
+                          const isSoon = daysLeft >= 0 && daysLeft <= 14;
+                          return (
+                            <div className="flex flex-col gap-0.5">
+                              <div className={`flex items-center gap-1 text-xs font-medium ${isPast ? 'text-red-600' : isSoon ? 'text-amber-600' : 'text-green-700'}`}>
+                                <CalendarClock className="h-3 w-3 shrink-0" />
+                                {end.toLocaleDateString()}
+                              </div>
+                              <span className={`text-[10px] ${isPast ? 'text-red-400' : isSoon ? 'text-amber-400' : 'text-gray-400'}`}>
+                                {isPast ? `Expired ${Math.abs(daysLeft)}d ago` : daysLeft === 0 ? 'Expires today' : `${daysLeft}d remaining`}
+                              </span>
                             </div>
                           );
                         })()}
