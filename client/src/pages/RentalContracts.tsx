@@ -58,6 +58,7 @@ export default function RentalContracts() {
   // Pricing states
   const [rentalDays, setRentalDays] = useState<number>(1);
   const [dailyRate, setDailyRate] = useState<number>(0);
+  const [isHighSeason, setIsHighSeason] = useState<boolean>(false);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
   const [finalAmount, setFinalAmount] = useState<number>(0);
@@ -117,6 +118,9 @@ export default function RentalContracts() {
   const vatRate = companyProfile?.vatRate ? Number(companyProfile.vatRate) : 11;
   const exchangeRate = companyProfile?.exchangeRate ? Number(companyProfile.exchangeRate) : 1.0;
   const { data: allInvoices = [] } = trpc.invoices.list.useQuery();
+  const { data: highSeasonPeriodsList = [] } = trpc.highSeason.list.useQuery(
+    selectedTargetUserId ? { filterUserId: selectedTargetUserId } : undefined
+  );
   const { data: selectedContractDamageMarks = [] } = trpc.contracts.getDamageMarks.useQuery(
     { contractId: selectedContract?.id ?? 0 },
     { enabled: !!selectedContract }
@@ -262,29 +266,54 @@ export default function RentalContracts() {
     setFinalAmount(final);
   }, [totalAmount, discount, insuranceCost]);
   
-  // Load daily rate when vehicle is selected and adjust based on rental duration
+  // Load daily rate when vehicle is selected and adjust based on rental duration + high season
   useEffect(() => {
     if (selectedVehicleId) {
       const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
       if (vehicle) {
-        let rate = 0;
-        
-        // Tiered pricing based on rental duration
-        if (rentalDays >= 30 && vehicle.monthlyRate) {
-          // Use monthly rate for 30+ days
-          rate = parseFloat(vehicle.monthlyRate);
-        } else if (rentalDays >= 7 && vehicle.weeklyRate) {
-          // Use weekly rate for 7-29 days
-          rate = parseFloat(vehicle.weeklyRate);
-        } else if (vehicle.dailyRate) {
-          // Use daily rate for 1-6 days
-          rate = parseFloat(vehicle.dailyRate);
+        // Check if rental start date falls within any high season period
+        let inHighSeason = false;
+        if (rentalStartDate && highSeasonPeriodsList.length > 0) {
+          const startTs = rentalStartDate.getTime();
+          inHighSeason = highSeasonPeriodsList.some((period: any) => {
+            const periodStart = new Date(period.startDate).getTime();
+            const periodEnd = new Date(period.endDate).getTime();
+            // Add one day to end date to make it inclusive
+            return startTs >= periodStart && startTs <= periodEnd + 86400000;
+          });
         }
-        
+        setIsHighSeason(inHighSeason);
+
+        let rate = 0;
+
+        if (inHighSeason) {
+          // High season tiered pricing
+          if (rentalDays >= 30 && vehicle.highSeasonMonthlyRate) {
+            rate = parseFloat(vehicle.highSeasonMonthlyRate);
+          } else if (rentalDays >= 7 && vehicle.highSeasonWeeklyRate) {
+            rate = parseFloat(vehicle.highSeasonWeeklyRate);
+          } else if (vehicle.highSeasonDailyRate) {
+            rate = parseFloat(vehicle.highSeasonDailyRate);
+          }
+          // If no high season rate is set for this tier, fall back to normal rate
+          if (!rate) inHighSeason = false;
+        }
+
+        if (!inHighSeason) {
+          // Normal tiered pricing based on rental duration
+          if (rentalDays >= 30 && vehicle.monthlyRate) {
+            rate = parseFloat(vehicle.monthlyRate);
+          } else if (rentalDays >= 7 && vehicle.weeklyRate) {
+            rate = parseFloat(vehicle.weeklyRate);
+          } else if (vehicle.dailyRate) {
+            rate = parseFloat(vehicle.dailyRate);
+          }
+        }
+
         setDailyRate(rate);
       }
     }
-  }, [selectedVehicleId, vehicles, rentalDays]);
+  }, [selectedVehicleId, vehicles, rentalDays, rentalStartDate, highSeasonPeriodsList]);
   
   const createContract = trpc.contracts.create.useMutation({
     onSuccess: () => {
@@ -1094,7 +1123,14 @@ export default function RentalContracts() {
                       </div>
                     </div>
 
-                    <h3 className="font-semibold mb-4">Pricing</h3>
+                    <div className="flex items-center gap-3 mb-4">
+                      <h3 className="font-semibold">Pricing</h3>
+                      {isHighSeason && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold border border-orange-200">
+                          🌞 High Season Rate
+                        </span>
+                      )}
+                    </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
@@ -1107,7 +1143,11 @@ export default function RentalContracts() {
                           value={dailyRate}
                           onChange={(e) => setDailyRate(parseFloat(e.target.value) || 0)}
                           required
+                          className={isHighSeason ? "border-orange-400 bg-orange-50" : ""}
                         />
+                        {isHighSeason && (
+                          <p className="text-xs text-orange-600 mt-1">High season pricing applied automatically</p>
+                        )}
                       </div>
                       <div>
                         <Label>Total Amount (USD)</Label>
