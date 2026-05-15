@@ -56,7 +56,7 @@ export default function RentalContracts() {
   const [secondDriverLicenseExpiryDate, setSecondDriverLicenseExpiryDate] = useState<Date | undefined>();
   
   // Pricing states
-  const [rentalDays, setRentalDays] = useState<number>(0);
+  const [rentalDays, setRentalDays] = useState<number>(1);
   const [dailyRate, setDailyRate] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
@@ -971,10 +971,11 @@ export default function RentalContracts() {
 
                   {/* Rental Period */}
                   <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-5">Rental Period</h3>
-                    <div className="space-y-5">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div>
+                    <h3 className="font-semibold mb-4">Rental Period</h3>
+                    <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-4 space-y-4">
+                      {/* Row 1: Start Date + Pickup Time */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg border border-gray-200 p-3">
                           <DateDropdownSelector
                             id="rentalStartDate"
                             label="Rental Start Date *"
@@ -982,49 +983,72 @@ export default function RentalContracts() {
                             onChange={setRentalStartDate}
                             required
                           />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            You can select any date, including past dates
+                          <p className="text-xs text-blue-500 mt-1.5 flex items-center gap-1">
+                            <span>✓</span> Past dates allowed
                           </p>
                         </div>
-                        <div>
-                          <Label htmlFor="pickupTime">Pickup Time</Label>
+                        <div className="bg-white rounded-lg border border-gray-200 p-3">
+                          <Label htmlFor="pickupTime" className="text-sm font-medium">Pickup Time</Label>
                           <Input
                             id="pickupTime"
                             type="time"
                             value={pickupTime}
                             onChange={(e) => setPickupTime(e.target.value)}
-                            className="mt-1 input-client"
+                            className="mt-1.5 input-client"
                           />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Exact hour the car was rented
-                          </p>
+                          <p className="text-xs text-muted-foreground mt-1.5">Exact hour the car was picked up</p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div>
-                          <Label htmlFor="rentalDays">Number of Rental Days *</Label>
-                          <Input
-                            id="rentalDays"
-                            name="rentalDays"
-                            type="number"
-                            min="1"
-                            value={rentalDays}
-                            onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)}
-                            className="mt-1 input-client"
-                            required
-                          />
-                          <p className="text-xs text-muted-foreground mt-1">
-                            End date will be calculated automatically
-                          </p>
+
+                      {/* Row 2: Number of Days + Auto End Date */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="bg-white rounded-lg border border-gray-200 p-3">
+                          <Label htmlFor="rentalDays" className="text-sm font-medium">Number of Rental Days *</Label>
+                          <div className="flex items-center mt-1.5 gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-9 w-9 shrink-0 p-0 text-lg font-bold"
+                              onClick={() => setRentalDays(Math.max(1, rentalDays - 1))}
+                            >−</Button>
+                            <Input
+                              id="rentalDays"
+                              name="rentalDays"
+                              type="number"
+                              min="1"
+                              value={rentalDays}
+                              onChange={(e) => setRentalDays(Math.max(1, parseInt(e.target.value) || 1))}
+                              className="text-center font-semibold text-base input-client"
+                              required
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="h-9 w-9 shrink-0 p-0 text-lg font-bold"
+                              onClick={() => setRentalDays(rentalDays + 1)}
+                            >+</Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1.5">End date calculated automatically</p>
                         </div>
-                        <div>
-                          <Label>End Date (Auto-calculated)</Label>
-                          <Input
-                            type="text"
-                            value={rentalEndDate ? rentalEndDate.toLocaleDateString() : ""}
-                            readOnly
-                            className="mt-1 bg-gray-50 input-client"
-                          />
+                        <div className="bg-white rounded-lg border border-gray-200 p-3">
+                          <Label className="text-sm font-medium text-gray-500">Return Date (Auto-calculated)</Label>
+                          <div className="mt-1.5 h-9 flex items-center px-3 rounded-md bg-gray-50 border border-dashed border-gray-300">
+                            {rentalEndDate ? (
+                              <span className="font-semibold text-gray-800">
+                                {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 text-sm italic">Set start date &amp; days above</span>
+                            )}
+                          </div>
+                          {rentalEndDate && rentalStartDate && (
+                            <p className="text-xs text-blue-500 mt-1.5">
+                              {rentalDays} day{rentalDays !== 1 ? 's' : ''} ·{' '}
+                              {rentalStartDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>

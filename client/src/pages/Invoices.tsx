@@ -446,8 +446,8 @@ export default function Invoices() {
                       {invoiceDetails.clientNationality && (
                         <p className="text-sm text-gray-600">Nationality: {invoiceDetails.clientNationality}</p>
                       )}
-                      {invoiceDetails.contractId && (
-                        <p className="text-sm text-gray-600">Contract: {invoiceDetails.contractId}</p>
+                      {(invoiceDetails.contractNumber || invoiceDetails.contractId) && (
+                        <p className="text-sm text-gray-600">Contract #: {invoiceDetails.contractNumber || invoiceDetails.contractId}</p>
                       )}
                     </div>
                   </div>

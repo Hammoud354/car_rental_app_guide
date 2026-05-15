@@ -2283,6 +2283,7 @@ export async function getInvoiceById(invoiceId: number, userId: number) {
     lineItems,
     clientName: contract?.clientName || 'Client',
     clientPhone: contract?.clientPhone || '',
+    contractNumber: contract?.contractNumber || '',
     ...clientDetails,
   };
 }

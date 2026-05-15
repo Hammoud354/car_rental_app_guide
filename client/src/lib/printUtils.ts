@@ -10,8 +10,10 @@ function buildPrintHtml(content: string, title: string): string {
       body { padding: 0; }
       @page { margin: 0.5in; }
     }
-    table { border-collapse: collapse; width: 100%; margin-bottom: 12px; }
-    th, td { text-align: left; padding: 8px 12px; font-size: 13px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 12px; table-layout: fixed; }
+    th, td { text-align: left; padding: 8px 10px; font-size: 13px; vertical-align: top; }
+    th:first-child, td:first-child { width: 50%; }
+    th:not(:first-child), td:not(:first-child) { width: 16.66%; text-align: right; }
     thead tr { border-bottom: 2px solid #333; }
     tbody tr { border-bottom: 1px solid #ddd; }
     h1, h2, h3, h4, h5, h6 { margin-bottom: 8px; color: #111; }
@@ -22,26 +24,41 @@ function buildPrintHtml(content: string, title: string): string {
     .grid-cols-3 { grid-template-columns: 1fr 1fr 1fr; }
     .gap-2 { gap: 8px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
     .flex { display: flex; } .flex-col { flex-direction: column; }
-    .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+    .items-center { align-items: center; } .items-start { align-items: flex-start; }
+    .justify-between { justify-content: space-between; } .justify-end { justify-content: flex-end; }
+    .space-y-1 > * + * { margin-top: 4px; }
     .space-y-2 > * + * { margin-top: 8px; }
     .space-y-4 > * + * { margin-top: 16px; }
     .space-y-6 > * + * { margin-top: 24px; }
-    .text-sm { font-size: 12px; } .text-xs { font-size: 11px; } .text-lg { font-size: 16px; } .text-xl { font-size: 18px; } .text-2xl { font-size: 22px; }
+    .text-sm { font-size: 12px; } .text-xs { font-size: 11px; } .text-base { font-size: 14px; }
+    .text-lg { font-size: 16px; } .text-xl { font-size: 18px; } .text-2xl { font-size: 22px; } .text-3xl { font-size: 28px; }
     .font-bold { font-weight: bold; } .font-semibold { font-weight: 600; } .font-medium { font-weight: 500; }
     .text-gray-500 { color: #6b7280; } .text-gray-600 { color: #4b5563; } .text-gray-700 { color: #374151; } .text-gray-900 { color: #111827; }
-    .text-right { text-align: right; }
+    .text-right { text-align: right; } .text-left { text-align: left; } .text-center { text-align: center; }
     .bg-gray-50 { background: #f9fafb; } .bg-gray-100 { background: #f3f4f6; }
     .border { border: 1px solid #e5e7eb; } .border-b { border-bottom: 1px solid #e5e7eb; } .border-t { border-top: 1px solid #e5e7eb; }
     .border-b-2 { border-bottom: 2px solid #333; } .border-t-2 { border-top: 2px solid #333; }
     .rounded { border-radius: 4px; } .rounded-lg { border-radius: 8px; } .rounded-md { border-radius: 6px; }
     .p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
-    .px-2 { padding-left: 8px; padding-right: 8px; } .px-4 { padding-left: 16px; padding-right: 16px; }
+    .px-2 { padding-left: 8px; padding-right: 8px; } .px-3 { padding-left: 12px; padding-right: 12px; }
+    .px-4 { padding-left: 16px; padding-right: 16px; } .px-6 { padding-left: 24px; padding-right: 24px; }
     .py-1 { padding-top: 4px; padding-bottom: 4px; } .py-2 { padding-top: 8px; padding-bottom: 8px; }
-    .mb-2 { margin-bottom: 8px; } .mb-4 { margin-bottom: 16px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
-    .w-full { width: 100%; }
+    .py-3 { padding-top: 12px; padding-bottom: 12px; } .py-4 { padding-top: 16px; padding-bottom: 16px; }
+    .mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; }
+    .mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; }
+    .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; } .pt-3 { padding-top: 12px; } .pt-4 { padding-top: 16px; }
+    .w-full { width: 100%; } .w-1\\/2 { width: 50%; } .w-1\\/3 { width: 33.33%; } .w-1\\/6 { width: 16.66%; }
+    .min-w-full { width: 100%; } .inline-block { display: block; } .align-middle { vertical-align: middle; }
+    .overflow-x-auto { overflow: visible; } .-mx-4 { margin-left: 0; margin-right: 0; }
+    .tracking-wider { letter-spacing: 0.05em; }
     .hidden, .print\\:hidden, button, [role="button"], svg.lucide { display: none !important; }
     img { max-width: 120px; height: auto; }
     .badge, [class*="badge"] { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 500; }
+    /* Invoice-specific: totals table */
+    .totals-table { width: 100%; margin-top: 8px; }
+    .totals-table td { padding: 4px 0; font-size: 13px; }
+    .totals-table td:last-child { text-align: right; font-weight: 500; }
+    .totals-table .total-row td { font-size: 15px; font-weight: bold; padding-top: 10px; border-top: 2px solid #333; }
   </style>
 </head>
 <body>
