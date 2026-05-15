@@ -1562,7 +1562,7 @@ export default function RentalContracts() {
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-card p-4 rounded-lg border border-border">
                       <div>
                         <div className="text-sm text-muted-foreground">Full Name</div>
-                        <div className="font-semibold">{selectedContract.clientFirstName} {selectedContract.clientLastName}</div>
+                        <div className="font-semibold">{selectedContract.clientName || `${selectedContract.clientFirstName || ""} ${selectedContract.clientLastName || ""}`.trim() || "—"}</div>
                       </div>
                       {selectedContract.clientNationality && (
                         <div>
