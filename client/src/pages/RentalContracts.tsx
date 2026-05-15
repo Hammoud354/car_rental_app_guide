@@ -1564,6 +1564,18 @@ export default function RentalContracts() {
                         <div className="text-sm text-muted-foreground">Full Name</div>
                         <div className="font-semibold">{selectedContract.clientName || `${selectedContract.clientFirstName || ""} ${selectedContract.clientLastName || ""}`.trim() || "—"}</div>
                       </div>
+                      {selectedContract.clientFatherFullName && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Father's Name</div>
+                          <div>{selectedContract.clientFatherFullName}</div>
+                        </div>
+                      )}
+                      {selectedContract.clientMotherFullName && (
+                        <div>
+                          <div className="text-sm text-muted-foreground">Mother's Name</div>
+                          <div>{selectedContract.clientMotherFullName}</div>
+                        </div>
+                      )}
                       {selectedContract.clientNationality && (
                         <div>
                           <div className="text-sm text-muted-foreground">Nationality</div>
