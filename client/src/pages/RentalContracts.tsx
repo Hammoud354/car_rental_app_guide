@@ -1406,7 +1406,7 @@ export default function RentalContracts() {
                           onClick={(e) => e.stopPropagation()}
                         />
                         <span className="text-lg">
-                          {contract.clientFirstName} {contract.clientLastName}
+                          {contract.clientName || `${contract.clientFirstName || ""} ${contract.clientLastName || ""}`.trim() || "—"}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
