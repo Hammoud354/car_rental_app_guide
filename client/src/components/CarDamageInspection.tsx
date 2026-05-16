@@ -65,75 +65,124 @@ const SIDE_BG_POS: Partial<Record<CarView, string>> = {
 
 function FrontCarSVG() {
   return (
-    <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" style={{ padding: "10px" }}>
-      {/* Wheels */}
-      <ellipse cx="54" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
-      <ellipse cx="246" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Wheel arches */}
-      <path d="M24 128 Q24 108 54 108 Q84 108 84 128" fill="none" stroke="#333" strokeWidth="2"/>
-      <path d="M216 128 Q216 108 246 108 Q276 108 276 128" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Side body panels */}
-      <path d="M24 128 L24 70 L84 70 L84 128" fill="none" stroke="#333" strokeWidth="2"/>
-      <path d="M216 70 L216 128 L276 128 L276 70" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Hood */}
-      <path d="M84 70 L84 54 L216 54 L216 70" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* A-pillars + roof */}
-      <path d="M84 54 L98 20 L202 20 L216 54" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Windshield */}
-      <path d="M91 52 L103 23 L197 23 L209 52" fill="none" stroke="#333" strokeWidth="1.5"/>
-      {/* Headlights */}
-      <rect x="24" y="73" width="54" height="22" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <line x1="28" y1="85" x2="73" y2="85" stroke="#333" strokeWidth="1" strokeDasharray="4,2.5"/>
-      <rect x="222" y="73" width="54" height="22" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <line x1="227" y1="85" x2="272" y2="85" stroke="#333" strokeWidth="1" strokeDasharray="4,2.5"/>
-      {/* Grille */}
-      <rect x="88" y="78" width="124" height="32" rx="5" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <line x1="88" y1="94" x2="212" y2="94" stroke="#333" strokeWidth="1"/>
-      {/* Front bumper */}
-      <path d="M19 116 L19 140 Q19 150 28 150 L272 150 Q281 150 281 140 L281 116" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* License plate */}
-      <rect x="118" y="124" width="64" height="18" rx="2" fill="none" stroke="#333" strokeWidth="1.5"/>
-      {/* Fog lights */}
-      <rect x="30" y="120" width="26" height="13" rx="3" fill="none" stroke="#333" strokeWidth="1"/>
-      <rect x="244" y="120" width="26" height="13" rx="3" fill="none" stroke="#333" strokeWidth="1"/>
+    <svg viewBox="0 0 420 260" className="absolute inset-0 w-full h-full" style={{ padding: "6px" }}>
+      {/* ── Roof ── */}
+      <path d="M145 42 Q210 34 275 42" fill="none" stroke="#444" strokeWidth="2.5" strokeLinecap="round"/>
+
+      {/* ── A-pillars (roof → hood corners) ── */}
+      <path d="M145 42 L92 98 Q210 90 328 98 L275 42" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+
+      {/* ── Windshield glass ── */}
+      <path d="M147 42 L96 96 L324 96 L273 42 Z" fill="none" stroke="#555" strokeWidth="1.4"/>
+
+      {/* ── Hood surface (below windshield) ── */}
+      <path d="M92 98 Q210 92 328 98 L340 115 Q210 108 80 115 Z" fill="none" stroke="#444" strokeWidth="2"/>
+
+      {/* ── Left outer fender / body side ── */}
+      <path d="M80 115 Q52 120 28 138 Q16 148 16 165 L16 195 Q16 204 26 206 L90 208" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round"/>
+
+      {/* ── Right outer fender / body side ── */}
+      <path d="M340 115 Q368 120 392 138 Q404 148 404 165 L404 195 Q404 204 394 206 L330 208" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round"/>
+
+      {/* ── Bumper (bottom) ── */}
+      <path d="M26 206 Q210 214 394 206" fill="none" stroke="#444" strokeWidth="2.2"/>
+
+      {/* ── Left headlight (angular, outer corner) ── */}
+      <path d="M18 140 L18 172 Q18 178 26 178 L80 174 L82 112 Q48 112 18 140 Z" fill="none" stroke="#444" strokeWidth="1.8"/>
+      <line x1="24" y1="143" x2="79" y2="140" stroke="#555" strokeWidth="1.1" strokeDasharray="7,4"/>
+      <line x1="24" y1="156" x2="79" y2="153" stroke="#555" strokeWidth="1.1"/>
+
+      {/* ── Right headlight ── */}
+      <path d="M402 140 L402 172 Q402 178 394 178 L340 174 L338 112 Q372 112 402 140 Z" fill="none" stroke="#444" strokeWidth="1.8"/>
+      <line x1="396" y1="143" x2="341" y2="140" stroke="#555" strokeWidth="1.1" strokeDasharray="7,4"/>
+      <line x1="396" y1="156" x2="341" y2="153" stroke="#555" strokeWidth="1.1"/>
+
+      {/* ── Central grille ── */}
+      <path d="M83 118 Q210 124 337 118 L337 178 Q210 182 83 178 Z" fill="none" stroke="#444" strokeWidth="1.6"/>
+      <line x1="84" y1="136" x2="336" y2="136" stroke="#555" strokeWidth="0.9"/>
+      <line x1="84" y1="153" x2="336" y2="153" stroke="#555" strokeWidth="0.9"/>
+      <line x1="84" y1="170" x2="336" y2="170" stroke="#555" strokeWidth="0.9"/>
+
+      {/* ── License plate ── */}
+      <rect x="162" y="182" width="96" height="22" rx="2" fill="none" stroke="#444" strokeWidth="1.6"/>
+
+      {/* ── Fog lights ── */}
+      <rect x="28" y="182" width="44" height="18" rx="4" fill="none" stroke="#444" strokeWidth="1.2"/>
+      <rect x="348" y="182" width="44" height="18" rx="4" fill="none" stroke="#444" strokeWidth="1.2"/>
+
+      {/* ── Left wheel arch + tyre ── */}
+      <path d="M16 200 Q70 188 124 200" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="70" cy="232" rx="54" ry="17" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="70" cy="232" rx="30" ry="9" fill="none" stroke="#555" strokeWidth="1.5"/>
+
+      {/* ── Right wheel arch + tyre ── */}
+      <path d="M296 200 Q350 188 404 200" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="350" cy="232" rx="54" ry="17" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="350" cy="232" rx="30" ry="9" fill="none" stroke="#555" strokeWidth="1.5"/>
     </svg>
   );
 }
 
 function RearCarSVG() {
   return (
-    <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" style={{ padding: "10px" }}>
-      {/* Wheels */}
-      <ellipse cx="54" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
-      <ellipse cx="246" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Wheel arches */}
-      <path d="M24 128 Q24 108 54 108 Q84 108 84 128" fill="none" stroke="#333" strokeWidth="2"/>
-      <path d="M216 128 Q216 108 246 108 Q276 108 276 128" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Side body panels */}
-      <path d="M24 128 L24 70 L84 70 L84 128" fill="none" stroke="#333" strokeWidth="2"/>
-      <path d="M216 70 L216 128 L276 128 L276 70" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Trunk lid */}
-      <path d="M84 70 L84 56 L216 56 L216 70" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* C-pillars + roof */}
-      <path d="M84 56 L98 20 L202 20 L216 56" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* Rear windshield */}
-      <path d="M100 54 L110 24 L190 24 L200 54" fill="none" stroke="#333" strokeWidth="1.5"/>
-      {/* Tail lights */}
-      <rect x="24" y="73" width="54" height="24" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <line x1="28" y1="80" x2="73" y2="80" stroke="#333" strokeWidth="1.5"/>
-      <line x1="28" y1="88" x2="73" y2="88" stroke="#333" strokeWidth="1.5"/>
-      <rect x="222" y="73" width="54" height="24" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <line x1="227" y1="80" x2="272" y2="80" stroke="#333" strokeWidth="1.5"/>
-      <line x1="227" y1="88" x2="272" y2="88" stroke="#333" strokeWidth="1.5"/>
-      {/* Rear bumper */}
-      <path d="M19 116 L19 140 Q19 150 28 150 L272 150 Q281 150 281 140 L281 116" fill="none" stroke="#333" strokeWidth="2"/>
-      {/* License plate */}
-      <rect x="108" y="120" width="84" height="20" rx="2" fill="none" stroke="#333" strokeWidth="1.5"/>
-      {/* Exhaust tips */}
-      <ellipse cx="52" cy="148" rx="8" ry="5" fill="none" stroke="#333" strokeWidth="1.5"/>
-      <ellipse cx="248" cy="148" rx="8" ry="5" fill="none" stroke="#333" strokeWidth="1.5"/>
-      {/* Trunk handle */}
-      <path d="M128 68 Q150 72 172 68" fill="none" stroke="#333" strokeWidth="1.5"/>
+    <svg viewBox="0 0 420 260" className="absolute inset-0 w-full h-full" style={{ padding: "6px" }}>
+      {/* ── Roof ── */}
+      <path d="M145 42 Q210 34 275 42" fill="none" stroke="#444" strokeWidth="2.5" strokeLinecap="round"/>
+
+      {/* ── C-pillars (roof → trunk corners) ── */}
+      <path d="M145 42 L92 98 Q210 90 328 98 L275 42" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+
+      {/* ── Rear windshield glass ── */}
+      <path d="M149 42 L100 96 L320 96 L271 42 Z" fill="none" stroke="#555" strokeWidth="1.4"/>
+
+      {/* ── Trunk lid (below rear windshield) ── */}
+      <path d="M92 98 Q210 92 328 98 L340 115 Q210 108 80 115 Z" fill="none" stroke="#444" strokeWidth="2"/>
+
+      {/* ── Trunk handle ── */}
+      <path d="M172 100 Q210 105 248 100" fill="none" stroke="#555" strokeWidth="1.5"/>
+
+      {/* ── Left outer fender / body side ── */}
+      <path d="M80 115 Q52 120 28 138 Q16 148 16 165 L16 195 Q16 204 26 206 L90 208" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round"/>
+
+      {/* ── Right outer fender / body side ── */}
+      <path d="M340 115 Q368 120 392 138 Q404 148 404 165 L404 195 Q404 204 394 206 L330 208" fill="none" stroke="#444" strokeWidth="2.2" strokeLinecap="round"/>
+
+      {/* ── Bumper (bottom) ── */}
+      <path d="M26 206 Q210 214 394 206" fill="none" stroke="#444" strokeWidth="2.2"/>
+
+      {/* ── Left tail light (horizontal lines = LEDs) ── */}
+      <path d="M18 138 L18 176 Q18 182 26 182 L82 178 L84 110 Q48 110 18 138 Z" fill="none" stroke="#444" strokeWidth="1.8"/>
+      <line x1="24" y1="138" x2="81" y2="134" stroke="#555" strokeWidth="1.4"/>
+      <line x1="24" y1="150" x2="81" y2="146" stroke="#555" strokeWidth="1.4"/>
+      <line x1="24" y1="162" x2="81" y2="158" stroke="#555" strokeWidth="1.4"/>
+      <line x1="24" y1="174" x2="81" y2="170" stroke="#555" strokeWidth="1.4"/>
+
+      {/* ── Right tail light ── */}
+      <path d="M402 138 L402 176 Q402 182 394 182 L338 178 L336 110 Q372 110 402 138 Z" fill="none" stroke="#444" strokeWidth="1.8"/>
+      <line x1="396" y1="138" x2="339" y2="134" stroke="#555" strokeWidth="1.4"/>
+      <line x1="396" y1="150" x2="339" y2="146" stroke="#555" strokeWidth="1.4"/>
+      <line x1="396" y1="162" x2="339" y2="158" stroke="#555" strokeWidth="1.4"/>
+      <line x1="396" y1="174" x2="339" y2="170" stroke="#555" strokeWidth="1.4"/>
+
+      {/* ── Rear fascia / lower bumper face ── */}
+      <path d="M85 118 Q210 124 335 118 L335 182 Q210 186 85 182 Z" fill="none" stroke="#444" strokeWidth="1.6"/>
+
+      {/* ── License plate (centered, large) ── */}
+      <rect x="148" y="126" width="124" height="30" rx="2" fill="none" stroke="#444" strokeWidth="1.8"/>
+
+      {/* ── Exhaust pipes ── */}
+      <ellipse cx="52" cy="200" rx="14" ry="8" fill="none" stroke="#444" strokeWidth="1.5"/>
+      <ellipse cx="368" cy="200" rx="14" ry="8" fill="none" stroke="#444" strokeWidth="1.5"/>
+
+      {/* ── Left wheel arch + tyre ── */}
+      <path d="M16 200 Q70 188 124 200" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="70" cy="232" rx="54" ry="17" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="70" cy="232" rx="30" ry="9" fill="none" stroke="#555" strokeWidth="1.5"/>
+
+      {/* ── Right wheel arch + tyre ── */}
+      <path d="M296 200 Q350 188 404 200" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="350" cy="232" rx="54" ry="17" fill="none" stroke="#444" strokeWidth="2"/>
+      <ellipse cx="350" cy="232" rx="30" ry="9" fill="none" stroke="#555" strokeWidth="1.5"/>
     </svg>
   );
 }
