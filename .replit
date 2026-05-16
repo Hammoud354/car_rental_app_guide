@@ -44,7 +44,7 @@ externalPort = 3002
 [deployment]
 deploymentTarget = "autoscale"
 run = ["node_modules/.bin/tsx", "server/_core/index.ts"]
-build = ["npm", "run", "build"]
+build = ["node_modules/.bin/vite", "build"]
 
 [userenv]
 
