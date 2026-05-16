@@ -4071,6 +4071,22 @@ export async function initializePurchaseDetailsColumns() {
   }
 }
 
+export async function initializeMissingVehicleColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE vehicles
+        ADD COLUMN IF NOT EXISTS "insuranceCost" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "purchaseCost" decimal(10, 2),
+        ADD COLUMN IF NOT EXISTS "registrationExpiryDate" timestamp
+    `);
+    console.log("[Startup] Missing vehicle columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize missing vehicle columns:", err);
+  }
+}
+
 export async function initializeHighSeasonTable() {
   const db = await getDb();
   if (!db) return;
