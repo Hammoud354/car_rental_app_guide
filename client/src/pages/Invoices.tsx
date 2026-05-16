@@ -553,8 +553,8 @@ export default function Invoices() {
                     {/* USD in words */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1.5">
                       <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Amount in Words — USD</p>
-                      <p className="text-sm font-medium text-gray-800 leading-snug">
-                        {amountToWordsEN(parseFloat(invoiceDetails.totalAmount), 'USD')}
+                      <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        {amountToWordsAR(parseFloat(invoiceDetails.totalAmount), 'USD')}
                       </p>
                     </div>
 
@@ -562,8 +562,8 @@ export default function Invoices() {
                     {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
                       <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-1.5">
                         <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2">Amount in Words — {localCurrencyCode}</p>
-                        <p className="text-sm font-medium text-gray-800 leading-snug">
-                          {amountToWordsEN(parseFloat(invoiceDetails.totalAmount) * exchangeRate, localCurrencyCode)}
+                        <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          {amountToWordsAR(parseFloat(invoiceDetails.totalAmount) * exchangeRate, localCurrencyCode)}
                         </p>
                       </div>
                     )}
