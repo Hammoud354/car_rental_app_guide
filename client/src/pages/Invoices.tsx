@@ -170,12 +170,10 @@ export default function Invoices() {
 
   const updatePaymentMutation = trpc.invoices.updatePaymentStatus.useMutation({
     onSuccess: () => {
-      toast.success("Payment status updated successfully");
+      toast.success("Payment status updated — invoice is ready to print");
       utils.invoices.list.invalidate();
       utils.invoices.getById.invalidate();
-      setPaymentStatus("");
-      setPaymentMethod("");
-      setSelectedInvoice(null); // Close the dialog
+      // Keep dialog open so the updated invoice can be printed immediately
     },
     onError: (error) => {
       toast.error(error.message || "Failed to update payment status");
