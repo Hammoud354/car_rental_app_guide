@@ -88,6 +88,14 @@ export default function RentalContracts() {
     vehicle: any;
     invoiceDestination: string;
   } | null>(null);
+
+  // Auto-print state: set after inspection-complete contract creation to trigger print then open invoice
+  const [autoPrintData, setAutoPrintData] = useState<{
+    contract: any;
+    vehicle: any;
+    damageMarks: any[];
+    invoiceDestination: string;
+  } | null>(null);
   
   // Fetch last odometer reading when vehicle is selected
   const { data: lastOdometerReading } = trpc.contracts.getLastOdometerReading.useQuery(
@@ -444,6 +452,80 @@ export default function RentalContracts() {
     setShowInspection(true);
   };
 
+  // Auto-print effect: triggered after inspection-complete contract creation
+  useEffect(() => {
+    if (!autoPrintData) return;
+    const { contract: c, vehicle: v, damageMarks: dm, invoiceDestination } = autoPrintData;
+
+    const triggerAutoPrint = async () => {
+      // Wait for the ContractPDFTemplate portal to render
+      await new Promise(r => setTimeout(r, 800));
+
+      try {
+        if (companyProfile?.contractTemplateUrl && companyProfile?.contractTemplateFieldMap) {
+          // Template overlay print
+          const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
+          const data: Record<string, string> = {
+            clientName: c.clientName || "",
+            clientMotherFullName: c.clientMotherFullName || "",
+            clientFatherFullName: c.clientFatherFullName || "",
+            clientNationality: c.clientNationality || "",
+            clientPhone: c.clientPhone || "",
+            clientAddress: c.clientAddress || "",
+            clientEmail: c.clientEmail || "",
+            clientDateOfBirth: fmtDate(c.clientDateOfBirth),
+            clientPlaceOfBirth: c.clientPlaceOfBirth || "",
+            clientPassportNumber: c.clientPassport || "",
+            clientRegistrationNumber: c.clientRegistrationNumber || "",
+            clientPlaceOfRegistration: c.clientPlaceOfRegistration || "",
+            clientLicenseNumber: c.clientDriverLicense || "",
+            clientLicenseIssueDate: fmtDate(c.licenseIssueDate),
+            clientLicenseExpiryDate: fmtDate(c.licenseExpiryDate),
+            vehiclePlate: v?.plateNumber || "",
+            vehicleMake: v?.brand || "",
+            vehicleModel: v?.model || "",
+            vehicleYear: v?.year?.toString() || "",
+            vehicleColor: c.vehicleColor || v?.color || "",
+            vehicleFuelType: c.vehicleFuelType || v?.fuelType || "",
+            vehicleVIN: c.vehicleVIN || v?.vin || "",
+            contractNumber: c.contractNumber || c.id?.toString() || "",
+            startDate: fmtDate(c.rentalStartDate),
+            endDate: fmtDate(c.rentalEndDate),
+            pickupTime: c.pickupTime || "",
+            returnTime: c.returnTime || "",
+            rentalDays: c.rentalDays?.toString() || "",
+            dailyRate: c.dailyRate?.toString() || "",
+            totalAmount: c.totalAmount?.toString() || "",
+            deposit: c.depositAmount?.toString() || "",
+            companyName: companyProfile.companyName || "",
+            companyPhone: companyProfile.phone || "",
+            companyAddress: companyProfile.address || "",
+          };
+          toast.info("Generating contract PDF from template…");
+          await exportTemplateOverlayToPDF(
+            companyProfile.contractTemplateUrl!,
+            companyProfile.contractTemplateFieldMap as Record<string, any>,
+            data,
+            `Contract_${c.contractNumber || c.id}.pdf`
+          );
+        } else {
+          // Standard A4 contract print
+          toast.info("Printing contract…");
+          await exportContractTemplateToPDF(`Contract_${c.contractNumber || c.id}.pdf`);
+        }
+      } catch (err) {
+        console.error("Auto-print failed:", err);
+      }
+
+      // After print done, navigate to invoice
+      setAutoPrintData(null);
+      toast.success("Contract printed! Opening invoice…");
+      setTimeout(() => setLocation(invoiceDestination), 700);
+    };
+
+    triggerAutoPrint();
+  }, [autoPrintData]);
+
   const handleInspectionComplete = (damageMarks: any[], signatureData: string, fuelLevel: string) => {
     if (!contractData) return;
 
@@ -469,17 +551,20 @@ export default function RentalContracts() {
         setContractData(null);
         setIsCreateDialogOpen(false);
 
-        // Force a fresh fetch so the new contract shows up immediately
+        // Refresh contracts list
         utils.contracts.listByStatus.invalidate();
         utils.contracts.list.invalidate();
+        utils.fleet.list.invalidate();
 
-        // Open invoice if auto-generated, otherwise stay on contracts page
-        if ((contract as any).invoice?.id) {
-          toast.success("Contract created! Opening invoice…");
-          setTimeout(() => setLocation(`/invoices?invoice=${(contract as any).invoice.id}`), 400);
-        } else {
-          toast.success(`Contract ${contract.contractNumber} created successfully!`);
-        }
+        const vehicle = vehicles.find(v => v.id === (contract as any).vehicleId);
+        const invoiceDestination = (contract as any).invoice?.id
+          ? `/invoices?invoice=${(contract as any).invoice.id}`
+          : "/invoices";
+
+        toast.success(`Contract ${contract.contractNumber} created! Preparing contract print…`);
+
+        // Trigger auto-print then open invoice
+        setAutoPrintData({ contract, vehicle, damageMarks, invoiceDestination });
       },
       onError: (error) => {
         console.error("Error creating contract:", error);
@@ -2447,10 +2532,11 @@ export default function RentalContracts() {
       )}
 
       {/* PDF Template — portalled directly into document.body so html2canvas has no parent CSS interference */}
-      {(selectedContract || postCompletionModal?.contract) && createPortal(
+      {(selectedContract || postCompletionModal?.contract || autoPrintData?.contract) && createPortal(
         (() => {
-          const c = selectedContract || postCompletionModal!.contract;
-          const vehicle = vehicles.find((v) => v.id === c.vehicleId) || postCompletionModal?.vehicle;
+          const c = selectedContract || postCompletionModal?.contract || autoPrintData!.contract;
+          const vehicle = vehicles.find((v) => v.id === c.vehicleId) || postCompletionModal?.vehicle || autoPrintData?.vehicle;
+          const marksForPdf = autoPrintData ? autoPrintData.damageMarks : selectedContractDamageMarks;
           return (
             <ContractPDFTemplate
               contract={{
@@ -2471,7 +2557,7 @@ export default function RentalContracts() {
               }}
               vehicle={vehicle ? { ...vehicle, fuelType: vehicle.fuelType } : null}
               companyProfile={companyProfile || null}
-              damageMarks={selectedContractDamageMarks}
+              damageMarks={marksForPdf}
             />
           );
         })(),
