@@ -23,6 +23,7 @@ import { FileText, Download, CheckCircle, Clock, AlertCircle, XCircle } from "lu
 import { toast } from "sonner";
 import { printElement, exportElementToPDF } from "@/lib/printUtils";
 import { convertUSDToLBP, calculateVAT, formatLBP, formatUSD } from "@shared/currency";
+import { amountToWordsEN, amountToWordsAR } from "@/lib/numberToWords";
 import { useTranslation } from "react-i18next";
 
 export default function Invoices() {
@@ -542,6 +543,45 @@ export default function Invoices() {
                         <div className="flex justify-between text-xl font-bold border-t-2 border-primary pt-3 mt-2">
                           <span>Total ({localCurrencyCode}):</span>
                           <span className="tracking-wider">{(parseFloat(invoiceDetails.totalAmount) * exchangeRate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {localCurrencyCode}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Amount in Words */}
+                  <div className="border-t-2 pt-4 mt-2 space-y-3">
+                    {/* USD in words */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1.5">
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Amount in Words — USD</p>
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-500 font-medium">English:</p>
+                        <p className="text-sm font-medium text-gray-800 leading-snug">
+                          {amountToWordsEN(parseFloat(invoiceDetails.totalAmount), 'USD')}
+                        </p>
+                      </div>
+                      <div className="space-y-1 pt-1">
+                        <p className="text-xs text-gray-500 font-medium text-right">:عربي</p>
+                        <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
+                          {amountToWordsAR(parseFloat(invoiceDetails.totalAmount), 'USD')}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Local currency in words */}
+                    {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-1.5">
+                        <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2">Amount in Words — {localCurrencyCode}</p>
+                        <div className="space-y-1">
+                          <p className="text-xs text-gray-500 font-medium">English:</p>
+                          <p className="text-sm font-medium text-gray-800 leading-snug">
+                            {amountToWordsEN(parseFloat(invoiceDetails.totalAmount) * exchangeRate, localCurrencyCode)}
+                          </p>
+                        </div>
+                        <div className="space-y-1 pt-1">
+                          <p className="text-xs text-gray-500 font-medium text-right">:عربي</p>
+                          <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
+                            {amountToWordsAR(parseFloat(invoiceDetails.totalAmount) * exchangeRate, localCurrencyCode)}
+                          </p>
                         </div>
                       </div>
                     )}
