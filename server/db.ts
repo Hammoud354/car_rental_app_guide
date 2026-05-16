@@ -4283,3 +4283,98 @@ export async function createTempDemoUser(): Promise<typeof users.$inferSelect> {
 
   return inserted;
 }
+
+export async function initializeRentalContractColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    // Create enum types if they don't exist (use DO block for compatibility)
+    await db.execute(sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fuelLevel') THEN
+          CREATE TYPE "fuelLevel" AS ENUM ('Empty', '1/4', '1/2', '3/4', 'Full');
+        END IF;
+      END $$
+    `);
+    await db.execute(sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'insurancePackage') THEN
+          CREATE TYPE "insurancePackage" AS ENUM ('None', 'Basic', 'Premium', 'Full Coverage');
+        END IF;
+      END $$
+    `);
+    await db.execute(sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'depositStatus') THEN
+          CREATE TYPE "depositStatus" AS ENUM ('None', 'Held', 'Refunded', 'Forfeited');
+        END IF;
+      END $$
+    `);
+    await db.execute(sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'fuelPolicy') THEN
+          CREATE TYPE "fuelPolicy" AS ENUM ('Full-to-Full', 'Same-to-Same', 'Pre-purchase');
+        END IF;
+      END $$
+    `);
+    await db.execute(sql`
+      DO $$ BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'contractStatus') THEN
+          CREATE TYPE "contractStatus" AS ENUM ('active', 'completed', 'overdue');
+        END IF;
+      END $$
+    `);
+
+    // Add all columns that may have been added after initial table creation
+    await db.execute(sql`
+      ALTER TABLE "rentalContracts"
+        ADD COLUMN IF NOT EXISTS "clientId2" varchar(100),
+        ADD COLUMN IF NOT EXISTS "clientMotherFullName" varchar(200),
+        ADD COLUMN IF NOT EXISTS "clientFatherFullName" varchar(200),
+        ADD COLUMN IF NOT EXISTS "clientDateOfBirth" timestamp,
+        ADD COLUMN IF NOT EXISTS "clientPlaceOfBirth" varchar(200),
+        ADD COLUMN IF NOT EXISTS "clientRegistrationNumber" varchar(100),
+        ADD COLUMN IF NOT EXISTS "clientPlaceOfRegistration" varchar(200),
+        ADD COLUMN IF NOT EXISTS "licenseIssueDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "pickupTime" varchar(20),
+        ADD COLUMN IF NOT EXISTS "returnTime" varchar(20),
+        ADD COLUMN IF NOT EXISTS "vehicleType" varchar(50),
+        ADD COLUMN IF NOT EXISTS "vehicleColor" varchar(50),
+        ADD COLUMN IF NOT EXISTS "vehicleFuelType" varchar(50),
+        ADD COLUMN IF NOT EXISTS "vehicleVIN" varchar(17),
+        ADD COLUMN IF NOT EXISTS "pickupKm" integer,
+        ADD COLUMN IF NOT EXISTS "returnKm" integer,
+        ADD COLUMN IF NOT EXISTS "returnNotes" text,
+        ADD COLUMN IF NOT EXISTS "damageInspection" text,
+        ADD COLUMN IF NOT EXISTS "kmLimit" integer,
+        ADD COLUMN IF NOT EXISTS "overLimitKmFee" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "overLimitKmRate" decimal(10,2) DEFAULT 0.50,
+        ADD COLUMN IF NOT EXISTS "lateFeePercentage" decimal(5,2) DEFAULT 150.00,
+        ADD COLUMN IF NOT EXISTS "lateFee" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "insuranceCost" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "insuranceDailyRate" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "depositAmount" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "depositRefundDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "depositNotes" text,
+        ADD COLUMN IF NOT EXISTS "fuelCharge" decimal(10,2) DEFAULT 0.00,
+        ADD COLUMN IF NOT EXISTS "secondDriverName" varchar(200),
+        ADD COLUMN IF NOT EXISTS "secondDriverDateOfBirth" timestamp,
+        ADD COLUMN IF NOT EXISTS "secondDriverLicenseIssueDate" timestamp,
+        ADD COLUMN IF NOT EXISTS "secondDriverLicenseExpiryDate" timestamp
+    `);
+
+    // Enum columns must be added separately (type cast required)
+    await db.execute(sql`
+      ALTER TABLE "rentalContracts"
+        ADD COLUMN IF NOT EXISTS "fuelLevel" "fuelLevel" DEFAULT 'Full',
+        ADD COLUMN IF NOT EXISTS "returnFuelLevel" "fuelLevel",
+        ADD COLUMN IF NOT EXISTS "insurancePackage" "insurancePackage" DEFAULT 'None',
+        ADD COLUMN IF NOT EXISTS "depositStatus" "depositStatus" DEFAULT 'None',
+        ADD COLUMN IF NOT EXISTS "fuelPolicy" "fuelPolicy" DEFAULT 'Full-to-Full'
+    `);
+
+    console.log("[Startup] rentalContracts columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize rentalContracts columns:", err);
+  }
+}
