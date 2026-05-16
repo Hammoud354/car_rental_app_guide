@@ -126,8 +126,9 @@ export function DateDropdownSelector({
       <Label htmlFor={id}>
         {label} {required && <span className="text-red-500">*</span>}
       </Label>
-      <div className={yearOnly ? "grid grid-cols-1 gap-2" : "grid gap-2"} style={yearOnly ? {} : { gridTemplateColumns: "2fr 3fr 1.5fr" }}>
-        {/* Year Selector */}
+
+      {yearOnly ? (
+        /* Year-only mode: single full-width dropdown */
         <Select
           value={selectedYear?.toString()}
           onValueChange={handleYearChange}
@@ -144,47 +145,68 @@ export function DateDropdownSelector({
             ))}
           </SelectContent>
         </Select>
+      ) : (
+        /* Full date: 2-row layout
+           Row 1: Day (narrow) + Month (wide)
+           Row 2: Year (full width) */
+        <div className="space-y-2">
+          <div className="grid grid-cols-[1fr_2fr] gap-2">
+            {/* Day Selector */}
+            <Select
+              value={selectedDay?.toString()}
+              onValueChange={handleDayChange}
+              required={required}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Day" />
+              </SelectTrigger>
+              <SelectContent>
+                {days.map((day) => (
+                  <SelectItem key={day} value={day.toString()}>
+                    {day}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-        {/* Month Selector */}
-        {!yearOnly && (
+            {/* Month Selector */}
+            <Select
+              value={selectedMonth?.toString()}
+              onValueChange={handleMonthChange}
+              required={required}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month.value} value={month.value.toString()}>
+                    {month.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Year Selector — full width */}
           <Select
-            value={selectedMonth?.toString()}
-            onValueChange={handleMonthChange}
+            value={selectedYear?.toString()}
+            onValueChange={handleYearChange}
             required={required}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Month" />
+              <SelectValue placeholder="Year" />
             </SelectTrigger>
             <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={month.value.toString()}>
-                  {month.label}
+              {years.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        )}
-
-        {/* Day Selector */}
-        {!yearOnly && (
-          <Select
-            value={selectedDay?.toString()}
-            onValueChange={handleDayChange}
-            required={required}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Day" />
-            </SelectTrigger>
-            <SelectContent>
-              {days.map((day) => (
-                <SelectItem key={day} value={day.toString()}>
-                  {day}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
