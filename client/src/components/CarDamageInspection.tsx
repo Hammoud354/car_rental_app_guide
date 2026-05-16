@@ -158,7 +158,7 @@ function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkCl
           return (
             <div
               key={mark.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110"
+              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer transition-transform hover:scale-110 scale-75 sm:scale-100"
               style={{ left: `${mark.x}%`, top: `${mark.y}%`, zIndex: 10 }}
               onClick={e => { e.stopPropagation(); onMarkClick(mark.id); }}
             >
