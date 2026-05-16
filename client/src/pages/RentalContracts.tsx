@@ -574,7 +574,7 @@ export default function RentalContracts() {
                   New Contract
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
                 <DialogHeader>
                   <DialogTitle>Create Rental Contract</DialogTitle>
                   <DialogDescription>Fill in the contract details to create a new rental agreement.</DialogDescription>

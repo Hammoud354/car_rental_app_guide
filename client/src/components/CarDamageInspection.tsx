@@ -56,16 +56,87 @@ const VIEW_LABELS: Record<CarView, string> = {
   right: "Right Side",
 };
 
-/* New PNG is a 2×2 grid (1536×1024):
-   top-left = left side, top-right = right side,
-   bottom-left = front,  bottom-right = rear
-   → bgSize "200% 200%" zooms into each quadrant */
-const VIEW_STYLE: Record<CarView, { bgPos: string }> = {
-  left:  { bgPos: "0% 0%"     },
-  right: { bgPos: "100% 0%"   },
-  front: { bgPos: "0% 100%"   },
-  rear:  { bgPos: "100% 100%" },
+/* Left / Right use the existing car-schema.png (2×2 grid, top half only).
+   Front / Rear are rendered as inline SVGs since the image bottom half is blank. */
+const SIDE_BG_POS: Partial<Record<CarView, string>> = {
+  left:  "0% 0%",
+  right: "100% 0%",
 };
+
+function FrontCarSVG() {
+  return (
+    <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" style={{ padding: "10px" }}>
+      {/* Wheels */}
+      <ellipse cx="54" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
+      <ellipse cx="246" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Wheel arches */}
+      <path d="M24 128 Q24 108 54 108 Q84 108 84 128" fill="none" stroke="#333" strokeWidth="2"/>
+      <path d="M216 128 Q216 108 246 108 Q276 108 276 128" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Side body panels */}
+      <path d="M24 128 L24 70 L84 70 L84 128" fill="none" stroke="#333" strokeWidth="2"/>
+      <path d="M216 70 L216 128 L276 128 L276 70" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Hood */}
+      <path d="M84 70 L84 54 L216 54 L216 70" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* A-pillars + roof */}
+      <path d="M84 54 L98 20 L202 20 L216 54" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Windshield */}
+      <path d="M91 52 L103 23 L197 23 L209 52" fill="none" stroke="#333" strokeWidth="1.5"/>
+      {/* Headlights */}
+      <rect x="24" y="73" width="54" height="22" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <line x1="28" y1="85" x2="73" y2="85" stroke="#333" strokeWidth="1" strokeDasharray="4,2.5"/>
+      <rect x="222" y="73" width="54" height="22" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <line x1="227" y1="85" x2="272" y2="85" stroke="#333" strokeWidth="1" strokeDasharray="4,2.5"/>
+      {/* Grille */}
+      <rect x="88" y="78" width="124" height="32" rx="5" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <line x1="88" y1="94" x2="212" y2="94" stroke="#333" strokeWidth="1"/>
+      {/* Front bumper */}
+      <path d="M19 116 L19 140 Q19 150 28 150 L272 150 Q281 150 281 140 L281 116" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* License plate */}
+      <rect x="118" y="124" width="64" height="18" rx="2" fill="none" stroke="#333" strokeWidth="1.5"/>
+      {/* Fog lights */}
+      <rect x="30" y="120" width="26" height="13" rx="3" fill="none" stroke="#333" strokeWidth="1"/>
+      <rect x="244" y="120" width="26" height="13" rx="3" fill="none" stroke="#333" strokeWidth="1"/>
+    </svg>
+  );
+}
+
+function RearCarSVG() {
+  return (
+    <svg viewBox="0 0 300 200" className="absolute inset-0 w-full h-full" style={{ padding: "10px" }}>
+      {/* Wheels */}
+      <ellipse cx="54" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
+      <ellipse cx="246" cy="158" rx="30" ry="18" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Wheel arches */}
+      <path d="M24 128 Q24 108 54 108 Q84 108 84 128" fill="none" stroke="#333" strokeWidth="2"/>
+      <path d="M216 128 Q216 108 246 108 Q276 108 276 128" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Side body panels */}
+      <path d="M24 128 L24 70 L84 70 L84 128" fill="none" stroke="#333" strokeWidth="2"/>
+      <path d="M216 70 L216 128 L276 128 L276 70" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Trunk lid */}
+      <path d="M84 70 L84 56 L216 56 L216 70" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* C-pillars + roof */}
+      <path d="M84 56 L98 20 L202 20 L216 56" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* Rear windshield */}
+      <path d="M100 54 L110 24 L190 24 L200 54" fill="none" stroke="#333" strokeWidth="1.5"/>
+      {/* Tail lights */}
+      <rect x="24" y="73" width="54" height="24" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <line x1="28" y1="80" x2="73" y2="80" stroke="#333" strokeWidth="1.5"/>
+      <line x1="28" y1="88" x2="73" y2="88" stroke="#333" strokeWidth="1.5"/>
+      <rect x="222" y="73" width="54" height="24" rx="4" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <line x1="227" y1="80" x2="272" y2="80" stroke="#333" strokeWidth="1.5"/>
+      <line x1="227" y1="88" x2="272" y2="88" stroke="#333" strokeWidth="1.5"/>
+      {/* Rear bumper */}
+      <path d="M19 116 L19 140 Q19 150 28 150 L272 150 Q281 150 281 140 L281 116" fill="none" stroke="#333" strokeWidth="2"/>
+      {/* License plate */}
+      <rect x="108" y="120" width="84" height="20" rx="2" fill="none" stroke="#333" strokeWidth="1.5"/>
+      {/* Exhaust tips */}
+      <ellipse cx="52" cy="148" rx="8" ry="5" fill="none" stroke="#333" strokeWidth="1.5"/>
+      <ellipse cx="248" cy="148" rx="8" ry="5" fill="none" stroke="#333" strokeWidth="1.5"/>
+      {/* Trunk handle */}
+      <path d="M128 68 Q150 72 172 68" fill="none" stroke="#333" strokeWidth="1.5"/>
+    </svg>
+  );
+}
 
 /* ── Render a single symbol at given size ─── */
 function SymbolBadge({
@@ -125,7 +196,7 @@ interface ViewPanelProps {
 
 function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkClick }: ViewPanelProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { bgPos } = VIEW_STYLE[view];
+  const bgPos = SIDE_BG_POS[view];
   const viewMarks = marks.filter(m => m.view === view);
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -141,17 +212,21 @@ function ViewPanel({ view, marks, allMarks, selectedMark, onPanelClick, onMarkCl
       </span>
       <div
         ref={ref}
-        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+        className="relative rounded-xl border border-slate-200 cursor-crosshair overflow-hidden shadow-sm hover:shadow-md transition-shadow bg-white"
         style={{
           aspectRatio: "3 / 2",
-          backgroundImage: "url('/car-schema.png')",
-          backgroundSize: "200% 200%",
-          backgroundPosition: bgPos,
-          backgroundRepeat: "no-repeat",
-          backgroundColor: "white",
+          ...(bgPos ? {
+            backgroundImage: "url('/car-schema.png')",
+            backgroundSize: "200% 200%",
+            backgroundPosition: bgPos,
+            backgroundRepeat: "no-repeat",
+          } : {}),
         }}
         onClick={handleClick}
       >
+        {/* Inline SVG for front/rear views (image has no bottom-half content) */}
+        {view === "front" && <FrontCarSVG />}
+        {view === "rear" && <RearCarSVG />}
 
         {viewMarks.map(mark => {
           const idx = allMarks.findIndex(m => m.id === mark.id) + 1;
