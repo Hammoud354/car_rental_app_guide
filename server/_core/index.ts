@@ -33,8 +33,13 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
-  // Gzip/deflate compression — must be first to compress all responses
-  app.use(compression());
+  // Gzip/deflate compression — skip pre-built /assets to avoid truncation on large JS bundles
+  app.use(compression({
+    filter: (req, res) => {
+      if (req.path.startsWith("/assets/")) return false;
+      return compression.filter(req, res);
+    },
+  }));
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
