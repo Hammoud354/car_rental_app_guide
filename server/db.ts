@@ -740,27 +740,38 @@ export async function deleteRentalContract(contractId: number) {
     // Delete the contract
     await db.delete(rentalContracts).where(eq(rentalContracts.id, contractId));
     
-    // Check if the vehicle has any other active contracts
-    const now = new Date();
-    const activeContracts = await db.select()
-      .from(rentalContracts)
-      .where(
-        and(
-          eq(rentalContracts.vehicleId, vehicleId),
-          or(
-            eq(rentalContracts.status, 'active'),
-            eq(rentalContracts.status, 'overdue')
-          ),
-          lte(rentalContracts.rentalStartDate, now),
-          gte(rentalContracts.rentalEndDate, now)
-        )
-      );
-    
-    // If no active contracts remain, return vehicle to Available status
-    if (activeContracts.length === 0) {
-      await db.update(vehicles)
-        .set({ status: 'Available' })
-        .where(eq(vehicles.id, vehicleId));
+    // Check the current vehicle status — only restore to Available if it was Rented
+    // (never overwrite Maintenance or Out of Service with Available)
+    const vehicleRecord = await db.select({ status: vehicles.status })
+      .from(vehicles)
+      .where(eq(vehicles.id, vehicleId))
+      .limit(1);
+
+    const currentStatus = vehicleRecord[0]?.status;
+
+    if (currentStatus === 'Rented') {
+      // Check if the vehicle has any other currently-running active contracts
+      const now = new Date();
+      const activeContracts = await db.select()
+        .from(rentalContracts)
+        .where(
+          and(
+            eq(rentalContracts.vehicleId, vehicleId),
+            or(
+              eq(rentalContracts.status, 'active'),
+              eq(rentalContracts.status, 'overdue')
+            ),
+            lte(rentalContracts.rentalStartDate, now),
+            gte(rentalContracts.rentalEndDate, now)
+          )
+        );
+
+      // If no other active contracts remain, free the vehicle back to Available
+      if (activeContracts.length === 0) {
+        await db.update(vehicles)
+          .set({ status: 'Available' })
+          .where(eq(vehicles.id, vehicleId));
+      }
     }
   }
   

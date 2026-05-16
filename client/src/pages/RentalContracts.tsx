@@ -344,8 +344,9 @@ export default function RentalContracts() {
   const deleteContract = trpc.contracts.delete.useMutation({
     onSuccess: () => {
       toast.success("Contract deleted successfully");
-      utils.contracts.list.invalidate(); // Refresh contract list
-      utils.contracts.getById.invalidate(); // Refresh contract details
+      utils.contracts.list.invalidate();
+      utils.contracts.getById.invalidate();
+      utils.fleet.list.invalidate(); // Refresh vehicle statuses so deleted contract frees the car
       setIsDetailsDialogOpen(false);
       setSelectedContract(null);
     },
