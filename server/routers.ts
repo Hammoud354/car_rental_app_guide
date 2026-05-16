@@ -502,7 +502,10 @@ export const appRouter = router({
           const tierName = subscription?.tier.displayName || "your plan";
           throw new Error(`Vehicle limit reached: You have ${vehicleLimit.current} vehicles but ${tierName} plan allows only ${vehicleLimit.limit}. Please upgrade your subscription to add more vehicles.`);
         }
-        
+
+        // Enforce uniqueness for plate number and VIN before inserting
+        await db.checkVehicleUniqueness(input.plateNumber, input.vin);
+
         const { targetUserId: _, ...vehicleData } = input;
         return await db.createVehicle({ ...vehicleData, userId });
       }),
@@ -552,8 +555,10 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input, ctx }) => {
-        await db.updateVehicle(input.id, ctx.user?.id || 1, input.data as any);
         const userId = ctx.user?.id || 1;
+        // Enforce uniqueness for plate number and VIN (excluding this vehicle)
+        await db.checkVehicleUniqueness(input.data.plateNumber, input.data.vin, input.id);
+        await db.updateVehicle(input.id, userId, input.data as any);
         const updatedVehicle = await db.getVehicleById(input.id, userId);
         if (updatedVehicle) {
           wsManager.broadcast({

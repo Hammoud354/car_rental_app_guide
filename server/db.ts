@@ -4071,6 +4071,53 @@ export async function initializePurchaseDetailsColumns() {
   }
 }
 
+export async function initializeVehicleUniqueConstraints() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    // Partial unique index on VIN (only when VIN is provided — NULLs are not checked)
+    await db.execute(sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS "vehicles_vin_unique"
+        ON vehicles("vin")
+        WHERE "vin" IS NOT NULL AND "vin" <> ''
+    `);
+    console.log("[Startup] Vehicle unique constraints ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize vehicle unique constraints:", err);
+  }
+}
+
+export async function checkVehicleUniqueness(
+  plateNumber: string | undefined,
+  vin: string | undefined,
+  excludeId?: number
+): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+
+  if (plateNumber) {
+    const rows = await db.execute(
+      excludeId
+        ? sql`SELECT id FROM vehicles WHERE "plateNumber" = ${plateNumber} AND id <> ${excludeId} LIMIT 1`
+        : sql`SELECT id FROM vehicles WHERE "plateNumber" = ${plateNumber} LIMIT 1`
+    );
+    if (rows.rows.length > 0) {
+      throw new Error(`A vehicle with plate number "${plateNumber}" already exists in the system.`);
+    }
+  }
+
+  if (vin && vin.trim() !== '') {
+    const rows = await db.execute(
+      excludeId
+        ? sql`SELECT id FROM vehicles WHERE "vin" = ${vin} AND id <> ${excludeId} LIMIT 1`
+        : sql`SELECT id FROM vehicles WHERE "vin" = ${vin} LIMIT 1`
+    );
+    if (rows.rows.length > 0) {
+      throw new Error(`A vehicle with VIN "${vin}" already exists in the system.`);
+    }
+  }
+}
+
 export async function initializeMissingVehicleColumns() {
   const db = await getDb();
   if (!db) return;
