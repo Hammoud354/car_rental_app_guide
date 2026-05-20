@@ -388,16 +388,24 @@ export default function Home() {
       </section>
 
       {/* Trusted By Section */}
-      <section className="py-12 border-y border-gray-100 bg-gray-50/50">
+      <section className="py-10 border-y border-gray-100 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <div className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-                    <CountUp target={stat.value} suffix={stat.suffix} prefix={stat.prefix || ""} />
-                  </div>
-                  <p className="text-sm text-gray-500 mt-1 font-medium">{t(stat.labelKey)}</p>
+            <p className="text-center text-xs font-semibold text-gray-400 uppercase tracking-widest mb-7">Trusted by rental agencies across</p>
+            <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+              {[
+                { flag: "🇱🇧", name: "Lebanon" },
+                { flag: "🇦🇪", name: "UAE" },
+                { flag: "🇸🇦", name: "Saudi Arabia" },
+                { flag: "🇶🇦", name: "Qatar" },
+                { flag: "🇰🇼", name: "Kuwait" },
+                { flag: "🇯🇴", name: "Jordan" },
+                { flag: "🇬🇧", name: "United Kingdom" },
+                { flag: "🇩🇪", name: "Germany" },
+              ].map((c) => (
+                <div key={c.name} className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors">
+                  <span className="text-xl">{c.flag}</span>
+                  <span className="text-sm font-medium">{c.name}</span>
                 </div>
               ))}
             </div>
