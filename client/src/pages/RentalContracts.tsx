@@ -645,7 +645,7 @@ export default function RentalContracts() {
                     toast.error(t("contracts.noContractsToExport"));
                     return;
                   }
-                  exportContractsToCSV(contracts);
+                  exportContractsToCSV(contracts, vehicles);
                   toast.success(`Exported ${contracts.length} contracts`);
                 }}
               >

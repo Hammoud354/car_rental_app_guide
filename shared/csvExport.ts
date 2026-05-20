@@ -86,34 +86,53 @@ export function exportClientsToCSV(clients: any[]) {
   exportToCSV(exportData, "clients");
 }
 
-// Export contracts to CSV — uses denormalized contract fields (no nested client/vehicle objects)
-export function exportContractsToCSV(contracts: any[]) {
-  const exportData = contracts.map(c => ({
-    "Contract Number": c.contractNumber || c.id || "",
-    "Client Name": c.clientName || "",
-    "Client Phone": c.clientPhone || "",
-    "Client Email": c.clientEmail || "",
-    "Client Nationality": c.clientNationality || "",
-    "Client License": c.clientDriverLicense || "",
-    "Client Date of Birth": fmt(c.clientDateOfBirth),
-    "Client Father's Name": c.clientFatherFullName || "",
-    "Client Mother's Name": c.clientMotherFullName || "",
-    "Client Passport": c.clientPassport || "",
-    "Client ID": c.clientId2 || "",
-    "Client Address": c.clientAddress || "",
-    "Start Date": fmt(c.rentalStartDate || c.startDate),
-    "End Date": fmt(c.rentalEndDate || c.endDate),
-    "Rental Days": c.rentalDays || c.totalDays || "",
-    "Daily Rate": c.dailyRate || "",
-    "Total Amount": c.totalAmount || c.baseAmount || "",
-    "Discount": c.discount || "",
-    "Final Amount": c.finalAmount || "",
-    "Status": c.status || "",
-    "Payment Status": c.paymentStatus || "",
-    "Pickup KM": c.pickupKm || "",
-    "Return KM": c.returnKm || "",
-    "Returned At": fmt(c.returnedAt),
-    "Notes": c.notes || "",
-  }));
+// Export contracts to CSV — accepts optional vehicles array for brand/model/plate lookup
+export function exportContractsToCSV(contracts: any[], vehicles?: any[]) {
+  const vehicleMap: Record<number, any> = {};
+  if (vehicles) {
+    for (const v of vehicles) vehicleMap[v.id] = v;
+  }
+
+  const exportData = contracts.map(c => {
+    const v = vehicleMap[c.vehicleId];
+    return {
+      "Contract Number": c.contractNumber || c.id || "",
+      "Client Name": c.clientName || "",
+      "Client Phone": c.clientPhone || "",
+      "Client Email": c.clientEmail || "",
+      "Client Nationality": c.clientNationality || "",
+      "Client License": c.clientDriverLicense || "",
+      "Client Date of Birth": fmt(c.clientDateOfBirth),
+      "Client Father's Name": c.clientFatherFullName || "",
+      "Client Mother's Name": c.clientMotherFullName || "",
+      "Client Passport": c.clientPassport || "",
+      "Client ID": c.clientId2 || "",
+      "Client Address": c.clientAddress || "",
+      "License Issue Date": fmt(c.licenseIssueDate),
+      "License Expiry Date": fmt(c.licenseExpiryDate),
+      "Vehicle": v ? `${v.brand} ${v.model}` : (c.vehicleType || ""),
+      "Plate Number": v?.plateNumber || "",
+      "Vehicle Color": v?.color || c.vehicleColor || "",
+      "Vehicle VIN": v?.vin || c.vehicleVIN || "",
+      "Start Date": fmt(c.rentalStartDate),
+      "End Date": fmt(c.rentalEndDate),
+      "Rental Days": c.rentalDays || "",
+      "Daily Rate": c.dailyRate || "",
+      "Total Amount": c.totalAmount || "",
+      "Discount": c.discount || "",
+      "Final Amount": c.finalAmount || "",
+      "Status": c.status || "",
+      "Payment Status": c.paymentStatus || "",
+      "Pickup KM": c.pickupKm || "",
+      "Return KM": c.returnKm || "",
+      "Fuel Level": c.fuelLevel || "",
+      "Return Fuel Level": c.returnFuelLevel || "",
+      "Insurance Package": c.insurancePackage || "",
+      "Deposit Amount": c.depositAmount || "",
+      "Deposit Status": c.depositStatus || "",
+      "Returned At": fmt(c.returnedAt),
+      "Notes": c.notes || "",
+    };
+  });
   exportToCSV(exportData, "contracts");
 }
