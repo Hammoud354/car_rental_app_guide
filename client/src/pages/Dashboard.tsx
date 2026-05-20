@@ -38,78 +38,120 @@ function ExportToExcelButton() {
 
       const { vehicles = [], contracts = [], clients = [], maintenanceRecords = [], invoices = [] } = result.data || {};
 
+      const fmt = (d: any) => d ? new Date(d).toLocaleDateString() : "";
+
+      // Lookup maps for cross-referencing
+      const vehicleMap = Object.fromEntries((vehicles || []).map(v => [v.id, v]));
+      const contractMap = Object.fromEntries((contracts || []).map(c => [c.id, c]));
+
       const fleetData = (vehicles || []).map(v => ({
-        "Brand": v.brand,
-        "Model": v.model,
-        "Year": v.year,
-        "Plate Number": v.plateNumber,
-        "VIN": v.vin || "",
-        "Category": v.category,
-        "Status": v.status,
-        "Daily Rate": v.dailyRate,
+        "Plate Number": v.plateNumber || "",
+        "Brand": v.brand || "",
+        "Model": v.model || "",
+        "Year": v.year || "",
+        "Color": v.color || "",
+        "Category": v.category || "",
+        "Status": v.status || "",
+        "Daily Rate": v.dailyRate || "",
         "Weekly Rate": v.weeklyRate || "",
         "Monthly Rate": v.monthlyRate || "",
-        "Color": v.color,
-        "Mileage": v.mileage,
+        "Mileage": v.mileage || "",
+        "VIN": v.vin || "",
         "Insurance Policy Number": v.insurancePolicyNumber || "",
-        "Insurance Expiry": v.insuranceExpiryDate ? new Date(v.insuranceExpiryDate).toLocaleDateString() : "",
+        "Insurance Expiry": fmt(v.insuranceExpiryDate),
         "Insurance Cost": v.insuranceCost || "",
         "Purchase Cost": v.purchaseCost || "",
-        "Registration Expiry": v.registrationExpiryDate ? new Date(v.registrationExpiryDate).toLocaleDateString() : "",
+        "Registration Expiry": fmt(v.registrationExpiryDate),
+        "Notes": v.notes || "",
       }));
 
-      const contractsData = (contracts || []).map(c => ({
-        "Contract Number": c.contractNumber,
-        "Client Name": c.clientName || "",
-        "Vehicle ID": c.vehicleId,
-        "Start Date": c.rentalStartDate ? new Date(c.rentalStartDate).toLocaleDateString() : "",
-        "End Date": c.rentalEndDate ? new Date(c.rentalEndDate).toLocaleDateString() : "",
-        "Rental Days": c.rentalDays,
-        "Daily Rate": c.dailyRate,
-        "Total Amount": c.totalAmount,
-        "Discount": c.discount,
-        "Final Amount": c.finalAmount,
-        "Status": c.status,
-        "Returned At": c.returnedAt ? new Date(c.returnedAt).toLocaleDateString() : "",
-        "Pickup KM": c.pickupKm || "",
-        "Return KM": c.returnKm || "",
-      }));
+      const contractsData = (contracts || []).map(c => {
+        const v = vehicleMap[c.vehicleId];
+        return {
+          "Contract Number": c.contractNumber || "",
+          "Client Name": c.clientName || "",
+          "Client Phone": c.clientPhone || "",
+          "Client Email": c.clientEmail || "",
+          "Client Nationality": c.clientNationality || "",
+          "Client License": c.clientDriverLicense || "",
+          "Client Date of Birth": fmt(c.clientDateOfBirth),
+          "Client Father's Name": c.clientFatherFullName || "",
+          "Client Mother's Name": c.clientMotherFullName || "",
+          "Client Passport": c.clientPassport || "",
+          "Client ID": c.clientId2 || "",
+          "Client Address": c.clientAddress || "",
+          "Vehicle": v ? `${v.brand} ${v.model}` : "",
+          "Plate Number": v?.plateNumber || "",
+          "Start Date": fmt(c.rentalStartDate),
+          "End Date": fmt(c.rentalEndDate),
+          "Rental Days": c.rentalDays || "",
+          "Daily Rate": c.dailyRate || "",
+          "Total Amount": c.totalAmount || "",
+          "Discount": c.discount || "",
+          "Final Amount": c.finalAmount || "",
+          "Status": c.status || "",
+          "Payment Status": c.paymentStatus || "",
+          "Pickup KM": c.pickupKm || "",
+          "Return KM": c.returnKm || "",
+          "Returned At": fmt(c.returnedAt),
+          "Notes": c.notes || "",
+        };
+      });
 
       const clientsData = (clients || []).map(c => ({
-        "Full Name": c.name,
-        "Nationality": c.nationality || "",
+        "Full Name": c.name || "",
+        "Father's Name": c.fatherName || "",
+        "Mother's Full Name": c.motherFullName || "",
         "Phone": c.phone || "",
         "Email": c.email || "",
-        "License Number": c.driverLicenseNumber || "",
-        "License Expiry": c.licenseExpiryDate ? new Date(c.licenseExpiryDate).toLocaleDateString() : "",
+        "Nationality": c.nationality || "",
+        "Date of Birth": fmt(c.dateOfBirth),
+        "Place of Birth": c.placeOfBirth || "",
+        "Driver License Number": c.driverLicenseNumber || "",
+        "License Issue Date": fmt(c.licenseIssueDate),
+        "License Expiry Date": fmt(c.licenseExpiryDate),
+        "Passport Number": c.passportNumber || "",
+        "ID Number": c.idNumber || "",
+        "Place of Registration": c.placeOfRegistration || "",
         "Address": c.address || "",
+        "Notes": c.notes || "",
       }));
 
-      const maintenanceData = (maintenanceRecords || []).map(m => ({
-        "Vehicle ID": m.vehicleId,
-        "Performed At": m.performedAt ? new Date(m.performedAt).toLocaleDateString() : "",
-        "Maintenance Type": m.maintenanceType,
-        "Description": m.description || "",
-        "Cost": m.cost || "",
-        "Mileage At Service": m.mileageAtService || "",
-        "Performed By": m.performedBy || "",
-        "Garage Location": m.garageLocation || "",
-        "Garage Entry Date": m.garageEntryDate ? new Date(m.garageEntryDate).toLocaleDateString() : "",
-        "Garage Exit Date": m.garageExitDate ? new Date(m.garageExitDate).toLocaleDateString() : "",
-      }));
+      const maintenanceData = (maintenanceRecords || []).map(m => {
+        const v = vehicleMap[m.vehicleId];
+        return {
+          "Vehicle": v ? `${v.brand} ${v.model}` : "",
+          "Plate Number": v?.plateNumber || "",
+          "Maintenance Type": m.maintenanceType || "",
+          "Description": m.description || "",
+          "Performed At": fmt(m.performedAt),
+          "Mileage At Service": m.mileageAtService || "",
+          "Cost": m.cost || "",
+          "Performed By": m.performedBy || "",
+          "Garage Location": m.garageLocation || "",
+          "Garage Entry Date": fmt(m.garageEntryDate),
+          "Garage Exit Date": fmt(m.garageExitDate),
+          "Notes": m.notes || "",
+        };
+      });
 
-      const invoicesData = (invoices || []).map(i => ({
-        "Invoice Number": i.invoiceNumber,
-        "Contract ID": i.contractId,
-        "Invoice Date": i.invoiceDate ? new Date(i.invoiceDate).toLocaleDateString() : "",
-        "Due Date": i.dueDate ? new Date(i.dueDate).toLocaleDateString() : "",
-        "Subtotal": i.subtotal,
-        "Tax Amount": i.taxAmount,
-        "Total Amount": i.totalAmount,
-        "Payment Status": i.paymentStatus,
-        "Payment Method": i.paymentMethod || "",
-        "Paid At": i.paidAt ? new Date(i.paidAt).toLocaleDateString() : "",
-      }));
+      const invoicesData = (invoices || []).map(i => {
+        const c = contractMap[i.contractId];
+        return {
+          "Invoice Number": i.invoiceNumber || "",
+          "Contract Number": c?.contractNumber || "",
+          "Client Name": c?.clientName || "",
+          "Client Phone": c?.clientPhone || "",
+          "Invoice Date": fmt(i.invoiceDate),
+          "Due Date": fmt(i.dueDate),
+          "Subtotal": i.subtotal || "",
+          "Tax Amount": i.taxAmount || "",
+          "Total Amount": i.totalAmount || "",
+          "Payment Status": i.paymentStatus || "",
+          "Payment Method": i.paymentMethod || "",
+          "Paid At": fmt(i.paidAt),
+        };
+      });
 
       const buffer = await generateExcelBuffer([
         { name: "Fleet", type: "json", data: fleetData },
