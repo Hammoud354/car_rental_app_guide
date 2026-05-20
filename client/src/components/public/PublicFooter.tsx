@@ -13,14 +13,6 @@ const COLS = [
     ],
   },
   {
-    title: "Solutions",
-    links: [
-      { label: "Fleet Management", href: "/fleet-management-software" },
-      { label: "Car Rental Software", href: "/car-rental-software" },
-      { label: "Booking System", href: "/vehicle-booking-system" },
-    ],
-  },
-  {
     title: "Industries",
     links: [
       { label: "Small Business", href: "/industries/small-business" },

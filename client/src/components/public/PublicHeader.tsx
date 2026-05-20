@@ -1,40 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Menu, X, LogIn, ArrowRight } from "lucide-react";
-
-const SOLUTIONS = [
-  { label: "Fleet Management Software", href: "/fleet-management-software" },
-  { label: "Car Rental Software", href: "/car-rental-software" },
-  { label: "Vehicle Booking System", href: "/vehicle-booking-system" },
-  { label: "Small Business Solution", href: "/industries/small-business" },
-  { label: "Enterprise Solution", href: "/industries/enterprise" },
-];
+import { Menu, X, LogIn, ArrowRight } from "lucide-react";
 
 export default function PublicHeader() {
   const [location] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
-  const solutionsRef = useRef<HTMLDivElement>(null);
   const isHome = location === "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (solutionsRef.current && !solutionsRef.current.contains(e.target as Node)) {
-        setSolutionsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   const navLink = "px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/70 rounded-lg transition-colors";
@@ -56,31 +36,6 @@ export default function PublicHeader() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-0.5">
           <a href={isHome ? "#features" : "/#features"} className={navLink}>Features</a>
-
-          <div ref={solutionsRef} className="relative">
-            <button
-              onClick={() => setSolutionsOpen(!solutionsOpen)}
-              className={`${navLink} flex items-center gap-1`}
-            >
-              Solutions
-              <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${solutionsOpen ? "rotate-180" : ""}`} />
-            </button>
-            {solutionsOpen && (
-              <div className="absolute top-full left-0 mt-1.5 w-64 bg-white rounded-xl border border-gray-100 shadow-xl shadow-gray-200/40 py-2 z-50">
-                {SOLUTIONS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setSolutionsOpen(false)}
-                    className="block px-4 py-2.5 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50/50 transition-colors"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
           <a href={isHome ? "#pricing" : "/#pricing"} className={navLink}>Pricing</a>
           <Link href="/demo" className={navLink}>Demo</Link>
           <Link href="/blog" className={navLink}>Blog</Link>
@@ -120,19 +75,6 @@ export default function PublicHeader() {
           >
             Features
           </a>
-          <div className="px-4 pt-2 pb-1">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Solutions</p>
-            {SOLUTIONS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-                className="block py-2 pl-2 text-sm text-gray-600 hover:text-blue-600 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
           <a
             href={isHome ? "#pricing" : "/#pricing"}
             onClick={() => setMenuOpen(false)}
