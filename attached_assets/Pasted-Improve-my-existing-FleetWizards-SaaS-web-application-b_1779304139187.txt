@@ -1,0 +1,113 @@
+Improve my existing FleetWizards SaaS web application by implementing a proper SEO-friendly structure and clean SaaS navigation.
+
+IMPORTANT GOALS:
+1. Keep the UI clean and professional (SaaS standard).
+2. Do NOT overload the header with too many links.
+3. Add SEO landing pages with proper routing.
+4. Ensure all pages are internally linked and crawlable by Google.
+5. Optimize structure for a car rental SaaS / fleet management platform.
+
+---
+
+NAVIGATION REQUIREMENTS:
+
+HEADER (main navigation only):
+- Features
+- Solutions (dropdown)
+- Pricing
+- Demo
+- Blog
+- Login
+
+Inside "Solutions" dropdown:
+- Fleet Management Software
+- Car Rental Software
+- Vehicle Booking System
+- Small Business Solution
+- Enterprise Solution
+
+Do NOT add locations or blog articles in header.
+
+---
+
+FOOTER (SEO hub section):
+Create structured footer columns:
+
+1. Product:
+- Features
+- Pricing
+- Demo
+
+2. Solutions:
+- Fleet Management Software
+- Car Rental Software
+- Booking System
+
+3. Industries:
+- Small Business
+- Enterprise
+- Airport Rentals
+
+4. Locations (SEO pages):
+- Lebanon
+- UAE
+- Saudi Arabia
+- Global
+
+5. Resources:
+- Blog
+- Guides
+
+---
+
+PAGES TO CREATE (SEO LANDING PAGES):
+
+Create proper routes/pages for:
+
+- /car-rental-software
+- /fleet-management-software
+- /vehicle-booking-system
+- /industries/small-business
+- /industries/enterprise
+- /features/booking-system
+- /features/fleet-tracking
+- /locations/lebanon
+- /locations/uae
+- /locations/saudi-arabia
+- /blog (already exists or create if missing)
+
+Each page must include:
+- Unique SEO title tag
+- Meta description
+- One H1 heading only
+- Clear CTA button (Request Demo or Start Trial)
+- Internal links to related pages
+
+---
+
+SEO REQUIREMENTS:
+- Clean URLs (no query strings)
+- Proper semantic HTML structure
+- Mobile responsive layout
+- Fast loading performance
+- Internal linking between all pages
+- Add sitemap.xml if missing
+- Add robots.txt if missing
+
+---
+
+CONTENT STRATEGY:
+Each landing page should be structured like:
+1. Hero section (problem + solution)
+2. Features section
+3. Benefits section
+4. Use cases
+5. CTA section
+
+---
+
+IMPORTANT:
+This is a SaaS product (FleetWizards), not a blog site.
+Focus on conversion + SEO balance.
+
+Do not clutter UI. Keep design modern, minimal, and professional.

@@ -1,14 +1,14 @@
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { AnimatedLogo } from "@/components/AnimatedLogo";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import PublicHeader from "@/components/public/PublicHeader";
+import PublicFooter from "@/components/public/PublicFooter";
 import { useTranslation } from "react-i18next";
 import { 
   ArrowRight, MessageCircle, Globe, ChevronRight,
   LogIn, UserPlus, CheckCircle2, Star, BarChart3, FileText, 
   Users, DollarSign, Wrench, Car, Clock, TrendingUp,
-  Activity, Phone, Mail, Menu, X
+  Activity, Phone, Mail
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useRef, useState } from "react";
@@ -165,14 +165,6 @@ export default function Home() {
   const { t } = useTranslation();
   const { user, loading, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
-  const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMenuOpen(false);
-  };
-
   const isSuperAdmin = user?.role === "super_admin";
 
   const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery(undefined, {
@@ -195,12 +187,6 @@ export default function Home() {
     // No redirect for users without a subscription — let them see the landing page
   }, [isAuthenticated, loading, isSuperAdmin, currentPlan, planLoading, setLocation]);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   const handleContactUs = () => {
     const message = encodeURIComponent(
       "Hello! I'm interested in learning more about FleetWizards.\n\n" +
@@ -222,84 +208,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white overflow-hidden">
-      {/* Navigation */}
-      <nav
-        style={{ animation: "slideDown 0.5s ease-out both" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled || menuOpen
-            ? "bg-white/95 backdrop-blur-xl shadow-sm border-b border-gray-100" 
-            : "bg-transparent"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center justify-between">
-          {/* Logo */}
-          <button onClick={() => scrollTo("home")} className="flex-shrink-0">
-            <AnimatedLogo size="md" showSubtext />
-          </button>
-
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-1">
-            {[
-              { labelKey: "landing.nav.home", id: "home" },
-              { labelKey: "landing.nav.aboutUs", id: "about" },
-              { labelKey: "landing.nav.features", id: "features" },
-              { labelKey: "landing.nav.contact", id: "contact" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100/70 rounded-lg transition-colors"
-              >
-                {t(item.labelKey)}
-              </button>
-            ))}
-          </div>
-
-          {/* Right: language selector + auth buttons + hamburger */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageSelector compact />
-            <Link href="/signin">
-              <Button size="sm" className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium text-sm shadow-md shadow-emerald-700/20 px-5">
-                <LogIn className="h-4 w-4 sm:mr-1.5" />
-                <span className="hidden sm:inline">{t("auth.signIn")}</span>
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20 font-medium px-5 text-sm">
-                <span>{t("auth.signUp")}</span>
-                <ArrowRight className="h-3.5 w-3.5 ml-1.5" />
-              </Button>
-            </Link>
-            {/* Hamburger — mobile only */}
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-            >
-              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile dropdown menu */}
-        {menuOpen && (
-          <div className="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1">
-            {[
-              { labelKey: "landing.nav.home", id: "home" },
-              { labelKey: "landing.nav.aboutUs", id: "about" },
-              { labelKey: "landing.nav.features", id: "features" },
-              { labelKey: "landing.nav.contact", id: "contact" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                {t(item.labelKey)}
-              </button>
-            ))}
-          </div>
-        )}
-      </nav>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section id="home" className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
@@ -593,7 +502,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="py-20 lg:py-28 bg-gray-50/50">
+      <section id="pricing" className="py-20 lg:py-28 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <AnimatedSection className="text-center max-w-2xl mx-auto mb-16">
             <p className="text-sm font-semibold text-blue-600 tracking-wide uppercase mb-3">{t("landing.pricing.badge")}</p>
@@ -750,22 +659,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-100 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <AnimatedLogo size="sm" />
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <button onClick={handleContactUs} className="hover:text-gray-600 transition-colors cursor-pointer">{t("landing.footer.contact")}</button>
-              <Link href="/signin"><span className="hover:text-gray-600 transition-colors cursor-pointer">{t("auth.signIn")}</span></Link>
-              <Link href="/signup"><span className="hover:text-gray-600 transition-colors cursor-pointer">{t("auth.signUp")}</span></Link>
-            </div>
-            <p className="text-xs text-gray-400">
-              &copy; {new Date().getFullYear()} FleetWizards. {t("landing.footer.rights")}
-            </p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }

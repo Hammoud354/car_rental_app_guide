@@ -48,8 +48,17 @@ const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AdminPaymentRequests = lazy(() => import("./pages/AdminPaymentRequests"));
 const SubscriptionPlans = lazy(() => import("./pages/SubscriptionPlans"));
 const ContractManagement = lazy(() => import("./pages/ContractManagement"));
+const SeoLandingPage = lazy(() => import("./pages/seo/SeoLandingPage"));
+const Blog = lazy(() => import("./pages/Blog"));
 
-const PUBLIC_ROUTES = ["/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans"];
+const PUBLIC_ROUTES = [
+  "/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans",
+  "/car-rental-software", "/fleet-management-software", "/vehicle-booking-system",
+  "/industries/small-business", "/industries/enterprise",
+  "/features/booking-system", "/features/fleet-tracking",
+  "/locations/lebanon", "/locations/uae", "/locations/saudi-arabia",
+  "/blog",
+];
 
 function PageLoader() {
   return (
@@ -119,6 +128,17 @@ function AppContent() {
           <Route path="/forgot-password" component={ForgotPassword} />
           <Route path="/reset-password" component={ResetPassword} />
           <Route path="/subscription-plans" component={SubscriptionPlans} />
+          <Route path="/car-rental-software"><SeoLandingPage pageId="car-rental-software" /></Route>
+          <Route path="/fleet-management-software"><SeoLandingPage pageId="fleet-management-software" /></Route>
+          <Route path="/vehicle-booking-system"><SeoLandingPage pageId="vehicle-booking-system" /></Route>
+          <Route path="/industries/small-business"><SeoLandingPage pageId="small-business" /></Route>
+          <Route path="/industries/enterprise"><SeoLandingPage pageId="enterprise" /></Route>
+          <Route path="/features/booking-system"><SeoLandingPage pageId="booking-system" /></Route>
+          <Route path="/features/fleet-tracking"><SeoLandingPage pageId="fleet-tracking" /></Route>
+          <Route path="/locations/lebanon"><SeoLandingPage pageId="lebanon" /></Route>
+          <Route path="/locations/uae"><SeoLandingPage pageId="uae" /></Route>
+          <Route path="/locations/saudi-arabia"><SeoLandingPage pageId="saudi-arabia" /></Route>
+          <Route path="/blog" component={Blog} />
         </Switch>
       </Suspense>
     );

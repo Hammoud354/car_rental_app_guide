@@ -6,6 +6,17 @@ Allow: /register
 Allow: /subscription-plans
 Allow: /forgot-password
 Allow: /reset-password
+Allow: /car-rental-software
+Allow: /fleet-management-software
+Allow: /vehicle-booking-system
+Allow: /industries/small-business
+Allow: /industries/enterprise
+Allow: /features/booking-system
+Allow: /features/fleet-tracking
+Allow: /locations/lebanon
+Allow: /locations/uae
+Allow: /locations/saudi-arabia
+Allow: /blog
 
 Disallow: /dashboard
 Disallow: /fleet
