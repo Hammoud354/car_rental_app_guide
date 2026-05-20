@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -106,6 +106,7 @@ const HARDCODED_PLANS = [
 ];
 
 export default function SubscriptionPlans() {
+  useEffect(() => { document.title = "Pricing & Plans — FleetWizards | Car Rental Software"; }, []);
   const [, setLocation] = useLocation();
   const [selectedPlan, setSelectedPlan] = useState<typeof HARDCODED_PLANS[0] | null>(null);
   const [step, setStep] = useState<"method" | "payment">("method");

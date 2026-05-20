@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Link } from "wouter";
 import { countries, getCountryData, COUNTRY_PHONE_DATA } from "@shared/countries";
 
 export default function SignUp() {
+  useEffect(() => { document.title = "Sign Up — FleetWizards | Start Your Free Trial"; }, []);
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({
     username: "",

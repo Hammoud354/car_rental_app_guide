@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 
 export default function SignIn() {
+  useEffect(() => { document.title = "Sign In — FleetWizards | Car Rental Management"; }, []);
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({

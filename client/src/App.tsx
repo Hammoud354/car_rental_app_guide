@@ -5,7 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { useAuth } from "./_core/hooks/useAuth";
 import { trpc } from "./lib/trpc";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { useRealtimeSync } from "./hooks/useRealtimeSync";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
@@ -59,6 +59,17 @@ function PageLoader() {
   );
 }
 
+// Injects noindex for authenticated pages as a belt-and-suspenders alongside the server X-Robots-Tag header
+function NoIndexMeta() {
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="robots"]');
+    const prev = meta?.getAttribute("content") ?? "index, follow";
+    meta?.setAttribute("content", "noindex, nofollow");
+    return () => { meta?.setAttribute("content", prev); };
+  }, []);
+  return null;
+}
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { loading, isAuthenticated, user } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/signin" });
 
@@ -87,7 +98,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Redirect to="/subscription-plans" />;
   }
 
-  return <>{children}</>;
+  return <><NoIndexMeta />{children}</>;
 }
 
 function AppContent() {
