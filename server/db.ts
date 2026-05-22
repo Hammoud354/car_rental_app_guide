@@ -144,7 +144,7 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
         return sum + cost;
       }, 0);
       
-      // Check if vehicle has any active contracts
+      // Check if vehicle has any active or overdue contracts (overdue = car still out, just past due date)
       const activeContracts = await db.select()
         .from(rentalContracts)
         .where(
@@ -154,8 +154,7 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
               eq(rentalContracts.status, 'active'),
               eq(rentalContracts.status, 'overdue')
             ),
-            lte(rentalContracts.rentalStartDate, now),
-            gte(rentalContracts.rentalEndDate, now)
+            lte(rentalContracts.rentalStartDate, now)
           )
         );
       
@@ -755,7 +754,7 @@ export async function deleteRentalContract(contractId: number) {
     const currentStatus = vehicleRecord[0]?.status;
 
     if (currentStatus === 'Rented') {
-      // Check if the vehicle has any other currently-running active contracts
+      // Check if the vehicle has any other active or overdue contracts (overdue cars are still out)
       const now = new Date();
       const activeContracts = await db.select()
         .from(rentalContracts)
@@ -766,12 +765,11 @@ export async function deleteRentalContract(contractId: number) {
               eq(rentalContracts.status, 'active'),
               eq(rentalContracts.status, 'overdue')
             ),
-            lte(rentalContracts.rentalStartDate, now),
-            gte(rentalContracts.rentalEndDate, now)
+            lte(rentalContracts.rentalStartDate, now)
           )
         );
 
-      // If no other active contracts remain, free the vehicle back to Available
+      // If no other active/overdue contracts remain, free the vehicle back to Available
       if (activeContracts.length === 0) {
         await db.update(vehicles)
           .set({ status: 'Available' })
