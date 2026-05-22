@@ -931,6 +931,8 @@ export const appRouter = router({
         // Deposit fields
         depositAmount: z.string().default("0.00"),
         depositStatus: z.enum(["None", "Held", "Refunded", "Forfeited"]).default("None"),
+        // Late fee (optional — server defaults to 150 if omitted)
+        lateFeePercentage: z.string().optional(),
         // Fuel policy
         fuelPolicy: z.enum(["Full-to-Full", "Same-to-Same", "Pre-purchase"]).default("Full-to-Full"),
         // Second driver (optional)
@@ -1055,6 +1057,8 @@ export const appRouter = router({
           // Deposit fields
           depositAmount: input.depositAmount,
           depositStatus: input.depositStatus,
+          // Late fee percentage (optional — falls back to schema default of 150)
+          ...(input.lateFeePercentage !== undefined && { lateFeePercentage: input.lateFeePercentage }),
           // Fuel policy
           fuelPolicy: input.fuelPolicy,
           // Second driver

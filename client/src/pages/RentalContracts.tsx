@@ -70,6 +70,7 @@ export default function RentalContracts() {
   const [insuranceDailyRate, setInsuranceDailyRate] = useState<number>(0);
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const [depositStatus, setDepositStatus] = useState<"None" | "Held" | "Refunded" | "Forfeited">("None");
+  const [lateFeePercentage, setLateFeePercentage] = useState<string>("");
   const [fuelPolicy, setFuelPolicy] = useState<"Full-to-Full" | "Same-to-Same" | "Pre-purchase">("Full-to-Full");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
@@ -432,6 +433,8 @@ export default function RentalContracts() {
       // Deposit fields
       depositAmount: depositAmount.toFixed(2),
       depositStatus,
+      // Late fee
+      ...(lateFeePercentage !== "" && { lateFeePercentage: lateFeePercentage }),
       // Fuel policy
       fuelPolicy,
       // Second driver
@@ -1312,6 +1315,34 @@ export default function RentalContracts() {
                         setFuelPolicy(policy);
                       }}
                     />
+                  </div>
+
+                  {/* Late Fee Percentage */}
+                  <div className="rounded-xl border border-gray-200 p-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Late Return Fee</h3>
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1">
+                        <label className="text-xs text-gray-500 mb-1 block">Late Fee % per day <span className="text-gray-400">(optional — defaults to 150%)</span></label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="0"
+                            max="1000"
+                            step="0.5"
+                            placeholder="150"
+                            value={lateFeePercentage}
+                            onChange={(e) => setLateFeePercentage(e.target.value)}
+                            className="w-full h-9 rounded-md border border-[#1e3a8a] border-opacity-60 px-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                        </div>
+                      </div>
+                      {lateFeePercentage !== "" && (
+                        <div className="text-xs text-gray-500 mt-5">
+                          = {((parseFloat(lateFeePercentage) || 0) / 100).toFixed(2)}× daily rate per overdue day
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <DialogFooter>
