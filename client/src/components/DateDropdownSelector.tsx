@@ -112,7 +112,7 @@ export function DateDropdownSelector({
         </Select>
       ) : (
         /* Single-row layout: Day | Month | Year */
-        <div className="grid grid-cols-[1fr_2fr_2fr] gap-1 mt-1.5">
+        <div className="grid gap-1 mt-1.5" style={{ gridTemplateColumns: '0.1fr 0.2fr 0.2fr' }}>
           <Select value={selectedDay?.toString()} onValueChange={handleDayChange} required={required}>
             <SelectTrigger>
               <SelectValue placeholder="Day" />
