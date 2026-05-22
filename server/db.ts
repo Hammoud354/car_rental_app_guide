@@ -606,6 +606,21 @@ export async function getActiveContractsByVehicleId(vehicleId: number, userId: n
   return await db.select().from(rentalContracts).where(and(...conditions));
 }
 
+export async function checkContractConflict(vehicleId: number, userId: number, startDate: Date, endDate: Date) {
+  const db = await getDb();
+  if (!db) return { hasConflict: false, conflictingContract: null };
+  const admin = await isSuperAdmin(userId);
+  const conditions: any[] = [
+    eq(rentalContracts.vehicleId, vehicleId),
+    inArray(rentalContracts.status, ["active", "overdue"]),
+    lte(rentalContracts.rentalStartDate, endDate),
+    gte(rentalContracts.rentalEndDate, startDate),
+  ];
+  if (!admin) conditions.push(eq(rentalContracts.userId, userId));
+  const conflicts = await db.select().from(rentalContracts).where(and(...conditions)).limit(1);
+  return { hasConflict: conflicts.length > 0, conflictingContract: conflicts[0] || null };
+}
+
 export async function getRentalContractsByClientId(clientId: number, userId: number) {
   const db = await getDb();
   if (!db) {

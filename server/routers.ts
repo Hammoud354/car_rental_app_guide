@@ -887,6 +887,21 @@ export const appRouter = router({
       .query(async ({ ctx, input }) => {
         return await db.getRentalContractsByStatus(ctx.user.id, input.status, input.filterUserId);
       }),
+
+    checkConflict: protectedProcedure
+      .input(z.object({
+        vehicleId: z.number(),
+        rentalStartDate: z.date(),
+        rentalEndDate: z.date(),
+      }))
+      .query(async ({ ctx, input }) => {
+        return await db.checkContractConflict(
+          input.vehicleId,
+          ctx.user.id,
+          input.rentalStartDate,
+          input.rentalEndDate
+        );
+      }),
     
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))

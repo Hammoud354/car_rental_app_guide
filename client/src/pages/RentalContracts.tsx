@@ -384,7 +384,7 @@ export default function RentalContracts() {
     { enabled: isDetailsDialogOpen && !!selectedContract }
   );
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
@@ -450,6 +450,24 @@ export default function RentalContracts() {
       targetUserId: selectedTargetUserId || undefined,
     };
     
+    // Check for scheduling conflict BEFORE opening the inspection form
+    try {
+      const conflict = await utils.contracts.checkConflict.fetch({
+        vehicleId: data.vehicleId,
+        rentalStartDate: data.rentalStartDate,
+        rentalEndDate: data.rentalEndDate,
+      });
+      if (conflict.hasConflict && conflict.conflictingContract) {
+        const c = conflict.conflictingContract as any;
+        toast.error(
+          `This vehicle already has a contract (${c.contractNumber}) from ${new Date(c.rentalStartDate).toLocaleDateString()} to ${new Date(c.rentalEndDate).toLocaleDateString()}. Please choose different dates or a different vehicle.`
+        );
+        return;
+      }
+    } catch {
+      // If the pre-check fails for any reason, the server will catch it at create time
+    }
+
     setContractData(data);
     setIsCreateDialogOpen(false);
     setShowInspection(true);
