@@ -43,10 +43,20 @@ export default function Invoices() {
     const invoiceId = urlParams.get('invoice');
     if (invoiceId) {
       setSelectedInvoice(parseInt(invoiceId));
-      // Clear the URL parameter after opening
+      setAutoPrintInvoice(true);
       window.history.replaceState({}, '', '/invoices');
     }
   }, []);
+
+  // Auto-print invoice when opened from contract creation flow
+  useEffect(() => {
+    if (!autoPrintInvoice || !invoiceDetails || isLoadingDetails) return;
+    setAutoPrintInvoice(false);
+    setTimeout(() => {
+      toast.info("Opening print dialog for invoice…");
+      printElement("invoice-content", `Invoice ${invoiceDetails.invoiceNumber || ""}`);
+    }, 700);
+  }, [autoPrintInvoice, invoiceDetails, isLoadingDetails]);
 
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
 

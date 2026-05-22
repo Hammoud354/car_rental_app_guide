@@ -483,65 +483,15 @@ export default function RentalContracts() {
       await new Promise(r => setTimeout(r, 800));
 
       try {
-        if (companyProfile?.contractTemplateUrl && companyProfile?.contractTemplateFieldMap) {
-          // Template overlay print
-          const fmtDate = (d: any) => d ? new Date(d).toLocaleDateString("en-GB") : "";
-          const data: Record<string, string> = {
-            clientName: c.clientName || "",
-            clientMotherFullName: c.clientMotherFullName || "",
-            clientFatherFullName: c.clientFatherFullName || "",
-            clientNationality: c.clientNationality || "",
-            clientPhone: c.clientPhone || "",
-            clientAddress: c.clientAddress || "",
-            clientEmail: c.clientEmail || "",
-            clientDateOfBirth: fmtDate(c.clientDateOfBirth),
-            clientPlaceOfBirth: c.clientPlaceOfBirth || "",
-            clientPassportNumber: c.clientPassport || "",
-            clientRegistrationNumber: c.clientRegistrationNumber || "",
-            clientPlaceOfRegistration: c.clientPlaceOfRegistration || "",
-            clientLicenseNumber: c.clientDriverLicense || "",
-            clientLicenseIssueDate: fmtDate(c.licenseIssueDate),
-            clientLicenseExpiryDate: fmtDate(c.licenseExpiryDate),
-            vehiclePlate: v?.plateNumber || "",
-            vehicleMake: v?.brand || "",
-            vehicleModel: v?.model || "",
-            vehicleYear: v?.year?.toString() || "",
-            vehicleColor: c.vehicleColor || v?.color || "",
-            vehicleFuelType: c.vehicleFuelType || v?.fuelType || "",
-            vehicleVIN: c.vehicleVIN || v?.vin || "",
-            contractNumber: c.contractNumber || c.id?.toString() || "",
-            startDate: fmtDate(c.rentalStartDate),
-            endDate: fmtDate(c.rentalEndDate),
-            pickupTime: c.pickupTime || "",
-            returnTime: c.returnTime || "",
-            rentalDays: c.rentalDays?.toString() || "",
-            dailyRate: c.dailyRate?.toString() || "",
-            totalAmount: c.totalAmount?.toString() || "",
-            deposit: c.depositAmount?.toString() || "",
-            companyName: companyProfile.companyName || "",
-            companyPhone: companyProfile.phone || "",
-            companyAddress: companyProfile.address || "",
-          };
-          toast.info("Generating contract PDF from template…");
-          await exportTemplateOverlayToPDF(
-            companyProfile.contractTemplateUrl!,
-            companyProfile.contractTemplateFieldMap as Record<string, any>,
-            data,
-            `Contract_${c.contractNumber || c.id}.pdf`
-          );
-        } else {
-          // Standard A4 contract print
-          toast.info("Printing contract…");
-          await exportContractTemplateToPDF(`Contract_${c.contractNumber || c.id}.pdf`);
-        }
+        toast.info("Opening print dialog for contract…");
+        printElement("contract-pdf-template", `Contract ${c.contractNumber || c.id}`);
       } catch (err) {
         console.error("Auto-print failed:", err);
       }
 
-      // After print done, navigate to invoice
+      // Navigate to invoice after print dialog opens
       setAutoPrintData(null);
-      toast.success("Contract printed! Opening invoice…");
-      setTimeout(() => setLocation(invoiceDestination), 700);
+      setTimeout(() => setLocation(invoiceDestination), 1200);
     };
 
     triggerAutoPrint();
