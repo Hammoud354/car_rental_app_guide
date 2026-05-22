@@ -1,4 +1,4 @@
-import { eq, and, or, lte, gte, lt, ne, sql, desc, asc } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, ne, sql, desc, asc, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod } from "../drizzle/schema";
@@ -580,14 +580,19 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
   
+  // "active" tab shows both active and overdue contracts (overdue are still ongoing rentals)
+  const statusCondition = status === "active"
+    ? inArray(rentalContracts.status, ["active", "overdue"])
+    : eq(rentalContracts.status, status as string);
+
   if (!status) {
     return effectiveFilter != null
       ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, effectiveFilter)).orderBy(desc(rentalContracts.id))
       : await db.select().from(rentalContracts).orderBy(desc(rentalContracts.id));
   }
   return effectiveFilter != null
-    ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, effectiveFilter), eq(rentalContracts.status, status))).orderBy(desc(rentalContracts.id))
-    : await db.select().from(rentalContracts).where(eq(rentalContracts.status, status)).orderBy(desc(rentalContracts.id));
+    ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, effectiveFilter), statusCondition)).orderBy(desc(rentalContracts.id))
+    : await db.select().from(rentalContracts).where(statusCondition).orderBy(desc(rentalContracts.id));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
