@@ -365,10 +365,10 @@ export default function Clients() {
 
                   {/* Body + Footer */}
                   <form onSubmit={handleCreateSubmit} className="flex flex-col flex-1 min-h-0">
-                    <div className="flex flex-1 min-h-0">
+                    <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-y-auto sm:overflow-hidden">
 
                       {/* Left column — Personal Information */}
-                      <div className="w-[55%] border-r border-gray-100 overflow-y-auto p-6">
+                      <div className="w-full sm:w-[55%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto p-6">
                         <div className="flex items-center gap-2 mb-5">
                           <User className="w-4 h-4 text-blue-700" />
                           <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Personal Information</h3>
@@ -455,7 +455,7 @@ export default function Clients() {
                       </div>
 
                       {/* Right column — Driving License + Notes */}
-                      <div className="flex-1 overflow-y-auto p-6 bg-gray-50/40 space-y-5">
+                      <div className="flex-1 sm:overflow-y-auto p-6 bg-gray-50/40 space-y-5">
 
                         {/* Driving License card */}
                         <div className="bg-white rounded-xl border border-gray-200 p-5">

@@ -860,10 +860,10 @@ export default function FleetManagement() {
 
                   {/* Body + Footer */}
                   <form onSubmit={handleAddVehicle} className="flex flex-col flex-1 min-h-0">
-                    <div className="flex flex-1 min-h-0">
+                    <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-y-auto sm:overflow-hidden">
 
                       {/* Left column — Basic Info + Pricing */}
-                      <div className="w-[52%] border-r border-gray-100 overflow-y-auto p-6 space-y-5">
+                      <div className="w-full sm:w-[52%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto p-6 space-y-5">
 
                         {/* Basic Info */}
                         <div>
@@ -1020,7 +1020,7 @@ export default function FleetManagement() {
                       </div>
 
                       {/* Right column — Insurance / Registration / Maintenance / Purchase / AI */}
-                      <div className="flex-1 overflow-y-auto p-6 bg-gray-50/40 space-y-4">
+                      <div className="flex-1 sm:overflow-y-auto p-6 bg-gray-50/40 space-y-4">
 
                         {/* Insurance */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
