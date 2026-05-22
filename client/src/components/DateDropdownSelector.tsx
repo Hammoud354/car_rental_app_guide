@@ -30,7 +30,7 @@ export function DateDropdownSelector({
 }: DateDropdownSelectorProps) {
   const currentYear = new Date().getFullYear();
   const selectedYearValue = value?.getFullYear();
-  const minYear = minDate ? minDate.getFullYear() : (yearOnly ? 1950 : 1990);
+  const minYear = minDate ? minDate.getFullYear() : 1950;
   const maxYear = maxDate ? maxDate.getFullYear() : (yearOnly ? 2050 : currentYear + 50);
   const actualMinYear = selectedYearValue !== undefined ? Math.min(selectedYearValue, minYear) : minYear;
   const actualMaxYear = selectedYearValue !== undefined ? Math.max(selectedYearValue, maxYear) : maxYear;
