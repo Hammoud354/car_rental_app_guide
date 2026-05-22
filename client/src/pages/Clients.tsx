@@ -459,11 +459,11 @@ export default function Clients() {
 
                         {/* Driving License card */}
                         <div className="bg-white rounded-xl border border-gray-200 p-5">
-                          <div className="flex items-center gap-2 mb-4">
+                          <div className="flex items-center gap-2 mb-3">
                             <FileText className="w-4 h-4 text-blue-700" />
                             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("clients.drivingLicense")}</h3>
                           </div>
-                          <div className="space-y-5">
+                          <div className="space-y-3">
                             <div>
                               <Label htmlFor="drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
                               <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client mt-1" />
