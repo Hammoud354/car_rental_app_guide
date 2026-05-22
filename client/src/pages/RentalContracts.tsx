@@ -45,7 +45,7 @@ export default function RentalContracts() {
   // Date states
   const [licenseIssueDate, setLicenseIssueDate] = useState<Date>();
   const [licenseExpiryDate, setLicenseExpiryDate] = useState<Date>();
-  const [rentalStartDate, setRentalStartDate] = useState<Date>();
+  const [rentalStartDate, setRentalStartDate] = useState<Date>(new Date());
   const [rentalEndDate, setRentalEndDate] = useState<Date>();
   const [pickupTime, setPickupTime] = useState<string>("");
 
