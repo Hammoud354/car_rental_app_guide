@@ -17,7 +17,7 @@ import { trpc } from "@/lib/trpc";
 import { printElement, exportElementToPDF, exportContractTemplateToPDF, exportTemplateOverlayToPDF } from "@/lib/printUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download, Car, User, Calendar, DollarSign, Shield, Gauge, Clock, X, ChevronRight, AlertCircle } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
@@ -674,706 +674,686 @@ export default function RentalContracts() {
                 Export CSV
               </Button>
               
-              <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto" size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Contract
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
-                <DialogHeader>
-                  <DialogTitle>Create Rental Contract</DialogTitle>
-                  <DialogDescription>Fill in the contract details to create a new rental agreement.</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  {/* Vehicle Selection */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <Label htmlFor="vehiclePlateNumber">Plate Number *</Label>
-                      <input type="hidden" name="vehicleId" value={selectedVehicleId} required />
-                      <Popover open={vehicleComboboxOpen} onOpenChange={setVehicleComboboxOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={vehicleComboboxOpen}
-                            className="w-full justify-between font-normal"
-                          >
+              {/* ── Trigger Button ─────────────────────────────────────────── */}
+              <Button
+                className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+                size="sm"
+                onClick={() => setIsCreateDialogOpen(true)}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                New Contract
+              </Button>
+
+              {/* ── Full-Width Workspace Portal ───────────────────────────── */}
+              {isCreateDialogOpen && createPortal(
+                <div
+                  className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
+                  onClick={(e) => { if (e.target === e.currentTarget) setIsCreateDialogOpen(false); }}
+                >
+                  <div
+                    className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden w-[90vw] max-w-[1400px]"
+                    style={{ height: "min(90vh, 940px)" }}
+                  >
+
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b shrink-0 bg-gradient-to-r from-blue-900 to-blue-800">
+                      <div className="flex items-center gap-3">
+                        <div className="bg-white/15 rounded-xl p-2">
+                          <FileText className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-white font-bold text-base leading-tight">New Rental Contract</h2>
+                          <p className="text-blue-200 text-xs">Fill in all required fields to continue to the vehicle inspection</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="text-white/60 hover:text-white transition-colors rounded-lg p-1.5 hover:bg-white/10"
+                        onClick={() => setIsCreateDialogOpen(false)}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Progress Stepper */}
+                    <div className="flex items-center gap-0 px-6 py-2.5 bg-blue-50/70 border-b border-blue-100/60 shrink-0">
+                      {[
+                        { n: 1, label: "Vehicle" },
+                        { n: 2, label: "Client Details" },
+                        { n: 3, label: "Dates & Pricing" },
+                        { n: 4, label: "Car Inspection" },
+                      ].map((step, i, arr) => (
+                        <div key={step.n} className="flex items-center">
+                          <div className="flex items-center gap-1.5">
+                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                              step.n < 4 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
+                            }`}>
+                              {step.n < 4 ? <Check className="w-3 h-3" /> : step.n}
+                            </div>
+                            <span className={`text-xs font-medium ${step.n < 4 ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
+                          </div>
+                          {i < arr.length - 1 && (
+                            <div className={`mx-3 h-px w-10 ${step.n < 4 ? "bg-blue-300" : "bg-gray-200"}`} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
+                      {/* ── Two-Column Body ─────────────────────────────────── */}
+                      <div className="flex flex-1 overflow-hidden min-h-0">
+
+                        {/* ═══ LEFT COLUMN ════════════════════════════════════ */}
+                        <div className="flex flex-col w-[52%] border-r border-gray-100 overflow-y-auto bg-white">
+                          <div className="p-5 space-y-5">
+
+                            {/* Vehicle Selection */}
+                            <div className="rounded-xl border border-gray-200 p-4 bg-gradient-to-br from-slate-50 to-white">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 text-slate-600">
+                                  <Car className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Vehicle Selection</h3>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="vehiclePlateNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">Plate Number *</Label>
+                                  <input type="hidden" name="vehicleId" value={selectedVehicleId} required />
+                                  <Popover open={vehicleComboboxOpen} onOpenChange={setVehicleComboboxOpen}>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={vehicleComboboxOpen}
+                                        className="w-full justify-between font-normal h-9 text-sm border-[#1e3a8a]/30"
+                                      >
                             {selectedVehicleId
                               ? (() => {
                                   const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
-                                  if (!vehicle) return "Select plate number...";
-                                  const statusEmoji = {
-                                    Available: "🟢",
-                                    Rented: "🔴",
-                                    Maintenance: "🟡",
-                                    "Out of Service": "⚫"
-                                  };
+                                  if (!vehicle) return "Select plate...";
                                   return (
-                                    <span className="flex items-center gap-2">
-                                      <span>{statusEmoji[vehicle.status]}</span>
-                                      <span className="font-semibold">{vehicle.plateNumber}</span>
-                                      <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
+                                    <span className="flex items-center gap-1.5 truncate">
+                                      <span className="text-xs">🟢</span>
+                                      <span className="font-semibold text-xs">{vehicle.plateNumber}</span>
                                     </span>
                                   );
                                 })()
-                              : "Select plate number..."}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[calc(100vw-2rem)] sm:w-[400px] p-0">
-                          <Command>
-                            <CommandInput placeholder="Search by plate number..." />
-                            <CommandList>
-                              <CommandEmpty>No vehicle found.</CommandEmpty>
-                              <CommandGroup>
-                                {vehicles.filter(v => v.status === "Available").map((vehicle) => {
-                                  return (
-                                    <CommandItem
-                                      key={vehicle.id}
-                                      value={`${vehicle.plateNumber} ${vehicle.brand} ${vehicle.model}`}
-                                      onSelect={() => {
-                                        setSelectedVehicleId(vehicle.id.toString());
-                                        (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
-                                        setVehicleComboboxOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={`mr-2 h-4 w-4 ${
-                                          selectedVehicleId === vehicle.id.toString() ? "opacity-100" : "opacity-0"
-                                        }`}
-                                      />
-                                      <span className="flex items-center gap-2 flex-1">
-                                        <span>🟢</span>
-                                        <span className="font-semibold">{vehicle.plateNumber}</span>
-                                        <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
-                                        <span className="text-xs font-semibold text-green-600">[Available]</span>
-                                      </span>
-                                    </CommandItem>
-                                  );
-                                })}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                      {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
-                        <p className="text-sm text-amber-600 mt-2 flex items-center gap-1">
-                          <span>⚠️</span>
-                          <span>Vehicle not available</span>
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <Label htmlFor="vehicleModel">Car Model *</Label>
-                      <Input 
-                        id="vehicleModel" 
-                        name="vehicleModel" 
-                        placeholder="Select plate number first"
-                        readOnly
-                        className="bg-muted cursor-not-allowed input-client"
-                      />
-                    </div>
-                  </div>
+                              : <span className="text-gray-400 text-xs">Select plate...</span>}
+                                        <ChevronsUpDown className="ml-1 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[340px] p-0" align="start">
+                                      <Command>
+                                        <CommandInput placeholder="Search by plate number..." />
+                                        <CommandList>
+                                          <CommandEmpty>No vehicle found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {vehicles.filter(v => v.status === "Available").map((vehicle) => (
+                                              <CommandItem
+                                                key={vehicle.id}
+                                                value={`${vehicle.plateNumber} ${vehicle.brand} ${vehicle.model}`}
+                                                onSelect={() => {
+                                                  setSelectedVehicleId(vehicle.id.toString());
+                                                  (document.getElementById("vehicleModel") as HTMLInputElement).value = `${vehicle.brand} ${vehicle.model}`;
+                                                  setVehicleComboboxOpen(false);
+                                                }}
+                                              >
+                                                <Check className={`mr-2 h-4 w-4 ${selectedVehicleId === vehicle.id.toString() ? "opacity-100" : "opacity-0"}`} />
+                                                <span className="flex items-center gap-2 flex-1">
+                                                  <span>🟢</span>
+                                                  <span className="font-semibold">{vehicle.plateNumber}</span>
+                                                  <span className="text-sm text-muted-foreground">- {vehicle.brand} {vehicle.model}</span>
+                                                </span>
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
+                                  {selectedVehicleId && vehicles.find(v => v.id.toString() === selectedVehicleId)?.status !== "Available" && (
+                                    <p className="text-xs text-amber-600 mt-1 flex items-center gap-1"><span>⚠️</span> Not available</p>
+                                  )}
+                                </div>
+                                <div>
+                                  <Label htmlFor="vehicleModel" className="text-xs font-medium text-gray-500 mb-1.5 block">Car Model *</Label>
+                                  <Input
+                                    id="vehicleModel"
+                                    name="vehicleModel"
+                                    placeholder="Select plate first"
+                                    readOnly
+                                    className="h-9 text-sm bg-gray-50 cursor-not-allowed input-client"
+                                  />
+                                </div>
+                              </div>
+                              {selectedVehicleId && (() => {
+                                const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
+                                if (!vehicle) return null;
+                                return (
+                                  <div className="mt-2.5 flex items-center gap-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
+                                    <Check className="w-3.5 h-3.5 text-green-600 shrink-0" />
+                                    <span className="text-xs text-green-700 font-medium">
+                                      {vehicle.brand} {vehicle.model} · Available{lastOdometerReading ? ` · Last odometer: ${lastOdometerReading.toLocaleString()} km` : ""}
+                                    </span>
+                                  </div>
+                                );
+                              })()}
+                            </div>
 
-                  {/* Client Information */}
-                  <div className="border-t pt-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="font-semibold">Client Information</h3>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => window.location.href = '/clients'}
-                      >
-                        <Users className="mr-2 h-4 w-4" />
-                        View Clients
-                      </Button>
-                    </div>
-                    <div className="mb-4">
-                      <Label htmlFor="clientSelector">Select Existing Client (Optional)</Label>
-                      <Popover open={clientComboboxOpen} onOpenChange={setClientComboboxOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            aria-expanded={clientComboboxOpen}
-                            className="w-full justify-between font-normal"
-                          >
-                            {selectedClientId
-                              ? (() => {
-                                  const client = clients.find((c) => c.id.toString() === selectedClientId);
-                                  return client ? `${client.name} - ${client.driverLicenseNumber || "No license"}` : "Choose a client...";
-                                })()
-                              : "Choose a client or type to search..."}
-                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-full p-0" align="start">
-                          <Command>
-                            <CommandInput placeholder="Search clients by name or license..." />
-                            <CommandList>
-                              <CommandEmpty>No client found.</CommandEmpty>
-                              <CommandGroup>
-                                <CommandItem
-                                  value="new"
-                                  onSelect={() => {
-                                    setSelectedClientId("");
-                                    setClientComboboxOpen(false);
-                                    // Clear form fields
-                                    (document.getElementById("clientFirstName") as HTMLInputElement).value = "";
-                                    (document.getElementById("clientLastName") as HTMLInputElement).value = "";
-                                    setSelectedNationality(""); // Fix: Clear nationality state
-                                    (document.getElementById("clientPhone") as HTMLInputElement).value = "";
-                                    (document.getElementById("clientAddress") as HTMLInputElement).value = "";
-                                    (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = "";
-                                    setLicenseIssueDate(undefined);
-                                    setLicenseExpiryDate(undefined);
-                                  }}
+                            {/* Client Information */}
+                            <div className="rounded-xl border border-gray-200 p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
+                                  <User className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Client Information</h3>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="ml-auto h-6 text-xs text-blue-600 px-2"
+                                  onClick={() => window.location.href = '/clients'}
                                 >
-                                  <Plus className="mr-2 h-4 w-4" />
-                                  Add New Client
-                                </CommandItem>
-                                {clients.map((client) => {
-                                  const nameParts = (client.name || "").trim().split(" ");
-                                  const firstName = nameParts[0] || "";
-                                  const lastName = nameParts.slice(1).join(" ") || "";
+                                  <Users className="w-3 h-3 mr-1" />
+                                  Manage
+                                </Button>
+                              </div>
+                              <div className="mb-3">
+                                <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Select Existing Client (Optional)</Label>
+                                <Popover open={clientComboboxOpen} onOpenChange={setClientComboboxOpen}>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      role="combobox"
+                                      aria-expanded={clientComboboxOpen}
+                                      className="w-full justify-between font-normal h-9 text-sm border-[#1e3a8a]/30"
+                                    >
+                                      {selectedClientId
+                                        ? (() => {
+                                            const client = clients.find((c) => c.id.toString() === selectedClientId);
+                                            return client ? `${client.name} - ${client.driverLicenseNumber || "No license"}` : "Choose a client...";
+                                          })()
+                                        : <span className="text-gray-400 text-xs">Search or choose a client...</span>}
+                                      <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-[420px] p-0" align="start">
+                                    <Command>
+                                      <CommandInput placeholder="Search clients by name or license..." />
+                                      <CommandList>
+                                        <CommandEmpty>No client found.</CommandEmpty>
+                                        <CommandGroup>
+                                          <CommandItem
+                                            value="new"
+                                            onSelect={() => {
+                                              setSelectedClientId("");
+                                              setClientComboboxOpen(false);
+                                              (document.getElementById("clientFirstName") as HTMLInputElement).value = "";
+                                              (document.getElementById("clientLastName") as HTMLInputElement).value = "";
+                                              setSelectedNationality("");
+                                              (document.getElementById("clientPhone") as HTMLInputElement).value = "";
+                                              (document.getElementById("clientAddress") as HTMLInputElement).value = "";
+                                              (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = "";
+                                              setLicenseIssueDate(undefined);
+                                              setLicenseExpiryDate(undefined);
+                                            }}
+                                          >
+                                            <Plus className="mr-2 h-4 w-4" />
+                                            Add New Client
+                                          </CommandItem>
+                                          {clients.map((client) => {
+                                            const nameParts = (client.name || "").trim().split(" ");
+                                            const firstName = nameParts[0] || "";
+                                            const lastName = nameParts.slice(1).join(" ") || "";
+                                            return (
+                                              <CommandItem
+                                                key={client.id}
+                                                value={`${client.name} ${client.driverLicenseNumber || ""}`}
+                                                onSelect={() => {
+                                                  setSelectedClientId(client.id.toString());
+                                                  setClientComboboxOpen(false);
+                                                  (document.getElementById("clientFirstName") as HTMLInputElement).value = firstName;
+                                                  (document.getElementById("clientLastName") as HTMLInputElement).value = lastName;
+                                                  (document.getElementById("clientMotherFullName") as HTMLInputElement).value = client.motherFullName || "";
+                                                  (document.getElementById("clientFatherFullName") as HTMLInputElement).value = client.fatherName || "";
+                                                  setSelectedNationality(client.nationality || "");
+                                                  (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
+                                                  (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
+                                                  (document.getElementById("clientPassportNumber") as HTMLInputElement).value = client.passportNumber || "";
+                                                  (document.getElementById("clientPlaceOfBirth") as HTMLInputElement).value = client.placeOfBirth || "";
+                                                  (document.getElementById("clientDateOfBirth") as HTMLInputElement).value = client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : "";
+                                                  (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.idNumber || "";
+                                                  (document.getElementById("clientPlaceOfRegistration") as HTMLInputElement).value = client.placeOfRegistration || "";
+                                                  (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.driverLicenseNumber || "";
+                                                  setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
+                                                  setLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
+                                                }}
+                                              >
+                                                <Check className={`mr-2 h-4 w-4 ${selectedClientId === client.id.toString() ? "opacity-100" : "opacity-0"}`} />
+                                                {client.name} - {client.driverLicenseNumber || "No license"}
+                                              </CommandItem>
+                                            );
+                                          })}
+                                        </CommandGroup>
+                                      </CommandList>
+                                    </Command>
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="clientFirstName" className="text-xs font-medium text-gray-500 mb-1.5 block">First Name *</Label>
+                                  <Input id="clientFirstName" name="clientFirstName" required className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientLastName" className="text-xs font-medium text-gray-500 mb-1.5 block">Last Name *</Label>
+                                  <Input id="clientLastName" name="clientLastName" required className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientMotherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">Mother's Full Name</Label>
+                                  <Input id="clientMotherFullName" name="clientMotherFullName" className="h-9 text-sm input-client" placeholder="Optional" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientFatherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">Father's Full Name</Label>
+                                  <Input id="clientFatherFullName" name="clientFatherFullName" className="h-9 text-sm input-client" placeholder="Optional" />
+                                </div>
+                                <div className="col-span-2">
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Nationality</Label>
+                                  <Popover open={nationalityComboboxOpen} onOpenChange={setNationalityComboboxOpen}>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        aria-expanded={nationalityComboboxOpen}
+                                        className="w-full justify-between h-9 text-sm border-[#1e3a8a]/30 font-normal"
+                                      >
+                                        {selectedNationality || <span className="text-gray-400 text-xs">Select nationality...</span>}
+                                        <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0">
+                                      <Command>
+                                        <CommandInput placeholder="Search nationality..." />
+                                        <CommandList>
+                                          <CommandEmpty>No nationality found.</CommandEmpty>
+                                          <CommandGroup>
+                                            {nationalities.map((nat) => (
+                                              <CommandItem
+                                                key={nat}
+                                                value={nat}
+                                                onSelect={(value) => {
+                                                  setSelectedNationality(value);
+                                                  setNationalityComboboxOpen(false);
+                                                }}
+                                              >
+                                                <Check className={`mr-2 h-4 w-4 ${selectedNationality === nat ? "opacity-100" : "opacity-0"}`} />
+                                                {nat}
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
+                                  <input type="hidden" id="clientNationality" name="clientNationality" value={selectedNationality} />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientPhone" className="text-xs font-medium text-gray-500 mb-1.5 block">Phone Number</Label>
+                                  <Input id="clientPhone" name="clientPhone" type="tel" placeholder="+1 234 567 8900" className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientPassportNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">Passport / ID Number</Label>
+                                  <Input id="clientPassportNumber" name="clientPassportNumber" className="h-9 text-sm input-client" placeholder="ID or Passport" />
+                                </div>
+                                <div className="col-span-2">
+                                  <Label htmlFor="clientAddress" className="text-xs font-medium text-gray-500 mb-1.5 block">Address</Label>
+                                  <Input id="clientAddress" name="clientAddress" placeholder="Street, City, ZIP" className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientRegistrationNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">Registration Number</Label>
+                                  <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="e.g., 267" className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientPlaceOfRegistration" className="text-xs font-medium text-gray-500 mb-1.5 block">Place of Registration</Label>
+                                  <Input id="clientPlaceOfRegistration" name="clientPlaceOfRegistration" placeholder="e.g., Beirut" className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientDateOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">Date of Birth</Label>
+                                  <Input id="clientDateOfBirth" name="clientDateOfBirth" type="date" className="h-9 text-sm input-client" />
+                                </div>
+                                <div>
+                                  <Label htmlFor="clientPlaceOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">Place of Birth</Label>
+                                  <Input id="clientPlaceOfBirth" name="clientPlaceOfBirth" placeholder="City, Country" className="h-9 text-sm input-client" />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Driving License */}
+                            <div className="rounded-xl border border-gray-200 p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
+                                  <FileText className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Driving License</h3>
+                              </div>
+                              <div className="space-y-3">
+                                <div>
+                                  <Label htmlFor="drivingLicenseNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">License Number *</Label>
+                                  <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="h-9 text-sm input-client" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <DateDropdownSelector
+                                    id="licenseIssueDate"
+                                    label="Issue Date"
+                                    value={licenseIssueDate}
+                                    onChange={setLicenseIssueDate}
+                                    maxDate={new Date()}
+                                  />
+                                  <DateDropdownSelector
+                                    id="licenseExpiryDate"
+                                    label="Expiry Date *"
+                                    value={licenseExpiryDate}
+                                    onChange={setLicenseExpiryDate}
+                                    required
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Second Driver */}
+                            <div className="rounded-xl border border-dashed border-gray-300 overflow-hidden">
+                              <div className="px-4 py-3 flex items-center gap-2">
+                                <Users className="w-3.5 h-3.5 text-gray-400" />
+                                <span className="text-sm font-medium text-gray-600">Second Driver</span>
+                                <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Optional</span>
+                              </div>
+                              <div className="px-4 pb-4 space-y-3 border-t border-dashed border-gray-200 bg-gray-50/40">
+                                <div className="pt-3">
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Select Client as Second Driver</Label>
+                                  <Popover open={secondDriverComboboxOpen} onOpenChange={setSecondDriverComboboxOpen}>
+                                    <PopoverTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        role="combobox"
+                                        className="w-full justify-between h-9 text-sm font-normal border-[#1e3a8a]/30"
+                                        type="button"
+                                      >
+                                        {secondDriverClientId
+                                          ? (() => {
+                                              const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
+                                              return c ? c.name : "Select client";
+                                            })()
+                                          : <span className="text-gray-400 text-xs">Select second driver...</span>}
+                                        <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-full p-0" align="start">
+                                      <Command>
+                                        <CommandInput placeholder="Search clients..." />
+                                        <CommandList>
+                                          <CommandEmpty>No client found.</CommandEmpty>
+                                          <CommandGroup>
+                                            <CommandItem
+                                              value="__clear__"
+                                              onSelect={() => {
+                                                setSecondDriverClientId("");
+                                                setSecondDriverLicenseIssueDate(undefined);
+                                                setSecondDriverLicenseExpiryDate(undefined);
+                                                setSecondDriverComboboxOpen(false);
+                                              }}
+                                            >
+                                              <span className="text-muted-foreground italic">— Remove second driver —</span>
+                                            </CommandItem>
+                                            {clients.map((cl) => (
+                                              <CommandItem
+                                                key={cl.id}
+                                                value={`${cl.name} ${cl.driverLicenseNumber || ""}`}
+                                                onSelect={() => {
+                                                  setSecondDriverClientId(cl.id.toString());
+                                                  if ((cl as any).licenseIssueDate) setSecondDriverLicenseIssueDate(new Date((cl as any).licenseIssueDate));
+                                                  if ((cl as any).licenseExpiryDate) setSecondDriverLicenseExpiryDate(new Date((cl as any).licenseExpiryDate));
+                                                  setSecondDriverComboboxOpen(false);
+                                                }}
+                                              >
+                                                <Check className={`mr-2 h-4 w-4 ${secondDriverClientId === cl.id.toString() ? "opacity-100" : "opacity-0"}`} />
+                                                <div>
+                                                  <div className="font-medium">{cl.name}</div>
+                                                  {cl.driverLicenseNumber && <div className="text-xs text-muted-foreground">{cl.driverLicenseNumber}</div>}
+                                                </div>
+                                              </CommandItem>
+                                            ))}
+                                          </CommandGroup>
+                                        </CommandList>
+                                      </Command>
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                                {secondDriverClientId && (() => {
+                                  const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
+                                  if (!c) return null;
                                   return (
-                                  <CommandItem
-                                    key={client.id}
-                                    value={`${client.name} ${client.driverLicenseNumber || ""}`}
-                                    onSelect={() => {
-                                      setSelectedClientId(client.id.toString());
-                                      setClientComboboxOpen(false);
-                                      // Auto-fill form fields
-                                      (document.getElementById("clientFirstName") as HTMLInputElement).value = firstName;
-                                      (document.getElementById("clientLastName") as HTMLInputElement).value = lastName;
-                                      (document.getElementById("clientMotherFullName") as HTMLInputElement).value = client.motherFullName || "";
-                                      (document.getElementById("clientFatherFullName") as HTMLInputElement).value = client.fatherName || "";
-                                      setSelectedNationality(client.nationality || "");
-                                      (document.getElementById("clientPhone") as HTMLInputElement).value = client.phone || "";
-                                      (document.getElementById("clientAddress") as HTMLInputElement).value = client.address || "";
-                                      (document.getElementById("clientPassportNumber") as HTMLInputElement).value = client.passportNumber || "";
-                                      (document.getElementById("clientPlaceOfBirth") as HTMLInputElement).value = client.placeOfBirth || "";
-                                      (document.getElementById("clientDateOfBirth") as HTMLInputElement).value = client.dateOfBirth ? new Date(client.dateOfBirth).toISOString().split('T')[0] : "";
-                                      (document.getElementById("clientRegistrationNumber") as HTMLInputElement).value = client.idNumber || "";
-                                      (document.getElementById("clientPlaceOfRegistration") as HTMLInputElement).value = client.placeOfRegistration || "";
-                                      (document.getElementById("drivingLicenseNumber") as HTMLInputElement).value = client.driverLicenseNumber || "";
-                                      setLicenseIssueDate(client.licenseIssueDate ? new Date(client.licenseIssueDate) : undefined);
-                                      setLicenseExpiryDate(client.licenseExpiryDate ? new Date(client.licenseExpiryDate) : undefined);
-                                    }}
-                                  >
-                                    <Check
-                                      className={`mr-2 h-4 w-4 ${
-                                        selectedClientId === client.id.toString() ? "opacity-100" : "opacity-0"
-                                      }`}
-                                    />
-                                    {client.name} - {client.driverLicenseNumber || "No license"}
-                                  </CommandItem>
-                                  );
-                                })}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <Label htmlFor="clientFirstName">First Name *</Label>
-                        <Input id="clientFirstName" name="clientFirstName" required className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientLastName">Last Name *</Label>
-                        <Input id="clientLastName" name="clientLastName" required className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="clientMotherFullName">Mother's Full Name</Label>
-                        <Input id="clientMotherFullName" name="clientMotherFullName" placeholder="e.g., Jane Smith" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="clientFatherFullName">Father's Full Name</Label>
-                        <Input id="clientFatherFullName" name="clientFatherFullName" placeholder="e.g., John Smith" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="clientNationality">Nationality</Label>
-                        <Popover open={nationalityComboboxOpen} onOpenChange={setNationalityComboboxOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={nationalityComboboxOpen}
-                              className="w-full justify-between"
-                            >
-                              {selectedNationality || "Select nationality..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0">
-                            <Command>
-                              <CommandInput placeholder="Search nationality..." />
-                              <CommandList>
-                                <CommandEmpty>No nationality found.</CommandEmpty>
-                                <CommandGroup>
-                                  {nationalities.map((nat) => (
-                                    <CommandItem
-                                      key={nat}
-                                      value={nat}
-                                      onSelect={(value) => {
-                                        setSelectedNationality(value);
-                                        setNationalityComboboxOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={`mr-2 h-4 w-4 ${
-                                          selectedNationality === nat ? "opacity-100" : "opacity-0"
-                                        }`}
-                                      />
-                                      {nat}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <input type="hidden" id="clientNationality" name="clientNationality" value={selectedNationality} />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="clientPhone">Phone Number</Label>
-                        <Input id="clientPhone" name="clientPhone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="clientAddress">Address</Label>
-                        <Input id="clientAddress" name="clientAddress" placeholder="Street, City, State, ZIP" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientPassportNumber">Passport/ID Number</Label>
-                        <Input id="clientPassportNumber" name="clientPassportNumber" placeholder="Passport or National ID" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientRegistrationNumber">Registration Number</Label>
-                        <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="e.g., 267" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientPlaceOfRegistration">Place of Registration</Label>
-                        <Input id="clientPlaceOfRegistration" name="clientPlaceOfRegistration" placeholder="e.g., Beirut, North Lebanon" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientDateOfBirth">Date of Birth</Label>
-                        <Input id="clientDateOfBirth" name="clientDateOfBirth" type="date" className="input-client" />
-                      </div>
-                      <div>
-                        <Label htmlFor="clientPlaceOfBirth">Place of Birth</Label>
-                        <Input id="clientPlaceOfBirth" name="clientPlaceOfBirth" placeholder="City, Country" className="input-client" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Driving License */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-5">Driving License</h3>
-                    <div className="space-y-5">
-                      <div>
-                        <Label htmlFor="drivingLicenseNumber">License Number *</Label>
-                        <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
-                      </div>
-                      <DateDropdownSelector
-                        id="licenseIssueDate"
-                        label="Issue Date"
-                        value={licenseIssueDate}
-                        onChange={setLicenseIssueDate}
-                        maxDate={new Date()}
-                      />
-                      <DateDropdownSelector
-                        id="licenseExpiryDate"
-                        label="Expiry Date *"
-                        value={licenseExpiryDate}
-                        onChange={setLicenseExpiryDate}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Second Driver (Optional) */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-1">Second Driver <span className="text-muted-foreground font-normal text-sm">(Optional)</span></h3>
-                    <p className="text-xs text-muted-foreground mb-5">Select an existing client as a second driver</p>
-                    <div className="space-y-5">
-                      {/* Client picker */}
-                      <div>
-                        <Label>Select Client</Label>
-                        <Popover open={secondDriverComboboxOpen} onOpenChange={setSecondDriverComboboxOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className="w-full justify-between mt-1 input-client font-normal"
-                              type="button"
-                            >
-                              {secondDriverClientId
-                                ? (() => {
-                                    const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
-                                    return c ? c.name : "Select client";
-                                  })()
-                                : "Select second driver..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0" align="start">
-                            <Command>
-                              <CommandInput placeholder="Search clients..." />
-                              <CommandList>
-                                <CommandEmpty>No client found.</CommandEmpty>
-                                <CommandGroup>
-                                  {/* Clear option */}
-                                  <CommandItem
-                                    value="__clear__"
-                                    onSelect={() => {
-                                      setSecondDriverClientId("");
-                                      setSecondDriverLicenseIssueDate(undefined);
-                                      setSecondDriverLicenseExpiryDate(undefined);
-                                      setSecondDriverComboboxOpen(false);
-                                    }}
-                                  >
-                                    <span className="text-muted-foreground italic">— Remove second driver —</span>
-                                  </CommandItem>
-                                  {clients.map((cl) => (
-                                    <CommandItem
-                                      key={cl.id}
-                                      value={`${cl.name} ${cl.driverLicenseNumber || ""}`}
-                                      onSelect={() => {
-                                        setSecondDriverClientId(cl.id.toString());
-                                        // Auto-populate license dates from client if available
-                                        if ((cl as any).licenseIssueDate) setSecondDriverLicenseIssueDate(new Date((cl as any).licenseIssueDate));
-                                        if ((cl as any).licenseExpiryDate) setSecondDriverLicenseExpiryDate(new Date((cl as any).licenseExpiryDate));
-                                        setSecondDriverComboboxOpen(false);
-                                      }}
-                                    >
-                                      <Check className={`mr-2 h-4 w-4 ${secondDriverClientId === cl.id.toString() ? "opacity-100" : "opacity-0"}`} />
-                                      <div>
-                                        <div className="font-medium">{cl.name}</div>
-                                        {cl.driverLicenseNumber && <div className="text-xs text-muted-foreground">{cl.driverLicenseNumber}</div>}
+                                    <div className="space-y-3 rounded-lg border border-gray-200 p-3 bg-white">
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Full Name</Label>
+                                          <Input value={c.name} readOnly className="h-9 text-sm bg-gray-50 input-client" />
+                                        </div>
+                                        <div>
+                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Date of Birth</Label>
+                                          <Input value={(c as any).dateOfBirth ? new Date((c as any).dateOfBirth).toLocaleDateString() : "—"} readOnly className="h-9 text-sm bg-gray-50 input-client" />
+                                        </div>
                                       </div>
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-
-                      {secondDriverClientId && (() => {
-                        const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
-                        if (!c) return null;
-                        return (
-                          <div className="space-y-4 rounded-lg border p-4 bg-muted/30">
-                            {/* Name (read-only) */}
-                            <div>
-                              <Label>Full Name</Label>
-                              <Input value={c.name} readOnly className="mt-1 bg-gray-50 input-client" />
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <DateDropdownSelector id="secondDriverLicenseIssueDate" label="License Issue Date" value={secondDriverLicenseIssueDate} onChange={setSecondDriverLicenseIssueDate} />
+                                        <DateDropdownSelector id="secondDriverLicenseExpiryDate" label="License Expiry Date" value={secondDriverLicenseExpiryDate} onChange={setSecondDriverLicenseExpiryDate} />
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
                             </div>
-                            {/* Date of Birth (read-only) */}
-                            <div>
-                              <Label>Date of Birth</Label>
+
+                          </div>
+                        </div>
+
+                        {/* ═══ RIGHT COLUMN ═══════════════════════════════════ */}
+                        <div className="flex flex-col flex-1 overflow-y-auto bg-gray-50/40">
+                          <div className="p-5 space-y-4">
+
+                            {/* Rental Period */}
+                            <div className="rounded-xl border border-blue-200 bg-blue-50/40 p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
+                                  <Calendar className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Rental Period</h3>
+                              </div>
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="bg-white rounded-lg border border-gray-200 p-3">
+                                    <DateDropdownSelector id="rentalStartDate" label="Start Date *" value={rentalStartDate} onChange={setRentalStartDate} required />
+                                    <p className="text-[10px] text-blue-500 mt-1.5 flex items-center gap-1">
+                                      <Check className="w-3 h-3" /> Past dates allowed
+                                    </p>
+                                  </div>
+                                  <div className="bg-white rounded-lg border border-gray-200 p-3">
+                                    <Label htmlFor="pickupTime" className="text-xs font-medium text-gray-500 mb-1.5 block">Pickup Time</Label>
+                                    <Input id="pickupTime" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="h-9 text-sm input-client" />
+                                    <p className="text-[10px] text-muted-foreground mt-1.5">Exact hour car was picked up</p>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="bg-white rounded-lg border border-gray-200 p-3">
+                                    <Label htmlFor="rentalDays" className="text-xs font-medium text-gray-500 mb-1.5 block">Rental Days *</Label>
+                                    <div className="flex items-center gap-2">
+                                      <Button type="button" variant="outline" size="sm" className="h-9 w-9 shrink-0 p-0 text-lg font-bold" onClick={() => setRentalDays(Math.max(1, rentalDays - 1))}>−</Button>
+                                      <Input id="rentalDays" name="rentalDays" type="number" min="1" value={rentalDays} onChange={(e) => setRentalDays(Math.max(1, parseInt(e.target.value) || 1))} className="text-center font-semibold text-sm h-9 input-client" required />
+                                      <Button type="button" variant="outline" size="sm" className="h-9 w-9 shrink-0 p-0 text-lg font-bold" onClick={() => setRentalDays(rentalDays + 1)}>+</Button>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground mt-1.5">End date calculated automatically</p>
+                                  </div>
+                                  <div className="bg-white rounded-lg border border-gray-200 p-3">
+                                    <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Return Date (Auto)</Label>
+                                    <div className="h-9 flex items-center px-3 rounded-md bg-gray-50 border border-dashed border-gray-300">
+                                      {rentalEndDate
+                                        ? <span className="font-semibold text-gray-800 text-sm">{rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                        : <span className="text-gray-400 text-xs italic">Set start date & days above</span>}
+                                    </div>
+                                    {rentalEndDate && rentalStartDate && (
+                                      <p className="text-[10px] text-blue-500 mt-1.5">
+                                        {rentalDays} day{rentalDays !== 1 ? 's' : ''} · {rentalStartDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Odometer */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 text-slate-600">
+                                  <Gauge className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Pickup Odometer</h3>
+                              </div>
+                              <Label htmlFor="pickupKm" className="text-xs font-medium text-gray-500 mb-1.5 block">Odometer Reading (KM) *</Label>
                               <Input
-                                value={(c as any).dateOfBirth ? new Date((c as any).dateOfBirth).toLocaleDateString() : "—"}
-                                readOnly
-                                className="mt-1 bg-gray-50 input-client"
+                                id="pickupKm"
+                                name="pickupKm"
+                                type="number"
+                                min={(() => { const v = vehicles.find(v => v.id.toString() === selectedVehicleId); return v?.mileage || 0; })()}
+                                value={pickupKm}
+                                onChange={(e) => setPickupKm(parseInt(e.target.value) || 0)}
+                                placeholder="Enter current odometer reading"
+                                required
+                                className="h-9 text-sm input-client"
+                              />
+                              {(() => {
+                                const v = vehicles.find(v => v.id.toString() === selectedVehicleId);
+                                const reg = v?.mileage || 0;
+                                if (lastOdometerReading && lastOdometerReading > 0) return <p className="text-xs text-muted-foreground mt-1">Auto-filled from last contract ({lastOdometerReading.toLocaleString()} km). Min: {reg.toLocaleString()} km.</p>;
+                                if (reg > 0) return <p className="text-xs text-muted-foreground mt-1">Min: {reg.toLocaleString()} km (registered mileage).</p>;
+                                return null;
+                              })()}
+                            </div>
+
+                            {/* Pricing */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-green-100 text-green-700">
+                                  <DollarSign className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Pricing</h3>
+                                {isHighSeason && (
+                                  <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-semibold border border-orange-200">🌞 High Season</span>
+                                )}
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 mb-3">
+                                <div>
+                                  <Label htmlFor="dailyRate" className="text-xs font-medium text-gray-500 mb-1.5 block">Daily Rate ($) *</Label>
+                                  <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" value={dailyRate} onChange={(e) => setDailyRate(parseFloat(e.target.value) || 0)} required className={`h-9 text-sm input-client ${isHighSeason ? "border-orange-400 bg-orange-50" : ""}`} />
+                                  {isHighSeason && <p className="text-[10px] text-orange-600 mt-1">High season rate applied</p>}
+                                </div>
+                                <div>
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Discount ($)</Label>
+                                  <Input id="discount" name="discount" type="number" step="0.01" min="0" max={totalAmount} value={discount} onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)} className="h-9 text-sm input-client" />
+                                </div>
+                              </div>
+                              <div className="rounded-lg bg-gradient-to-br from-blue-900 to-blue-800 p-3 text-white">
+                                <div className="flex justify-between text-xs mb-1.5">
+                                  <span className="text-blue-200">Subtotal ({rentalDays} day{rentalDays !== 1 ? 's' : ''} × ${dailyRate.toFixed(2)})</span>
+                                  <span className="font-medium">${totalAmount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-xs mb-1.5">
+                                  <span className="text-blue-200">VAT ({vatRate}%)</span>
+                                  <span className="font-medium">${(totalAmount * (vatRate / 100)).toFixed(2)}</span>
+                                </div>
+                                {discount > 0 && (
+                                  <div className="flex justify-between text-xs mb-1.5">
+                                    <span className="text-blue-200">Discount</span>
+                                    <span className="font-medium text-green-300">−${discount.toFixed(2)}</span>
+                                  </div>
+                                )}
+                                <div className="flex justify-between pt-2 border-t border-white/20">
+                                  <span className="text-sm font-bold">Total with VAT</span>
+                                  <span className="text-lg font-bold">${(finalAmount + (finalAmount * (vatRate / 100))).toFixed(2)}</span>
+                                </div>
+                                {exchangeRate !== 1.0 && (
+                                  <div className="flex justify-between text-xs mt-1.5 text-blue-200">
+                                    <span>In local currency (×{exchangeRate.toFixed(4)})</span>
+                                    <span className="font-medium text-white">{((finalAmount + (finalAmount * (vatRate / 100))) * exchangeRate).toFixed(2)} {companyProfile?.localCurrencyCode || ""}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Insurance, Deposit & Fuel */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
+                                  <Shield className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Insurance, Deposit & Fuel</h3>
+                              </div>
+                              <InsuranceDepositSelector
+                                rentalDays={rentalDays}
+                                onInsuranceChange={(pkg, cost, dailyRate) => { setInsurancePackage(pkg); setInsuranceCost(cost); setInsuranceDailyRate(dailyRate); }}
+                                onDepositChange={(amount, status) => { setDepositAmount(amount); setDepositStatus(status); }}
+                                onFuelPolicyChange={(policy) => { setFuelPolicy(policy); }}
                               />
                             </div>
-                            {/* License dates */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                              <DateDropdownSelector
-                                id="secondDriverLicenseIssueDate"
-                                label="License Issue Date"
-                                value={secondDriverLicenseIssueDate}
-                                onChange={setSecondDriverLicenseIssueDate}
-                              />
-                              <DateDropdownSelector
-                                id="secondDriverLicenseExpiryDate"
-                                label="License Expiry Date"
-                                value={secondDriverLicenseExpiryDate}
-                                onChange={setSecondDriverLicenseExpiryDate}
-                              />
+
+                            {/* Late Return Fee */}
+                            <div className="rounded-xl border border-gray-200 bg-white p-4">
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+                                  <Clock className="w-3.5 h-3.5" />
+                                </span>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Late Return Fee</h3>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1">
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">
+                                    Late Fee % per day <span className="text-gray-400 font-normal">(optional — defaults to 150%)</span>
+                                  </Label>
+                                  <div className="relative">
+                                    <input type="number" min="0" max="1000" step="0.5" placeholder="150" value={lateFeePercentage} onChange={(e) => setLateFeePercentage(e.target.value)} className="w-full h-9 rounded-md border border-[#1e3a8a]/40 px-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+                                  </div>
+                                </div>
+                                {lateFeePercentage !== "" && (
+                                  <div className="text-xs text-gray-500 mt-5 shrink-0">= {((parseFloat(lateFeePercentage) || 0) / 100).toFixed(2)}× daily rate / day</div>
+                                )}
+                              </div>
                             </div>
+
                           </div>
-                        );
-                      })()}
-                    </div>
+                        </div>
+                      </div>
+
+                      {/* Sticky Footer */}
+                      <div className="flex items-center justify-between px-6 py-3.5 border-t border-gray-100 bg-white shrink-0">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                          <span>Next: photograph vehicle damage marks before confirming</span>
+                        </div>
+                        <div className="flex items-center gap-2.5">
+                          <Button type="button" variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => setIsCreateDialogOpen(false)}>
+                            Cancel
+                          </Button>
+                          <Button type="submit" size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900 gap-1.5" disabled={createContract.isPending}>
+                            {createContract.isPending ? "Creating..." : "Continue to Car Inspection"}
+                            {!createContract.isPending && <ChevronRight className="w-3.5 h-3.5" />}
+                          </Button>
+                        </div>
+                      </div>
+                    </form>
                   </div>
-
-                  {/* Rental Period */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-4">Rental Period</h3>
-                    <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-4 space-y-4">
-                      {/* Row 1: Start Date + Pickup Time */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg border border-gray-200 p-3">
-                          <DateDropdownSelector
-                            id="rentalStartDate"
-                            label="Rental Start Date *"
-                            value={rentalStartDate}
-                            onChange={setRentalStartDate}
-                            required
-                          />
-                          <p className="text-xs text-blue-500 mt-1.5 flex items-center gap-1">
-                            <span>✓</span> Past dates allowed
-                          </p>
-                        </div>
-                        <div className="bg-white rounded-lg border border-gray-200 p-3">
-                          <Label htmlFor="pickupTime" className="text-sm font-medium">Pickup Time</Label>
-                          <Input
-                            id="pickupTime"
-                            type="time"
-                            value={pickupTime}
-                            onChange={(e) => setPickupTime(e.target.value)}
-                            className="mt-1.5 input-client"
-                          />
-                          <p className="text-xs text-muted-foreground mt-1.5">Exact hour the car was picked up</p>
-                        </div>
-                      </div>
-
-                      {/* Row 2: Number of Days + Auto End Date */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white rounded-lg border border-gray-200 p-3">
-                          <Label htmlFor="rentalDays" className="text-sm font-medium">Number of Rental Days *</Label>
-                          <div className="flex items-center mt-1.5 gap-2">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-9 w-9 shrink-0 p-0 text-lg font-bold"
-                              onClick={() => setRentalDays(Math.max(1, rentalDays - 1))}
-                            >−</Button>
-                            <Input
-                              id="rentalDays"
-                              name="rentalDays"
-                              type="number"
-                              min="1"
-                              value={rentalDays}
-                              onChange={(e) => setRentalDays(Math.max(1, parseInt(e.target.value) || 1))}
-                              className="text-center font-semibold text-base input-client"
-                              required
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              className="h-9 w-9 shrink-0 p-0 text-lg font-bold"
-                              onClick={() => setRentalDays(rentalDays + 1)}
-                            >+</Button>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1.5">End date calculated automatically</p>
-                        </div>
-                        <div className="bg-white rounded-lg border border-gray-200 p-3">
-                          <Label className="text-sm font-medium text-gray-500">Return Date (Auto-calculated)</Label>
-                          <div className="mt-1.5 h-9 flex items-center px-3 rounded-md bg-gray-50 border border-dashed border-gray-300">
-                            {rentalEndDate ? (
-                              <span className="font-semibold text-gray-800">
-                                {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400 text-sm italic">Set start date &amp; days above</span>
-                            )}
-                          </div>
-                          {rentalEndDate && rentalStartDate && (
-                            <p className="text-xs text-blue-500 mt-1.5">
-                              {rentalDays} day{rentalDays !== 1 ? 's' : ''} ·{' '}
-                              {rentalStartDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Pricing */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-5">Vehicle Inspection</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
-                      <div>
-                        <Label htmlFor="pickupKm">Pickup Odometer (KM) *</Label>
-                        <Input
-                          id="pickupKm"
-                          name="pickupKm"
-                          type="number"
-                          min={(() => {
-                            const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
-                            return vehicle?.mileage || 0;
-                          })()}
-                          value={pickupKm}
-                          onChange={(e) => setPickupKm(parseInt(e.target.value) || 0)}
-                          placeholder="Enter current odometer reading"
-                          required
-                        />
-                        {(() => {
-                          const vehicle = vehicles.find(v => v.id.toString() === selectedVehicleId);
-                          const registeredMileage = vehicle?.mileage || 0;
-                          if (lastOdometerReading && lastOdometerReading > 0) {
-                            return (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Auto-filled from last completed contract ({lastOdometerReading.toLocaleString()} km). Minimum: {registeredMileage.toLocaleString()} km (registered mileage).
-                              </p>
-                            );
-                          } else if (registeredMileage > 0) {
-                            return (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Minimum: {registeredMileage.toLocaleString()} km (vehicle's registered mileage).
-                              </p>
-                            );
-                          }
-                          return null;
-                        })()}
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 mb-4">
-                      <h3 className="font-semibold">Pricing</h3>
-                      {isHighSeason && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold border border-orange-200">
-                          🌞 High Season Rate
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
-                        <Input
-                          id="dailyRate"
-                          name="dailyRate"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={dailyRate}
-                          onChange={(e) => setDailyRate(parseFloat(e.target.value) || 0)}
-                          required
-                          className={isHighSeason ? "border-orange-400 bg-orange-50" : ""}
-                        />
-                        {isHighSeason && (
-                          <p className="text-xs text-orange-600 mt-1">High season pricing applied automatically</p>
-                        )}
-                      </div>
-                      <div>
-                        <Label>Total Amount (USD)</Label>
-                        <Input
-                          type="text"
-                          value={totalAmount.toFixed(2)}
-                          readOnly
-                          className="bg-gray-50 input-client"
-                        />
-                      </div>
-                      <div>
-                        <Label>VAT {vatRate}% (USD)</Label>
-                        <Input
-                          type="text"
-                          value={(totalAmount * (vatRate / 100)).toFixed(2)}
-                          readOnly
-                          className="bg-gray-50 input-client"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="discount">Discount (USD)</Label>
-                        <Input
-                          id="discount"
-                          name="discount"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          max={totalAmount}
-                          value={discount}
-                          onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div>
-                        <Label>Final Amount with VAT (USD)</Label>
-                        <Input
-                          type="text"
-                          value={(finalAmount + (finalAmount * (vatRate / 100))).toFixed(2)}
-                          readOnly
-                          className="bg-gray-50 font-bold text-lg input-client"
-                        />
-                      </div>
-                      {exchangeRate !== 1.0 && (
-                        <>
-                          <div>
-                            <Label>Final Amount with VAT (Local)</Label>
-                            <Input
-                              type="text"
-                              value={((finalAmount + (finalAmount * (vatRate / 100))) * exchangeRate).toFixed(2)}
-                              readOnly
-                              className="bg-gray-50 font-bold text-lg input-client"
-                            />
-                          </div>
-                          <div className="col-span-2 text-xs text-gray-500">
-                            Exchange Rate: 1 USD = {exchangeRate.toFixed(4)} {companyProfile?.localCurrencyCode || "Local"}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Insurance, Deposit, and Fuel Policy */}
-                  <div className="border-t pt-6">
-                    <h3 className="font-semibold mb-5">Additional Options</h3>
-                    <InsuranceDepositSelector
-                      rentalDays={rentalDays}
-                      onInsuranceChange={(pkg, cost, dailyRate) => {
-                        setInsurancePackage(pkg);
-                        setInsuranceCost(cost);
-                        setInsuranceDailyRate(dailyRate);
-                      }}
-                      onDepositChange={(amount, status) => {
-                        setDepositAmount(amount);
-                        setDepositStatus(status);
-                      }}
-                      onFuelPolicyChange={(policy) => {
-                        setFuelPolicy(policy);
-                      }}
-                    />
-                  </div>
-
-                  {/* Late Fee Percentage */}
-                  <div className="rounded-xl border border-gray-200 p-4">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Late Return Fee</h3>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1">
-                        <label className="text-xs text-gray-500 mb-1 block">Late Fee % per day <span className="text-gray-400">(optional — defaults to 150%)</span></label>
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min="0"
-                            max="1000"
-                            step="0.5"
-                            placeholder="150"
-                            value={lateFeePercentage}
-                            onChange={(e) => setLateFeePercentage(e.target.value)}
-                            className="w-full h-9 rounded-md border border-[#1e3a8a] border-opacity-60 px-3 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
-                        </div>
-                      </div>
-                      {lateFeePercentage !== "" && (
-                        <div className="text-xs text-gray-500 mt-5">
-                          = {((parseFloat(lateFeePercentage) || 0) / 100).toFixed(2)}× daily rate per overdue day
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={createContract.isPending}>
-                      {createContract.isPending ? "Creating..." : "Continue to Car Inspection"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-              </Dialog>
+                </div>,
+                document.body
+              )}
             </div>
           </div>
           
