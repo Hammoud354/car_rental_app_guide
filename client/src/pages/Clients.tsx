@@ -463,7 +463,7 @@ export default function Clients() {
                             <FileText className="w-4 h-4 text-blue-700" />
                             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("clients.drivingLicense")}</h3>
                           </div>
-                          <div className="space-y-3">
+                          <div className="space-y-2">
                             <div>
                               <Label htmlFor="drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
                               <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client mt-1" />
