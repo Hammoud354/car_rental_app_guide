@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle, Upload, Download } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Users, Wrench, Edit, Trash2, Eye, Search, Settings, Check, ChevronsUpDown, AlertTriangle, Upload, Download, X, User } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
@@ -328,170 +329,190 @@ export default function Clients() {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm">
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Client
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Add New Client</DialogTitle>
-                  <DialogDescription>
-                    Enter the client's personal and license information
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleCreateSubmit} className="space-y-6">
-                  {/* Personal Information */}
-                  <div>
-                    <h3 className="font-semibold mb-4">Personal Information</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="firstName">First Name *</Label>
-                        <Input id="firstName" name="firstName" required className="input-client" />
+            {/* New Client button */}
+            <Button size="sm" onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              New Client
+            </Button>
+
+            {/* New Client portal workspace */}
+            {isCreateDialogOpen && createPortal(
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                onClick={(e) => { if (e.target === e.currentTarget) setIsCreateDialogOpen(false); }}
+              >
+                <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ width: "90vw", height: "90vh" }}>
+
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] flex-shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white/10 rounded-lg">
+                        <User className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Last Name *</Label>
-                        <Input id="lastName" name="lastName" required className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="fatherName">Father's Name *</Label>
-                        <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="nationality">{t("clients.nationality")}</Label>
-                        <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={createNationalityOpen}
-                              className="w-full justify-between"
-                            >
-                              {createSelectedNationality || "Select nationality..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-full p-0">
-                            <Command>
-                              <CommandInput placeholder="Search nationality..." />
-                              <CommandList>
-                                <CommandEmpty>No nationality found.</CommandEmpty>
-                                <CommandGroup>
-                                  {nationalities.map((nat) => (
-                                    <CommandItem
-                                      key={nat}
-                                      value={nat}
-                                      onSelect={(value) => {
-                                        setCreateSelectedNationality(value);
-                                        setCreateNationalityOpen(false);
-                                      }}
-                                    >
-                                      <Check
-                                        className={`mr-2 h-4 w-4 ${
-                                          createSelectedNationality === nat ? "opacity-100" : "opacity-0"
-                                        }`}
-                                      />
-                                      {nat}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="motherFullName">Mother's Full Name *</Label>
-                        <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="phone">{t("common.phone")}</Label>
-                        <Input id="phone" name="phone" type="tel" placeholder="e.g., +1 234 567 8900" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="email">{t("common.email")}</Label>
-                        <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="address">{t("common.address")}</Label>
-                        <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label>{t("clients.dateOfBirth")}</Label>
-                        <ModernDatePicker
-                          date={createDateOfBirth}
-                          onDateChange={setCreateDateOfBirth}
-                          placeholder="Select date"
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="placeOfBirth">{t("clients.placeOfBirth")}</Label>
-                        <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client w-full" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="registrationNumber">{t("clients.registrationNumber")}</Label>
-                        <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Registration" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="placeOfRegistration">{t("clients.placeOfRegistration")}</Label>
-                        <Input id="placeOfRegistration" name="placeOfRegistration" placeholder="e.g., Beirut, Tripoli" className="input-client" />
-                      </div>
-                      <div className="col-span-2">
-                        <Label htmlFor="passportIdNumber">{t("clients.passportNumber")}</Label>
-                        <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client" />
+                        <h2 className="text-lg font-bold text-white">New Client</h2>
+                        <p className="text-blue-200 text-xs">Fill in the client's personal and license information</p>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsCreateDialogOpen(false)}
+                      className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
 
-                  {/* Driving License */}
-                   <div className="border-t border-gray-700 pt-4">
-                     <h3 className="font-semibold mb-4">{t("clients.drivingLicense")}</h3>
-                     <div className="space-y-6">
-                       <div>
-                         <Label htmlFor="drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
-                         <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client" />
-                       </div>
-                       <div className="pt-2">
-                         <DateDropdownSelector
-                           id="licenseIssueDate"
-                           label="Issue Date"
-                           value={createLicenseIssueDate}
-                           onChange={setCreateLicenseIssueDate}
-                           maxDate={new Date()}
-                         />
-                       </div>
-                       <div className="pt-2">
-                         <DateDropdownSelector
-                           id="licenseExpiryDate"
-                           label="Expiry Date *"
-                           value={createLicenseExpiryDate}
-                           onChange={setCreateLicenseExpiryDate}
-                           required
-                           minDate={new Date()}
-                         />
+                  {/* Body + Footer */}
+                  <form onSubmit={handleCreateSubmit} className="flex flex-col flex-1 min-h-0">
+                    <div className="flex flex-1 min-h-0">
+
+                      {/* Left column — Personal Information */}
+                      <div className="w-[55%] border-r border-gray-100 overflow-y-auto p-6">
+                        <div className="flex items-center gap-2 mb-5">
+                          <User className="w-4 h-4 text-blue-700" />
+                          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Personal Information</h3>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="firstName">First Name *</Label>
+                            <Input id="firstName" name="firstName" required className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="lastName">Last Name *</Label>
+                            <Input id="lastName" name="lastName" required className="input-client mt-1" />
+                          </div>
+                          <div className="col-span-2">
+                            <Label htmlFor="fatherName">Father's Name *</Label>
+                            <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client mt-1" />
+                          </div>
+                          <div className="col-span-2">
+                            <Label htmlFor="nationality">{t("clients.nationality")}</Label>
+                            <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" role="combobox" aria-expanded={createNationalityOpen} className="w-full justify-between mt-1">
+                                  {createSelectedNationality || "Select nationality..."}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[300px] p-0" style={{ zIndex: 9999 }}>
+                                <Command>
+                                  <CommandInput placeholder="Search nationality..." />
+                                  <CommandList>
+                                    <CommandEmpty>No nationality found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {nationalities.map((nat) => (
+                                        <CommandItem key={nat} value={nat} onSelect={(value) => { setCreateSelectedNationality(value); setCreateNationalityOpen(false); }}>
+                                          <Check className={`mr-2 h-4 w-4 ${createSelectedNationality === nat ? "opacity-100" : "opacity-0"}`} />
+                                          {nat}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <div className="col-span-2">
+                            <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+                            <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="phone">{t("common.phone")}</Label>
+                            <Input id="phone" name="phone" type="tel" placeholder="+1 234 567 8900" className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="email">{t("common.email")}</Label>
+                            <Input id="email" name="email" type="email" placeholder="client@example.com" className="input-client mt-1" />
+                          </div>
+                          <div className="col-span-2">
+                            <Label htmlFor="address">{t("common.address")}</Label>
+                            <Input id="address" name="address" placeholder="Street, City, State, ZIP" className="input-client mt-1" />
+                          </div>
+                          <div className="col-span-2">
+                            <Label>{t("clients.dateOfBirth")}</Label>
+                            <div className="mt-1">
+                              <ModernDatePicker date={createDateOfBirth} onDateChange={setCreateDateOfBirth} placeholder="Select date" />
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor="placeOfBirth">{t("clients.placeOfBirth")}</Label>
+                            <Input id="placeOfBirth" name="placeOfBirth" placeholder="City, Country" className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="passportIdNumber">{t("clients.passportNumber")}</Label>
+                            <Input id="passportIdNumber" name="passportIdNumber" placeholder="Passport or National ID" className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="registrationNumber">{t("clients.registrationNumber")}</Label>
+                            <Input id="registrationNumber" name="registrationNumber" placeholder="Business/Company Reg." className="input-client mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="placeOfRegistration">{t("clients.placeOfRegistration")}</Label>
+                            <Input id="placeOfRegistration" name="placeOfRegistration" placeholder="e.g., Beirut" className="input-client mt-1" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right column — Driving License + Notes */}
+                      <div className="flex-1 overflow-y-auto p-6 bg-gray-50/40 space-y-5">
+
+                        {/* Driving License card */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                          <div className="flex items-center gap-2 mb-4">
+                            <FileText className="w-4 h-4 text-blue-700" />
+                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("clients.drivingLicense")}</h3>
+                          </div>
+                          <div className="space-y-5">
+                            <div>
+                              <Label htmlFor="drivingLicenseNumber">{t("clients.drivingLicense")} *</Label>
+                              <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="input-client mt-1" />
+                            </div>
+                            <DateDropdownSelector
+                              id="licenseIssueDate"
+                              label="Issue Date"
+                              value={createLicenseIssueDate}
+                              onChange={setCreateLicenseIssueDate}
+                              maxDate={new Date()}
+                            />
+                            <DateDropdownSelector
+                              id="licenseExpiryDate"
+                              label="Expiry Date *"
+                              value={createLicenseExpiryDate}
+                              onChange={setCreateLicenseExpiryDate}
+                              required
+                              minDate={new Date()}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Notes card */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                          <Label htmlFor="notes" className="text-sm font-semibold text-gray-700">{t("common.notes")}</Label>
+                          <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client mt-2" />
+                        </div>
+
                       </div>
                     </div>
-                  </div>
 
-                  {/* Notes */}
-                  <div className="border-t border-gray-700 pt-4">
-                    <Label htmlFor="notes">{t("common.notes")}</Label>
-                    <Input id="notes" name="notes" placeholder="Additional information about the client" className="input-client" />
-                  </div>
+                    {/* Sticky footer */}
+                    <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex-shrink-0">
+                      <p className="text-xs text-gray-400">* Required fields</p>
+                      <div className="flex gap-3">
+                        <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" disabled={createClient.isPending} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
+                          {createClient.isPending ? "Adding..." : "Add Client"}
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
 
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={createClient.isPending}>
-                      {createClient.isPending ? "Adding..." : "Add Client"}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+                </div>
+              </div>,
+              document.body
+            )}
           </div>
         </div>
 

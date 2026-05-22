@@ -1,4 +1,5 @@
 
+import { createPortal } from "react-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +111,9 @@ export default function FleetManagement() {
   const [pendingSellData, setPendingSellData] = useState<any>(null);
   const [editStatusValue, setEditStatusValue] = useState<string>("");
   const [editSaleDate, setEditSaleDate] = useState<Date | undefined>();
+
+  // Add vehicle portal – AI section toggle
+  const [showAddAiSection, setShowAddAiSection] = useState(false);
 
   // High season periods state
   const [isHighSeasonDialogOpen, setIsHighSeasonDialogOpen] = useState(false);
@@ -794,593 +798,531 @@ export default function FleetManagement() {
               <Download className="mr-1.5 h-3.5 w-3.5" />
               Export
             </Button>
-            <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
-              setIsAddDialogOpen(open);
-              if (!open) {
-                setSelectedMakerId(null);
-                setSelectedModelId(null);
-              }
-            }}>
-              <DialogTrigger asChild>
-                <Button 
-                  size="sm"
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    try {
-                      const subscription = await utils.subscription.getCurrentPlan.fetch();
-                      if (subscription && vehicles) {
-                        const vehicleCount = vehicles.length;
-                        const limit = subscription.tier?.maxVehicles;
-                        
-                        // If limit is null, it means unlimited vehicles
-                        if (limit !== null && vehicleCount >= limit) {
-                          setSubscriptionLimitError({
-                            show: true,
-                            message: `You have reached your vehicle limit`,
-                            limit,
-                            current: vehicleCount
-                          });
-                          return;
-                        }
-                      }
-                      setIsAddDialogOpen(true);
-                    } catch (error) {
-                      console.error('Error checking subscription:', error);
-                      setIsAddDialogOpen(true);
+            {/* Add Vehicle button — subscription check preserved */}
+            <Button
+              size="sm"
+              onClick={async (e) => {
+                e.preventDefault();
+                try {
+                  const subscription = await utils.subscription.getCurrentPlan.fetch();
+                  if (subscription && vehicles) {
+                    const vehicleCount = vehicles.length;
+                    const limit = subscription.tier?.maxVehicles;
+                    if (limit !== null && vehicleCount >= limit) {
+                      setSubscriptionLimitError({ show: true, message: `You have reached your vehicle limit`, limit, current: vehicleCount });
+                      return;
                     }
-                  }}
-                >
-                  <Plus className="mr-1.5 h-3.5 w-3.5" />
-                  {t("fleet.addVehicle")}
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
-              <DialogHeader>
-                <DialogTitle>Add New Vehicle</DialogTitle>
-                <DialogDescription>Enter vehicle details to add it to your fleet.</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddVehicle} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="plateNumber">Plate Number *</Label>
-                    <Input id="plateNumber" name="plateNumber" required className="input-client" />
-                  </div>
-                  <div>
-                    <Label htmlFor="vin">VIN</Label>
-                    <Input id="vin" name="vin" maxLength={17} />
-                  </div>
-                </div>
+                  }
+                  setIsAddDialogOpen(true);
+                } catch (error) {
+                  console.error('Error checking subscription:', error);
+                  setIsAddDialogOpen(true);
+                }
+              }}
+            >
+              <Plus className="mr-1.5 h-3.5 w-3.5" />
+              {t("fleet.addVehicle")}
+            </Button>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label>Car Maker *</Label>
-                    <Popover open={makerOpen} onOpenChange={setMakerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={makerOpen}
-                          className="w-full justify-between"
-                        >
-                          {selectedMakerId
-                            ? carMakers?.find((maker) => maker.id === selectedMakerId)?.name
-                            : "Select maker..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search maker..." />
-                          <CommandList>
-                            <CommandEmpty>No maker found.</CommandEmpty>
-                            <CommandGroup>
-                              {carMakers?.map((maker) => (
-                                <CommandItem
-                                  key={maker.id}
-                                  value={maker.name}
-                                  onSelect={() => {
-                                    setSelectedMakerId(maker.id);
-                                    setSelectedModelId(null); // Reset model when maker changes
-                                    setMakerOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      selectedMakerId === maker.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {maker.name}
-                                </CommandItem>
-                              ))}
-                              <CommandItem
-                                onSelect={() => {
-                                  setMakerOpen(false);
-                                  setIsCustomMakerDialogOpen(true);
-                                }}
-                                className="border-t mt-2 pt-2 text-primary font-medium"
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Custom Maker
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label>Car Model *</Label>
-                    <Popover open={modelOpen} onOpenChange={setModelOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={modelOpen}
-                          className="w-full justify-between"
-                          disabled={!selectedMakerId}
-                        >
-                          {selectedModelId
-                            ? carModels?.find((model) => model.id === selectedModelId)?.modelName
-                            : "Select model..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput placeholder="Search model..." />
-                          <CommandList>
-                            <CommandEmpty>No model found.</CommandEmpty>
-                            <CommandGroup>
-                              {carModels?.map((model) => (
-                                <CommandItem
-                                  key={model.id}
-                                  value={model.modelName}
-                                  onSelect={() => {
-                                    setSelectedModelId(model.id);
-                                    setModelOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      selectedModelId === model.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
-                                  {model.modelName}
-                                </CommandItem>
-                              ))}
-                              <CommandItem
-                                onSelect={() => {
-                                  setModelOpen(false);
-                                  setCustomModelMakerId(selectedMakerId);
-                                  setIsCustomModelDialogOpen(true);
-                                }}
-                                className="border-t mt-2 pt-2 text-primary font-medium"
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                Add Custom Model
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label htmlFor="year">Year *</Label>
-                    <Input id="year" name="year" type="number" min="1900" max="2100" required className="input-client" />
-                  </div>
-                </div>
+            {/* Add Vehicle portal workspace */}
+            {isAddDialogOpen && createPortal(
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    setIsAddDialogOpen(false);
+                    setSelectedMakerId(null);
+                    setSelectedModelId(null);
+                  }
+                }}
+              >
+                <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ width: "90vw", height: "90vh" }}>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="color">Color *</Label>
-                    <Input id="color" name="color" required className="input-client" />
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Category *</Label>
-                    <Select name="category" required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Economy">Economy</SelectItem>
-                        <SelectItem value="Compact">Compact</SelectItem>
-                        <SelectItem value="Midsize">Midsize</SelectItem>
-                        <SelectItem value="SUV">SUV</SelectItem>
-                        <SelectItem value="Luxury">Luxury</SelectItem>
-                        <SelectItem value="Van">Van</SelectItem>
-                        <SelectItem value="Truck">Truck</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="mileage">Mileage</Label>
-                  <Input id="mileage" name="mileage" type="number" min="0" />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="col-span-1">
-                    <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
-                    <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client" />
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="weeklyRate">Weekly Rate ($)</Label>
-                    <Input id="weeklyRate" name="weeklyRate" type="number" step="0.01" min="0" />
-                  </div>
-                  <div className="col-span-1 sm:col-span-2 lg:col-span-1">
-                    <Label htmlFor="monthlyRate">Monthly Rate ($)</Label>
-                    <Input id="monthlyRate" name="monthlyRate" type="number" step="0.01" min="0" />
-                  </div>
-                </div>
-
-                {/* High Season Pricing */}
-                <div className="space-y-3 p-4 border border-amber-200 rounded-lg bg-amber-50/50">
-                  <div className="flex items-center gap-2">
-                    <Sun className="h-4 w-4 text-amber-500" />
-                    <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
-                  </div>
-                  <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <Label htmlFor="highSeasonDailyRate">HS Daily ($)</Label>
-                      <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" />
-                    </div>
-                    <div>
-                      <Label htmlFor="highSeasonWeeklyRate">HS Weekly ($)</Label>
-                      <Input id="highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" />
-                    </div>
-                    <div>
-                      <Label htmlFor="highSeasonMonthlyRate">HS Monthly ($)</Label>
-                      <Input id="highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">Insurance Information</h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="col-span-1">
-                      <Label htmlFor="insuranceProvider">Insurance Provider</Label>
-                      <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" />
-                    </div>
-
-                    <div className="col-span-1">
-                      <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
-                      <Input id="insurancePolicyNumber" name="insurancePolicyNumber" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="col-span-1">
-                      <Label>Policy Start Date</Label>
-                      <ModernDatePicker
-                        date={insuranceStartDate}
-                        onDateChange={setInsuranceStartDate}
-                        placeholder="Select start date"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">Expiry date will be automatically set to 1 year from start date</p>
-                    </div>
-
-                    <div className="col-span-1">
-                      <Label>Policy Expiry Date (Auto-calculated)</Label>
-                      <div className="p-2 bg-muted rounded border border-muted-foreground/20">
-                        <p className="text-sm font-medium">
-                          {insuranceStartDate 
-                            ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
-                            : 'Select a start date above'}
-                        </p>
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] flex-shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-white/10 rounded-lg">
+                        <Car className="w-5 h-5 text-white" />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">Automatically calculated as 1 year from the policy start date</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="insuranceAnnualPremium">Annual Premium ($)</Label>
-                    <Input id="insuranceAnnualPremium" name="insuranceAnnualPremium" type="number" step="0.01" min="0" placeholder="0.00" />
-                    <p className="text-xs text-muted-foreground mt-1">You'll be prompted to renew when policy expires</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">Registration</h4>
-                  <div>
-                    <Label htmlFor="vehicleRegistrationNumber">Registration Number</Label>
-                    <Input id="vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Expiry Date</Label>
-                      <ModernDatePicker
-                        date={registrationExpiryDate}
-                        onDateChange={setRegistrationExpiryDate}
-                        placeholder="Select expiry date"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="registrationFee">Annual Fee ($)</Label>
-                      <Input id="registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" />
-                      <p className="text-xs text-muted-foreground mt-1">Registration fees can vary each year</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <Label>Next Maintenance Date</Label>
-                  <ModernDatePicker
-                    date={nextMaintenanceDate}
-                    onDateChange={setNextMaintenanceDate}
-                    placeholder="Select maintenance date"
-                  />
-                </div>
-
-                {/* Vehicle Purchase Details */}
-                <div className="border rounded-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowPurchaseSection(v => !v)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
-                      <span className="text-xs text-blue-600 font-normal">(Optional)</span>
-                    </div>
-                    {showPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
-                  </button>
-
-                  {showPurchaseSection && (
-                    <div className="p-4 space-y-4 bg-white">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label>Purchase Type</Label>
-                          <Select onValueChange={(v) => setPurchaseType(v as any)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Cash or Installments" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Cash">Cash</SelectItem>
-                              <SelectItem value="Installments">Installments</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="purchaseCost">Purchase Price</Label>
-                          <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00"
-                            onChange={(e) => { setAddPurchaseCost(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="downPayment">Down Payment</Label>
-                          <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00"
-                            onChange={(e) => { setAddDownPayment(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
-                        </div>
-                        <div>
-                          <Label htmlFor="sellerName">Seller / Dealer Name</Label>
-                          <Input id="sellerName" name="sellerName" placeholder="e.g. ABC Motors" />
-                        </div>
-                      </div>
-
                       <div>
-                        <Label>Purchase Date</Label>
-                        <ModernDatePicker
-                          date={purchaseDate}
-                          onDateChange={setPurchaseDate}
-                          placeholder="Select purchase date"
-                        />
+                        <h2 className="text-lg font-bold text-white">Add New Vehicle</h2>
+                        <p className="text-blue-200 text-xs">Enter vehicle details to add it to your fleet</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setIsAddDialogOpen(false); setSelectedMakerId(null); setSelectedModelId(null); }}
+                      className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Body + Footer */}
+                  <form onSubmit={handleAddVehicle} className="flex flex-col flex-1 min-h-0">
+                    <div className="flex flex-1 min-h-0">
+
+                      {/* Left column — Basic Info + Pricing */}
+                      <div className="w-[52%] border-r border-gray-100 overflow-y-auto p-6 space-y-5">
+
+                        {/* Basic Info */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-4">
+                            <Car className="w-4 h-4 text-blue-700" />
+                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Basic Info</h3>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label htmlFor="plateNumber">Plate Number *</Label>
+                              <Input id="plateNumber" name="plateNumber" required className="input-client mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="vin">VIN</Label>
+                              <Input id="vin" name="vin" maxLength={17} className="mt-1" />
+                            </div>
+                            <div>
+                              <Label>Car Maker *</Label>
+                              <Popover open={makerOpen} onOpenChange={setMakerOpen}>
+                                <PopoverTrigger asChild>
+                                  <Button variant="outline" role="combobox" aria-expanded={makerOpen} className="w-full justify-between mt-1">
+                                    {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : "Select maker..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
+                                  <Command>
+                                    <CommandInput placeholder="Search maker..." />
+                                    <CommandList>
+                                      <CommandEmpty>No maker found.</CommandEmpty>
+                                      <CommandGroup>
+                                        {carMakers?.map((maker) => (
+                                          <CommandItem key={maker.id} value={maker.name} onSelect={() => { setSelectedMakerId(maker.id); setSelectedModelId(null); setMakerOpen(false); }}>
+                                            <Check className={cn("mr-2 h-4 w-4", selectedMakerId === maker.id ? "opacity-100" : "opacity-0")} />
+                                            {maker.name}
+                                          </CommandItem>
+                                        ))}
+                                        <CommandItem onSelect={() => { setMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
+                                          <Plus className="mr-2 h-4 w-4" />Add Custom Maker
+                                        </CommandItem>
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                            <div>
+                              <Label>Car Model *</Label>
+                              <Popover open={modelOpen} onOpenChange={setModelOpen}>
+                                <PopoverTrigger asChild>
+                                  <Button variant="outline" role="combobox" aria-expanded={modelOpen} className="w-full justify-between mt-1" disabled={!selectedMakerId}>
+                                    {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : "Select model..."}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
+                                  <Command>
+                                    <CommandInput placeholder="Search model..." />
+                                    <CommandList>
+                                      <CommandEmpty>No model found.</CommandEmpty>
+                                      <CommandGroup>
+                                        {carModels?.map((model) => (
+                                          <CommandItem key={model.id} value={model.modelName} onSelect={() => { setSelectedModelId(model.id); setModelOpen(false); }}>
+                                            <Check className={cn("mr-2 h-4 w-4", selectedModelId === model.id ? "opacity-100" : "opacity-0")} />
+                                            {model.modelName}
+                                          </CommandItem>
+                                        ))}
+                                        <CommandItem onSelect={() => { setModelOpen(false); setCustomModelMakerId(selectedMakerId); setIsCustomModelDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
+                                          <Plus className="mr-2 h-4 w-4" />Add Custom Model
+                                        </CommandItem>
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            </div>
+                            <div>
+                              <Label htmlFor="year">Year *</Label>
+                              <Input id="year" name="year" type="number" min="1900" max="2100" required className="input-client mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="mileage">Mileage (km)</Label>
+                              <Input id="mileage" name="mileage" type="number" min="0" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="color">Color *</Label>
+                              <Input id="color" name="color" required className="input-client mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="category">Category *</Label>
+                              <Select name="category" required>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent style={{ zIndex: 9999 }}>
+                                  <SelectItem value="Economy">Economy</SelectItem>
+                                  <SelectItem value="Compact">Compact</SelectItem>
+                                  <SelectItem value="Midsize">Midsize</SelectItem>
+                                  <SelectItem value="SUV">SUV</SelectItem>
+                                  <SelectItem value="Luxury">Luxury</SelectItem>
+                                  <SelectItem value="Van">Van</SelectItem>
+                                  <SelectItem value="Truck">Truck</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Pricing */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-4">
+                            <DollarSign className="w-4 h-4 text-blue-700" />
+                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Pricing</h3>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
+                              <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="weeklyRate">Weekly ($)</Label>
+                              <Input id="weeklyRate" name="weeklyRate" type="number" step="0.01" min="0" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="monthlyRate">Monthly ($)</Label>
+                              <Input id="monthlyRate" name="monthlyRate" type="number" step="0.01" min="0" className="mt-1" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* High Season Pricing */}
+                        <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Sun className="h-4 w-4 text-amber-500" />
+                            <span className="text-sm font-medium text-amber-800">High Season Pricing</span>
+                            <span className="text-xs text-amber-600">(Optional)</span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <Label htmlFor="highSeasonDailyRate" className="text-xs">HS Daily ($)</Label>
+                              <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="highSeasonWeeklyRate" className="text-xs">HS Weekly ($)</Label>
+                              <Input id="highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
+                            </div>
+                            <div>
+                              <Label htmlFor="highSeasonMonthlyRate" className="text-xs">HS Monthly ($)</Label>
+                              <Input id="highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
 
-                      {purchaseType === "Installments" && (() => {
-                        const loanAmount = Math.max(0, addPurchaseCost - addDownPayment);
-                        const remaining = loanAmount * (1 + addInterestRate / 100);
-                        const computedMonthly = addNumInstallments > 0 ? remaining / addNumInstallments : 0;
-                        const monthlyDisplay = addMonthlyManual !== null ? addMonthlyManual : computedMonthly;
-                        return (
-                          <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
-                            <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="interestRate">Interest Rate (%)</Label>
-                                <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
-                                  onChange={(e) => { setAddInterestRate(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
-                              </div>
-                              <div>
-                                <Label htmlFor="numberOfInstallments">Number of Installments</Label>
-                                <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
-                                  onChange={(e) => { setAddNumInstallments(parseInt(e.target.value) || 0); setAddMonthlyManual(null); }} />
-                              </div>
+                      {/* Right column — Insurance / Registration / Maintenance / Purchase / AI */}
+                      <div className="flex-1 overflow-y-auto p-6 bg-gray-50/40 space-y-4">
+
+                        {/* Insurance */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Insurance</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="insuranceProvider">Provider</Label>
+                              <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm" className="mt-1" />
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="monthlyInstallmentAmount">
-                                  Monthly Installment
-                                  {addMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
-                                </Label>
-                                <Input
-                                  id="monthlyInstallmentAmount"
-                                  name="monthlyInstallmentAmount"
-                                  type="number"
-                                  step="0.01"
-                                  min="0"
-                                  placeholder="0.00"
-                                  value={monthlyDisplay.toFixed(2)}
-                                  onChange={(e) => setAddMonthlyManual(parseFloat(e.target.value) || 0)}
-                                  className={addMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}
-                                />
+                            <div>
+                              <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
+                              <Input id="insurancePolicyNumber" name="insurancePolicyNumber" className="mt-1" />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs">Policy Start Date</Label>
+                              <div className="mt-1">
+                                <ModernDatePicker date={insuranceStartDate} onDateChange={setInsuranceStartDate} placeholder="Select start date" />
                               </div>
-                              <div>
-                                <Label htmlFor="remainingBalance">Remaining Balance</Label>
-                                <div className="relative">
-                                  <Input
-                                    id="remainingBalance"
-                                    name="remainingBalance"
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    readOnly
-                                    value={remaining.toFixed(2)}
-                                    className="bg-gray-50 text-gray-700 cursor-default pr-20"
-                                  />
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
-                                </div>
+                              <p className="text-[10px] text-gray-400 mt-1">Expiry auto-set to +1 year</p>
+                            </div>
+                            <div>
+                              <Label className="text-xs">Expiry (Auto)</Label>
+                              <div className="mt-1 p-2 bg-gray-50 rounded border border-gray-200 min-h-[38px] flex items-center">
+                                <p className="text-sm text-gray-600">
+                                  {insuranceStartDate
+                                    ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
+                                    : <span className="text-gray-400 text-xs">Select start date</span>}
+                                </p>
                               </div>
                             </div>
                           </div>
-                        );
-                      })()}
+                          <div>
+                            <Label htmlFor="insuranceAnnualPremium">Annual Premium ($)</Label>
+                            <Input id="insuranceAnnualPremium" name="insuranceAnnualPremium" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
+                          </div>
+                        </div>
+
+                        {/* Registration */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Registration</h4>
+                          <div>
+                            <Label htmlFor="vehicleRegistrationNumber">Registration Number</Label>
+                            <Input id="vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" className="mt-1" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label className="text-xs">Expiry Date</Label>
+                              <div className="mt-1">
+                                <ModernDatePicker date={registrationExpiryDate} onDateChange={setRegistrationExpiryDate} placeholder="Select date" />
+                              </div>
+                            </div>
+                            <div>
+                              <Label htmlFor="registrationFee">Annual Fee ($)</Label>
+                              <Input id="registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Next Maintenance */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                          <Label className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Next Maintenance Date</Label>
+                          <div className="mt-2">
+                            <ModernDatePicker date={nextMaintenanceDate} onDateChange={setNextMaintenanceDate} placeholder="Select date" />
+                          </div>
+                        </div>
+
+                        {/* Purchase Details — collapsible */}
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setShowPurchaseSection(v => !v)}
+                            className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+                          >
+                            <div className="flex items-center gap-2">
+                              <DollarSign className="h-4 w-4 text-blue-600" />
+                              <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
+                              <span className="text-xs text-blue-500">(Optional)</span>
+                            </div>
+                            {showPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
+                          </button>
+                          {showPurchaseSection && (
+                            <div className="p-4 space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label>Purchase Type</Label>
+                                  <Select onValueChange={(v) => setPurchaseType(v as any)}>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Cash or Installments" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Cash">Cash</SelectItem>
+                                      <SelectItem value="Installments">Installments</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor="purchaseCost">Purchase Price ($)</Label>
+                                  <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1"
+                                    onChange={(e) => { setAddPurchaseCost(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="downPayment">Down Payment ($)</Label>
+                                  <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1"
+                                    onChange={(e) => { setAddDownPayment(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                                </div>
+                                <div>
+                                  <Label htmlFor="sellerName">Seller / Dealer</Label>
+                                  <Input id="sellerName" name="sellerName" placeholder="e.g. ABC Motors" className="mt-1" />
+                                </div>
+                              </div>
+                              <div>
+                                <Label>Purchase Date</Label>
+                                <div className="mt-1">
+                                  <ModernDatePicker date={purchaseDate} onDateChange={setPurchaseDate} placeholder="Select date" />
+                                </div>
+                              </div>
+                              {purchaseType === "Installments" && (() => {
+                                const loanAmount = Math.max(0, addPurchaseCost - addDownPayment);
+                                const remaining = loanAmount * (1 + addInterestRate / 100);
+                                const computedMonthly = addNumInstallments > 0 ? remaining / addNumInstallments : 0;
+                                const monthlyDisplay = addMonthlyManual !== null ? addMonthlyManual : computedMonthly;
+                                return (
+                                  <div className="space-y-3 pt-3 border-t border-dashed border-blue-200">
+                                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                                        <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" className="mt-1"
+                                          onChange={(e) => { setAddInterestRate(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                                      </div>
+                                      <div>
+                                        <Label htmlFor="numberOfInstallments">No. of Installments</Label>
+                                        <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" className="mt-1"
+                                          onChange={(e) => { setAddNumInstallments(parseInt(e.target.value) || 0); setAddMonthlyManual(null); }} />
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      <div>
+                                        <Label htmlFor="monthlyInstallmentAmount">
+                                          Monthly Installment
+                                          {addMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
+                                        </Label>
+                                        <Input id="monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00"
+                                          value={monthlyDisplay.toFixed(2)} onChange={(e) => setAddMonthlyManual(parseFloat(e.target.value) || 0)}
+                                          className={`mt-1 ${addMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}`} />
+                                      </div>
+                                      <div>
+                                        <Label htmlFor="remainingBalance">Remaining Balance</Label>
+                                        <div className="relative mt-1">
+                                          <Input id="remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" readOnly
+                                            value={remaining.toFixed(2)} className="bg-gray-50 text-gray-700 cursor-default pr-14" />
+                                          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* AI Maintenance — collapsible */}
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setShowAddAiSection(v => !v)}
+                            className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Wrench className="h-4 w-4 text-gray-500" />
+                              <span className="text-sm font-medium text-gray-800">AI Maintenance Data</span>
+                              <span className="text-xs text-gray-400">(Optional — enables smart scheduling)</span>
+                            </div>
+                            {showAddAiSection ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+                          </button>
+                          {showAddAiSection && (
+                            <div className="p-4 space-y-3">
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="engineType">Engine Type</Label>
+                                  <Select name="engineType">
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Gasoline">Gasoline</SelectItem>
+                                      <SelectItem value="Diesel">Diesel</SelectItem>
+                                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                      <SelectItem value="Electric">Electric</SelectItem>
+                                      <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor="transmissionType">Transmission</Label>
+                                  <Select name="transmissionType">
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Manual">Manual</SelectItem>
+                                      <SelectItem value="Automatic">Automatic</SelectItem>
+                                      <SelectItem value="CVT">CVT</SelectItem>
+                                      <SelectItem value="DCT">DCT (Dual Clutch)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="fuelType">Fuel Type</Label>
+                                  <Select name="fuelType">
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Regular">Regular</SelectItem>
+                                      <SelectItem value="Premium">Premium</SelectItem>
+                                      <SelectItem value="Diesel">Diesel</SelectItem>
+                                      <SelectItem value="Electric">Electric</SelectItem>
+                                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor="averageDailyKm">Avg Daily KM</Label>
+                                  <Input id="averageDailyKm" name="averageDailyKm" type="number" min="0" step="1" placeholder="e.g., 50" className="mt-1" />
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label htmlFor="primaryUse">Primary Use</Label>
+                                  <Select name="primaryUse">
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Rental">Rental</SelectItem>
+                                      <SelectItem value="Fleet">Fleet</SelectItem>
+                                      <SelectItem value="Personal">Personal</SelectItem>
+                                      <SelectItem value="Commercial">Commercial</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div>
+                                  <Label htmlFor="operatingClimate">Operating Climate</Label>
+                                  <Select name="operatingClimate">
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectContent style={{ zIndex: 9999 }}>
+                                      <SelectItem value="Hot">Hot</SelectItem>
+                                      <SelectItem value="Cold">Cold</SelectItem>
+                                      <SelectItem value="Moderate">Moderate</SelectItem>
+                                      <SelectItem value="Humid">Humid</SelectItem>
+                                      <SelectItem value="Arid">Arid</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <Label>Last Service Date</Label>
+                                  <div className="mt-1">
+                                    <ModernDatePicker date={editLastServiceDate} onDateChange={setEditLastServiceDate} placeholder="Select date" />
+                                  </div>
+                                </div>
+                                <div>
+                                  <Label>Purchase Date (AI)</Label>
+                                  <div className="mt-1">
+                                    <ModernDatePicker date={editPurchaseDate} onDateChange={setEditPurchaseDate} placeholder="Select date" />
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <Label htmlFor="serviceHistory">Service History Notes</Label>
+                                <Textarea id="serviceHistory" name="serviceHistory" rows={2} placeholder="e.g., Recent oil change, new tires..." className="mt-1" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Notes */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-4">
+                          <Label htmlFor="notes" className="font-semibold text-sm text-gray-700">Notes</Label>
+                          <Textarea id="notes" name="notes" rows={3} className="mt-2" />
+                        </div>
+
+                      </div>
                     </div>
-                  )}
+
+                    {/* Sticky footer */}
+                    <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex-shrink-0">
+                      <p className="text-xs text-gray-400">* Required fields</p>
+                      <div className="flex gap-3">
+                        <Button type="button" variant="outline" onClick={() => { setIsAddDialogOpen(false); setSelectedMakerId(null); setSelectedModelId(null); }}>
+                          Cancel
+                        </Button>
+                        <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
+                          {createMutation.isPending ? t("common.loading") : t("fleet.addVehicle")}
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
+
                 </div>
-
-                <div>
-                  <Label htmlFor="notes">Notes</Label>
-                  <Textarea id="notes" name="notes" rows={3} />
-                </div>
-
-                {/* AI Maintenance Fields */}
-                <div className="border-t pt-4 mt-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <h3 className="text-sm font-semibold">AI Maintenance Data (Optional)</h3>
-                    <span className="text-xs text-muted-foreground">Enables intelligent maintenance scheduling</span>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="engineType">Engine Type</Label>
-                      <Select name="engineType">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select engine type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Gasoline">Gasoline</SelectItem>
-                          <SelectItem value="Diesel">Diesel</SelectItem>
-                          <SelectItem value="Hybrid">Hybrid</SelectItem>
-                          <SelectItem value="Electric">Electric</SelectItem>
-                          <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="transmissionType">Transmission</Label>
-                      <Select name="transmissionType">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select transmission" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Manual">Manual</SelectItem>
-                          <SelectItem value="Automatic">Automatic</SelectItem>
-                          <SelectItem value="CVT">CVT</SelectItem>
-                          <SelectItem value="DCT">DCT (Dual Clutch)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <Label htmlFor="fuelType">Fuel Type</Label>
-                      <Select name="fuelType">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select fuel type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Regular">Regular</SelectItem>
-                          <SelectItem value="Premium">Premium</SelectItem>
-                          <SelectItem value="Diesel">Diesel</SelectItem>
-                          <SelectItem value="Electric">Electric</SelectItem>
-                          <SelectItem value="Hybrid">Hybrid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label>Purchase Date</Label>
-                      <ModernDatePicker
-                        date={editPurchaseDate}
-                        onDateChange={setEditPurchaseDate}
-                        placeholder="Select purchase date"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <Label htmlFor="averageDailyKm">Average Daily KM</Label>
-                      <Input id="averageDailyKm" name="averageDailyKm" type="number" min="0" step="1" placeholder="e.g., 50" />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="primaryUse">Primary Use</Label>
-                      <Select name="primaryUse">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select primary use" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Rental">Rental</SelectItem>
-                          <SelectItem value="Fleet">Fleet</SelectItem>
-                          <SelectItem value="Personal">Personal</SelectItem>
-                          <SelectItem value="Commercial">Commercial</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div>
-                      <Label htmlFor="operatingClimate">Operating Climate</Label>
-                      <Select name="operatingClimate">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select climate" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Hot">Hot</SelectItem>
-                          <SelectItem value="Cold">Cold</SelectItem>
-                          <SelectItem value="Moderate">Moderate</SelectItem>
-                          <SelectItem value="Humid">Humid</SelectItem>
-                          <SelectItem value="Arid">Arid</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label>Last Service Date</Label>
-                      <ModernDatePicker
-                        date={editLastServiceDate}
-                        onDateChange={setEditLastServiceDate}
-                        placeholder="Select last service date"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <Label htmlFor="serviceHistory">Service History Notes</Label>
-                    <Textarea 
-                      id="serviceHistory" 
-                      name="serviceHistory" 
-                      rows={2} 
-                      placeholder="e.g., Recent oil change, new tires, brake service..."
-                    />
-                  </div>
-                </div>
-
-                <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)} className="w-full sm:w-auto">
-                    Cancel
-                  </Button>
-                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
-                    {createMutation.isPending ? t("common.loading") : t("fleet.addVehicle")}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </div>,
+              document.body
+            )}
           
           </div>
         </div>
