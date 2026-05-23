@@ -323,8 +323,12 @@ function GarageFormModal({
 function DeleteConfirm({ open, name, onClose, onConfirm, isPending }: {
   open: boolean; name: string; onClose: () => void; onConfirm: () => void; isPending: boolean;
 }) {
-  return (
-    <ModalOverlay open={open} onClose={onClose}>
+  if (!open) return null;
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
           <Trash2 className="h-6 w-6 text-red-600" />
@@ -340,7 +344,8 @@ function DeleteConfirm({ open, name, onClose, onConfirm, isPending }: {
           </Button>
         </div>
       </div>
-    </ModalOverlay>
+    </div>,
+    document.body
   );
 }
 
