@@ -1,4 +1,4 @@
-import { eq, and, or, lte, gte, lt, ne, sql, desc, asc, inArray } from "drizzle-orm";
+import { eq, and, or, lte, gte, lt, ne, sql, desc, asc, inArray, notInArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod } from "../drizzle/schema";
@@ -217,27 +217,31 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
   
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+
+  // Exclude Sold and Rented vehicles up front
+  const excludedStatuses = ['Sold', 'Rented'];
   const allVehicles = effectiveFilter != null
-    ? await db.select().from(vehicles).where(and(eq(vehicles.userId, effectiveFilter), ne(vehicles.status, 'Sold')))
-    : await db.select().from(vehicles).where(ne(vehicles.status, 'Sold'));
-  
+    ? await db.select().from(vehicles).where(
+        and(eq(vehicles.userId, effectiveFilter), notInArray(vehicles.status, excludedStatuses))
+      )
+    : await db.select().from(vehicles).where(notInArray(vehicles.status, excludedStatuses));
+
   const availableVehicles = await Promise.all(
     allVehicles.map(async (vehicle) => {
+      // Also exclude any vehicle that has an active or overdue contract
       const activeContracts = await db.select()
         .from(rentalContracts)
         .where(
           and(
             eq(rentalContracts.vehicleId, vehicle.id),
-            eq(rentalContracts.status, 'active')
+            inArray(rentalContracts.status, ['active', 'overdue'])
           )
         );
-      
-      // Return vehicle only if it has no active contracts
+
       return activeContracts.length === 0 ? vehicle : null;
     })
   );
-  
-  // Filter out null values and return
+
   return availableVehicles.filter(v => v !== null);
 }
 
