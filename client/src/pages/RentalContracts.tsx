@@ -1548,7 +1548,7 @@ export default function RentalContracts() {
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </Button>
-                        {contract.status === "active" && (
+                        {(contract.status === "active" || contract.status === "overdue") && (
                           <Button
                             variant="default"
                             size="sm"
@@ -2212,8 +2212,8 @@ export default function RentalContracts() {
                     </Button>
                   )
                 )}
-                {/* Mark as Returned button - only show for active contracts */}
-                {selectedContract?.status === 'active' && (
+                {/* Mark as Returned button - show for active and overdue contracts */}
+                {(selectedContract?.status === 'active' || selectedContract?.status === 'overdue') && (
                   <Button 
                     onClick={() => setIsReturnDialogOpen(true)} 
                     variant="outline"
