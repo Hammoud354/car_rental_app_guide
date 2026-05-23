@@ -641,7 +641,7 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         const userId = ctx.user?.id || 1;
         const result = await db.pool.query(
-          `SELECT DISTINCT "garageLocation" FROM "vehicleMaintenance"
+          `SELECT DISTINCT "garageLocation" FROM "maintenanceRecords"
            WHERE "userId" = $1 AND "garageLocation" IS NOT NULL AND "garageLocation" <> ''
            ORDER BY "garageLocation" ASC`,
           [userId]

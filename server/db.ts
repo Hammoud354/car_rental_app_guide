@@ -165,27 +165,32 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
       // - Otherwise, show as Available
       let effectiveStatus = vehicle.status;
       
-      // Auto-release from maintenance if garageExitDate has passed
+      // Auto-release from maintenance only when garage exit dates have passed.
+      // If there are NO records with a garageEntryDate (vehicle was manually set to
+      // Maintenance via checkbox or direct status change), never auto-release.
       if (vehicle.status === 'Maintenance') {
-        const activeMaintenanceRecords = records.filter(r => {
-          if (r.garageExitDate && new Date(r.garageExitDate) <= now) {
-            return false; // Exit date has passed, no longer in maintenance
+        const recordsWithGarageEntry = records.filter(r => r.garageEntryDate);
+        if (recordsWithGarageEntry.length > 0) {
+          const activeGarageRecords = recordsWithGarageEntry.filter(r => {
+            if (r.garageExitDate && new Date(r.garageExitDate) <= now) {
+              return false; // Exit date has passed — no longer in garage
+            }
+            if (!r.garageExitDate) {
+              return true; // In garage, no exit date set yet
+            }
+            if (new Date(r.garageExitDate) > now) {
+              return true; // Exit date is in the future
+            }
+            return false;
+          });
+          if (activeGarageRecords.length === 0) {
+            // All dated garage sessions are complete — auto-release
+            effectiveStatus = activeContracts.length > 0 ? 'Rented' : 'Available';
+            db.update(vehicles).set({ status: 'Available' }).where(eq(vehicles.id, vehicle.id)).catch(() => {});
           }
-          if (r.garageEntryDate && !r.garageExitDate) {
-            return true; // Entered garage but no exit date set - still in maintenance
-          }
-          if (r.garageEntryDate && r.garageExitDate && new Date(r.garageExitDate) > now) {
-            return true; // Exit date is in the future - still in maintenance
-          }
-          return false;
-        });
-        
-        if (activeMaintenanceRecords.length === 0) {
-          // All maintenance records have passed exit dates, auto-release vehicle
-          effectiveStatus = activeContracts.length > 0 ? 'Rented' : 'Available';
-          // Update the vehicle status in the database
-          db.update(vehicles).set({ status: 'Available' }).where(eq(vehicles.id, vehicle.id)).catch(() => {});
         }
+        // If recordsWithGarageEntry.length === 0: vehicle was manually put in
+        // Maintenance (no dates), keep status as Maintenance.
       } else if (vehicle.status === 'Available' && activeContracts.length > 0) {
         effectiveStatus = 'Rented';
       } else if (vehicle.status === 'Rented' && activeContracts.length === 0) {
