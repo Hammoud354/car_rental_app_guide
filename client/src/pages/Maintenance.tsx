@@ -116,6 +116,7 @@ export default function Maintenance() {
   );
   
   const { data: garageLocations } = trpc.fleet.getGarageLocations.useQuery();
+  const { data: technicians } = trpc.fleet.getTechnicians.useQuery();
 
   const { data: lastReturnKm } = trpc.fleet.getLastReturnKm.useQuery(
     { vehicleId: selectedVehicleId || 0 },
@@ -545,14 +546,17 @@ export default function Maintenance() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input name="garageLocation" list="garage-locations-list" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" autoComplete="off" />
+                <Input name="garageLocation" list="garage-locations-list" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" />
                 <datalist id="garage-locations-list">
                   {garageLocations?.map((loc) => <option key={loc} value={loc} />)}
                 </datalist>
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>
-                <Input name="performedBy" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+                <Input name="performedBy" list="technicians-list" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+                <datalist id="technicians-list">
+                  {technicians?.map((tech) => <option key={tech} value={tech} />)}
+                </datalist>
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
@@ -690,11 +694,11 @@ export default function Maintenance() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" list="garage-locations-list" autoComplete="off" className="mt-1 h-9 text-sm input-client" />
+                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" list="garage-locations-list" className="mt-1 h-9 text-sm input-client" />
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>
-                <Input value={editFormData.performedBy} onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})} placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+                <Input value={editFormData.performedBy} onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})} placeholder="Technician name" list="technicians-list" className="mt-1 h-9 text-sm input-client" />
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>

@@ -649,6 +649,18 @@ export const appRouter = router({
         return (result.rows as any[]).map((r: any) => r.garageLocation as string);
       }),
 
+    getTechnicians: publicProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id || 1;
+        const result = await db.pool.query(
+          `SELECT DISTINCT "performedBy" FROM "maintenanceRecords"
+           WHERE "userId" = $1 AND "performedBy" IS NOT NULL AND "performedBy" <> '' AND "performedBy" <> 'Pending'
+           ORDER BY "performedBy" ASC`,
+          [userId]
+        );
+        return (result.rows as any[]).map((r: any) => r.performedBy as string);
+      }),
+
     getLastReturnKm: publicProcedure
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {
