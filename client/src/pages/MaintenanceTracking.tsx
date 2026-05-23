@@ -1,12 +1,12 @@
+import { createPortal } from "react-dom";
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AlertTriangle, Calendar, Gauge, Wrench, Plus, ChevronRight, Clock, MessageCircle } from "lucide-react";
+import { AlertTriangle, Calendar, Gauge, Wrench, ChevronRight, Clock, MessageCircle, X } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
@@ -40,11 +40,11 @@ export default function MaintenanceTracking() {
     const formData = new FormData(e.currentTarget);
     updateScheduleMutation.mutate({
       vehicleId: selectedVehicle,
-      nextMaintenanceDate: formData.get("nextMaintenanceDate") 
-        ? new Date(formData.get("nextMaintenanceDate") as string) 
+      nextMaintenanceDate: formData.get("nextMaintenanceDate")
+        ? new Date(formData.get("nextMaintenanceDate") as string)
         : undefined,
-      nextMaintenanceKm: formData.get("nextMaintenanceKm") 
-        ? parseInt(formData.get("nextMaintenanceKm") as string) 
+      nextMaintenanceKm: formData.get("nextMaintenanceKm")
+        ? parseInt(formData.get("nextMaintenanceKm") as string)
         : undefined,
       maintenanceIntervalKm: parseInt(formData.get("maintenanceIntervalKm") as string),
       maintenanceIntervalMonths: parseInt(formData.get("maintenanceIntervalMonths") as string),
@@ -54,47 +54,37 @@ export default function MaintenanceTracking() {
   const getMaintenanceStatus = (vehicle: any) => {
     const now = new Date();
     const currentMileage = vehicle.mileage || 0;
-
-    // Check date-based maintenance
     const dateOverdue = vehicle.nextMaintenanceDate && new Date(vehicle.nextMaintenanceDate) < now;
-    const dateUpcoming = vehicle.nextMaintenanceDate && 
-      new Date(vehicle.nextMaintenanceDate) <= new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
-
-    // Check km-based maintenance
+    const dateUpcoming = vehicle.nextMaintenanceDate &&
+      new Date(vehicle.nextMaintenanceDate) <= new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     const kmOverdue = vehicle.nextMaintenanceKm && currentMileage >= vehicle.nextMaintenanceKm;
-    const kmUpcoming = vehicle.nextMaintenanceKm && 
-      currentMileage >= (vehicle.nextMaintenanceKm - 500); // 500km before
-
-    if (dateOverdue || kmOverdue) {
-      return { status: "overdue", color: "destructive", label: "Overdue" };
-    }
-    if (dateUpcoming || kmUpcoming) {
-      return { status: "upcoming", color: "warning", label: "Due Soon" };
-    }
+    const kmUpcoming = vehicle.nextMaintenanceKm && currentMileage >= (vehicle.nextMaintenanceKm - 500);
+    if (dateOverdue || kmOverdue) return { status: "overdue", color: "destructive", label: "Overdue" };
+    if (dateUpcoming || kmUpcoming) return { status: "upcoming", color: "warning", label: "Due Soon" };
     return { status: "ok", color: "default", label: "On Schedule" };
   };
 
   const overdueVehicles = vehicles?.filter(v => getMaintenanceStatus(v).status === "overdue") || [];
   const upcomingVehicles = vehicles?.filter(v => getMaintenanceStatus(v).status === "upcoming") || [];
 
+  const selectedVehicleData = vehicles?.find(v => v.id === selectedVehicle);
+
   return (
-    <div className="container mx-auto py-8 input-client">
+    <div className="container mx-auto py-8">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4 input-client">
-        <Link href="/">
-          <span className="hover:text-foreground cursor-pointer input-client">Overview</span>
-        </Link>
-        <ChevronRight className="h-4 w-4 input-client" />
-        <span className="text-foreground font-medium input-client">{t("maintenance.title")}</span>
+      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+        <Link href="/"><span className="hover:text-foreground cursor-pointer">Overview</span></Link>
+        <ChevronRight className="h-4 w-4" />
+        <span className="text-foreground font-medium">{t("maintenance.title")}</span>
       </div>
 
-      <div className="mb-8 flex justify-between items-start input-client">
+      <div className="mb-8 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2 input-client">
-            <Wrench className="h-8 w-8 input-client" />
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Wrench className="h-6 w-6" />
             Maintenance Tracking & Alerts
           </h1>
-          <p className="text-muted-foreground mt-2 input-client">
+          <p className="text-sm text-gray-500 mt-0.5">
             Track maintenance schedules and get alerts for upcoming service
           </p>
         </div>
@@ -113,204 +103,235 @@ export default function MaintenanceTracking() {
             }
           }}
           disabled={sendAlertMutation.isPending || (overdueVehicles.length === 0 && upcomingVehicles.length === 0)}
-          className="gap-2 input-client"
+          className="gap-2 self-start"
+          size="sm"
         >
-          <MessageCircle className="h-4 w-4 input-client" />
+          <MessageCircle className="h-4 w-4" />
           Send WhatsApp Alert
         </Button>
       </div>
 
       {/* Alert Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 input-client">
-        <Card className="border-destructive/50 input-client">
-          <CardHeader className="pb-3 input-client">
-            <CardTitle className="text-lg flex items-center gap-2 input-client">
-              <AlertTriangle className="h-5 w-5 text-destructive input-client" />
-              Overdue Maintenance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-destructive input-client">{overdueVehicles.length}</div>
-            <p className="text-sm text-muted-foreground mt-1 input-client">
-              {overdueVehicles.length === 1 ? "vehicle needs" : "vehicles need"} immediate attention
-            </p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white rounded-xl border border-red-200 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+              <AlertTriangle className="h-4 w-4 text-red-600" />
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Overdue</span>
+          </div>
+          <div className="text-3xl font-bold text-red-600">{overdueVehicles.length}</div>
+          <p className="text-xs text-gray-500 mt-1">{overdueVehicles.length === 1 ? "vehicle needs" : "vehicles need"} immediate attention</p>
+        </div>
 
-        <Card className="border-yellow-500/50 input-client">
-          <CardHeader className="pb-3 input-client">
-            <CardTitle className="text-lg flex items-center gap-2 input-client">
-              <Clock className="h-5 w-5 text-yellow-600 input-client" />
-              Due Soon
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-yellow-600 input-client">{upcomingVehicles.length}</div>
-            <p className="text-sm text-muted-foreground mt-1 input-client">
-              {upcomingVehicles.length === 1 ? "vehicle is" : "vehicles are"} due within 30 days
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-xl border border-yellow-200 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
+              <Clock className="h-4 w-4 text-yellow-600" />
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Due Soon</span>
+          </div>
+          <div className="text-3xl font-bold text-yellow-600">{upcomingVehicles.length}</div>
+          <p className="text-xs text-gray-500 mt-1">{upcomingVehicles.length === 1 ? "vehicle is" : "vehicles are"} due within 30 days</p>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-3 input-client">
-            <CardTitle className="text-lg flex items-center gap-2 input-client">
-              <Gauge className="h-5 w-5 input-client" />
-              Total Fleet
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold input-client">{vehicles?.length || 0}</div>
-            <p className="text-sm text-muted-foreground mt-1 input-client">
-              vehicles being tracked
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Gauge className="h-4 w-4 text-blue-600" />
+            </div>
+            <span className="text-sm font-semibold text-gray-700">Total Fleet</span>
+          </div>
+          <div className="text-3xl font-bold text-gray-900">{vehicles?.length || 0}</div>
+          <p className="text-xs text-gray-500 mt-1">vehicles being tracked</p>
+        </div>
       </div>
 
-      {/* Overdue Vehicles Section */}
+      {/* Overdue */}
       {overdueVehicles.length > 0 && (
-        <div className="mb-8 input-client">
-          <h2 className="text-2xl font-bold mb-4 text-destructive flex items-center gap-2 input-client">
-            <AlertTriangle className="h-6 w-6 input-client" />
+        <div className="mb-8">
+          <h2 className="text-lg font-bold mb-4 text-red-700 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
             Overdue Maintenance
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 input-client">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {overdueVehicles.map((vehicle) => (
               <VehicleMaintenanceCard
                 key={vehicle.id}
                 vehicle={vehicle}
                 status={getMaintenanceStatus(vehicle)}
-                onScheduleClick={() => {
-                  setSelectedVehicle(vehicle.id);
-                  setIsScheduleDialogOpen(true);
-                }}
+                onScheduleClick={() => { setSelectedVehicle(vehicle.id); setIsScheduleDialogOpen(true); }}
               />
             ))}
           </div>
         </div>
       )}
 
-      {/* Upcoming Vehicles Section */}
+      {/* Upcoming */}
       {upcomingVehicles.length > 0 && (
-        <div className="mb-8 input-client">
-          <h2 className="text-2xl font-bold mb-4 text-yellow-600 flex items-center gap-2 input-client">
-            <Clock className="h-6 w-6 input-client" />
+        <div className="mb-8">
+          <h2 className="text-lg font-bold mb-4 text-yellow-600 flex items-center gap-2">
+            <Clock className="h-5 w-5" />
             Due Soon
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 input-client">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {upcomingVehicles.map((vehicle) => (
               <VehicleMaintenanceCard
                 key={vehicle.id}
                 vehicle={vehicle}
                 status={getMaintenanceStatus(vehicle)}
-                onScheduleClick={() => {
-                  setSelectedVehicle(vehicle.id);
-                  setIsScheduleDialogOpen(true);
-                }}
+                onScheduleClick={() => { setSelectedVehicle(vehicle.id); setIsScheduleDialogOpen(true); }}
               />
             ))}
           </div>
         </div>
       )}
 
-      {/* All Vehicles Section */}
+      {/* All Vehicles */}
       <div>
-        <h2 className="text-2xl font-bold mb-4 input-client">All Vehicles</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 input-client">
+        <h2 className="text-lg font-bold mb-4 text-gray-900">All Vehicles</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {vehicles?.map((vehicle) => (
             <VehicleMaintenanceCard
               key={vehicle.id}
               vehicle={vehicle}
               status={getMaintenanceStatus(vehicle)}
-              onScheduleClick={() => {
-                setSelectedVehicle(vehicle.id);
-                setIsScheduleDialogOpen(true);
-              }}
+              onScheduleClick={() => { setSelectedVehicle(vehicle.id); setIsScheduleDialogOpen(true); }}
             />
           ))}
         </div>
       </div>
 
-      {/* Schedule Dialog */}
-      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
-        <DialogContent className="max-w-md input-client">
-          <DialogHeader>
-            <DialogTitle>Update Maintenance Schedule</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleUpdateSchedule} className="space-y-4 input-client">
-            {selectedVehicle && (
-              <>
-                <div className="space-y-2 input-client">
-                  <Label>Next Maintenance Date</Label>
-                  <ModernDatePicker
-                    date={nextMaintenanceDate}
-                    onDateChange={setNextMaintenanceDate}
-                    placeholder="Select maintenance date"
-                  />
+      {/* ── Schedule Portal ──────────────────────────────────────── */}
+      {isScheduleDialogOpen && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
+          onClick={(e) => { if (e.target === e.currentTarget) setIsScheduleDialogOpen(false); }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-lg"
+            style={{ height: "min(90vh, 600px)" }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-900 to-blue-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/10 rounded-xl p-2">
+                  <Calendar className="w-4 h-4 text-white" />
                 </div>
-
-                <div className="space-y-2 input-client">
-                  <Label htmlFor="nextMaintenanceKm">Next Maintenance at (km)</Label>
-                  <Input
-                    id="nextMaintenanceKm"
-                    name="nextMaintenanceKm"
-                    type="number"
-                    defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.nextMaintenanceKm || ""}
-                  />
+                <div>
+                  <h2 className="text-white font-bold text-base leading-tight">Update Maintenance Schedule</h2>
+                  {selectedVehicleData && (
+                    <p className="text-blue-200 text-xs mt-0.5">{selectedVehicleData.plateNumber} — {selectedVehicleData.brand} {selectedVehicleData.model}</p>
+                  )}
                 </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsScheduleDialogOpen(false)}
+                className="text-white/60 hover:text-white transition-colors rounded-lg p-1.5 hover:bg-white/10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-                <div className="space-y-2 input-client">
-                  <Label htmlFor="maintenanceIntervalKm">Maintenance Interval (km)</Label>
-                  <Input
-                    id="maintenanceIntervalKm"
-                    name="maintenanceIntervalKm"
-                    type="number"
-                    required
-                    defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.maintenanceIntervalKm || 5000}
-                  />
-                  <p className="text-sm text-muted-foreground input-client">
-                    Maintenance every X kilometers
-                  </p>
-                </div>
+            {/* Body */}
+            <form id="schedule-form" onSubmit={handleUpdateSchedule} className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+              <div className="p-5 space-y-4">
+                {selectedVehicle && (
+                  <>
+                    {/* Schedule dates & km */}
+                    <div className="rounded-xl border border-gray-200 p-4 bg-white">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
+                          <Calendar className="w-3.5 h-3.5" />
+                        </span>
+                        <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Next Service</h3>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-xs font-medium text-gray-600">Next Maintenance Date</Label>
+                          <div className="mt-1">
+                            <ModernDatePicker
+                              date={nextMaintenanceDate}
+                              onDateChange={setNextMaintenanceDate}
+                              placeholder="Select maintenance date"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="nextMaintenanceKm" className="text-xs font-medium text-gray-600">Next Maintenance at (km)</Label>
+                          <Input
+                            id="nextMaintenanceKm"
+                            name="nextMaintenanceKm"
+                            type="number"
+                            className="mt-1 h-9 text-sm input-client"
+                            defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.nextMaintenanceKm || ""}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="space-y-2 input-client">
-                  <Label htmlFor="maintenanceIntervalMonths">Maintenance Interval (months)</Label>
-                  <Input
-                    id="maintenanceIntervalMonths"
-                    name="maintenanceIntervalMonths"
-                    type="number"
-                    required
-                    defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.maintenanceIntervalMonths || 6}
-                  />
-                  <p className="text-sm text-muted-foreground input-client">
-                    Maintenance every X months
-                  </p>
-                </div>
-              </>
-            )}
+                    {/* Intervals */}
+                    <div className="rounded-xl border border-gray-200 p-4 bg-white">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+                          <Gauge className="w-3.5 h-3.5" />
+                        </span>
+                        <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Intervals</h3>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="maintenanceIntervalKm" className="text-xs font-medium text-gray-600">Interval (km)</Label>
+                          <Input
+                            id="maintenanceIntervalKm"
+                            name="maintenanceIntervalKm"
+                            type="number"
+                            required
+                            className="mt-1 h-9 text-sm input-client"
+                            defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.maintenanceIntervalKm || 5000}
+                          />
+                          <p className="text-[10px] text-gray-400 mt-1">Every X kilometers</p>
+                        </div>
+                        <div>
+                          <Label htmlFor="maintenanceIntervalMonths" className="text-xs font-medium text-gray-600">Interval (months)</Label>
+                          <Input
+                            id="maintenanceIntervalMonths"
+                            name="maintenanceIntervalMonths"
+                            type="number"
+                            required
+                            className="mt-1 h-9 text-sm input-client"
+                            defaultValue={vehicles?.find(v => v.id === selectedVehicle)?.maintenanceIntervalMonths || 6}
+                          />
+                          <p className="text-[10px] text-gray-400 mt-1">Every X months</p>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </form>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={updateScheduleMutation.isPending}>
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 bg-white shrink-0">
+              <Button type="button" variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => setIsScheduleDialogOpen(false)}>Cancel</Button>
+              <Button type="submit" form="schedule-form" size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900" disabled={updateScheduleMutation.isPending}>
                 {updateScheduleMutation.isPending ? "Saving..." : "Save Schedule"}
               </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
 
-function VehicleMaintenanceCard({ 
-  vehicle, 
-  status, 
-  onScheduleClick 
-}: { 
-  vehicle: any; 
+function VehicleMaintenanceCard({
+  vehicle,
+  status,
+  onScheduleClick
+}: {
+  vehicle: any;
   status: { status: string; color: string; label: string };
   onScheduleClick: () => void;
 }) {
@@ -319,65 +340,55 @@ function VehicleMaintenanceCard({
     return new Date(date).toLocaleDateString();
   };
 
+  const borderColor = status.status === "overdue" ? "border-red-200" : status.status === "upcoming" ? "border-yellow-200" : "border-gray-100";
+  const badgeClass = status.status === "overdue"
+    ? "bg-red-100 text-red-700 border-red-200"
+    : status.status === "upcoming"
+    ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+    : "bg-emerald-100 text-emerald-700 border-emerald-200";
+
   return (
-    <Card className={status.status === "overdue" ? "border-destructive" : status.status === "upcoming" ? "border-yellow-500" : ""}>
-      <CardHeader className="pb-3 input-client">
-        <div className="flex items-start justify-between input-client">
-          <div>
-            <CardTitle className="text-lg input-client">{vehicle.brand} {vehicle.model}</CardTitle>
-            <CardDescription>{vehicle.plateNumber}</CardDescription>
-          </div>
-          <Badge variant={status.color as any}>{status.label}</Badge>
+    <div className={`bg-white rounded-xl border ${borderColor} p-5 hover:shadow-sm transition-all`}>
+      <div className="flex items-start justify-between mb-3">
+        <div>
+          <h3 className="text-base font-bold text-gray-900">{vehicle.brand} {vehicle.model}</h3>
+          <p className="text-xs text-gray-500">{vehicle.plateNumber}</p>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-3 input-client">
-        <div className="space-y-2 text-sm input-client">
-          <div className="flex items-center justify-between input-client">
-            <span className="text-muted-foreground flex items-center gap-1 input-client">
-              <Gauge className="h-4 w-4 input-client" />
-              Current Mileage
-            </span>
-            <span className="font-medium input-client">{vehicle.mileage?.toLocaleString() || 0} km</span>
-          </div>
-          
-          <div className="flex items-center justify-between input-client">
-            <span className="text-muted-foreground flex items-center gap-1 input-client">
-              <Gauge className="h-4 w-4 input-client" />
-              Next at
-            </span>
-            <span className="font-medium input-client">
-              {vehicle.nextMaintenanceKm ? `${vehicle.nextMaintenanceKm.toLocaleString()} km` : "Not set"}
-            </span>
-          </div>
+        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeClass}`}>
+          {status.label}
+        </span>
+      </div>
 
-          <div className="flex items-center justify-between input-client">
-            <span className="text-muted-foreground flex items-center gap-1 input-client">
-              <Calendar className="h-4 w-4 input-client" />
-              Next Date
-            </span>
-            <span className="font-medium input-client">{formatDate(vehicle.nextMaintenanceDate)}</span>
-          </div>
-
-          <div className="flex items-center justify-between input-client">
-            <span className="text-muted-foreground input-client">Interval</span>
-            <span className="font-medium input-client">
-              {vehicle.maintenanceIntervalKm || 5000} km / {vehicle.maintenanceIntervalMonths || 6} months
-            </span>
-          </div>
+      <div className="space-y-2 text-sm mb-4">
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500 flex items-center gap-1 text-xs"><Gauge className="h-3.5 w-3.5" />Current Mileage</span>
+          <span className="font-medium text-xs">{vehicle.mileage?.toLocaleString() || 0} km</span>
         </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500 flex items-center gap-1 text-xs"><Gauge className="h-3.5 w-3.5" />Next at</span>
+          <span className="font-medium text-xs">{vehicle.nextMaintenanceKm ? `${vehicle.nextMaintenanceKm.toLocaleString()} km` : "Not set"}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500 flex items-center gap-1 text-xs"><Calendar className="h-3.5 w-3.5" />Next Date</span>
+          <span className="font-medium text-xs">{formatDate(vehicle.nextMaintenanceDate)}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-gray-500 text-xs">Interval</span>
+          <span className="font-medium text-xs">{vehicle.maintenanceIntervalKm || 5000} km / {vehicle.maintenanceIntervalMonths || 6} mo</span>
+        </div>
+      </div>
 
-        <div className="flex gap-2 pt-2 input-client">
-          <Button variant="outline" size="sm" className="flex-1 input-client" onClick={onScheduleClick}>
-            <Wrench className="h-4 w-4 mr-1 input-client" />
-            Update Schedule
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" className="flex-1 text-xs h-8" onClick={onScheduleClick}>
+          <Wrench className="h-3.5 w-3.5 mr-1" />
+          Update Schedule
+        </Button>
+        <Link href="/maintenance">
+          <Button variant="outline" size="sm" className="text-xs h-8">
+            History
           </Button>
-          <Link href="/maintenance">
-            <Button variant="outline" size="sm">
-              View History
-            </Button>
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        </Link>
+      </div>
+    </div>
   );
 }

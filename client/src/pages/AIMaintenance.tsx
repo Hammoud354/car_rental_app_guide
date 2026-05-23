@@ -1,13 +1,13 @@
+import { createPortal } from "react-dom";
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter, Wrench } from "lucide-react";
+import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter, Wrench, X } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -667,43 +667,81 @@ export default function AIMaintenance() {
           </TabsContent>
         </Tabs>
 
-        {/* Edit Task Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Override Task</DialogTitle>
-              <DialogDescription>
-                Add your notes to customize this AI recommendation
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div>
-                <Label>Task Name</Label>
-                <Input value={selectedTask?.taskName || ""} disabled />
+        {/* Edit Task Portal */}
+        {isEditDialogOpen && createPortal(
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
+            onClick={(e) => { if (e.target === e.currentTarget) setIsEditDialogOpen(false); }}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-md"
+              style={{ height: "min(90vh, 480px)" }}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-900 to-blue-800 shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/10 rounded-xl p-2">
+                    <Edit className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-white font-bold text-base leading-tight">Override Task</h2>
+                    <p className="text-blue-200 text-xs mt-0.5">Add your notes to customize this AI recommendation</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="text-white/60 hover:text-white transition-colors rounded-lg p-1.5 hover:bg-white/10"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
 
-              <div>
-                <Label>Override Notes</Label>
-                <Textarea
-                  placeholder="Add your custom notes or modifications..."
-                  value={overrideNotes}
-                  onChange={(e) => setOverrideNotes(e.target.value)}
-                  rows={4}
-                />
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+                <div className="p-5 space-y-4">
+                  <div className="rounded-xl border border-gray-200 p-4 bg-gradient-to-br from-slate-50 to-white">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
+                        <Wrench className="w-3.5 h-3.5" />
+                      </span>
+                      <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Task</h3>
+                    </div>
+                    <Label className="text-xs font-medium text-gray-600">Task Name</Label>
+                    <Input value={selectedTask?.taskName || ""} disabled className="mt-1 h-9 text-sm bg-gray-50" />
+                  </div>
+
+                  <div className="rounded-xl border border-gray-200 p-4 bg-white">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+                        <Edit className="w-3.5 h-3.5" />
+                      </span>
+                      <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Override Notes</h3>
+                    </div>
+                    <Textarea
+                      placeholder="Add your custom notes or modifications..."
+                      value={overrideNotes}
+                      onChange={(e) => setOverrideNotes(e.target.value)}
+                      rows={4}
+                      className="text-sm input-client"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 bg-white shrink-0">
+                <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => setIsEditDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900" onClick={handleSaveTaskEdit} disabled={updateTask.isPending}>
+                  {updateTask.isPending ? "Saving..." : "Save Override"}
+                </Button>
               </div>
             </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSaveTaskEdit}>
-                Save Override
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </div>,
+          document.body
+        )}
       </div>
     </>
   );

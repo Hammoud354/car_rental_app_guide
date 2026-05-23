@@ -1,12 +1,12 @@
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Plus, Wrench, MapPin, Gauge, DollarSign, Car, Edit, Trash2, CheckCircle, Calendar, Search, AlertTriangle, Clock, ChevronRight, Activity } from "lucide-react";
+import { Plus, Wrench, MapPin, Gauge, DollarSign, Car, Edit, Trash2, CheckCircle, Calendar, Search, AlertTriangle, Clock, ChevronRight, Activity, X } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
@@ -31,6 +31,63 @@ function getStatusStyle(status: string) {
   if (status === "Maintenance") return { bg: "bg-orange-50 border-orange-200", text: "text-orange-700", dot: "bg-orange-500" };
   if (status === "Out of Service") return { bg: "bg-red-50 border-red-200", text: "text-red-700", dot: "bg-red-500" };
   return { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700", dot: "bg-emerald-500" };
+}
+
+function PortalModal({ open, onClose, title, subtitle, icon: Icon, iconBg = "bg-white/10", children, footer }: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  subtitle?: string;
+  icon: any;
+  iconBg?: string;
+  children: React.ReactNode;
+  footer: React.ReactNode;
+}) {
+  if (!open) return null;
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-2xl"
+        style={{ height: "min(90vh, 860px)" }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-900 to-blue-800 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className={`${iconBg} rounded-xl p-2`}>
+              <Icon className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-white font-bold text-base leading-tight">{title}</h2>
+              {subtitle && <p className="text-blue-200 text-xs mt-0.5">{subtitle}</p>}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-white/60 hover:text-white transition-colors rounded-lg p-1.5 hover:bg-white/10"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+          <div className="p-5 space-y-4">
+            {children}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 bg-white shrink-0">
+          {footer}
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
 }
 
 export default function Maintenance() {
@@ -230,153 +287,14 @@ export default function Maintenance() {
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t("nav.maintenance")}</h1>
             <p className="text-sm text-gray-500 mt-0.5">{t("maintenance.subtitle")}</p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
-              setIsAddDialogOpen(open);
-              if (!open) {
-                setSelectedVehicleId(null);
-                setPerformedAtDate(undefined);
-                setGarageEntryDate(undefined);
-                setGarageExitDate(undefined);
-                setMarkInMaintenance(true);
-              }
-            }}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm" size="sm">
-                <Plus className="mr-1.5 h-4 w-4" />
-                Add Record
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold">New Maintenance Record</DialogTitle>
-                <DialogDescription>Record maintenance work performed on a vehicle.</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddMaintenance} className="space-y-4 mt-2">
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Vehicle *</Label>
-                  <Select
-                    value={selectedVehicleId?.toString() || ""}
-                    onValueChange={(value) => setSelectedVehicleId(parseInt(value))}
-                    required
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder="Select a vehicle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {vehicles?.map((vehicle) => (
-                        <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                          {vehicle.plateNumber} — {vehicle.brand} {vehicle.model}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Type *</Label>
-                    <Select name="maintenanceType" required>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MAINTENANCE_TYPES.map(t => (
-                          <SelectItem key={t} value={t}>{t}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Date Performed *</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder="Select date" />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Description *</Label>
-                  <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm" />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
-                    <Input name="garageLocation" placeholder="e.g., Downtown Auto" className="mt-1 text-sm" />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Performed By</Label>
-                    <Input name="performedBy" placeholder="Technician name" className="mt-1 text-sm" />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage Exit</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">
-                      KM Reading
-                      {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
-                    </Label>
-                    <Input
-                      name="mileageAtService"
-                      type="number"
-                      min="0"
-                      placeholder="45000"
-                      defaultValue={autoFilledKm || undefined}
-                      key={autoFilledKm || 'empty'}
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Cost ($)</Label>
-                    <Input name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1 text-sm" />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Next Service KM</Label>
-                    <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 text-sm" />
-                  </div>
-                </div>
-
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={markInMaintenance}
-                      onChange={(e) => setMarkInMaintenance(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
-                    />
-                    <div>
-                      <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
-                      <p className="text-xs text-orange-600 mt-0.5">
-                        Block this vehicle from being rented until maintenance is complete
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                <DialogFooter className="pt-2">
-                  <Button type="button" variant="outline" size="sm" onClick={() => setIsAddDialogOpen(false)}>Cancel</Button>
-                  <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700" disabled={addMaintenanceMutation.isPending}>
-                    {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm self-start sm:self-auto"
+            size="sm"
+            onClick={() => setIsAddDialogOpen(true)}
+          >
+            <Plus className="mr-1.5 h-4 w-4" />
+            Add Record
+          </Button>
         </div>
 
         {/* Summary Cards */}
@@ -513,150 +431,359 @@ export default function Maintenance() {
             })}
           </div>
         )}
+      </div>
 
-        {/* Edit Record Dialog */}
-        {editingRecordId && (
-          <Dialog open={editingRecordId !== null} onOpenChange={() => { setEditingRecordId(null); setEditFormData({}); }}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold">Edit Maintenance Record</DialogTitle>
-                <DialogDescription>Update the record details below.</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 mt-2">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Type *</Label>
-                    <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
-                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {MAINTENANCE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Date Performed *</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={editPerformedAtDate} onDateChange={setEditPerformedAtDate} placeholder="Select date" />
-                    </div>
-                  </div>
-                </div>
+      {/* ── Add Record Portal ──────────────────────────────────── */}
+      <PortalModal
+        open={isAddDialogOpen}
+        onClose={() => {
+          setIsAddDialogOpen(false);
+          setSelectedVehicleId(null);
+          setPerformedAtDate(undefined);
+          setGarageEntryDate(undefined);
+          setGarageExitDate(undefined);
+          setMarkInMaintenance(true);
+        }}
+        title="New Maintenance Record"
+        subtitle="Record maintenance work performed on a vehicle"
+        icon={Wrench}
+        footer={
+          <>
+            <Button type="button" variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => {
+              setIsAddDialogOpen(false);
+              setSelectedVehicleId(null);
+              setPerformedAtDate(undefined);
+              setGarageEntryDate(undefined);
+              setGarageExitDate(undefined);
+              setMarkInMaintenance(true);
+            }}>Cancel</Button>
+            <Button
+              type="submit"
+              form="add-maintenance-form"
+              size="sm"
+              className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900"
+              disabled={addMaintenanceMutation.isPending}
+            >
+              {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
+            </Button>
+          </>
+        }
+      >
+        <form id="add-maintenance-form" onSubmit={handleAddMaintenance} className="space-y-4">
 
-                <div>
-                  <Label className="text-xs font-medium text-gray-700">Description *</Label>
-                  <Textarea
-                    rows={2}
-                    value={editFormData.description}
-                    onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                    placeholder="Describe the work performed..."
-                    className="mt-1 text-sm"
-                  />
-                </div>
+          {/* Vehicle */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-gradient-to-br from-slate-50 to-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
+                <Car className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Vehicle</h3>
+            </div>
+            <Select
+              value={selectedVehicleId?.toString() || ""}
+              onValueChange={(value) => setSelectedVehicleId(parseInt(value))}
+              required
+            >
+              <SelectTrigger className="h-9 text-sm input-client">
+                <SelectValue placeholder="Select a vehicle" />
+              </SelectTrigger>
+              <SelectContent>
+                {vehicles?.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
+                    {vehicle.plateNumber} — {vehicle.brand} {vehicle.model}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage / Location</Label>
-                    <Input
-                      value={editFormData.garageLocation}
-                      onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})}
-                      placeholder="Downtown Auto Center"
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Performed By</Label>
-                    <Input
-                      value={editFormData.performedBy}
-                      onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})}
-                      placeholder="Technician name"
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage Entry</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={editGarageEntryDate} onDateChange={setEditGarageEntryDate} placeholder="Entry date" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Garage Exit</Label>
-                    <div className="mt-1">
-                      <ModernDatePicker date={editGarageExitDate} onDateChange={setEditGarageExitDate} placeholder="Exit date" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">KM Reading</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={editFormData.mileageAtService}
-                      onChange={(e) => setEditFormData({...editFormData, mileageAtService: e.target.value})}
-                      placeholder="45000"
-                      className="mt-1 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs font-medium text-gray-700">Cost ($)</Label>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      value={editFormData.cost}
-                      onChange={(e) => setEditFormData({...editFormData, cost: e.target.value})}
-                      placeholder="0.00"
-                      className="mt-1 text-sm"
-                    />
-                  </div>
+          {/* Type & Date */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+                <Wrench className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Service Details</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Type *</Label>
+                <Select name="maintenanceType" required>
+                  <SelectTrigger className="mt-1 h-9 text-sm input-client">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MAINTENANCE_TYPES.map(t => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Date Performed *</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder="Select date" />
                 </div>
               </div>
-              <DialogFooter className="pt-2">
-                <Button variant="outline" size="sm" onClick={() => { setEditingRecordId(null); setEditFormData({}); }}>Cancel</Button>
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={handleSaveEdit} disabled={updateMaintenanceMutation.isPending}>
-                  {updateMaintenanceMutation.isPending ? "Saving..." : "Save Changes"}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+            </div>
+            <div className="mt-3">
+              <Label className="text-xs font-medium text-gray-600">Description *</Label>
+              <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm input-client" />
+            </div>
+          </div>
 
-        {/* History Dialog */}
-        {viewingHistory && (
-          <Dialog open={viewingHistory !== null} onOpenChange={() => setViewingHistory(null)}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-gray-400" />
-                  {viewingVehicle?.plateNumber} — {viewingVehicle?.brand} {viewingVehicle?.model}
-                </DialogTitle>
-                <DialogDescription>All maintenance records for this vehicle.</DialogDescription>
-              </DialogHeader>
-
-              {maintenanceRecords && maintenanceRecords.length > 0 && (
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-100">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-blue-600" />
-                      <span className="text-sm font-medium text-gray-600">Total Maintenance Cost</span>
-                    </div>
-                    <span className="text-2xl font-bold text-blue-700">
-                      ${maintenanceRecords.reduce((sum, r) => sum + (r.cost ? parseFloat(r.cost.toString()) : 0), 0).toFixed(2)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">{maintenanceRecords.length} record{maintenanceRecords.length !== 1 ? 's' : ''}</p>
+          {/* Garage Info */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
+                <MapPin className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
+                <Input name="garageLocation" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Performed By</Label>
+                <Input name="performedBy" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
                 </div>
-              )}
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-              <div className="space-y-3 mt-2">
+          {/* Odometer & Cost */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
+                <Gauge className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">
+                  KM Reading
+                  {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
+                </Label>
+                <Input
+                  name="mileageAtService"
+                  type="number"
+                  min="0"
+                  placeholder="45000"
+                  defaultValue={autoFilledKm || undefined}
+                  key={autoFilledKm || 'empty'}
+                  className="mt-1 h-9 text-sm input-client"
+                />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Cost ($)</Label>
+                <Input name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Next Service KM</Label>
+                <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 h-9 text-sm input-client" />
+              </div>
+            </div>
+          </div>
+
+          {/* Garage Status */}
+          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={markInMaintenance}
+                onChange={(e) => setMarkInMaintenance(e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
+              />
+              <div>
+                <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
+                <p className="text-xs text-orange-600 mt-0.5">
+                  Block this vehicle from being rented until maintenance is complete
+                </p>
+              </div>
+            </label>
+          </div>
+
+        </form>
+      </PortalModal>
+
+      {/* ── Edit Record Portal ─────────────────────────────────── */}
+      <PortalModal
+        open={editingRecordId !== null}
+        onClose={() => { setEditingRecordId(null); setEditFormData({}); }}
+        title="Edit Maintenance Record"
+        subtitle="Update the record details below"
+        icon={Edit}
+        footer={
+          <>
+            <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => { setEditingRecordId(null); setEditFormData({}); }}>Cancel</Button>
+            <Button size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900" onClick={handleSaveEdit} disabled={updateMaintenanceMutation.isPending}>
+              {updateMaintenanceMutation.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          {/* Type & Date */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+                <Wrench className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Service Details</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Type *</Label>
+                <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
+                  <SelectTrigger className="mt-1 h-9 text-sm input-client"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MAINTENANCE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Date Performed *</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={editPerformedAtDate} onDateChange={setEditPerformedAtDate} placeholder="Select date" />
+                </div>
+              </div>
+            </div>
+            <div className="mt-3">
+              <Label className="text-xs font-medium text-gray-600">Description *</Label>
+              <Textarea
+                rows={2}
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                placeholder="Describe the work performed..."
+                className="mt-1 text-sm input-client"
+              />
+            </div>
+          </div>
+
+          {/* Garage Info */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
+                <MapPin className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
+                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Performed By</Label>
+                <Input value={editFormData.performedBy} onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})} placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={editGarageEntryDate} onDateChange={setEditGarageEntryDate} placeholder="Entry date" />
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
+                <div className="mt-1">
+                  <ModernDatePicker date={editGarageExitDate} onDateChange={setEditGarageExitDate} placeholder="Exit date" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Odometer & Cost */}
+          <div className="rounded-xl border border-gray-200 p-4 bg-white">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
+                <Gauge className="w-3.5 h-3.5" />
+              </span>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs font-medium text-gray-600">KM Reading</Label>
+                <Input type="number" min="0" value={editFormData.mileageAtService} onChange={(e) => setEditFormData({...editFormData, mileageAtService: e.target.value})} placeholder="45000" className="mt-1 h-9 text-sm input-client" />
+              </div>
+              <div>
+                <Label className="text-xs font-medium text-gray-600">Cost ($)</Label>
+                <Input type="number" step="0.01" min="0" value={editFormData.cost} onChange={(e) => setEditFormData({...editFormData, cost: e.target.value})} placeholder="0.00" className="mt-1 h-9 text-sm input-client" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </PortalModal>
+
+      {/* ── History Portal ─────────────────────────────────────── */}
+      {viewingHistory && createPortal(
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
+          onClick={(e) => { if (e.target === e.currentTarget) setViewingHistory(null); }}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden w-full max-w-2xl"
+            style={{ height: "min(90vh, 860px)" }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-blue-900 to-blue-800 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/10 rounded-xl p-2">
+                  <Wrench className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-white font-bold text-base leading-tight">
+                    {viewingVehicle?.plateNumber} — {viewingVehicle?.brand} {viewingVehicle?.model}
+                  </h2>
+                  <p className="text-blue-200 text-xs mt-0.5">All maintenance records for this vehicle</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingHistory(null)}
+                className="text-white/60 hover:text-white transition-colors rounded-lg p-1.5 hover:bg-white/10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+              <div className="p-5 space-y-4">
+
+                {maintenanceRecords && maintenanceRecords.length > 0 && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium text-gray-600">Total Maintenance Cost</span>
+                      </div>
+                      <span className="text-2xl font-bold text-blue-700">
+                        ${maintenanceRecords.reduce((sum, r) => sum + (r.cost ? parseFloat(r.cost.toString()) : 0), 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">{maintenanceRecords.length} record{maintenanceRecords.length !== 1 ? 's' : ''}</p>
+                  </div>
+                )}
+
                 {maintenanceRecords && maintenanceRecords.length > 0 ? (
                   maintenanceRecords.map((record) => {
                     const style = getTypeStyle(record.maintenanceType);
                     return (
-                      <div key={record.id} className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
+                      <div key={record.id} className="rounded-xl border border-gray-100 bg-gray-50/50 p-4">
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-2">
                             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${style.bg} ${style.text}`}>
@@ -668,7 +795,7 @@ export default function Maintenance() {
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => handleEditRecord(record)} className="h-7 w-7 p-0">
+                            <Button size="sm" variant="ghost" onClick={() => { handleEditRecord(record); setViewingHistory(null); }} className="h-7 w-7 p-0">
                               <Edit className="h-3.5 w-3.5 text-gray-400" />
                             </Button>
                             <Button size="sm" variant="ghost" onClick={() => handleDeleteRecord(record.id)} className="h-7 w-7 p-0 text-red-400 hover:text-red-600 hover:bg-red-50">
@@ -707,10 +834,23 @@ export default function Maintenance() {
                   </div>
                 )}
               </div>
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-2 px-5 py-3.5 border-t border-gray-100 bg-white shrink-0">
+              <Button size="sm" variant="outline" className="h-8 text-xs px-4" onClick={() => setViewingHistory(null)}>Close</Button>
+              <Button
+                size="sm"
+                className="h-8 text-xs px-4 bg-blue-800 hover:bg-blue-900"
+                onClick={() => { setSelectedVehicleId(viewingHistory); setMarkInMaintenance(true); setViewingHistory(null); setIsAddDialogOpen(true); }}
+              >
+                <Plus className="h-3.5 w-3.5 mr-1" /> Add Record
+              </Button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </>
   );
 }
