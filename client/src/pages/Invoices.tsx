@@ -36,6 +36,7 @@ export default function Invoices() {
   const [invoiceSearch, setInvoiceSearch] = useState<string>("");
   const [paymentStatus, setPaymentStatus] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [autoPrintInvoice, setAutoPrintInvoice] = useState(false);
   
   // Check URL for invoice parameter and open it automatically
   useEffect(() => {
