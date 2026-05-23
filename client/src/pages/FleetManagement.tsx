@@ -978,7 +978,7 @@ export default function FleetManagement() {
                             <DollarSign className="w-4 h-4 text-blue-700" />
                             <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Pricing</h3>
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
                               <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client mt-1" />
@@ -1001,7 +1001,7 @@ export default function FleetManagement() {
                             <span className="text-sm font-medium text-amber-800">High Season Pricing</span>
                             <span className="text-xs text-amber-600">(Optional)</span>
                           </div>
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <Label htmlFor="highSeasonDailyRate" className="text-xs">HS Daily ($)</Label>
                               <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />

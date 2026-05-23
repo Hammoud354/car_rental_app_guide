@@ -692,10 +692,10 @@ export default function RentalContracts() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
                       {/* ── Two-Column Body ─────────────────────────────────── */}
-                      <div className="flex flex-1 overflow-hidden min-h-0">
+                      <div className="flex flex-col sm:flex-row flex-1 overflow-y-auto sm:overflow-hidden min-h-0">
 
                         {/* ═══ LEFT COLUMN ════════════════════════════════════ */}
-                        <div className="flex flex-col w-[52%] border-r border-gray-100 overflow-y-auto bg-white">
+                        <div className="flex flex-col w-full sm:w-[52%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto bg-white">
                           <div className="p-5 space-y-5">
 
                             {/* Vehicle Selection */}
@@ -992,7 +992,7 @@ export default function RentalContracts() {
                                   <Label htmlFor="drivingLicenseNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">License Number *</Label>
                                   <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="h-9 text-sm input-client" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <DateDropdownSelector
                                     id="licenseIssueDate"
                                     label="Issue Date"
@@ -1108,7 +1108,7 @@ export default function RentalContracts() {
                         </div>
 
                         {/* ═══ RIGHT COLUMN ═══════════════════════════════════ */}
-                        <div className="flex flex-col flex-1 overflow-y-auto bg-gray-50/40">
+                        <div className="flex flex-col w-full sm:flex-1 sm:overflow-y-auto bg-gray-50/40">
                           <div className="p-5 space-y-4">
 
                             {/* Rental Period */}

@@ -510,17 +510,17 @@ function OverdueWidget({ filterUserId }: { filterUserId: number | null }) {
 
         <div className={`grid transition-all duration-200 ease-in-out ${isExpanded ? "[grid-template-rows:1fr]" : "[grid-template-rows:0fr]"}`}>
           <div className="overflow-hidden">
-            <div className="pt-4 grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-                <div className="text-2xl font-bold text-red-600">{stats.count}</div>
+            <div className="pt-4 grid grid-cols-3 gap-2">
+              <div className="text-center p-2 bg-white rounded-lg border border-red-200 min-w-0">
+                <div className="text-xl font-bold text-red-600 truncate">{stats.count}</div>
                 <div className="text-xs text-red-700">Overdue</div>
               </div>
-              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-                <div className="text-2xl font-bold text-red-600">${stats.totalLateFees}</div>
+              <div className="text-center p-2 bg-white rounded-lg border border-red-200 min-w-0">
+                <div className="text-sm font-bold text-red-600 truncate">${stats.totalLateFees}</div>
                 <div className="text-xs text-red-700">Late Fees</div>
               </div>
-              <div className="text-center p-3 bg-white rounded-lg border border-red-200">
-                <div className="text-2xl font-bold text-red-600">{stats.avgDaysOverdue}</div>
+              <div className="text-center p-2 bg-white rounded-lg border border-red-200 min-w-0">
+                <div className="text-xl font-bold text-red-600 truncate">{stats.avgDaysOverdue}</div>
                 <div className="text-xs text-red-700">Avg Days</div>
               </div>
             </div>
