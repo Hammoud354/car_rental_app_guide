@@ -50,23 +50,11 @@ const EMPTY_FORM: GarageForm = {
   isPreferred: false,
 };
 
-function ModalOverlay({ open, onClose, children }: { open: boolean; onClose: () => void; children: React.ReactNode }) {
-  if (!open) return null;
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-3 sm:p-5"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      {children}
-    </div>,
-    document.body
-  );
-}
-
 function GarageFormModal({
   open,
   onClose,
   title,
+  subtitle,
   form,
   setForm,
   onSubmit,
@@ -75,6 +63,7 @@ function GarageFormModal({
   open: boolean;
   onClose: () => void;
   title: string;
+  subtitle: string;
   form: GarageForm;
   setForm: (f: GarageForm) => void;
   onSubmit: () => void;
@@ -83,123 +72,204 @@ function GarageFormModal({
   const set = (key: keyof GarageForm) => (val: string | boolean) =>
     setForm({ ...form, [key]: val });
 
-  return (
-    <ModalOverlay open={open} onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl flex flex-col w-full max-w-2xl max-h-[90vh]">
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ width: "90vw", height: "90vh" }}>
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-blue-800 to-blue-700 rounded-t-2xl">
+        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-white/10">
-              <Building2 className="h-5 w-5 text-white" />
-            </span>
+            <div className="p-2 bg-white/10 rounded-lg">
+              <Building2 className="w-5 h-5 text-white" />
+            </div>
             <div>
-              <h2 className="text-base font-bold text-white">{title}</h2>
-              <p className="text-xs text-blue-200">Fill in the garage details below</p>
+              <h2 className="text-lg font-bold text-white">{title}</h2>
+              <p className="text-blue-200 text-xs">{subtitle}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/10 text-white/80 hover:text-white transition-colors">
-            <X className="h-5 w-5" />
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="overflow-y-auto flex-1 p-5 space-y-4">
-          {/* Basic Info */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5" /> Basic Information
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="sm:col-span-2">
-                <Label className="text-xs font-medium text-gray-600">Garage Name *</Label>
-                <Input value={form.garageName} onChange={e => set("garageName")(e.target.value)} placeholder="e.g., Downtown Auto Center" className="mt-1 h-9 text-sm input-client" />
+        {/* Body — two columns */}
+        <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-y-auto sm:overflow-hidden">
+
+          {/* Left column — Contact & Location */}
+          <div className="w-full sm:w-[55%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <Building2 className="w-4 h-4 text-blue-700" />
+              <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Garage Information</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <Label htmlFor="garageName">Garage Name *</Label>
+                <Input
+                  id="garageName"
+                  value={form.garageName}
+                  onChange={e => set("garageName")(e.target.value)}
+                  placeholder="e.g., Downtown Auto Center"
+                  className="input-client mt-1"
+                />
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Contact Person</Label>
-                <Input value={form.contactPerson} onChange={e => set("contactPerson")(e.target.value)} placeholder="e.g., Ahmad Hassan" className="mt-1 h-9 text-sm input-client" />
+                <Label htmlFor="contactPerson">Contact Person</Label>
+                <Input
+                  id="contactPerson"
+                  value={form.contactPerson}
+                  onChange={e => set("contactPerson")(e.target.value)}
+                  placeholder="e.g., Ahmad Hassan"
+                  className="input-client mt-1"
+                />
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Email</Label>
-                <Input type="email" value={form.email} onChange={e => set("email")(e.target.value)} placeholder="garage@example.com" className="mt-1 h-9 text-sm input-client" />
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={e => set("email")(e.target.value)}
+                  placeholder="garage@example.com"
+                  className="input-client mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  value={form.phoneNumber}
+                  onChange={e => set("phoneNumber")(e.target.value)}
+                  placeholder="+961 1 234 567"
+                  className="input-client mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
+                <Input
+                  id="whatsappNumber"
+                  value={form.whatsappNumber}
+                  onChange={e => set("whatsappNumber")(e.target.value)}
+                  placeholder="+961 70 123 456"
+                  className="input-client mt-1"
+                />
+              </div>
+            </div>
+
+            {/* Location sub-section */}
+            <div className="flex items-center gap-2 mt-6 mb-4">
+              <MapPin className="w-4 h-4 text-blue-700" />
+              <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Location</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={form.address}
+                  onChange={e => set("address")(e.target.value)}
+                  placeholder="Street, Building, Area"
+                  className="input-client mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={form.city}
+                  onChange={e => set("city")(e.target.value)}
+                  placeholder="e.g., Beirut"
+                  className="input-client mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="googleMapsLink">Google Maps Link</Label>
+                <Input
+                  id="googleMapsLink"
+                  value={form.googleMapsLink}
+                  onChange={e => set("googleMapsLink")(e.target.value)}
+                  placeholder="https://maps.google.com/..."
+                  className="input-client mt-1"
+                />
               </div>
             </div>
           </div>
 
-          {/* Contact */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <Phone className="h-3.5 w-3.5" /> Contact Details
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Phone Number</Label>
-                <Input value={form.phoneNumber} onChange={e => set("phoneNumber")(e.target.value)} placeholder="+961 1 234 567" className="mt-1 h-9 text-sm input-client" />
+          {/* Right column — Services, Business, Status, Notes */}
+          <div className="flex-1 sm:overflow-y-auto p-6 bg-gray-50/40 space-y-5">
+
+            {/* Services */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Wrench className="w-4 h-4 text-blue-700" />
+                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Services Offered</h3>
               </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">WhatsApp Number</Label>
-                <Input value={form.whatsappNumber} onChange={e => set("whatsappNumber")(e.target.value)} placeholder="+961 70 123 456" className="mt-1 h-9 text-sm input-client" />
+              <Textarea
+                value={form.servicesOffered}
+                onChange={e => set("servicesOffered")(e.target.value)}
+                rows={3}
+                placeholder="e.g., Oil change, Brake service, Electrical, Bodywork, AC..."
+                className="input-client"
+              />
+            </div>
+
+            {/* Business */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <DollarSign className="w-4 h-4 text-blue-700" />
+                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Business Details</h3>
               </div>
-              <div className="sm:col-span-2">
-                <Label className="text-xs font-medium text-gray-600">Google Maps Link</Label>
-                <Input value={form.googleMapsLink} onChange={e => set("googleMapsLink")(e.target.value)} placeholder="https://maps.google.com/..." className="mt-1 h-9 text-sm input-client" />
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="vatNumber">VAT Number</Label>
+                  <Input
+                    id="vatNumber"
+                    value={form.vatNumber}
+                    onChange={e => set("vatNumber")(e.target.value)}
+                    placeholder="VAT-123456"
+                    className="input-client mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="paymentTerms">Payment Terms</Label>
+                  <Input
+                    id="paymentTerms"
+                    value={form.paymentTerms}
+                    onChange={e => set("paymentTerms")(e.target.value)}
+                    placeholder="e.g., Net 30 days"
+                    className="input-client mt-1"
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Location */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" /> Location
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="sm:col-span-2">
-                <Label className="text-xs font-medium text-gray-600">Address</Label>
-                <Input value={form.address} onChange={e => set("address")(e.target.value)} placeholder="Street, Building, Area" className="mt-1 h-9 text-sm input-client" />
+            {/* Status & Preferences */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-4 h-4 text-blue-700" />
+                <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Status & Preferences</h3>
               </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">City</Label>
-                <Input value={form.city} onChange={e => set("city")(e.target.value)} placeholder="e.g., Beirut" className="mt-1 h-9 text-sm input-client" />
-              </div>
-            </div>
-          </div>
-
-          {/* Business Info */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <DollarSign className="h-3.5 w-3.5" /> Business Details
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-medium text-gray-600">VAT Number</Label>
-                <Input value={form.vatNumber} onChange={e => set("vatNumber")(e.target.value)} placeholder="VAT-123456" className="mt-1 h-9 text-sm input-client" />
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Payment Terms</Label>
-                <Input value={form.paymentTerms} onChange={e => set("paymentTerms")(e.target.value)} placeholder="e.g., Net 30 days" className="mt-1 h-9 text-sm input-client" />
-              </div>
-              <div className="sm:col-span-2">
-                <Label className="text-xs font-medium text-gray-600">Services Offered</Label>
-                <Textarea value={form.servicesOffered} onChange={e => set("servicesOffered")(e.target.value)} rows={2} placeholder="e.g., Oil change, Brake service, Electrical, Bodywork..." className="mt-1 text-sm input-client" />
-              </div>
-            </div>
-          </div>
-
-          {/* Status & Notes */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Status & Notes</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Status</Label>
-                <Select value={form.status} onValueChange={v => set("status")(v)}>
-                  <SelectTrigger className="mt-1 h-9 text-sm input-client"><SelectValue /></SelectTrigger>
-                  <SelectContent style={{ zIndex: 9999 }}>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end pb-1">
-                <label className="flex items-center gap-2 cursor-pointer">
+              <div className="space-y-3">
+                <div>
+                  <Label>Status</Label>
+                  <Select value={form.status} onValueChange={v => set("status")(v)}>
+                    <SelectTrigger className="mt-1 input-client"><SelectValue /></SelectTrigger>
+                    <SelectContent style={{ zIndex: 9999 }}>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <label className="flex items-center gap-2 cursor-pointer pt-1">
                   <input
                     type="checkbox"
                     checked={form.isPreferred}
@@ -207,32 +277,46 @@ function GarageFormModal({
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm font-medium text-gray-700 flex items-center gap-1.5">
-                    <Star className="h-3.5 w-3.5 text-amber-500" /> Mark as Preferred
+                    <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-400" /> Mark as Preferred
                   </span>
                 </label>
               </div>
-              <div className="sm:col-span-2">
-                <Label className="text-xs font-medium text-gray-600">Notes</Label>
-                <Textarea value={form.notes} onChange={e => set("notes")(e.target.value)} rows={2} placeholder="Internal notes about this garage..." className="mt-1 text-sm input-client" />
-              </div>
             </div>
+
+            {/* Notes */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <Label htmlFor="notes" className="text-sm font-semibold text-gray-700">Notes</Label>
+              <Textarea
+                id="notes"
+                value={form.notes}
+                onChange={e => set("notes")(e.target.value)}
+                rows={3}
+                placeholder="Internal notes about this garage..."
+                className="input-client mt-2"
+              />
+            </div>
+
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl">
-          <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={onClose}>Cancel</Button>
-          <Button
-            size="sm"
-            className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900"
-            onClick={onSubmit}
-            disabled={isPending || !form.garageName.trim()}
-          >
-            {isPending ? "Saving..." : "Save Garage"}
-          </Button>
+        {/* Sticky footer */}
+        <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex-shrink-0">
+          <p className="text-xs text-gray-400">* Required fields</p>
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+            <Button
+              onClick={onSubmit}
+              disabled={isPending || !form.garageName.trim()}
+              className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white"
+            >
+              {isPending ? "Saving..." : "Save Garage"}
+            </Button>
+          </div>
         </div>
+
       </div>
-    </ModalOverlay>
+    </div>,
+    document.body
   );
 }
 
@@ -773,7 +857,8 @@ export default function Garages() {
       <GarageFormModal
         open={addOpen}
         onClose={() => { setAddOpen(false); setForm(EMPTY_FORM); }}
-        title="Add New Garage"
+        title="New Garage"
+        subtitle="Fill in the garage / service center details"
         form={form}
         setForm={setForm}
         onSubmit={handleSubmitAdd}
@@ -785,6 +870,7 @@ export default function Garages() {
         open={editId !== null}
         onClose={() => { setEditId(null); setForm(EMPTY_FORM); }}
         title="Edit Garage"
+        subtitle="Update the garage / service center details"
         form={form}
         setForm={setForm}
         onSubmit={handleSubmitEdit}
