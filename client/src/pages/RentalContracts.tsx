@@ -666,24 +666,24 @@ export default function RentalContracts() {
                     </div>
 
                     {/* Progress Stepper */}
-                    <div className="flex items-center gap-0 px-6 py-2.5 bg-blue-50/70 border-b border-blue-100/60 shrink-0">
+                    <div className="flex items-center gap-0 px-3 sm:px-6 py-2.5 bg-blue-50/70 border-b border-blue-100/60 shrink-0 overflow-x-hidden">
                       {[
                         { n: 1, label: "Vehicle" },
                         { n: 2, label: "Client Details" },
                         { n: 3, label: "Dates & Pricing" },
                         { n: 4, label: "Car Inspection" },
                       ].map((step, i, arr) => (
-                        <div key={step.n} className="flex items-center">
-                          <div className="flex items-center gap-1.5">
-                            <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                        <div key={step.n} className="flex items-center min-w-0">
+                          <div className="flex items-center gap-1 min-w-0">
+                            <div className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
                               step.n < 4 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
                             }`}>
                               {step.n < 4 ? <Check className="w-3 h-3" /> : step.n}
                             </div>
-                            <span className={`text-xs font-medium ${step.n < 4 ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
+                            <span className={`text-[10px] sm:text-xs font-medium truncate ${step.n < 4 ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
                           </div>
                           {i < arr.length - 1 && (
-                            <div className={`mx-3 h-px w-10 ${step.n < 4 ? "bg-blue-300" : "bg-gray-200"}`} />
+                            <div className={`mx-1 sm:mx-3 h-px w-4 sm:w-10 shrink-0 ${step.n < 4 ? "bg-blue-300" : "bg-gray-200"}`} />
                           )}
                         </div>
                       ))}
@@ -692,7 +692,7 @@ export default function RentalContracts() {
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
                       {/* ── Two-Column Body ─────────────────────────────────── */}
-                      <div className="flex-1 overflow-y-auto sm:overflow-hidden min-h-0 sm:flex sm:flex-row">
+                      <div className="flex-1 overflow-y-auto overflow-x-hidden sm:overflow-hidden min-h-0 sm:flex sm:flex-row">
 
                         {/* ═══ LEFT COLUMN ════════════════════════════════════ */}
                         <div className="w-full sm:flex sm:flex-col sm:w-[52%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto bg-white">
