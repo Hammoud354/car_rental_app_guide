@@ -115,6 +115,8 @@ export default function Maintenance() {
     { enabled: viewingHistory !== null }
   );
   
+  const { data: garageLocations } = trpc.fleet.getGarageLocations.useQuery();
+
   const { data: lastReturnKm } = trpc.fleet.getLastReturnKm.useQuery(
     { vehicleId: selectedVehicleId || 0 },
     { enabled: selectedVehicleId !== null }
@@ -543,7 +545,10 @@ export default function Maintenance() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input name="garageLocation" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" />
+                <Input name="garageLocation" list="garage-locations-list" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" autoComplete="off" />
+                <datalist id="garage-locations-list">
+                  {garageLocations?.map((loc) => <option key={loc} value={loc} />)}
+                </datalist>
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>
@@ -685,7 +690,7 @@ export default function Maintenance() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" className="mt-1 h-9 text-sm input-client" />
+                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" list="garage-locations-list" autoComplete="off" className="mt-1 h-9 text-sm input-client" />
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>

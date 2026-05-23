@@ -637,6 +637,18 @@ export const appRouter = router({
         return await db.getVehicleAnalysis(input.vehicleId, ctx.user?.id || 1);
       }),
     
+    getGarageLocations: publicProcedure
+      .query(async ({ ctx }) => {
+        const userId = ctx.user?.id || 1;
+        const result = await db.pool.query(
+          `SELECT DISTINCT "garageLocation" FROM "vehicleMaintenance"
+           WHERE "userId" = $1 AND "garageLocation" IS NOT NULL AND "garageLocation" <> ''
+           ORDER BY "garageLocation" ASC`,
+          [userId]
+        );
+        return (result.rows as any[]).map((r: any) => r.garageLocation as string);
+      }),
+
     getLastReturnKm: publicProcedure
       .input(z.object({ vehicleId: z.number() }))
       .query(async ({ input, ctx }) => {
