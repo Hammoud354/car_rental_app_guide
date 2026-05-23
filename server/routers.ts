@@ -596,6 +596,7 @@ export const appRouter = router({
         performedAt: z.date(),
         performedBy: z.string().max(200).optional(),
         garageLocation: z.string().max(300).optional(),
+        garageId: z.number().int().optional(),
         mileageAtService: z.number().int().optional(),
         kmDueMaintenance: z.number().int().optional(),
         garageEntryDate: z.date().optional(),
@@ -621,6 +622,7 @@ export const appRouter = router({
         performedAt: z.date().optional(),
         performedBy: z.string().optional(),
         garageLocation: z.string().optional(),
+        garageId: z.number().int().nullable().optional(),
         mileageAtService: z.number().optional(),
         kmDueForNextMaintenance: z.number().optional(),
         garageEntryDate: z.date().optional(),
@@ -3401,6 +3403,63 @@ export const appRouter = router({
           throw new Error("Access denied");
         }
         return contract;
+      }),
+  }),
+
+  garages: router({
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        return await db.listGarages(ctx.user.id);
+      }),
+
+    create: protectedProcedure
+      .input(z.object({
+        garageName: z.string().min(1).max(200),
+        contactPerson: z.string().max(200).optional(),
+        phoneNumber: z.string().max(50).optional(),
+        whatsappNumber: z.string().max(50).optional(),
+        email: z.string().max(200).optional(),
+        address: z.string().optional(),
+        city: z.string().max(100).optional(),
+        servicesOffered: z.string().optional(),
+        notes: z.string().optional(),
+        status: z.enum(["Active", "Inactive"]).optional(),
+        googleMapsLink: z.string().optional(),
+        vatNumber: z.string().max(100).optional(),
+        paymentTerms: z.string().optional(),
+        isPreferred: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.createGarage({ ...input, userId: ctx.user.id });
+      }),
+
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        garageName: z.string().min(1).max(200).optional(),
+        contactPerson: z.string().max(200).optional(),
+        phoneNumber: z.string().max(50).optional(),
+        whatsappNumber: z.string().max(50).optional(),
+        email: z.string().max(200).optional(),
+        address: z.string().optional(),
+        city: z.string().max(100).optional(),
+        servicesOffered: z.string().optional(),
+        notes: z.string().optional(),
+        status: z.enum(["Active", "Inactive"]).optional(),
+        googleMapsLink: z.string().optional(),
+        vatNumber: z.string().max(100).optional(),
+        paymentTerms: z.string().optional(),
+        isPreferred: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { id, ...data } = input;
+        return await db.updateGarage(id, ctx.user.id, data);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.deleteGarage(input.id, ctx.user.id);
       }),
   }),
 

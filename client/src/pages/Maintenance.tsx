@@ -108,6 +108,8 @@ export default function Maintenance() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [markInMaintenance, setMarkInMaintenance] = useState(true);
+  const [selectedGarageId, setSelectedGarageId] = useState<number | null>(null);
+  const [editGarageId, setEditGarageId] = useState<number | null | undefined>(undefined);
 
   const { data: vehicles } = trpc.fleet.listAvailableForMaintenance.useQuery();
   const { data: maintenanceRecords, refetch: refetchRecords } = trpc.fleet.getMaintenanceRecords.useQuery(
@@ -117,6 +119,7 @@ export default function Maintenance() {
   
   const { data: garageLocations } = trpc.fleet.getGarageLocations.useQuery();
   const { data: technicians } = trpc.fleet.getTechnicians.useQuery();
+  const { data: garagesList = [] } = trpc.garages.list.useQuery();
 
   const { data: lastReturnKm } = trpc.fleet.getLastReturnKm.useQuery(
     { vehicleId: selectedVehicleId || 0 },
@@ -159,6 +162,7 @@ export default function Maintenance() {
       setGarageEntryDate(undefined);
       setGarageExitDate(undefined);
       setMarkInMaintenance(true);
+      setSelectedGarageId(null);
     },
     onError: (error) => {
       toast.error(`Failed to add maintenance record: ${error.message}`);
@@ -223,6 +227,7 @@ export default function Maintenance() {
       garageEntryDate: record.garageEntryDate ? new Date(record.garageEntryDate).toISOString().split('T')[0] : "",
       garageExitDate: record.garageExitDate ? new Date(record.garageExitDate).toISOString().split('T')[0] : "",
     });
+    setEditGarageId(record.garageId || null);
     setEditPerformedAtDate(new Date(record.performedAt));
     setEditGarageEntryDate(record.garageEntryDate ? new Date(record.garageEntryDate) : undefined);
     setEditGarageExitDate(record.garageExitDate ? new Date(record.garageExitDate) : undefined);
@@ -230,6 +235,12 @@ export default function Maintenance() {
 
   const handleSaveEdit = () => {
     if (!editingRecordId) return;
+    // Resolve garage name from selected garage if garageId is set
+    let garageName = editFormData.garageLocation || undefined;
+    if (editGarageId) {
+      const matched = (garagesList as any[]).find((g: any) => g.id === editGarageId);
+      if (matched) garageName = matched.garageName;
+    }
     updateMaintenanceMutation.mutate({
       id: editingRecordId,
       maintenanceType: editFormData.maintenanceType,
@@ -237,7 +248,8 @@ export default function Maintenance() {
       cost: editFormData.cost || undefined,
       performedAt: editPerformedAtDate || new Date(editFormData.performedAt),
       performedBy: editFormData.performedBy || undefined,
-      garageLocation: editFormData.garageLocation || undefined,
+      garageLocation: garageName,
+      garageId: editGarageId ?? undefined,
       mileageAtService: editFormData.mileageAtService ? parseInt(editFormData.mileageAtService) : undefined,
       garageEntryDate: editGarageEntryDate || undefined,
       garageExitDate: editGarageExitDate || undefined,
@@ -267,6 +279,13 @@ export default function Maintenance() {
     const mileageAtService = formData.get("mileageAtService") as string;
     const kmDueMaintenance = formData.get("kmDueMaintenance") as string;
 
+    // Resolve garage name from selected garage
+    let garageName = (formData.get("garageLocation") as string) || undefined;
+    if (selectedGarageId) {
+      const matched = (garagesList as any[]).find((g: any) => g.id === selectedGarageId);
+      if (matched) garageName = matched.garageName;
+    }
+
     addMaintenanceMutation.mutate({
       vehicleId: selectedVehicleId,
       maintenanceType: formData.get("maintenanceType") as any,
@@ -274,7 +293,8 @@ export default function Maintenance() {
       cost: cost && cost.trim() ? parseFloat(cost).toString() : undefined,
       performedAt: performedAtDate,
       performedBy: (formData.get("performedBy") as string) || undefined,
-      garageLocation: (formData.get("garageLocation") as string) || undefined,
+      garageLocation: garageName,
+      garageId: selectedGarageId || undefined,
       mileageAtService: mileageAtService && mileageAtService.trim() ? parseInt(mileageAtService) : undefined,
       kmDueMaintenance: kmDueMaintenance && kmDueMaintenance.trim() ? parseInt(kmDueMaintenance) : undefined,
       garageEntryDate: garageEntryDate || undefined,
@@ -554,11 +574,24 @@ export default function Maintenance() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input name="garageLocation" list="garage-locations-list" placeholder="e.g., Downtown Auto" className="mt-1 h-9 text-sm input-client" />
-                <datalist id="garage-locations-list">
-                  {garageLocations?.map((loc) => <option key={loc} value={loc} />)}
-                </datalist>
+                <Label className="text-xs font-medium text-gray-600">Garage</Label>
+                <Select value={selectedGarageId?.toString() || "none"} onValueChange={v => setSelectedGarageId(v === "none" ? null : parseInt(v))}>
+                  <SelectTrigger className="mt-1 h-9 text-sm input-client">
+                    <SelectValue placeholder="Select a garage" />
+                  </SelectTrigger>
+                  <SelectContent style={{ zIndex: 9999 }}>
+                    <SelectItem value="none">No garage selected</SelectItem>
+                    {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
+                      <SelectItem key={g.id} value={g.id.toString()}>
+                        <span className="flex items-center gap-1.5">
+                          {g.isPreferred && <span className="text-amber-500">★</span>}
+                          {g.garageName}
+                          {g.city && <span className="text-gray-400 text-xs">· {g.city}</span>}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>
@@ -702,8 +735,24 @@ export default function Maintenance() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">Garage / Location</Label>
-                <Input value={editFormData.garageLocation} onChange={(e) => setEditFormData({...editFormData, garageLocation: e.target.value})} placeholder="Downtown Auto Center" list="garage-locations-list" className="mt-1 h-9 text-sm input-client" />
+                <Label className="text-xs font-medium text-gray-600">Garage</Label>
+                <Select value={editGarageId?.toString() || "none"} onValueChange={v => setEditGarageId(v === "none" ? null : parseInt(v))}>
+                  <SelectTrigger className="mt-1 h-9 text-sm input-client">
+                    <SelectValue placeholder="Select a garage" />
+                  </SelectTrigger>
+                  <SelectContent style={{ zIndex: 9999 }}>
+                    <SelectItem value="none">No garage selected</SelectItem>
+                    {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
+                      <SelectItem key={g.id} value={g.id.toString()}>
+                        <span className="flex items-center gap-1.5">
+                          {g.isPreferred && <span className="text-amber-500">★</span>}
+                          {g.garageName}
+                          {g.city && <span className="text-gray-400 text-xs">· {g.city}</span>}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label className="text-xs font-medium text-gray-600">Performed By</Label>

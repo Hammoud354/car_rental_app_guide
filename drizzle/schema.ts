@@ -181,6 +181,7 @@ export const maintenanceRecords = pgTable("maintenanceRecords", {
   performedAt: timestamp("performedAt").notNull(),
   performedBy: varchar("performedBy", { length: 200 }),
   garageLocation: varchar("garageLocation", { length: 300 }),
+  garageId: integer("garageId"),
   mileageAtService: integer("mileageAtService"),
   kmDueMaintenance: integer("kmDueMaintenance"),
   garageEntryDate: timestamp("garageEntryDate"),
@@ -759,3 +760,30 @@ export const whishPaymentRequests = pgTable("whishPaymentRequests", {
 
 export type WhishPaymentRequest = typeof whishPaymentRequests.$inferSelect;
 export type InsertWhishPaymentRequest = typeof whishPaymentRequests.$inferInsert;
+
+/**
+ * Garages / Service Centers table
+ */
+export const garages = pgTable("garages", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  garageName: varchar("garageName", { length: 200 }).notNull(),
+  contactPerson: varchar("contactPerson", { length: 200 }),
+  phoneNumber: varchar("phoneNumber", { length: 50 }),
+  whatsappNumber: varchar("whatsappNumber", { length: 50 }),
+  email: varchar("email", { length: 200 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  servicesOffered: text("servicesOffered"),
+  notes: text("notes"),
+  status: varchar("status", { length: 20 }).default("Active").notNull(),
+  googleMapsLink: text("googleMapsLink"),
+  vatNumber: varchar("vatNumber", { length: 100 }),
+  paymentTerms: text("paymentTerms"),
+  isPreferred: boolean("isPreferred").default(false).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+});
+
+export type Garage = typeof garages.$inferSelect;
+export type InsertGarage = typeof garages.$inferInsert;

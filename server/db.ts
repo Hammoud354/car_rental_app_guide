@@ -1,7 +1,7 @@
 import { eq, and, or, lte, gte, lt, ne, sql, desc, asc, inArray, notInArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod } from "../drizzle/schema";
+import { InsertUser, users, vehicles, InsertVehicle, maintenanceRecords, InsertMaintenanceRecord, maintenanceTasks, InsertMaintenanceTask, rentalContracts, InsertRentalContract, damageMarks, InsertDamageMark, clients, InsertClient, Client, carMakers, carModels, companySettings, InsertCompanySettings, CompanySettings, invoices, invoiceLineItems, InsertInvoice, nationalities, InsertNationality, auditLogs, InsertAuditLog, vehicleImages, InsertVehicleImage, whatsappTemplates, InsertWhatsappTemplate, insurancePolicies, InsertInsurancePolicy, highSeasonPeriods, InsertHighSeasonPeriod, HighSeasonPeriod, garages, InsertGarage } from "../drizzle/schema";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -4320,6 +4320,89 @@ export async function createTempDemoUser(): Promise<typeof users.$inferSelect> {
   }).returning();
 
   return inserted;
+}
+
+// ─── Garages ────────────────────────────────────────────────────────────────
+
+export async function listGarages(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const admin = await isSuperAdmin(userId);
+  const ownerClause = admin ? "" : `WHERE g."userId" = ${userId}`;
+  const result = await db.execute(sql.raw(`
+    SELECT g.*,
+      COUNT(m.id)::int AS "totalJobs",
+      COALESCE(SUM(m.cost::numeric), 0)::numeric AS "totalSpent",
+      MAX(m."performedAt") AS "lastServiceDate"
+    FROM garages g
+    LEFT JOIN "maintenanceRecords" m ON m."garageId" = g.id
+    ${ownerClause}
+    GROUP BY g.id
+    ORDER BY g."garageName" ASC
+  `));
+  return result.rows as any[];
+}
+
+export async function createGarage(data: InsertGarage) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [created] = await db.insert(garages).values(data).returning();
+  return created;
+}
+
+export async function updateGarage(id: number, userId: number, data: Partial<InsertGarage>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const admin = await isSuperAdmin(userId);
+  const w = admin ? eq(garages.id, id) : and(eq(garages.id, id), eq(garages.userId, userId));
+  await db.update(garages).set({ ...data, updatedAt: new Date() }).where(w);
+  const [updated] = await db.select().from(garages).where(eq(garages.id, id)).limit(1);
+  return updated;
+}
+
+export async function deleteGarage(id: number, userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const admin = await isSuperAdmin(userId);
+  const w = admin ? eq(garages.id, id) : and(eq(garages.id, id), eq(garages.userId, userId));
+  await db.delete(garages).where(w);
+  return { success: true };
+}
+
+export async function initializeGaragesTable() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS garages (
+        id serial PRIMARY KEY,
+        "userId" integer NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        "garageName" varchar(200) NOT NULL,
+        "contactPerson" varchar(200),
+        "phoneNumber" varchar(50),
+        "whatsappNumber" varchar(50),
+        email varchar(200),
+        address text,
+        city varchar(100),
+        "servicesOffered" text,
+        notes text,
+        status varchar(20) NOT NULL DEFAULT 'Active',
+        "googleMapsLink" text,
+        "vatNumber" varchar(100),
+        "paymentTerms" text,
+        "isPreferred" boolean NOT NULL DEFAULT false,
+        "createdAt" timestamp NOT NULL DEFAULT now(),
+        "updatedAt" timestamp NOT NULL DEFAULT now()
+      )
+    `);
+    await db.execute(sql`
+      ALTER TABLE "maintenanceRecords"
+        ADD COLUMN IF NOT EXISTS "garageId" integer REFERENCES garages(id) ON DELETE SET NULL
+    `);
+    console.log("[Startup] Garages table ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize garages table:", err);
+  }
 }
 
 export async function initializeRentalContractColumns() {

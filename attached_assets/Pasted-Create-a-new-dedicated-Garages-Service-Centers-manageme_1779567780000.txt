@@ -1,0 +1,119 @@
+Create a new dedicated “Garages / Service Centers” management module for the FleetWizards car rental SaaS.
+
+IMPORTANT:
+The Garages module should be a separate database table/entity from the Maintenance records table, but it should appear visually under the Maintenance section in the sidebar navigation.
+
+Sidebar structure:
+
+* Maintenance
+
+  * Maintenance Records
+  * Garages
+
+GOAL:
+Allow the company to store and manage all garage/service center information in one centralized place, then link garages to maintenance records using relationships/dropdowns instead of manually typing garage names every time.
+
+========================
+DATABASE REQUIREMENTS
+=====================
+
+Create a new table/entity called:
+Garages
+
+Fields:
+
+* id
+* garageName
+* contactPerson
+* phoneNumber
+* whatsappNumber
+* email
+* address
+* city
+* servicesOffered
+* notes
+* status (Active / Inactive)
+* googleMapsLink
+* vatNumber
+* paymentTerms
+* createdAt
+* updatedAt
+
+========================
+UI REQUIREMENTS
+===============
+
+Create a full Garages management page with:
+
+* Modern responsive table
+* Search bar
+* Filters
+* Pagination
+* Add Garage button
+* Edit Garage modal/page
+* Delete confirmation
+* View details drawer/modal
+
+Columns in table:
+
+* Garage Name
+* Contact Person
+* Phone
+* City
+* Status
+* Actions
+
+========================
+MAINTENANCE INTEGRATION
+=======================
+
+Inside the Maintenance Record form:
+
+* Replace manual garage text input with a searchable dropdown/select field
+* The dropdown should pull garage names from the Garages table
+* Selecting a garage should create a relationship between maintenance records and garages
+
+Additionally:
+
+* Show clickable garage details inside maintenance records
+* Allow filtering maintenance records by garage
+* Add “View All Maintenance History” button inside each garage profile
+
+========================
+RESPONSIVE DESIGN
+=================
+
+Ensure:
+
+* Fully responsive on desktop/tablet/mobile
+* No overlapping fields or buttons
+* Forms use proper spacing
+* Related fields should stay on the same row on desktop
+* Tables should collapse properly on mobile
+
+========================
+BONUS FEATURES
+==============
+
+If possible, also add:
+
+* Garage statistics cards
+
+  * Total maintenance jobs
+  * Total spent
+  * Last maintenance date
+* Ability to mark garages as “Preferred”
+* WhatsApp quick contact button
+* Click-to-call phone number
+* Export garages to Excel/PDF
+* Import garages from Excel file
+
+========================
+IMPORTANT
+=========
+
+Keep the design clean and professional, matching the existing FleetWizards UI and theme.
+
+Do NOT break existing maintenance functionality.
+Preserve all current maintenance data and relationships.
+Use optimized database relationships and scalable architecture.

@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -135,6 +135,9 @@ async function startServer() {
     );
     initializeRentalContractColumns().catch(err =>
       console.error("[Startup] Failed to initialize rentalContracts columns:", err)
+    );
+    initializeGaragesTable().catch(err =>
+      console.error("[Startup] Failed to initialize garages table:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)

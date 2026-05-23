@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet, Building2
 } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
@@ -96,6 +96,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         { href: "/reservations", label: t("nav.reservations"), icon: CalendarDays },
         { href: "/rental-contracts", label: t("nav.contracts"), icon: FileText },
         { href: "/maintenance", label: t("nav.maintenance"), icon: Wrench },
+        { href: "/garages", label: "Garages", icon: Building2 },
         { href: "/ai-maintenance", label: t("nav.aiMaintenance"), icon: Sparkles },
       ],
     },

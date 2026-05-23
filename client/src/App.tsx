@@ -43,6 +43,7 @@ const ProfitAndLoss = lazy(() => import("./pages/ProfitAndLoss"));
 const Demo = lazy(() => import("./pages/Demo"));
 const Home = lazy(() => import("./pages/Home"));
 const AIMaintenance = lazy(() => import("./pages/AIMaintenance"));
+const Garages = lazy(() => import("./pages/Garages"));
 const AdminNumberingManagement = lazy(() => import("./pages/AdminNumberingManagement"));
 const AdminAnalytics = lazy(() => import("./pages/AdminAnalytics"));
 const AdminPaymentRequests = lazy(() => import("./pages/AdminPaymentRequests"));
@@ -157,6 +158,7 @@ function AppContent() {
             <Route path="/maintenance" component={Maintenance} />
             <Route path="/maintenance-tracking" component={MaintenanceTracking} />
             <Route path="/ai-maintenance" component={AIMaintenance} />
+            <Route path="/garages" component={Garages} />
             <Route path="/fleet" component={Fleet} />
             <Route path="/fleet-management" component={FleetManagement} />
             <Route path="/vehicle/:id" component={VehicleDetails} />
