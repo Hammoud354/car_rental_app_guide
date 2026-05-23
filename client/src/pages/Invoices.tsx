@@ -396,7 +396,7 @@ export default function Invoices() {
                 {/* Invoice Content for PDF Export */}
                 <div id="invoice-content" className="bg-white text-black p-3 sm:p-4 md:p-6 space-y-3 sm:space-y-4 print:block text-sm sm:text-base">
                   {/* Company Header */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start border-b pb-2 sm:pb-3 gap-2">
+                  <div className="flex flex-row justify-between items-start border-b pb-3 gap-4">
                     <div className="space-y-2">
                       {companyProfile?.logoUrl && (
                         <img
