@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
@@ -48,16 +48,6 @@ export default function Invoices() {
       window.history.replaceState({}, '', '/invoices');
     }
   }, []);
-
-  // Auto-print invoice when opened from contract creation flow
-  useEffect(() => {
-    if (!autoPrintInvoice || !invoiceDetails || isLoadingDetails) return;
-    setAutoPrintInvoice(false);
-    setTimeout(() => {
-      toast.info("Opening print dialog for invoice…");
-      printElement("invoice-content", `Invoice ${invoiceDetails.invoiceNumber || ""}`);
-    }, 700);
-  }, [autoPrintInvoice, invoiceDetails, isLoadingDetails]);
 
   const [isSendingWhatsApp, setIsSendingWhatsApp] = useState(false);
 
@@ -170,6 +160,17 @@ export default function Invoices() {
     { invoiceId: selectedInvoice! },
     { enabled: !!selectedInvoice }
   );
+
+  // Auto-print invoice when opened from contract creation flow
+  // MUST be placed after invoiceDetails and isLoadingDetails are declared above
+  useEffect(() => {
+    if (!autoPrintInvoice || !invoiceDetails || isLoadingDetails) return;
+    setAutoPrintInvoice(false);
+    setTimeout(() => {
+      toast.info("Opening print dialog for invoice…");
+      printElement("invoice-content", `Invoice ${invoiceDetails.invoiceNumber || ""}`);
+    }, 700);
+  }, [autoPrintInvoice, invoiceDetails, isLoadingDetails]);
 
   // Initialize payment status when invoice details are loaded
   useEffect(() => {
