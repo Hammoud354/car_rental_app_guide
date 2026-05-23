@@ -487,7 +487,7 @@ export default function Maintenance() {
               <SelectTrigger className="h-9 text-sm input-client">
                 <SelectValue placeholder="Select a vehicle" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent style={{ zIndex: 9999 }}>
                 {vehicles?.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
                     {vehicle.plateNumber} — {vehicle.brand} {vehicle.model}
@@ -512,7 +512,7 @@ export default function Maintenance() {
                   <SelectTrigger className="mt-1 h-9 text-sm input-client">
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent style={{ zIndex: 9999 }}>
                     {MAINTENANCE_TYPES.map(t => (
                       <SelectItem key={t} value={t}>{t}</SelectItem>
                     ))}
@@ -650,7 +650,7 @@ export default function Maintenance() {
                 <Label className="text-xs font-medium text-gray-600">Type *</Label>
                 <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
                   <SelectTrigger className="mt-1 h-9 text-sm input-client"><SelectValue /></SelectTrigger>
-                  <SelectContent>
+                  <SelectContent style={{ zIndex: 9999 }}>
                     {MAINTENANCE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                   </SelectContent>
                 </Select>
