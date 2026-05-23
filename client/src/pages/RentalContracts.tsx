@@ -1119,7 +1119,7 @@ export default function RentalContracts() {
                                 </span>
                                 <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Rental Period</h3>
                               </div>
-                              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                                 {/* Start Date */}
                                 <div>
                                   <DateDropdownSelector id="rentalStartDate" label="Start Date *" value={rentalStartDate} onChange={setRentalStartDate} required />
