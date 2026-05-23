@@ -1287,17 +1287,22 @@ export default function RentalContracts() {
                       </div>
 
                       {/* Sticky Footer */}
-                      <div className="flex items-center justify-between px-6 py-3.5 border-t border-gray-100 bg-white shrink-0">
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                      <div className="flex items-center justify-between px-3 sm:px-6 py-3.5 border-t border-gray-100 bg-white shrink-0">
+                        <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-400">
                           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
                           <span>Next: photograph vehicle damage marks before confirming</span>
                         </div>
-                        <div className="flex items-center gap-2.5">
+                        <div className="flex items-center gap-2 ml-auto">
                           <Button type="button" variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => setIsCreateDialogOpen(false)}>
                             Cancel
                           </Button>
-                          <Button type="submit" size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900 gap-1.5" disabled={createContract.isPending}>
-                            {createContract.isPending ? "Creating..." : "Continue to Car Inspection"}
+                          <Button type="submit" size="sm" className="h-8 text-xs px-4 bg-blue-800 hover:bg-blue-900 gap-1.5 whitespace-nowrap" disabled={createContract.isPending}>
+                            {createContract.isPending ? "Creating..." : (
+                              <>
+                                <span className="sm:hidden">Continue</span>
+                                <span className="hidden sm:inline">Continue to Car Inspection</span>
+                              </>
+                            )}
                             {!createContract.isPending && <ChevronRight className="w-3.5 h-3.5" />}
                           </Button>
                         </div>
