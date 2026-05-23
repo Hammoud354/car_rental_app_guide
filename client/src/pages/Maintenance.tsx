@@ -151,6 +151,8 @@ export default function Maintenance() {
       toast.success("Maintenance record added successfully");
       refetchRecords();
       utils.fleet.listAvailableForMaintenance.invalidate();
+      utils.fleet.getGarageLocations.invalidate();
+      utils.fleet.getTechnicians.invalidate();
       setIsAddDialogOpen(false);
       setSelectedVehicleId(null);
       setPerformedAtDate(undefined);
@@ -167,6 +169,8 @@ export default function Maintenance() {
     onSuccess: () => {
       toast.success("Maintenance record updated");
       refetchRecords();
+      utils.fleet.getGarageLocations.invalidate();
+      utils.fleet.getTechnicians.invalidate();
       setEditingRecordId(null);
       setEditFormData({});
     },
