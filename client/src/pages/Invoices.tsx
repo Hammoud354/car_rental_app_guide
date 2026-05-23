@@ -463,19 +463,15 @@ export default function Invoices() {
                     </div>
                   </div>
 
-                  {/* Invoice Status */}
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-sm text-gray-600">Payment Status</p>
-                      {getStatusBadge(invoiceDetails.paymentStatus)}
-                    </div>
-                    {invoiceDetails.paymentMethod && (
+                  {/* Payment Method (status badge removed from print) */}
+                  {invoiceDetails.paymentMethod && (
+                    <div className="flex justify-end">
                       <div className="text-right">
                         <p className="text-sm text-gray-600">Payment Method</p>
                         <p className="font-medium">{invoiceDetails.paymentMethod}</p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {/* Line Items */}
                   <div className="space-y-2">
