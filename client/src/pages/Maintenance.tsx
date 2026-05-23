@@ -493,7 +493,12 @@ export default function Maintenance() {
               <SelectContent style={{ zIndex: 9999 }}>
                 {vehicles?.map((vehicle) => (
                   <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
-                    {vehicle.plateNumber} — {vehicle.brand} {vehicle.model}
+                    <span className="flex items-center gap-2">
+                      <span>{vehicle.plateNumber} — {vehicle.brand} {vehicle.model}</span>
+                      {vehicle.status === "Maintenance" && (
+                        <span className="text-[10px] font-semibold bg-orange-100 text-orange-700 rounded px-1.5 py-0.5 leading-none">In Garage</span>
+                      )}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
