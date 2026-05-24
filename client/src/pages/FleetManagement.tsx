@@ -884,7 +884,7 @@ export default function FleetManagement() {
                               <Label>Car Maker *</Label>
                               <Popover open={makerOpen} onOpenChange={setMakerOpen}>
                                 <PopoverTrigger asChild>
-                                  <Button variant="outline" role="combobox" aria-expanded={makerOpen} className="w-full justify-between mt-1">
+                                  <Button variant="outline" role="combobox" aria-expanded={makerOpen} className="w-full justify-between mt-1 overflow-hidden">
                                     {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : "Select maker..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
@@ -914,7 +914,7 @@ export default function FleetManagement() {
                               <Label>Car Model *</Label>
                               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                                 <PopoverTrigger asChild>
-                                  <Button variant="outline" role="combobox" aria-expanded={modelOpen} className="w-full justify-between mt-1" disabled={!selectedMakerId}>
+                                  <Button variant="outline" role="combobox" aria-expanded={modelOpen} className="w-full justify-between mt-1 overflow-hidden" disabled={!selectedMakerId}>
                                     {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : "Select model..."}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>

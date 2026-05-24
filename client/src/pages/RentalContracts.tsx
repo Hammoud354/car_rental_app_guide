@@ -73,6 +73,7 @@ export default function RentalContracts() {
   const [lateFeePercentage, setLateFeePercentage] = useState<string>("");
   const [fuelPolicy, setFuelPolicy] = useState<"Full-to-Full" | "Same-to-Same" | "Pre-purchase">("Full-to-Full");
   const [selectedClientId, setSelectedClientId] = useState<string>("");
+  const [clientFirstNameFilled, setClientFirstNameFilled] = useState(false);
   const [clientComboboxOpen, setClientComboboxOpen] = useState(false);
   const [vehicleComboboxOpen, setVehicleComboboxOpen] = useState(false);
   const [nationalityComboboxOpen, setNationalityComboboxOpen] = useState(false);
@@ -667,26 +668,32 @@ export default function RentalContracts() {
 
                     {/* Progress Stepper */}
                     <div className="flex items-center gap-0 px-3 sm:px-6 py-2.5 bg-blue-50/70 border-b border-blue-100/60 shrink-0 overflow-x-hidden">
-                      {[
-                        { n: 1, label: "Vehicle" },
-                        { n: 2, label: "Client Details" },
-                        { n: 3, label: "Dates & Pricing" },
-                        { n: 4, label: "Car Inspection" },
-                      ].map((step, i, arr) => (
-                        <div key={step.n} className="flex items-center min-w-0">
-                          <div className="flex items-center gap-1 min-w-0">
-                            <div className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                              step.n < 4 ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
-                            }`}>
-                              {step.n < 4 ? <Check className="w-3 h-3" /> : step.n}
+                      {(() => {
+                        const step1Done = !!selectedVehicleId;
+                        const step2Done = !!(selectedClientId || clientFirstNameFilled);
+                        const step3Done = !!rentalEndDate;
+                        const stepDone = (n: number) => n === 1 ? step1Done : n === 2 ? step2Done : n === 3 ? step3Done : false;
+                        return [
+                          { n: 1, label: "Vehicle" },
+                          { n: 2, label: "Client Details" },
+                          { n: 3, label: "Dates & Pricing" },
+                          { n: 4, label: "Car Inspection" },
+                        ].map((step, i, arr) => (
+                          <div key={step.n} className="flex items-center min-w-0">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <div className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                stepDone(step.n) ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
+                              }`}>
+                                {stepDone(step.n) ? <Check className="w-3 h-3" /> : step.n}
+                              </div>
+                              <span className={`text-[10px] sm:text-xs font-medium truncate ${stepDone(step.n) ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
                             </div>
-                            <span className={`text-[10px] sm:text-xs font-medium truncate ${step.n < 4 ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
+                            {i < arr.length - 1 && (
+                              <div className={`mx-1 sm:mx-3 h-px w-4 sm:w-10 shrink-0 ${stepDone(step.n) ? "bg-blue-300" : "bg-gray-200"}`} />
+                            )}
                           </div>
-                          {i < arr.length - 1 && (
-                            <div className={`mx-1 sm:mx-3 h-px w-4 sm:w-10 shrink-0 ${step.n < 4 ? "bg-blue-300" : "bg-gray-200"}`} />
-                          )}
-                        </div>
-                      ))}
+                        ));
+                      })()}
                     </div>
 
                     {/* Form */}
@@ -716,7 +723,7 @@ export default function RentalContracts() {
                                         variant="outline"
                                         role="combobox"
                                         aria-expanded={vehicleComboboxOpen}
-                                        className="w-full justify-between font-normal h-9 text-sm border-[#1e3a8a]/30"
+                                        className="w-full justify-between font-normal h-9 text-sm border-[#1e3a8a]/30 overflow-hidden"
                                       >
                             {selectedVehicleId
                               ? (() => {
@@ -863,6 +870,7 @@ export default function RentalContracts() {
                                                 onSelect={() => {
                                                   setSelectedClientId(client.id.toString());
                                                   setClientComboboxOpen(false);
+                                                  setClientFirstNameFilled(true);
                                                   (document.getElementById("clientFirstName") as HTMLInputElement).value = firstName;
                                                   (document.getElementById("clientLastName") as HTMLInputElement).value = lastName;
                                                   (document.getElementById("clientMotherFullName") as HTMLInputElement).value = client.motherFullName || "";
@@ -894,7 +902,7 @@ export default function RentalContracts() {
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
                                   <Label htmlFor="clientFirstName" className="text-xs font-medium text-gray-500 mb-1.5 block">First Name *</Label>
-                                  <Input id="clientFirstName" name="clientFirstName" required className="h-9 text-sm input-client" />
+                                  <Input id="clientFirstName" name="clientFirstName" required className="h-9 text-sm input-client" onChange={(e) => setClientFirstNameFilled(!!e.target.value.trim())} />
                                 </div>
                                 <div>
                                   <Label htmlFor="clientLastName" className="text-xs font-medium text-gray-500 mb-1.5 block">Last Name *</Label>
