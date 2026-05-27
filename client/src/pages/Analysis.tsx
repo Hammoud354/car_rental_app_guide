@@ -1,13 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, TrendingDown, DollarSign, Wrench, Shield, FileText } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Wrench, Shield, FileText, Lock } from "lucide-react";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 
 export default function Analysis() {
+  const [, setLocation] = useLocation();
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
-  
+
+  const { data: user } = trpc.auth.me.useQuery();
+  const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery();
+
+  const isSuperAdmin = user?.role === "super_admin";
+  const tierName = (currentPlan?.tier as any)?.name;
+  const features = (currentPlan?.tier as any)?.features as Record<string, boolean> | undefined;
+  const hasAccess = isSuperAdmin || tierName === "internal" || features?.advancedAnalytics === true;
+
   const { data: vehicles, isLoading: vehiclesLoading } = trpc.fleet.list.useQuery();
   const { data: analysis, isLoading: analysisLoading } = trpc.fleet.getAnalysis.useQuery(
     { vehicleId: parseInt(selectedVehicleId) },
@@ -18,6 +29,37 @@ export default function Analysis() {
   const profitabilityPercentage = analysis && analysis.totalRevenue > 0
     ? ((analysis.netProfit / analysis.totalRevenue) * 100).toFixed(1)
     : "0";
+
+  if (planLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Vehicle Analysis</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Analyze individual vehicle profitability, costs, and performance metrics</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-5 bg-white rounded-xl border border-gray-200">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 border border-blue-200">
+            <Lock className="h-7 w-7 text-blue-500" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-gray-900">Professional Feature</h2>
+            <p className="text-gray-500 max-w-sm">Vehicle analysis is available on the Professional and Enterprise plans. Upgrade to unlock per-vehicle profitability insights.</p>
+          </div>
+          <Button onClick={() => setLocation("/subscription-plans")} className="bg-blue-600 hover:bg-blue-700 text-white">
+            Upgrade Plan
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

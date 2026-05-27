@@ -5,10 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/lib/trpc";
-import { TrendingUp, TrendingDown, DollarSign, Percent, ChevronRight, Home } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Percent, ChevronRight, Home, Lock } from "lucide-react";
 import { format, startOfMonth, endOfMonth } from "date-fns";
 import { ModernDatePicker } from "@/components/ModernDatePicker";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useTranslation } from "react-i18next";
 
 interface DetailedBreakdown {
@@ -26,11 +26,20 @@ interface MonthlyDetail {
 
 export default function ProfitAndLoss() {
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
   const [startDate, setStartDate] = useState<Date | undefined>(startOfMonth(new Date()));
   const [endDate, setEndDate] = useState<Date | undefined>(endOfMonth(new Date()));
   const [selectedBreakdown, setSelectedBreakdown] = useState<DetailedBreakdown | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<MonthlyDetail | null>(null);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+
+  const { data: user } = trpc.auth.me.useQuery();
+  const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery();
+
+  const isSuperAdmin = user?.role === "super_admin";
+  const tierName = (currentPlan?.tier as any)?.name;
+  const features = (currentPlan?.tier as any)?.features as Record<string, boolean> | undefined;
+  const hasAccess = isSuperAdmin || tierName === "internal" || features?.pnlAnalysis === true;
 
   // Fetch P&L data
   const { data: pnlData, isLoading } = trpc.profitLoss.calculatePnL.useQuery({
@@ -111,6 +120,39 @@ export default function ProfitAndLoss() {
   const handleNextYear = () => {
     setCurrentYear(currentYear + 1);
   };
+
+  if (planLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (!hasAccess) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{t("profitLoss.title")}</h1>
+            <p className="text-sm text-gray-500 mt-0.5">{t("profitLoss.subtitle")}</p>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-5 bg-white rounded-xl border border-gray-200">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 border border-blue-200">
+            <Lock className="h-7 w-7 text-blue-500" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-gray-900">Professional Feature</h2>
+            <p className="text-gray-500 max-w-sm">Profit & Loss reporting is available on the Professional and Enterprise plans. Upgrade to access full financial analytics.</p>
+          </div>
+          <Button onClick={() => setLocation("/subscription-plans")} className="bg-blue-600 hover:bg-blue-700 text-white">
+            Upgrade Plan
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-background">
