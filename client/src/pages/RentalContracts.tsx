@@ -668,32 +668,26 @@ export default function RentalContracts() {
 
                     {/* Progress Stepper */}
                     <div className="flex items-center gap-0 px-3 sm:px-6 py-2.5 bg-blue-50/70 border-b border-blue-100/60 shrink-0 overflow-x-hidden">
-                      {(() => {
-                        const step1Done = !!selectedVehicleId;
-                        const step2Done = !!(selectedClientId || clientFirstNameFilled);
-                        const step3Done = !!rentalEndDate;
-                        const stepDone = (n: number) => n === 1 ? step1Done : n === 2 ? step2Done : n === 3 ? step3Done : false;
-                        return [
-                          { n: 1, label: "Vehicle" },
-                          { n: 2, label: "Client Details" },
-                          { n: 3, label: "Dates & Pricing" },
-                          { n: 4, label: "Car Inspection" },
-                        ].map((step, i, arr) => (
-                          <div key={step.n} className="flex items-center min-w-0">
-                            <div className="flex items-center gap-1 min-w-0">
-                              <div className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                                stepDone(step.n) ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
-                              }`}>
-                                {stepDone(step.n) ? <Check className="w-3 h-3" /> : step.n}
-                              </div>
-                              <span className={`text-[10px] sm:text-xs font-medium truncate ${stepDone(step.n) ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
+                      {[
+                        { n: 1, label: "Vehicle", done: !!selectedVehicleId },
+                        { n: 2, label: "Client Details", done: !!(selectedClientId || clientFirstNameFilled) },
+                        { n: 3, label: "Dates & Pricing", done: !!rentalEndDate },
+                        { n: 4, label: "Car Inspection", done: false },
+                      ].map((step, i, arr) => (
+                        <div key={step.n} className="flex items-center min-w-0">
+                          <div className="flex items-center gap-1 min-w-0">
+                            <div className={`w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                              step.done ? "bg-blue-700 text-white" : "bg-gray-200 text-gray-400"
+                            }`}>
+                              {step.done ? <Check className="w-3 h-3" /> : step.n}
                             </div>
-                            {i < arr.length - 1 && (
-                              <div className={`mx-1 sm:mx-3 h-px w-4 sm:w-10 shrink-0 ${stepDone(step.n) ? "bg-blue-300" : "bg-gray-200"}`} />
-                            )}
+                            <span className={`text-[10px] sm:text-xs font-medium truncate ${step.done ? "text-blue-800" : "text-gray-400"}`}>{step.label}</span>
                           </div>
-                        ));
-                      })()}
+                          {i < arr.length - 1 && (
+                            <div className={`mx-1 sm:mx-3 h-px w-4 sm:w-10 shrink-0 ${step.done ? "bg-blue-300" : "bg-gray-200"}`} />
+                          )}
+                        </div>
+                      ))}
                     </div>
 
                     {/* Form */}
