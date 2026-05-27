@@ -590,8 +590,8 @@ export const appRouter = router({
     addMaintenanceRecord: publicProcedure
       .input(z.object({
         vehicleId: z.number(),
-        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"]),
-        description: z.string().min(1),
+        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter", "Battery Change", "Lamp / Bulb Change", "Brake Light", "Wiper Blades", "Fuse Replacement", "Tire Inflation / Fix", "AC Recharge", "Oil Top-up", "Minor Adjustment", "Other On-Spot"]),
+        description: z.string().optional().default(""),
         cost: z.string().optional(),
         performedAt: z.date(),
         performedBy: z.string().max(200).optional(),
@@ -616,7 +616,7 @@ export const appRouter = router({
     updateMaintenanceRecord: publicProcedure
       .input(z.object({
         id: z.number(),
-        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"]).optional(),
+        maintenanceType: z.enum(["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter", "Battery Change", "Lamp / Bulb Change", "Brake Light", "Wiper Blades", "Fuse Replacement", "Tire Inflation / Fix", "AC Recharge", "Oil Top-up", "Minor Adjustment", "Other On-Spot"]).optional(),
         description: z.string().min(1).optional(),
         cost: z.string().optional(),
         performedAt: z.date().optional(),

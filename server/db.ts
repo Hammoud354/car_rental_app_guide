@@ -4089,6 +4089,24 @@ export async function initializeSoldStatusEnum() {
   }
 }
 
+export async function initializeMaintenanceTypeEnum() {
+  const db = await getDb();
+  if (!db) return;
+  const onSpotValues = [
+    "Battery Change", "Lamp / Bulb Change", "Brake Light", "Wiper Blades",
+    "Fuse Replacement", "Tire Inflation / Fix", "AC Recharge", "Oil Top-up",
+    "Minor Adjustment", "Other On-Spot",
+  ];
+  try {
+    for (const val of onSpotValues) {
+      await db.execute(sql.raw(`ALTER TYPE "maintenanceType" ADD VALUE IF NOT EXISTS '${val}'`));
+    }
+    console.log("[Startup] maintenanceType enum on-spot values ready");
+  } catch (err) {
+    console.error("[Startup] Failed to add on-spot values to maintenanceType enum:", err);
+  }
+}
+
 export async function initializePurchaseDetailsColumns() {
   const db = await getDb();
   if (!db) return;

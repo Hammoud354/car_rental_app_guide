@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable, initializeMaintenanceTypeEnum } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -120,6 +120,9 @@ async function startServer() {
     );
     initializeSoldStatusEnum().catch(err =>
       console.error("[Startup] Failed to initialize Sold enum value:", err)
+    );
+    initializeMaintenanceTypeEnum().catch(err =>
+      console.error("[Startup] Failed to initialize maintenanceType on-spot values:", err)
     );
     initializeSaleColumns().catch(err =>
       console.error("[Startup] Failed to initialize sale columns:", err)
