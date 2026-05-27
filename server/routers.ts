@@ -1273,6 +1273,12 @@ export const appRouter = router({
         reason: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const sub = await db.getUserSubscription(ctx.user.id);
+        const features = sub?.tier?.features as any;
+        const tierName = (sub?.tier as any)?.name;
+        if (tierName !== "internal" && ctx.user.role !== "super_admin" && !features?.contractAmendments) {
+          throw new Error("Contract amendments require the Professional or Enterprise plan.");
+        }
         const amendments = await import("./contractAmendments");
         return await amendments.amendContractDates(
           input.contractId,
@@ -1290,6 +1296,12 @@ export const appRouter = router({
         reason: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const sub = await db.getUserSubscription(ctx.user.id);
+        const features = sub?.tier?.features as any;
+        const tierName = (sub?.tier as any)?.name;
+        if (tierName !== "internal" && ctx.user.role !== "super_admin" && !features?.contractAmendments) {
+          throw new Error("Contract amendments require the Professional or Enterprise plan.");
+        }
         const amendments = await import("./contractAmendments");
         return await amendments.amendContractVehicle(
           input.contractId,
@@ -1306,6 +1318,12 @@ export const appRouter = router({
         reason: z.string(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const sub = await db.getUserSubscription(ctx.user.id);
+        const features = sub?.tier?.features as any;
+        const tierName = (sub?.tier as any)?.name;
+        if (tierName !== "internal" && ctx.user.role !== "super_admin" && !features?.contractAmendments) {
+          throw new Error("Contract amendments require the Professional or Enterprise plan.");
+        }
         const amendments = await import("./contractAmendments");
         return await amendments.amendContractRate(
           input.contractId,

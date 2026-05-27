@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import CarDamageInspection from "@/components/CarDamageInspection";
+import { ContractAmendmentDialog } from "@/components/ContractAmendmentDialog";
 import { ContractPDFTemplate } from "@/components/ContractPDFTemplate";
 import { DateDropdownSelector } from "@/components/DateDropdownSelector";
 import { ReturnVehicleDialog } from "@/components/ReturnVehicleDialog";
@@ -17,7 +18,7 @@ import { trpc } from "@/lib/trpc";
 import { printElement, exportElementToPDF, exportContractTemplateToPDF, exportTemplateOverlayToPDF } from "@/lib/printUtils";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useUserFilter } from "@/contexts/UserFilterContext";
-import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download, Car, User, Calendar, DollarSign, Shield, Gauge, Clock, X, ChevronRight, AlertCircle } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Plus, Wrench, Eye, Users, Check, ChevronsUpDown, Home, Settings, BarChart3, Download, Car, User, Calendar, DollarSign, Shield, Gauge, Clock, X, ChevronRight, AlertCircle, FilePen, Lock } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { toast } from "sonner";
 import { createSanitizedPdfClone, cleanupSanitizedClone, validateNoModernCss } from "@/lib/pdfSanitizerEngine";
@@ -85,6 +86,12 @@ export default function RentalContracts() {
   const [pendingBulkAction, setPendingBulkAction] = useState<"completed" | "overdue" | null>(null);
   const [returnInspectionOpen, setReturnInspectionOpen] = useState(false);
   const [selectedContractForReturn, setSelectedContractForReturn] = useState<number | null>(null);
+  const [amendmentContractId, setAmendmentContractId] = useState<number | null>(null);
+
+  const { data: currentPlan } = trpc.subscription.getCurrentPlan.useQuery();
+  const amendmentFeatures = (currentPlan?.tier as any)?.features as Record<string, boolean> | undefined;
+  const amendmentTierName = (currentPlan?.tier as any)?.name;
+  const hasAmendmentAccess = isSuperAdmin || amendmentTierName === "internal" || amendmentFeatures?.contractAmendments === true;
   const [postCompletionModal, setPostCompletionModal] = useState<{
     contract: any;
     vehicle: any;
@@ -1551,19 +1558,44 @@ export default function RentalContracts() {
                           View Details
                         </Button>
                         {(contract.status === "active" || contract.status === "overdue") && (
-                          <Button
-                            variant="default"
-                            size="sm"
-                            className="w-full"
-                            onClick={() => {
-                              // Open full return vehicle dialog
-                              setSelectedContract(contract);
-                              setIsReturnDialogOpen(true);
-                            }}
-                          >
-                            <Check className="mr-2 h-4 w-4" />
-                            Mark as completed
-                          </Button>
+                          <>
+                            <Button
+                              variant="default"
+                              size="sm"
+                              className="w-full"
+                              onClick={() => {
+                                setSelectedContract(contract);
+                                setIsReturnDialogOpen(true);
+                              }}
+                            >
+                              <Check className="mr-2 h-4 w-4" />
+                              Mark as completed
+                            </Button>
+                            {hasAmendmentAccess ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => setAmendmentContractId(contract.id)}
+                                data-testid={`button-amend-contract-${contract.id}`}
+                              >
+                                <FilePen className="mr-2 h-4 w-4" />
+                                Amend Contract
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full opacity-60 cursor-not-allowed"
+                                disabled
+                                title="Upgrade to Professional or Enterprise to amend contracts"
+                                data-testid={`button-amend-locked-${contract.id}`}
+                              >
+                                <Lock className="mr-2 h-4 w-4" />
+                                Amend Contract
+                              </Button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
@@ -1588,6 +1620,14 @@ export default function RentalContracts() {
           })()}
           </>
           )}
+
+        {/* Contract Amendment Dialog */}
+        <ContractAmendmentDialog
+          contractId={amendmentContractId ?? 0}
+          open={amendmentContractId !== null}
+          onOpenChange={(open) => { if (!open) setAmendmentContractId(null); }}
+          onSuccess={() => { refetch(); setAmendmentContractId(null); }}
+        />
 
         {/* Contract Details Dialog */}
         <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
