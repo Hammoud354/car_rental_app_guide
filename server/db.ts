@@ -1885,6 +1885,8 @@ export async function getCompanyProfile(userId: number) {
       logoUrl: companyProfiles.logoUrl,
       primaryColor: companyProfiles.primaryColor,
       secondaryColor: companyProfiles.secondaryColor,
+      platformName: companyProfiles.platformName,
+      hidePoweredBy: companyProfiles.hidePoweredBy,
       contractTemplateUrl: companyProfiles.contractTemplateUrl,
       contractTemplateFieldMap: companyProfiles.contractTemplateFieldMap,
       defaultCurrency: companyProfiles.defaultCurrency,
@@ -1918,6 +1920,8 @@ export async function upsertCompanyProfile(data: {
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  platformName?: string;
+  hidePoweredBy?: boolean;
   contractTemplateUrl?: string;
   contractTemplateFieldMap?: any;
   defaultCurrency?: "USD" | "LOCAL";
@@ -1960,6 +1964,8 @@ export async function upsertCompanyProfile(data: {
         logoUrl: data.logoUrl,
         primaryColor: data.primaryColor,
         secondaryColor: data.secondaryColor,
+        platformName: data.platformName,
+        hidePoweredBy: data.hidePoweredBy,
         contractTemplateUrl: data.contractTemplateUrl,
         contractTemplateFieldMap: data.contractTemplateFieldMap,
         defaultCurrency: data.defaultCurrency,
@@ -4515,5 +4521,40 @@ export async function initializeRentalContractColumns() {
     console.log("[Startup] rentalContracts columns ready");
   } catch (err) {
     console.error("[Startup] Failed to initialize rentalContracts columns:", err);
+  }
+}
+
+export async function initializeWhiteLabelColumns() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      ALTER TABLE "companyProfiles"
+        ADD COLUMN IF NOT EXISTS "platformName" varchar(255),
+        ADD COLUMN IF NOT EXISTS "hidePoweredBy" boolean DEFAULT false
+    `);
+    console.log("[Startup] companyProfiles white-label columns ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize companyProfiles white-label columns:", err);
+  }
+}
+
+export async function hasWhiteLabelAccess(userId: number): Promise<boolean> {
+  const db = await getDb();
+  if (!db) return false;
+  try {
+    const userResult = await db.execute(
+      sql`SELECT role, "isInternal" FROM users WHERE id = ${userId} LIMIT 1`
+    );
+    const rows = (userResult as any)?.rows || [];
+    if (rows.length === 0) return false;
+    const { role, isInternal } = rows[0];
+    if (role === 'super_admin' || isInternal) return true;
+
+    const sub = await getUserSubscription(userId);
+    const features = sub?.tier?.features as any;
+    return !!(features?.whiteLabel);
+  } catch {
+    return false;
   }
 }

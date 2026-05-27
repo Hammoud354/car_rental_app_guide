@@ -1814,6 +1814,52 @@ export const appRouter = router({
         const { url } = await storagePut(input.fileName, buffer, input.contentType);
         return { url };
       }),
+
+    hasWhiteLabelAccess: protectedProcedure.query(async ({ ctx }) => {
+      const access = await db.hasWhiteLabelAccess(ctx.user.id);
+      return { access };
+    }),
+
+    updateWhiteLabel: protectedProcedure
+      .input(z.object({
+        platformName: z.string().optional(),
+        primaryColor: z.string().optional(),
+        secondaryColor: z.string().optional(),
+        logoUrl: z.string().optional(),
+        hidePoweredBy: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const canAccess = await db.hasWhiteLabelAccess(ctx.user.id);
+        if (!canAccess) throw new Error("White label access requires the Enterprise plan.");
+
+        const existing = await db.getCompanyProfile(ctx.user.id);
+        if (!existing) throw new Error("Company profile not found. Please set up your company settings first.");
+
+        const updated = await db.upsertCompanyProfile({
+          userId: ctx.user.id,
+          companyName: existing.companyName,
+          registrationNumber: existing.registrationNumber ?? undefined,
+          taxId: existing.taxId ?? undefined,
+          address: existing.address ?? undefined,
+          city: existing.city ?? undefined,
+          country: existing.country ?? undefined,
+          phone: existing.phone ?? undefined,
+          email: existing.email ?? undefined,
+          website: existing.website ?? undefined,
+          logoUrl: input.logoUrl !== undefined ? input.logoUrl : (existing.logoUrl ?? undefined),
+          primaryColor: input.primaryColor !== undefined ? input.primaryColor : (existing.primaryColor ?? undefined),
+          secondaryColor: input.secondaryColor !== undefined ? input.secondaryColor : (existing.secondaryColor ?? undefined),
+          platformName: input.platformName !== undefined ? input.platformName : (existing.platformName ?? undefined),
+          hidePoweredBy: input.hidePoweredBy !== undefined ? input.hidePoweredBy : (existing.hidePoweredBy ?? false),
+          contractTemplateUrl: existing.contractTemplateUrl ?? undefined,
+          contractTemplateFieldMap: existing.contractTemplateFieldMap ?? undefined,
+          defaultCurrency: existing.defaultCurrency,
+          exchangeRate: existing.exchangeRate ? parseFloat(existing.exchangeRate) : undefined,
+          localCurrencyCode: existing.localCurrencyCode ?? undefined,
+          vatRate: existing.vatRate ? parseFloat(existing.vatRate) : undefined,
+        });
+        return updated;
+      }),
   }),
 
   // Nationalities router for autocomplete

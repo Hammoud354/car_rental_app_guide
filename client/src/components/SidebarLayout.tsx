@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet, Building2
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet, Building2, Paintbrush
 } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,35 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   });
 
   // All sections expanded by default
+  const { data: whiteLabelAccess } = trpc.company.hasWhiteLabelAccess.useQuery();
+
+  // Apply brand colors from company profile as CSS variables
+  useEffect(() => {
+    if (companyProfile?.primaryColor) {
+      const hex = companyProfile.primaryColor;
+      // Convert hex to HSL for Tailwind CSS variable
+      const r = parseInt(hex.slice(1, 3), 16) / 255;
+      const g = parseInt(hex.slice(3, 5), 16) / 255;
+      const b = parseInt(hex.slice(5, 7), 16) / 255;
+      const max = Math.max(r, g, b), min = Math.min(r, g, b);
+      let h = 0, s = 0;
+      const l = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+          case g: h = ((b - r) / d + 2) / 6; break;
+          case b: h = ((r - g) / d + 4) / 6; break;
+        }
+      }
+      const hDeg = Math.round(h * 360);
+      const sPct = Math.round(s * 100);
+      const lPct = Math.round(l * 100);
+      document.documentElement.style.setProperty("--primary", `${hDeg} ${sPct}% ${lPct}%`);
+    }
+  }, [companyProfile?.primaryColor]);
+
   const [expandedSections] = useState<Set<string>>(new Set(["main", "management", "clients-invoices", "admin"]));
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Auto-collapse on mobile devices
@@ -288,6 +317,12 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                   <Settings className="h-4 w-4 mr-2" />
                   {t("user.companySettings")}
                 </DropdownMenuItem>
+                {whiteLabelAccess?.access && (
+                  <DropdownMenuItem onClick={() => setLocation("/white-label")}>
+                    <Paintbrush className="h-4 w-4 mr-2" />
+                    {t("whiteLabel.navLabel")}
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />

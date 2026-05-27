@@ -51,6 +51,7 @@ const SubscriptionPlans = lazy(() => import("./pages/SubscriptionPlans"));
 const ContractManagement = lazy(() => import("./pages/ContractManagement"));
 const SeoLandingPage = lazy(() => import("./pages/seo/SeoLandingPage"));
 const Blog = lazy(() => import("./pages/Blog"));
+const WhiteLabelSettings = lazy(() => import("./pages/WhiteLabelSettings"));
 
 const PUBLIC_ROUTES = [
   "/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans",
@@ -180,6 +181,7 @@ function AppContent() {
             <Route path="/contract-template-mapper" component={ContractTemplateMapper} />
             <Route path="/contract-management" component={ContractManagement} />
             <Route path="/invoices" component={Invoices} />
+            <Route path="/white-label" component={WhiteLabelSettings} />
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch>

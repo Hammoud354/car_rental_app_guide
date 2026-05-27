@@ -84,6 +84,8 @@ export const companyProfiles = pgTable("companyProfiles", {
   logoUrl: text("logoUrl"),
   primaryColor: varchar("primaryColor", { length: 7 }),
   secondaryColor: varchar("secondaryColor", { length: 7 }),
+  platformName: varchar("platformName", { length: 255 }),
+  hidePoweredBy: boolean("hidePoweredBy").default(false),
   contractTemplateUrl: text("contractTemplateUrl"),
   contractTemplateFieldMap: json("contractTemplateFieldMap"),
   defaultCurrency: defaultCurrencyEnum("defaultCurrency").default("USD").notNull(),
