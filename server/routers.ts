@@ -2840,6 +2840,12 @@ export const appRouter = router({
     generateSchedule: protectedProcedure
       .input(z.object({ vehicleId: z.number() }))
       .mutation(async ({ input, ctx }) => {
+        const _subAI = await db.getUserSubscription(ctx.user.id);
+        const _featAI = _subAI?.tier?.features as any;
+        const _tierAI = (_subAI?.tier as any)?.name;
+        if (_tierAI !== "internal" && ctx.user.role !== "super_admin" && !_featAI?.aiMaintenance) {
+          throw new Error("AI Maintenance requires the Professional or Enterprise plan.");
+        }
         const { generateMaintenanceSchedule } = await import("./aiMaintenanceGenerator");
         
         // Get vehicle data
@@ -2919,6 +2925,12 @@ export const appRouter = router({
         }),
       }))
       .mutation(async ({ input, ctx }) => {
+        const _subAI = await db.getUserSubscription(ctx.user.id);
+        const _featAI = _subAI?.tier?.features as any;
+        const _tierAI = (_subAI?.tier as any)?.name;
+        if (_tierAI !== "internal" && ctx.user.role !== "super_admin" && !_featAI?.aiMaintenance) {
+          throw new Error("AI Maintenance requires the Professional or Enterprise plan.");
+        }
         return await db.updateMaintenanceTask(input.taskId, ctx.user.id, input.updates);
       }),
     
@@ -2930,6 +2942,12 @@ export const appRouter = router({
         maintenanceRecordId: z.number().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const _subAI = await db.getUserSubscription(ctx.user.id);
+        const _featAI = _subAI?.tier?.features as any;
+        const _tierAI = (_subAI?.tier as any)?.name;
+        if (_tierAI !== "internal" && ctx.user.role !== "super_admin" && !_featAI?.aiMaintenance) {
+          throw new Error("AI Maintenance requires the Professional or Enterprise plan.");
+        }
         return await db.completeMaintenanceTask(input.taskId, ctx.user.id, {
           completedMileage: input.completedMileage,
           actualCost: input.actualCost,
@@ -2940,6 +2958,12 @@ export const appRouter = router({
     deleteTask: protectedProcedure
       .input(z.object({ taskId: z.number() }))
       .mutation(async ({ input, ctx }) => {
+        const _subAI = await db.getUserSubscription(ctx.user.id);
+        const _featAI = _subAI?.tier?.features as any;
+        const _tierAI = (_subAI?.tier as any)?.name;
+        if (_tierAI !== "internal" && ctx.user.role !== "super_admin" && !_featAI?.aiMaintenance) {
+          throw new Error("AI Maintenance requires the Professional or Enterprise plan.");
+        }
         return await db.deleteMaintenanceTask(input.taskId, ctx.user.id);
       }),
 
@@ -3123,6 +3147,12 @@ export const appRouter = router({
         performedBy: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const _subAI = await db.getUserSubscription(ctx.user.id);
+        const _featAI = _subAI?.tier?.features as any;
+        const _tierAI = (_subAI?.tier as any)?.name;
+        if (_tierAI !== "internal" && ctx.user.role !== "super_admin" && !_featAI?.aiMaintenance) {
+          throw new Error("AI Maintenance requires the Professional or Enterprise plan.");
+        }
         const userId = ctx.user.id;
         const task = (await db.getAllMaintenanceTasks(userId)).find((t: any) => t.id === input.taskId);
         if (!task) throw new Error("Task not found");

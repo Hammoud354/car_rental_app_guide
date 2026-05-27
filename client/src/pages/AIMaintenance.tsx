@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter, Wrench, X } from "lucide-react";
+import { Sparkles, Calendar, DollarSign, Clock, AlertTriangle, CheckCircle2, XCircle, Edit, Trash2, RefreshCw, Filter, Wrench, X, Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,8 +18,16 @@ import { useTranslation } from "react-i18next";
 
 export default function AIMaintenance() {
   const { t } = useTranslation();
+  const [, setLocation] = useLocation();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "super_admin";
   const utils = trpc.useUtils();
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
+
+  const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery();
+  const aiTierName = (currentPlan?.tier as any)?.name;
+  const aiFeatures = (currentPlan?.tier as any)?.features as Record<string, boolean> | undefined;
+  const hasAiAccess = isSuperAdmin || aiTierName === "internal" || aiFeatures?.aiMaintenance === true;
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedTask, setSelectedTask] = useState<any>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -228,6 +239,40 @@ export default function AIMaintenance() {
     acc[task.vehicleId].push(task);
     return acc;
   }, {}) || {};
+
+  if (planLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (!hasAiAccess) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-blue-600" />
+            {t("aiMaintenance.title")}
+          </h1>
+          <p className="text-sm text-gray-500 mt-0.5">{t("aiMaintenance.subtitle")}</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-20 text-center space-y-5 bg-white rounded-xl border border-gray-200">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 border border-blue-200">
+            <Lock className="h-7 w-7 text-blue-500" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold text-gray-900">Professional Feature</h2>
+            <p className="text-gray-500 max-w-sm">AI Maintenance scheduling is available on the Professional and Enterprise plans. Upgrade to unlock predictive maintenance tasks and smart scheduling.</p>
+          </div>
+          <Button onClick={() => setLocation("/subscription-plans")} className="bg-blue-600 hover:bg-blue-700 text-white">
+            Upgrade Plan
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
