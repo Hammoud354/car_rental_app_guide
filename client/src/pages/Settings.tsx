@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, Save, Loader2, ChevronRight, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export default function Settings() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { data: settings, isLoading, refetch } = trpc.settings.get.useQuery();
   const updateSettings = trpc.settings.update.useMutation();
@@ -62,14 +64,14 @@ export default function Settings() {
       });
 
       toast({
-        title: "Settings saved",
-        description: "Your company settings have been updated successfully.",
+        title: t("settings.settingsSaved"),
+        description: t("settings.settingsSavedSubtitle"),
       });
 
       refetch();
     } catch (error) {
       toast({
-        title: "Error",
+        title: t("common.error"),
         description: "Failed to save settings. Please try again.",
         variant: "destructive",
       });
@@ -89,25 +91,25 @@ export default function Settings() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Company Settings</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t("settings.title")}</h1>
         <p className="text-sm text-gray-500 mt-0.5">
-          Manage your company information that will appear on rental contracts
+          {t("settings.subtitle")}
         </p>
       </div>
 
       {/* Quick Links to Other Settings */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Additional Settings</CardTitle>
+          <CardTitle>{t("settings.additionalSettings")}</CardTitle>
           <CardDescription>
-            Configure additional features and integrations
+            {t("settings.additionalSettingsSubtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Link href="/whatsapp-settings">
             <Button variant="outline" className="w-full justify-start gap-2">
               <MessageCircle className="h-4 w-4" />
-              WhatsApp Message Templates
+              {t("settings.whatsappTemplates")}
               <ChevronRight className="h-4 w-4 ml-auto" />
             </Button>
           </Link>
@@ -117,15 +119,15 @@ export default function Settings() {
       <form onSubmit={handleSubmit}>
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Company Logo</CardTitle>
+            <CardTitle>{t("settings.companyLogo")}</CardTitle>
             <CardDescription>
-              Enter the URL of your company logo. This will appear on rental contracts.
+              {t("settings.logoSubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="logo">Logo URL</Label>
+                <Label htmlFor="logo">{t("settings.logoUrl")}</Label>
                 <Input
                   id="logo"
                   type="url"
@@ -141,7 +143,7 @@ export default function Settings() {
                 <div className="w-32 h-32 border-2 border-gray-200 rounded-lg overflow-hidden flex items-center justify-center bg-white">
                   <img
                     src={formData.logo}
-                    alt="Company Logo Preview"
+                    alt={t("settings.logoPreview")}
                     className="max-w-full max-h-full object-contain"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
@@ -155,14 +157,14 @@ export default function Settings() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Company Information</CardTitle>
+            <CardTitle>{t("settings.companyInfo")}</CardTitle>
             <CardDescription>
-              Basic information about your company
+              {t("settings.companyInfoSubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="companyName">Company Name *</Label>
+              <Label htmlFor="companyName">{t("settings.companyName")} *</Label>
               <Input
                 id="companyName"
                 value={formData.companyName}
@@ -175,7 +177,7 @@ export default function Settings() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("common.email")}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -187,7 +189,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone">{t("common.phone")}</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -200,7 +202,7 @@ export default function Settings() {
             </div>
 
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">{t("common.address")}</Label>
               <Input
                 id="address"
                 value={formData.address}
@@ -212,7 +214,7 @@ export default function Settings() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">{t("common.city")}</Label>
                 <Input
                   id="city"
                   value={formData.city}
@@ -223,7 +225,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <Label htmlFor="country">Country</Label>
+                <Label htmlFor="country">{t("common.country")}</Label>
                 <Input
                   id="country"
                   value={formData.country}
@@ -237,7 +239,7 @@ export default function Settings() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="taxId">Tax ID / Registration Number</Label>
+                <Label htmlFor="taxId">{t("settings.taxId")}</Label>
                 <Input
                   id="taxId"
                   value={formData.taxId}
@@ -248,7 +250,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <Label htmlFor="website">Website</Label>
+                <Label htmlFor="website">{t("settings.website")}</Label>
                 <Input
                   id="website"
                   value={formData.website}
@@ -264,14 +266,14 @@ export default function Settings() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Currency Settings</CardTitle>
+            <CardTitle>{t("settings.currencySettings")}</CardTitle>
             <CardDescription>
-              Configure the LBP to USD exchange rate for invoices
+              {t("settings.currencySubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div>
-              <Label htmlFor="exchangeRate">LBP to USD Exchange Rate</Label>
+              <Label htmlFor="exchangeRate">{t("settings.exchangeRate")}</Label>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">1 USD =</span>
                 <Input
@@ -289,7 +291,7 @@ export default function Settings() {
                 <span className="text-sm text-gray-600">LBP</span>
               </div>
               <p className="text-sm text-gray-500 mt-2">
-                This rate will be used to convert USD amounts to LBP on all invoices. Current rate: 1 USD = {formData.exchangeRateLbpToUsd.toLocaleString()} LBP
+                {t("settings.currentRate", { rate: formData.exchangeRateLbpToUsd.toLocaleString() })}
               </p>
             </div>
           </CardContent>
@@ -297,9 +299,9 @@ export default function Settings() {
 
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Terms and Conditions</CardTitle>
+            <CardTitle>{t("settings.termsAndConditions")}</CardTitle>
             <CardDescription>
-              Default terms and conditions for rental contracts
+              {t("settings.termsSubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -309,7 +311,7 @@ export default function Settings() {
                 setFormData({ ...formData, termsAndConditions: e.target.value })
               }
               rows={8}
-              placeholder="Enter your terms and conditions..."
+              placeholder={t("settings.termsPlaceholder")}
             />
           </CardContent>
         </Card>
@@ -323,12 +325,12 @@ export default function Settings() {
             {isUploading || updateSettings.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {t("common.loading")}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                Save Settings
+                {t("settings.saveSettings")}
               </>
             )}
           </Button>

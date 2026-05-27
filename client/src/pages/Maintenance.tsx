@@ -165,7 +165,7 @@ export default function Maintenance() {
 
   const addMaintenanceMutation = trpc.fleet.addMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Maintenance record added successfully");
+      toast.success(t("maintenance.recordAdded"));
       refetchRecords();
       utils.fleet.listAvailableForMaintenance.invalidate();
       utils.fleet.getGarageLocations.invalidate();
@@ -180,13 +180,13 @@ export default function Maintenance() {
       setSelectedGarageId(null);
     },
     onError: (error) => {
-      toast.error(`Failed to add maintenance record: ${error.message}`);
+      toast.error(`${t("maintenance.addError")}: ${error.message}`);
     },
   });
 
   const updateMaintenanceMutation = trpc.fleet.updateMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Maintenance record updated");
+      toast.success(t("maintenance.recordUpdated"));
       refetchRecords();
       utils.fleet.getGarageLocations.invalidate();
       utils.fleet.getTechnicians.invalidate();
@@ -194,37 +194,37 @@ export default function Maintenance() {
       setEditFormData({});
     },
     onError: (error) => {
-      toast.error(`Failed to update: ${error.message}`);
+      toast.error(`${t("maintenance.updateError")}: ${error.message}`);
     },
   });
 
   const sendToMaintenanceMutation = trpc.fleet.sendToMaintenance.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle sent to maintenance — blocked from rentals");
+      toast.success(t("maintenance.vehicleInGarage"));
       utils.fleet.listAvailableForMaintenance.invalidate();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to send vehicle to maintenance");
+      toast.error(error.message || t("maintenance.failedSend"));
     },
   });
 
   const removeFromMaintenanceMutation = trpc.fleet.removeFromMaintenance.useMutation({
     onSuccess: () => {
-      toast.success("Vehicle marked as Available");
+      toast.success(t("maintenance.vehicleMarkedAvailable"));
       utils.fleet.listAvailableForMaintenance.invalidate();
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to remove vehicle from maintenance");
+      toast.error(error.message || t("maintenance.updateError"));
     },
   });
 
   const deleteMaintenanceMutation = trpc.fleet.deleteMaintenanceRecord.useMutation({
     onSuccess: () => {
-      toast.success("Record deleted");
+      toast.success(t("maintenance.recordDeleted"));
       refetchRecords();
     },
     onError: (error) => {
-      toast.error(`Failed to delete: ${error.message}`);
+      toast.error(`${t("maintenance.updateError")}: ${error.message}`);
     },
   });
 
@@ -272,7 +272,7 @@ export default function Maintenance() {
   };
 
   const handleDeleteRecord = (recordId: number) => {
-    if (confirm("Are you sure you want to delete this maintenance record?")) {
+    if (confirm(t("maintenance.deleteConfirm"))) {
       deleteMaintenanceMutation.mutate({ id: recordId });
     }
   };
@@ -286,7 +286,7 @@ export default function Maintenance() {
       return;
     }
     if (!performedAtDate) {
-      toast.error("Please select a date performed");
+      toast.error(t("maintenance.selectDateError"));
       return;
     }
 
@@ -486,8 +486,8 @@ export default function Maintenance() {
           setGarageExitDate(undefined);
           setMarkInMaintenance(true);
         }}
-        title="New Maintenance Record"
-        subtitle={isOnSpotRepair ? "Quick on-spot repair — no garage needed" : "Record maintenance work performed on a vehicle"}
+        title={t("maintenance.newRecord")}
+        subtitle={isOnSpotRepair ? t("maintenance.quickOnSpotSubtitle") : t("maintenance.recordSubtitle")}
         icon={Wrench}
         footer={
           <>
@@ -499,7 +499,7 @@ export default function Maintenance() {
               setGarageExitDate(undefined);
               setMarkInMaintenance(true);
               setIsOnSpotRepair(false);
-            }}>Cancel</Button>
+            }}>{t("common.cancel")}</Button>
             <Button
               type="submit"
               form="add-maintenance-form"
@@ -507,7 +507,7 @@ export default function Maintenance() {
               className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900"
               disabled={addMaintenanceMutation.isPending}
             >
-              {addMaintenanceMutation.isPending ? "Adding..." : "Add Record"}
+              {addMaintenanceMutation.isPending ? t("maintenance.adding") : t("maintenance.addRecord")}
             </Button>
           </>
         }
@@ -526,7 +526,7 @@ export default function Maintenance() {
               }`}
             >
               <Wrench className="w-3.5 h-3.5" />
-              Standard Maintenance
+              {t("maintenance.standardMaintenance")}
             </button>
             <button
               type="button"
@@ -538,7 +538,7 @@ export default function Maintenance() {
               }`}
             >
               <Activity className="w-3.5 h-3.5" />
-              On Spot Repair
+              {t("maintenance.onSpotRepair")}
             </button>
           </div>
 
@@ -548,7 +548,7 @@ export default function Maintenance() {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
                 <Car className="w-3.5 h-3.5" />
               </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Vehicle</h3>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.vehicleSection")}</h3>
             </div>
             <Select
               value={selectedVehicleId?.toString() || ""}
@@ -556,7 +556,7 @@ export default function Maintenance() {
               required
             >
               <SelectTrigger className="h-9 text-sm input-client">
-                <SelectValue placeholder="Select a vehicle" />
+                <SelectValue placeholder={t("maintenance.selectVehicle")} />
               </SelectTrigger>
               <SelectContent style={{ zIndex: 9999 }}>
                 {vehicles?.map((vehicle) => (
@@ -564,7 +564,7 @@ export default function Maintenance() {
                     <span className="flex items-center gap-2">
                       <span>{vehicle.plateNumber} — {vehicle.brand} {vehicle.model}</span>
                       {vehicle.status === "Maintenance" && (
-                        <span className="text-[10px] font-semibold bg-orange-100 text-orange-700 rounded px-1.5 py-0.5 leading-none">In Garage</span>
+                        <span className="text-[10px] font-semibold bg-orange-100 text-orange-700 rounded px-1.5 py-0.5 leading-none">{t("maintenance.inGarageTag")}</span>
                       )}
                     </span>
                   </SelectItem>
@@ -580,15 +580,15 @@ export default function Maintenance() {
                 <Wrench className="w-3.5 h-3.5" />
               </span>
               <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">
-                {isOnSpotRepair ? "On Spot Repair Details" : "Service Details"}
+                {isOnSpotRepair ? t("maintenance.onSpotRepairDetails") : t("maintenance.serviceDetails")}
               </h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">Type *</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.typeLabel")} *</Label>
                 <Select name="maintenanceType" required>
                   <SelectTrigger className="mt-1 h-9 text-sm input-client">
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t("maintenance.selectType")} />
                   </SelectTrigger>
                   <SelectContent style={{ zIndex: 9999 }}>
                     {isOnSpotRepair
@@ -599,25 +599,25 @@ export default function Maintenance() {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Date Performed *</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.datePerformed")} *</Label>
                 <div className="mt-1">
-                  <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder="Select date" />
+                  <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder={t("common.selectDate")} />
                 </div>
               </div>
               <div className={isOnSpotRepair ? "" : "sm:col-span-2"}>
-                <Label className="text-xs font-medium text-gray-600">Cost ($)</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.costDollar")}</Label>
                 <Input name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1 h-9 text-sm input-client" />
               </div>
               {!isOnSpotRepair && (
                 <div className="sm:col-span-2">
-                  <Label className="text-xs font-medium text-gray-600">Description *</Label>
-                  <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm input-client" />
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.descriptionLabel")} *</Label>
+                  <Textarea name="description" rows={2} required placeholder={t("maintenance.describeWork")} className="mt-1 text-sm input-client" />
                 </div>
               )}
               {isOnSpotRepair && (
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Notes</Label>
-                  <Input name="description" placeholder="Optional notes..." className="mt-1 h-9 text-sm input-client" />
+                  <Label className="text-xs font-medium text-gray-600">{t("common.notes")}</Label>
+                  <Input name="description" placeholder={t("maintenance.notesInput")} className="mt-1 h-9 text-sm input-client" />
                 </div>
               )}
             </div>
@@ -630,17 +630,17 @@ export default function Maintenance() {
                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
                   <MapPin className="w-3.5 h-3.5" />
                 </span>
-                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
+                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.garageInfoSection")}</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Garage</Label>
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.garage")}</Label>
                   <Select value={selectedGarageId?.toString() || "none"} onValueChange={v => setSelectedGarageId(v === "none" ? null : parseInt(v))}>
                     <SelectTrigger className="mt-1 h-9 text-sm input-client">
-                      <SelectValue placeholder="Select a garage" />
+                      <SelectValue placeholder={t("maintenance.selectGarage")} />
                     </SelectTrigger>
                     <SelectContent style={{ zIndex: 9999 }}>
-                      <SelectItem value="none">No garage selected</SelectItem>
+                      <SelectItem value="none">{t("maintenance.noGarageSelected")}</SelectItem>
                       {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
                         <SelectItem key={g.id} value={g.id.toString()}>
                           <span className="flex items-center gap-1.5">
@@ -654,22 +654,22 @@ export default function Maintenance() {
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Performed By</Label>
-                  <Input name="performedBy" list="technicians-list" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.performedBy")}</Label>
+                  <Input name="performedBy" list="technicians-list" placeholder={t("maintenance.technicianName")} className="mt-1 h-9 text-sm input-client" />
                   <datalist id="technicians-list">
                     {technicians?.map((tech) => <option key={tech} value={tech} />)}
                   </datalist>
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.garageEntry")}</Label>
                   <div className="mt-1">
-                    <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
+                    <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder={t("maintenance.entryDate")} />
                   </div>
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.garageExit")}</Label>
                   <div className="mt-1">
-                    <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
+                    <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder={t("maintenance.exitDate")} />
                   </div>
                 </div>
               </div>
@@ -683,13 +683,13 @@ export default function Maintenance() {
                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
                   <Gauge className="w-3.5 h-3.5" />
                 </span>
-                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
+                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.odometerCostSection")}</h3>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs font-medium text-gray-600">
-                    KM Reading
-                    {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
+                    {t("maintenance.kmReading")}
+                    {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">{t("maintenance.kmReadingAuto")}</span>}
                   </Label>
                   <Input
                     name="mileageAtService"
@@ -702,7 +702,7 @@ export default function Maintenance() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-600">Next Service KM</Label>
+                  <Label className="text-xs font-medium text-gray-600">{t("maintenance.nextServiceKm")}</Label>
                   <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 h-9 text-sm input-client" />
                 </div>
               </div>
@@ -720,9 +720,9 @@ export default function Maintenance() {
                   className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
                 />
                 <div>
-                  <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
+                  <span className="text-sm font-semibold text-orange-800">{t("maintenance.vehicleInGarageLabel")}</span>
                   <p className="text-xs text-orange-600 mt-0.5">
-                    Block this vehicle from being rented until maintenance is complete
+                    {t("maintenance.vehicleInGarageDesc")}
                   </p>
                 </div>
               </label>
@@ -734,9 +734,9 @@ export default function Maintenance() {
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
               <Activity className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
               <div>
-                <span className="text-sm font-semibold text-emerald-800">On Spot Repair</span>
+                <span className="text-sm font-semibold text-emerald-800">{t("maintenance.onSpotRepair")}</span>
                 <p className="text-xs text-emerald-600 mt-0.5">
-                  Vehicle stays available for rental — no garage visit required.
+                  {t("maintenance.onSpotAvailableDesc")}
                 </p>
               </div>
             </div>
@@ -749,14 +749,14 @@ export default function Maintenance() {
       <PortalModal
         open={editingRecordId !== null}
         onClose={() => { setEditingRecordId(null); setEditFormData({}); }}
-        title="Edit Maintenance Record"
-        subtitle="Update the record details below"
+        title={t("maintenance.editMaintenanceRecord")}
+        subtitle={t("maintenance.updateRecordSubtitle")}
         icon={Edit}
         footer={
           <>
-            <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => { setEditingRecordId(null); setEditFormData({}); }}>Cancel</Button>
+            <Button variant="outline" size="sm" className="h-8 text-xs px-4" onClick={() => { setEditingRecordId(null); setEditFormData({}); }}>{t("common.cancel")}</Button>
             <Button size="sm" className="h-8 text-xs px-5 bg-blue-800 hover:bg-blue-900" onClick={handleSaveEdit} disabled={updateMaintenanceMutation.isPending}>
-              {updateMaintenanceMutation.isPending ? "Saving..." : "Save Changes"}
+              {updateMaintenanceMutation.isPending ? t("maintenance.savingText") : t("maintenance.updateRecord")}
             </Button>
           </>
         }
@@ -768,11 +768,11 @@ export default function Maintenance() {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
                 <Wrench className="w-3.5 h-3.5" />
               </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Service Details</h3>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.serviceDetails")}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">Type *</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.typeLabel")} *</Label>
                 <Select value={editFormData.maintenanceType} onValueChange={(v) => setEditFormData({...editFormData, maintenanceType: v})}>
                   <SelectTrigger className="mt-1 h-9 text-sm input-client"><SelectValue /></SelectTrigger>
                   <SelectContent style={{ zIndex: 9999 }}>
@@ -781,19 +781,19 @@ export default function Maintenance() {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Date Performed *</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.datePerformed")} *</Label>
                 <div className="mt-1">
-                  <ModernDatePicker date={editPerformedAtDate} onDateChange={setEditPerformedAtDate} placeholder="Select date" />
+                  <ModernDatePicker date={editPerformedAtDate} onDateChange={setEditPerformedAtDate} placeholder={t("common.selectDate")} />
                 </div>
               </div>
             </div>
             <div className="mt-3">
-              <Label className="text-xs font-medium text-gray-600">Description *</Label>
+              <Label className="text-xs font-medium text-gray-600">{t("maintenance.descriptionLabel")} *</Label>
               <Textarea
                 rows={2}
                 value={editFormData.description}
                 onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
-                placeholder="Describe the work performed..."
+                placeholder={t("maintenance.describeWork")}
                 className="mt-1 text-sm input-client"
               />
             </div>
@@ -805,17 +805,17 @@ export default function Maintenance() {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
                 <MapPin className="w-3.5 h-3.5" />
               </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.garageInfoSection")}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">Garage</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.garage")}</Label>
                 <Select value={editGarageId?.toString() || "none"} onValueChange={v => setEditGarageId(v === "none" ? null : parseInt(v))}>
                   <SelectTrigger className="mt-1 h-9 text-sm input-client">
-                    <SelectValue placeholder="Select a garage" />
+                    <SelectValue placeholder={t("maintenance.selectGarage")} />
                   </SelectTrigger>
                   <SelectContent style={{ zIndex: 9999 }}>
-                    <SelectItem value="none">No garage selected</SelectItem>
+                    <SelectItem value="none">{t("maintenance.noGarageSelected")}</SelectItem>
                     {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
                       <SelectItem key={g.id} value={g.id.toString()}>
                         <span className="flex items-center gap-1.5">
@@ -829,19 +829,19 @@ export default function Maintenance() {
                 </Select>
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Performed By</Label>
-                <Input value={editFormData.performedBy} onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})} placeholder="Technician name" list="technicians-list" className="mt-1 h-9 text-sm input-client" />
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.performedBy")}</Label>
+                <Input value={editFormData.performedBy} onChange={(e) => setEditFormData({...editFormData, performedBy: e.target.value})} placeholder={t("maintenance.technicianName")} list="technicians-list" className="mt-1 h-9 text-sm input-client" />
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.garageEntry")}</Label>
                 <div className="mt-1">
-                  <ModernDatePicker date={editGarageEntryDate} onDateChange={setEditGarageEntryDate} placeholder="Entry date" />
+                  <ModernDatePicker date={editGarageEntryDate} onDateChange={setEditGarageEntryDate} placeholder={t("maintenance.entryDate")} />
                 </div>
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.garageExit")}</Label>
                 <div className="mt-1">
-                  <ModernDatePicker date={editGarageExitDate} onDateChange={setEditGarageExitDate} placeholder="Exit date" />
+                  <ModernDatePicker date={editGarageExitDate} onDateChange={setEditGarageExitDate} placeholder={t("maintenance.exitDate")} />
                 </div>
               </div>
             </div>
@@ -853,15 +853,15 @@ export default function Maintenance() {
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
                 <Gauge className="w-3.5 h-3.5" />
               </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("maintenance.odometerCostSection")}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs font-medium text-gray-600">KM Reading</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.kmReading")}</Label>
                 <Input type="number" min="0" value={editFormData.mileageAtService} onChange={(e) => setEditFormData({...editFormData, mileageAtService: e.target.value})} placeholder="45000" className="mt-1 h-9 text-sm input-client" />
               </div>
               <div>
-                <Label className="text-xs font-medium text-gray-600">Cost ($)</Label>
+                <Label className="text-xs font-medium text-gray-600">{t("maintenance.costDollar")}</Label>
                 <Input type="number" step="0.01" min="0" value={editFormData.cost} onChange={(e) => setEditFormData({...editFormData, cost: e.target.value})} placeholder="0.00" className="mt-1 h-9 text-sm input-client" />
               </div>
             </div>

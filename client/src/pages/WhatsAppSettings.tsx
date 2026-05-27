@@ -7,13 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MessageCircle, Save, Loader2, ChevronRight, Info } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
-const templateTypes = [
-  {
-    type: 'contract_created' as const,
-    title: 'Contract Created',
-    description: 'Message sent when a new rental contract is created',
-    defaultTemplate: `New Contract Created!
+export default function WhatsAppSettings() {
+  const { t } = useTranslation();
+  const { data: templates, isLoading, refetch } = trpc.whatsappTemplates.list.useQuery();
+  const upsertTemplate = trpc.whatsappTemplates.upsert.useMutation();
+
+  const templateTypes = [
+    {
+      type: 'contract_created' as const,
+      title: t('whatsapp.contractCreated'),
+      description: t('whatsapp.contractCreatedDesc'),
+      defaultTemplate: `New Contract Created!
 
 📋 Contract: {{contractNumber}}
 👤 Client: {{clientName}}
@@ -25,12 +31,12 @@ const templateTypes = [
 {{pdfUrl}}
 
 {{thumbnailUrl}}`
-  },
-  {
-    type: 'contract_renewed' as const,
-    title: 'Contract Renewed',
-    description: 'Message sent when a rental contract is renewed',
-    defaultTemplate: `Contract Renewed!
+    },
+    {
+      type: 'contract_renewed' as const,
+      title: t('whatsapp.contractRenewed'),
+      description: t('whatsapp.contractRenewedDesc'),
+      defaultTemplate: `Contract Renewed!
 
 📋 Contract: {{contractNumber}}
 👤 Client: {{clientName}}
@@ -40,12 +46,12 @@ const templateTypes = [
 
 📄 Download Updated Contract:
 {{pdfUrl}}`
-  },
-  {
-    type: 'contract_completed' as const,
-    title: 'Contract Completed',
-    description: 'Message sent when a rental contract is completed',
-    defaultTemplate: `Contract Completed!
+    },
+    {
+      type: 'contract_completed' as const,
+      title: t('whatsapp.contractCompleted'),
+      description: t('whatsapp.contractCompletedDesc'),
+      defaultTemplate: `Contract Completed!
 
 📋 Contract: {{contractNumber}}
 👤 Client: {{clientName}}
@@ -54,12 +60,12 @@ const templateTypes = [
 💰 Final Amount: {{totalAmount}}
 
 Thank you for choosing our service!`
-  },
-  {
-    type: 'invoice_generated' as const,
-    title: 'Invoice Generated',
-    description: 'Message sent when an invoice is generated',
-    defaultTemplate: `Invoice Generated!
+    },
+    {
+      type: 'invoice_generated' as const,
+      title: t('whatsapp.invoiceGenerated'),
+      description: t('whatsapp.invoiceGeneratedDesc'),
+      defaultTemplate: `Invoice Generated!
 
 📋 Invoice: {{invoiceNumber}}
 👤 Client: {{clientName}}
@@ -68,25 +74,21 @@ Thank you for choosing our service!`
 
 📄 Download Invoice:
 {{pdfUrl}}`
-  }
-];
+    }
+  ];
 
-const availableVariables = [
-  { var: '{{contractNumber}}', desc: 'Contract number' },
-  { var: '{{clientName}}', desc: 'Client full name' },
-  { var: '{{vehicleName}}', desc: 'Vehicle brand and model' },
-  { var: '{{startDate}}', desc: 'Rental start date' },
-  { var: '{{endDate}}', desc: 'Rental end date' },
-  { var: '{{totalAmount}}', desc: 'Total amount' },
-  { var: '{{pdfUrl}}', desc: 'PDF download URL' },
-  { var: '{{thumbnailUrl}}', desc: 'Contract thumbnail URL' },
-  { var: '{{invoiceNumber}}', desc: 'Invoice number (invoices only)' },
-  { var: '{{dueDate}}', desc: 'Due date (invoices only)' },
-];
-
-export default function WhatsAppSettings() {
-  const { data: templates, isLoading, refetch } = trpc.whatsappTemplates.list.useQuery();
-  const upsertTemplate = trpc.whatsappTemplates.upsert.useMutation();
+  const availableVariables = [
+    { var: '{{contractNumber}}', desc: t('whatsapp.variable_contractNumber') },
+    { var: '{{clientName}}', desc: t('whatsapp.variable_clientName') },
+    { var: '{{vehicleName}}', desc: t('whatsapp.variable_vehicleName') },
+    { var: '{{startDate}}', desc: t('whatsapp.variable_startDate') },
+    { var: '{{endDate}}', desc: t('whatsapp.variable_endDate') },
+    { var: '{{totalAmount}}', desc: t('whatsapp.variable_totalAmount') },
+    { var: '{{pdfUrl}}', desc: t('whatsapp.variable_pdfUrl') },
+    { var: '{{thumbnailUrl}}', desc: t('whatsapp.variable_thumbnailUrl') },
+    { var: '{{invoiceNumber}}', desc: t('whatsapp.variable_invoiceNumber') },
+    { var: '{{dueDate}}', desc: t('whatsapp.variable_dueDate') },
+  ];
 
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -111,10 +113,10 @@ export default function WhatsAppSettings() {
         isActive: true,
       });
 
-      toast.success("Template saved successfully");
+      toast.success(t("whatsapp.templateSaved"));
       refetch();
     } catch (error) {
-      toast.error("Failed to save template");
+      toast.error(t("whatsapp.failedSave"));
     } finally {
       setIsSaving(false);
     }
@@ -146,23 +148,23 @@ export default function WhatsAppSettings() {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
           <Link href="/">
-            <span className="hover:text-foreground cursor-pointer">Overview</span>
+            <span className="hover:text-foreground cursor-pointer">{t("common.overview")}</span>
           </Link>
           <ChevronRight className="h-4 w-4" />
           <Link href="/settings">
-            <span className="hover:text-foreground cursor-pointer">Settings</span>
+            <span className="hover:text-foreground cursor-pointer">{t("settings.title")}</span>
           </Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground font-medium">WhatsApp Templates</span>
+          <span className="text-foreground font-medium">{t("whatsapp.title")}</span>
         </div>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold flex items-center gap-2">
             <MessageCircle className="h-8 w-8" />
-            WhatsApp Message Templates
+            {t("whatsapp.title")}
           </h1>
           <p className="text-gray-600 mt-2">
-            Customize the messages sent when sharing contracts via WhatsApp
+            {t("whatsapp.subtitle")}
           </p>
         </div>
 
@@ -171,10 +173,10 @@ export default function WhatsAppSettings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5" />
-              Available Variables
+              {t("whatsapp.availableVariables")}
             </CardTitle>
             <CardDescription>
-              Use these variables in your templates - they will be replaced with actual values
+              {t("whatsapp.availableVariablesSubtitle")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -200,7 +202,7 @@ export default function WhatsAppSettings() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor={`template-${template.type}`}>Message Template</Label>
+                <Label htmlFor={`template-${template.type}`}>{t("whatsapp.messageTemplate")}</Label>
                 <Textarea
                   id={`template-${template.type}`}
                   value={formData[template.type] || ''}
@@ -223,13 +225,13 @@ export default function WhatsAppSettings() {
                   ) : (
                     <Save className="h-4 w-4" />
                   )}
-                  Save Template
+                  {t("whatsapp.saveTemplate")}
                 </Button>
                 <Button
                   onClick={() => handleReset(template.type)}
                   variant="outline"
                 >
-                  Reset to Default
+                  {t("whatsapp.resetToDefault")}
                 </Button>
               </div>
             </CardContent>

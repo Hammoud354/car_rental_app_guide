@@ -616,7 +616,7 @@ export default function FleetManagement() {
 
           <div className="space-y-4 py-2">
             <div>
-              <Label htmlFor="maint-garage">Garage / Workshop *</Label>
+              <Label htmlFor="maint-garage">{t("fleet.garageWorkshop")} *</Label>
               <Input
                 id="maint-garage"
                 placeholder="e.g. Al Baraka Garage"
@@ -632,7 +632,7 @@ export default function FleetManagement() {
                 onValueChange={(val) => setMaintenanceForm(f => ({ ...f, type: val }))}
               >
                 <SelectTrigger id="maint-type">
-                  <SelectValue placeholder="Select type..." />
+                  <SelectValue placeholder={t("maintenance.selectType")} />
                 </SelectTrigger>
                 <SelectContent>
                   {["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"].map(t => (
@@ -644,7 +644,7 @@ export default function FleetManagement() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="maint-mileage">Current Mileage (km)</Label>
+                <Label htmlFor="maint-mileage">{t("fleet.currentMileageKm")}</Label>
                 <Input
                   id="maint-mileage"
                   type="number"
@@ -654,7 +654,7 @@ export default function FleetManagement() {
                 />
               </div>
               <div>
-                <Label htmlFor="maint-next-km">Next Maintenance at (km) <span className="text-muted-foreground font-normal text-xs">(optional)</span></Label>
+                <Label htmlFor="maint-next-km">{t("fleet.nextMaintenanceAt")} <span className="text-muted-foreground font-normal text-xs">({t("common.optional")})</span></Label>
                 <Input
                   id="maint-next-km"
                   type="number"
@@ -667,7 +667,7 @@ export default function FleetManagement() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label>Entry Date *</Label>
+                <Label>{t("fleet.entryDateRequired")} *</Label>
                 <ModernDatePicker
                   date={maintenanceEntryDate}
                   onDateChange={(d) => d && setMaintenanceEntryDate(d)}
@@ -675,21 +675,21 @@ export default function FleetManagement() {
                 />
               </div>
               <div>
-                <Label>Expected Exit Date</Label>
+                <Label>{t("fleet.expectedExitDate")}</Label>
                 <ModernDatePicker
                   date={maintenanceExitDate}
                   onDateChange={(d) => setMaintenanceExitDate(d)}
-                  placeholder="Optional"
+                  placeholder={t("common.optional")}
                   maxYear={new Date().getFullYear() + 2}
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="maint-notes">Notes (optional)</Label>
+              <Label htmlFor="maint-notes">{t("fleet.notesOptional")}</Label>
               <Textarea
                 id="maint-notes"
-                placeholder="Describe the issue or work to be done..."
+                placeholder={t("fleet.describeIssue")}
                 rows={3}
                 value={maintenanceForm.notes}
                 onChange={(e) => setMaintenanceForm(f => ({ ...f, notes: e.target.value }))}
@@ -845,8 +845,8 @@ export default function FleetManagement() {
                         <Car className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-bold text-white">Add New Vehicle</h2>
-                        <p className="text-blue-200 text-xs">Enter vehicle details to add it to your fleet</p>
+                        <h2 className="text-lg font-bold text-white">{t("fleet.addVehicle")}</h2>
+                        <p className="text-blue-200 text-xs">{t("fleet.subtitle")}</p>
                       </div>
                     </div>
                     <button
@@ -869,11 +869,11 @@ export default function FleetManagement() {
                         <div>
                           <div className="flex items-center gap-2 mb-4">
                             <Car className="w-4 h-4 text-blue-700" />
-                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Basic Info</h3>
+                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("fleet.basicInfo")}</h3>
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label htmlFor="plateNumber">Plate Number *</Label>
+                              <Label htmlFor="plateNumber">{t("fleet.plateNumber")} *</Label>
                               <Input id="plateNumber" name="plateNumber" required className="input-client mt-1" />
                             </div>
                             <div>
@@ -881,19 +881,19 @@ export default function FleetManagement() {
                               <Input id="vin" name="vin" maxLength={17} className="mt-1" />
                             </div>
                             <div>
-                              <Label>Car Maker *</Label>
+                              <Label>{t("fleet.makerBrand")} *</Label>
                               <Popover open={makerOpen} onOpenChange={setMakerOpen}>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" role="combobox" aria-expanded={makerOpen} className="w-full justify-between mt-1 overflow-hidden">
-                                    {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : "Select maker..."}
+                                    {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : t("fleet.selectMaker")}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
                                   <Command>
-                                    <CommandInput placeholder="Search maker..." />
+                                    <CommandInput placeholder={t("fleet.searchMaker")} />
                                     <CommandList>
-                                      <CommandEmpty>No maker found.</CommandEmpty>
+                                      <CommandEmpty>{t("common.noData")}</CommandEmpty>
                                       <CommandGroup>
                                         {carMakers?.map((maker) => (
                                           <CommandItem key={maker.id} value={maker.name} onSelect={() => { setSelectedMakerId(maker.id); setSelectedModelId(null); setMakerOpen(false); }}>
@@ -902,7 +902,7 @@ export default function FleetManagement() {
                                           </CommandItem>
                                         ))}
                                         <CommandItem onSelect={() => { setMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
-                                          <Plus className="mr-2 h-4 w-4" />Add Custom Maker
+                                          <Plus className="mr-2 h-4 w-4" />{t("fleet.addMaker")}
                                         </CommandItem>
                                       </CommandGroup>
                                     </CommandList>
@@ -911,19 +911,19 @@ export default function FleetManagement() {
                               </Popover>
                             </div>
                             <div>
-                              <Label>Car Model *</Label>
+                              <Label>{t("common.model")} *</Label>
                               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" role="combobox" aria-expanded={modelOpen} className="w-full justify-between mt-1 overflow-hidden" disabled={!selectedMakerId}>
-                                    {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : "Select model..."}
+                                    {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : t("fleet.selectModel")}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
                                   <Command>
-                                    <CommandInput placeholder="Search model..." />
+                                    <CommandInput placeholder={t("fleet.searchModel")} />
                                     <CommandList>
-                                      <CommandEmpty>No model found.</CommandEmpty>
+                                      <CommandEmpty>{t("common.noData")}</CommandEmpty>
                                       <CommandGroup>
                                         {carModels?.map((model) => (
                                           <CommandItem key={model.id} value={model.modelName} onSelect={() => { setSelectedModelId(model.id); setModelOpen(false); }}>
@@ -932,7 +932,7 @@ export default function FleetManagement() {
                                           </CommandItem>
                                         ))}
                                         <CommandItem onSelect={() => { setModelOpen(false); setCustomModelMakerId(selectedMakerId); setIsCustomModelDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
-                                          <Plus className="mr-2 h-4 w-4" />Add Custom Model
+                                          <Plus className="mr-2 h-4 w-4" />{t("fleet.addModel")}
                                         </CommandItem>
                                       </CommandGroup>
                                     </CommandList>
@@ -941,31 +941,34 @@ export default function FleetManagement() {
                               </Popover>
                             </div>
                             <div>
-                              <Label htmlFor="year">Year *</Label>
+                              <Label htmlFor="year">{t("common.year")} *</Label>
                               <Input id="year" name="year" type="number" min="1900" max="2100" required className="input-client mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="mileage">Mileage (km)</Label>
+                              <Label htmlFor="mileage">{t("fleet.mileage")}</Label>
                               <Input id="mileage" name="mileage" type="number" min="0" className="mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="color">Color *</Label>
+                              <Label htmlFor="color">{t("common.color")} *</Label>
                               <Input id="color" name="color" required className="input-client mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="category">Category *</Label>
+                              <Label htmlFor="category">{t("common.category")} *</Label>
                               <Select name="category" required>
                                 <SelectTrigger className="mt-1">
-                                  <SelectValue placeholder="Select category" />
+                                  <SelectValue placeholder={t("fleet.selectCategory")} />
                                 </SelectTrigger>
                                 <SelectContent style={{ zIndex: 9999 }}>
-                                  <SelectItem value="Economy">Economy</SelectItem>
-                                  <SelectItem value="Compact">Compact</SelectItem>
-                                  <SelectItem value="Midsize">Midsize</SelectItem>
-                                  <SelectItem value="SUV">SUV</SelectItem>
-                                  <SelectItem value="Luxury">Luxury</SelectItem>
-                                  <SelectItem value="Van">Van</SelectItem>
-                                  <SelectItem value="Truck">Truck</SelectItem>
+                                  <SelectItem value="Economy">{t("fleet.economy")}</SelectItem>
+                                  <SelectItem value="Compact">{t("fleet.compact")}</SelectItem>
+                                  <SelectItem value="Intermediate">{t("fleet.intermediate")}</SelectItem>
+                                  <SelectItem value="Standard">{t("fleet.standard")}</SelectItem>
+                                  <SelectItem value="Full-size">{t("fleet.fullSize")}</SelectItem>
+                                  <SelectItem value="Luxury">{t("fleet.luxury")}</SelectItem>
+                                  <SelectItem value="SUV">{t("fleet.suv")}</SelectItem>
+                                  <SelectItem value="Minivan">{t("fleet.minivan")}</SelectItem>
+                                  <SelectItem value="Pickup Truck">{t("fleet.pickupTruck")}</SelectItem>
+                                  <SelectItem value="Cargo Van">{t("fleet.cargoVan")}</SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
@@ -976,19 +979,19 @@ export default function FleetManagement() {
                         <div>
                           <div className="flex items-center gap-2 mb-4">
                             <DollarSign className="w-4 h-4 text-blue-700" />
-                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Pricing</h3>
+                            <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("fleet.pricingFinancials")}</h3>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                              <Label htmlFor="dailyRate">Daily Rate ($) *</Label>
+                              <Label htmlFor="dailyRate">{t("fleet.dailyRate")} *</Label>
                               <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="weeklyRate">Weekly ($)</Label>
+                              <Label htmlFor="weeklyRate">{t("fleet.weeklyRate")}</Label>
                               <Input id="weeklyRate" name="weeklyRate" type="number" step="0.01" min="0" className="mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="monthlyRate">Monthly ($)</Label>
+                              <Label htmlFor="monthlyRate">{t("fleet.monthlyRate")}</Label>
                               <Input id="monthlyRate" name="monthlyRate" type="number" step="0.01" min="0" className="mt-1" />
                             </div>
                           </div>
@@ -998,20 +1001,20 @@ export default function FleetManagement() {
                         <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 space-y-3">
                           <div className="flex items-center gap-2">
                             <Sun className="h-4 w-4 text-amber-500" />
-                            <span className="text-sm font-medium text-amber-800">High Season Pricing</span>
-                            <span className="text-xs text-amber-600">(Optional)</span>
+                            <span className="text-sm font-medium text-amber-800">{t("fleet.highSeasonPricing")}</span>
+                            <span className="text-xs text-amber-600">({t("common.optional")})</span>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                              <Label htmlFor="highSeasonDailyRate" className="text-xs">HS Daily ($)</Label>
+                              <Label htmlFor="highSeasonDailyRate" className="text-xs">{t("fleet.hsDaily")}</Label>
                               <Input id="highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="highSeasonWeeklyRate" className="text-xs">HS Weekly ($)</Label>
+                              <Label htmlFor="highSeasonWeeklyRate" className="text-xs">{t("fleet.hsWeekly")}</Label>
                               <Input id="highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="highSeasonMonthlyRate" className="text-xs">HS Monthly ($)</Label>
+                              <Label htmlFor="highSeasonMonthlyRate" className="text-xs">{t("fleet.hsMonthly")}</Label>
                               <Input id="highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
                             </div>
                           </div>
@@ -1024,58 +1027,58 @@ export default function FleetManagement() {
 
                         {/* Insurance */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Insurance</h4>
+                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.insurance")}</h4>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <Label htmlFor="insuranceProvider">Provider</Label>
+                              <Label htmlFor="insuranceProvider">{t("fleet.provider")}</Label>
                               <Input id="insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm" className="mt-1" />
                             </div>
                             <div>
-                              <Label htmlFor="insurancePolicyNumber">Policy Number</Label>
+                              <Label htmlFor="insurancePolicyNumber">{t("fleet.policyNumber")}</Label>
                               <Input id="insurancePolicyNumber" name="insurancePolicyNumber" className="mt-1" />
                             </div>
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <Label className="text-xs">Policy Start Date</Label>
+                              <Label className="text-xs">{t("fleet.policyStartDate")}</Label>
                               <div className="mt-1">
-                                <ModernDatePicker date={insuranceStartDate} onDateChange={setInsuranceStartDate} placeholder="Select start date" />
+                                <ModernDatePicker date={insuranceStartDate} onDateChange={setInsuranceStartDate} placeholder={t("common.selectDate")} />
                               </div>
-                              <p className="text-[10px] text-gray-400 mt-1">Expiry auto-set to +1 year</p>
+                              <p className="text-[10px] text-gray-400 mt-1">{t("fleet.expiryAutoSet")}</p>
                             </div>
                             <div>
-                              <Label className="text-xs">Expiry (Auto)</Label>
+                              <Label className="text-xs">{t("fleet.expiryAuto")}</Label>
                               <div className="mt-1 p-2 bg-gray-50 rounded border border-gray-200 min-h-[38px] flex items-center">
                                 <p className="text-sm text-gray-600">
                                   {insuranceStartDate
                                     ? new Date(new Date(insuranceStartDate).setFullYear(new Date(insuranceStartDate).getFullYear() + 1)).toLocaleDateString()
-                                    : <span className="text-gray-400 text-xs">Select start date</span>}
+                                    : <span className="text-gray-400 text-xs">{t("common.selectDate")}</span>}
                                 </p>
                               </div>
                             </div>
                           </div>
                           <div>
-                            <Label htmlFor="insuranceAnnualPremium">Annual Premium ($)</Label>
+                            <Label htmlFor="insuranceAnnualPremium">{t("fleet.annualPremium")}</Label>
                             <Input id="insuranceAnnualPremium" name="insuranceAnnualPremium" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
                           </div>
                         </div>
 
                         {/* Registration */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Registration</h4>
+                          <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.registration")}</h4>
                           <div>
-                            <Label htmlFor="vehicleRegistrationNumber">Registration Number</Label>
+                            <Label htmlFor="vehicleRegistrationNumber">{t("fleet.registrationNumber")}</Label>
                             <Input id="vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" className="mt-1" />
                           </div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <Label className="text-xs">Expiry Date</Label>
+                              <Label className="text-xs">{t("fleet.expiryDate")}</Label>
                               <div className="mt-1">
-                                <ModernDatePicker date={registrationExpiryDate} onDateChange={setRegistrationExpiryDate} placeholder="Select date" />
+                                <ModernDatePicker date={registrationExpiryDate} onDateChange={setRegistrationExpiryDate} placeholder={t("common.selectDate")} />
                               </div>
                             </div>
                             <div>
-                              <Label htmlFor="registrationFee">Annual Fee ($)</Label>
+                              <Label htmlFor="registrationFee">{t("fleet.annualFee")}</Label>
                               <Input id="registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1" />
                             </div>
                           </div>
@@ -1083,9 +1086,9 @@ export default function FleetManagement() {
 
                         {/* Next Maintenance */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
-                          <Label className="font-semibold text-sm text-gray-900 uppercase tracking-wide">Next Maintenance Date</Label>
+                          <Label className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.nextMaintenance")}</Label>
                           <div className="mt-2">
-                            <ModernDatePicker date={nextMaintenanceDate} onDateChange={setNextMaintenanceDate} placeholder="Select date" />
+                            <ModernDatePicker date={nextMaintenanceDate} onDateChange={setNextMaintenanceDate} placeholder={t("common.selectDate")} />
                           </div>
                         </div>
 
@@ -1098,8 +1101,8 @@ export default function FleetManagement() {
                           >
                             <div className="flex items-center gap-2">
                               <DollarSign className="h-4 w-4 text-blue-600" />
-                              <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
-                              <span className="text-xs text-blue-500">(Optional)</span>
+                              <span className="text-sm font-medium text-blue-900">{t("fleet.purchaseDetails")}</span>
+                              <span className="text-xs text-blue-500">({t("common.optional")})</span>
                             </div>
                             {showPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
                           </button>
@@ -1107,36 +1110,36 @@ export default function FleetManagement() {
                             <div className="p-4 space-y-3">
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label>Purchase Type</Label>
+                                  <Label>{t("fleet.purchaseType")}</Label>
                                   <Select onValueChange={(v) => setPurchaseType(v as any)}>
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Cash or Installments" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("fleet.cash") + " or " + t("fleet.installments")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Cash">Cash</SelectItem>
-                                      <SelectItem value="Installments">Installments</SelectItem>
+                                      <SelectItem value="Cash">{t("fleet.cash")}</SelectItem>
+                                      <SelectItem value="Installments">{t("fleet.installments")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label htmlFor="purchaseCost">Purchase Price ($)</Label>
+                                  <Label htmlFor="purchaseCost">{t("fleet.purchasePrice")}</Label>
                                   <Input id="purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1"
                                     onChange={(e) => { setAddPurchaseCost(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
                                 </div>
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label htmlFor="downPayment">Down Payment ($)</Label>
+                                  <Label htmlFor="downPayment">{t("fleet.downPayment")}</Label>
                                   <Input id="downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1"
                                     onChange={(e) => { setAddDownPayment(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="sellerName">Seller / Dealer</Label>
+                                  <Label htmlFor="sellerName">{t("fleet.sellerDealer")}</Label>
                                   <Input id="sellerName" name="sellerName" placeholder="e.g. ABC Motors" className="mt-1" />
                                 </div>
                               </div>
                               <div>
-                                <Label>Purchase Date</Label>
+                                <Label>{t("fleet.purchaseDate")}</Label>
                                 <div className="mt-1">
-                                  <ModernDatePicker date={purchaseDate} onDateChange={setPurchaseDate} placeholder="Select date" />
+                                  <ModernDatePicker date={purchaseDate} onDateChange={setPurchaseDate} placeholder={t("common.selectDate")} />
                                 </div>
                               </div>
                               {purchaseType === "Installments" && (() => {
@@ -1146,15 +1149,15 @@ export default function FleetManagement() {
                                 const monthlyDisplay = addMonthlyManual !== null ? addMonthlyManual : computedMonthly;
                                 return (
                                   <div className="space-y-3 pt-3 border-t border-dashed border-blue-200">
-                                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                                    <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">{t("fleet.financingDetails")}</p>
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
-                                        <Label htmlFor="interestRate">Interest Rate (%)</Label>
+                                        <Label htmlFor="interestRate">{t("fleet.interestRate")}</Label>
                                         <Input id="interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5" className="mt-1"
                                           onChange={(e) => { setAddInterestRate(parseFloat(e.target.value) || 0); setAddMonthlyManual(null); }} />
                                       </div>
                                       <div>
-                                        <Label htmlFor="numberOfInstallments">No. of Installments</Label>
+                                        <Label htmlFor="numberOfInstallments">{t("fleet.numInstallments")}</Label>
                                         <Input id="numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36" className="mt-1"
                                           onChange={(e) => { setAddNumInstallments(parseInt(e.target.value) || 0); setAddMonthlyManual(null); }} />
                                       </div>
@@ -1162,7 +1165,7 @@ export default function FleetManagement() {
                                     <div className="grid grid-cols-2 gap-3">
                                       <div>
                                         <Label htmlFor="monthlyInstallmentAmount">
-                                          Monthly Installment
+                                          {t("fleet.monthlyInstallment")}
                                           {addMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
                                         </Label>
                                         <Input id="monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00"
@@ -1170,7 +1173,7 @@ export default function FleetManagement() {
                                           className={`mt-1 ${addMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}`} />
                                       </div>
                                       <div>
-                                        <Label htmlFor="remainingBalance">Remaining Balance</Label>
+                                        <Label htmlFor="remainingBalance">{t("fleet.remainingBalance")}</Label>
                                         <div className="relative mt-1">
                                           <Input id="remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" readOnly
                                             value={remaining.toFixed(2)} className="bg-gray-50 text-gray-700 cursor-default pr-14" />
@@ -1194,8 +1197,8 @@ export default function FleetManagement() {
                           >
                             <div className="flex items-center gap-2">
                               <Wrench className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm font-medium text-gray-800">AI Maintenance Data</span>
-                              <span className="text-xs text-gray-400">(Optional — enables smart scheduling)</span>
+                              <span className="text-sm font-medium text-gray-800">{t("fleet.aiMaintenanceData")}</span>
+                              <span className="text-xs text-gray-400">{t("fleet.aiMaintenanceOptional")}</span>
                             </div>
                             {showAddAiSection ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
                           </button>
@@ -1203,93 +1206,93 @@ export default function FleetManagement() {
                             <div className="p-4 space-y-3">
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label htmlFor="engineType">Engine Type</Label>
+                                  <Label htmlFor="engineType">{t("fleet.engineType")}</Label>
                                   <Select name="engineType">
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.selectDate")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Gasoline">Gasoline</SelectItem>
-                                      <SelectItem value="Diesel">Diesel</SelectItem>
-                                      <SelectItem value="Hybrid">Hybrid</SelectItem>
-                                      <SelectItem value="Electric">Electric</SelectItem>
-                                      <SelectItem value="Plug-in Hybrid">Plug-in Hybrid</SelectItem>
+                                      <SelectItem value="Gasoline">{t("fleet.gasoline")}</SelectItem>
+                                      <SelectItem value="Diesel">{t("fleet.diesel")}</SelectItem>
+                                      <SelectItem value="Hybrid">{t("fleet.hybrid")}</SelectItem>
+                                      <SelectItem value="Electric">{t("fleet.electric")}</SelectItem>
+                                      <SelectItem value="Plug-in Hybrid">{t("fleet.pluginHybrid")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label htmlFor="transmissionType">Transmission</Label>
+                                  <Label htmlFor="transmissionType">{t("fleet.transmission")}</Label>
                                   <Select name="transmissionType">
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.selectDate")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Manual">Manual</SelectItem>
-                                      <SelectItem value="Automatic">Automatic</SelectItem>
-                                      <SelectItem value="CVT">CVT</SelectItem>
-                                      <SelectItem value="DCT">DCT (Dual Clutch)</SelectItem>
+                                      <SelectItem value="Manual">{t("fleet.manual")}</SelectItem>
+                                      <SelectItem value="Automatic">{t("fleet.automatic")}</SelectItem>
+                                      <SelectItem value="CVT">{t("fleet.cvt")}</SelectItem>
+                                      <SelectItem value="DCT">{t("fleet.dct")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label htmlFor="fuelType">Fuel Type</Label>
+                                  <Label htmlFor="fuelType">{t("fleet.fuelPolicy")}</Label>
                                   <Select name="fuelType">
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.selectDate")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Regular">Regular</SelectItem>
-                                      <SelectItem value="Premium">Premium</SelectItem>
-                                      <SelectItem value="Diesel">Diesel</SelectItem>
-                                      <SelectItem value="Electric">Electric</SelectItem>
-                                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                                      <SelectItem value="Regular">{t("fleet.regular")}</SelectItem>
+                                      <SelectItem value="Premium">{t("fleet.premium")}</SelectItem>
+                                      <SelectItem value="Diesel">{t("fleet.diesel")}</SelectItem>
+                                      <SelectItem value="Electric">{t("fleet.electric")}</SelectItem>
+                                      <SelectItem value="Hybrid">{t("fleet.hybrid")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label htmlFor="averageDailyKm">Avg Daily KM</Label>
+                                  <Label htmlFor="averageDailyKm">{t("fleet.avgDailyKm")}</Label>
                                   <Input id="averageDailyKm" name="averageDailyKm" type="number" min="0" step="1" placeholder="e.g., 50" className="mt-1" />
                                 </div>
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label htmlFor="primaryUse">Primary Use</Label>
+                                  <Label htmlFor="primaryUse">{t("fleet.primaryUse")}</Label>
                                   <Select name="primaryUse">
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.selectDate")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Rental">Rental</SelectItem>
-                                      <SelectItem value="Fleet">Fleet</SelectItem>
-                                      <SelectItem value="Personal">Personal</SelectItem>
-                                      <SelectItem value="Commercial">Commercial</SelectItem>
+                                      <SelectItem value="Rental">{t("fleet.rental")}</SelectItem>
+                                      <SelectItem value="Fleet">{t("nav.fleet")}</SelectItem>
+                                      <SelectItem value="Personal">{t("fleet.personal")}</SelectItem>
+                                      <SelectItem value="Commercial">{t("fleet.commercial")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                                 <div>
-                                  <Label htmlFor="operatingClimate">Operating Climate</Label>
+                                  <Label htmlFor="operatingClimate">{t("fleet.operatingClimate")}</Label>
                                   <Select name="operatingClimate">
-                                    <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
+                                    <SelectTrigger className="mt-1"><SelectValue placeholder={t("common.selectDate")} /></SelectTrigger>
                                     <SelectContent style={{ zIndex: 9999 }}>
-                                      <SelectItem value="Hot">Hot</SelectItem>
-                                      <SelectItem value="Cold">Cold</SelectItem>
-                                      <SelectItem value="Moderate">Moderate</SelectItem>
-                                      <SelectItem value="Humid">Humid</SelectItem>
-                                      <SelectItem value="Arid">Arid</SelectItem>
+                                      <SelectItem value="Hot">{t("fleet.hot")}</SelectItem>
+                                      <SelectItem value="Cold">{t("fleet.cold")}</SelectItem>
+                                      <SelectItem value="Moderate">{t("fleet.moderate")}</SelectItem>
+                                      <SelectItem value="Humid">{t("fleet.humid")}</SelectItem>
+                                      <SelectItem value="Arid">{t("fleet.arid")}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label>Last Service Date</Label>
+                                  <Label>{t("fleet.lastServiceDate")}</Label>
                                   <div className="mt-1">
-                                    <ModernDatePicker date={editLastServiceDate} onDateChange={setEditLastServiceDate} placeholder="Select date" />
+                                    <ModernDatePicker date={editLastServiceDate} onDateChange={setEditLastServiceDate} placeholder={t("common.selectDate")} />
                                   </div>
                                 </div>
                                 <div>
-                                  <Label>Purchase Date (AI)</Label>
+                                  <Label>{t("fleet.purchaseDateAI")}</Label>
                                   <div className="mt-1">
-                                    <ModernDatePicker date={editPurchaseDate} onDateChange={setEditPurchaseDate} placeholder="Select date" />
+                                    <ModernDatePicker date={editPurchaseDate} onDateChange={setEditPurchaseDate} placeholder={t("common.selectDate")} />
                                   </div>
                                 </div>
                               </div>
                               <div>
-                                <Label htmlFor="serviceHistory">Service History Notes</Label>
+                                <Label htmlFor="serviceHistory">{t("fleet.serviceHistoryNotes")}</Label>
                                 <Textarea id="serviceHistory" name="serviceHistory" rows={2} placeholder="e.g., Recent oil change, new tires..." className="mt-1" />
                               </div>
                             </div>
@@ -1298,7 +1301,7 @@ export default function FleetManagement() {
 
                         {/* Notes */}
                         <div className="bg-white rounded-xl border border-gray-200 p-4">
-                          <Label htmlFor="notes" className="font-semibold text-sm text-gray-700">Notes</Label>
+                          <Label htmlFor="notes" className="font-semibold text-sm text-gray-700">{t("common.notes")}</Label>
                           <Textarea id="notes" name="notes" rows={3} className="mt-2" />
                         </div>
 
@@ -1307,10 +1310,10 @@ export default function FleetManagement() {
 
                     {/* Sticky footer */}
                     <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex-shrink-0">
-                      <p className="text-xs text-gray-400">* Required fields</p>
+                      <p className="text-xs text-gray-400">{t("fleet.requiredFields")}</p>
                       <div className="flex gap-3">
                         <Button type="button" variant="outline" onClick={() => { setIsAddDialogOpen(false); setSelectedMakerId(null); setSelectedModelId(null); }}>
-                          Cancel
+                          {t("common.cancel")}
                         </Button>
                         <Button type="submit" className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
                           {createMutation.isPending ? t("common.loading") : t("fleet.addVehicle")}
@@ -1647,13 +1650,13 @@ export default function FleetManagement() {
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
               <DialogHeader>
-                <DialogTitle>Edit Vehicle</DialogTitle>
-                <DialogDescription>Update vehicle information below.</DialogDescription>
+                <DialogTitle>{t("fleet.editVehicle")}</DialogTitle>
+                <DialogDescription>{t("fleet.subtitle")}</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleEditVehicle} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="edit-plateNumber">Plate Number *</Label>
+                    <Label htmlFor="edit-plateNumber">{t("fleet.plateNumber")} *</Label>
                     <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required className="input-client" />
                   </div>
                   <div>
@@ -1664,7 +1667,7 @@ export default function FleetManagement() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <Label>Car Maker *</Label>
+                    <Label>{t("fleet.makerBrand")} *</Label>
                     <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
                       <PopoverTrigger asChild>
                         <Button
@@ -1675,15 +1678,15 @@ export default function FleetManagement() {
                         >
                           {editSelectedMakerId
                             ? carMakers?.find((maker) => maker.id === editSelectedMakerId)?.name
-                            : "Select maker..."}
+                            : t("fleet.selectMaker")}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
-                          <CommandInput placeholder="Search maker..." />
+                          <CommandInput placeholder={t("fleet.searchMaker")} />
                           <CommandList>
-                            <CommandEmpty>No maker found.</CommandEmpty>
+                            <CommandEmpty>{t("common.noData")}</CommandEmpty>
                             <CommandGroup>
                               {carMakers?.map((maker) => (
                                 <CommandItem
@@ -1712,7 +1715,7 @@ export default function FleetManagement() {
                                 className="border-t mt-2 pt-2 text-primary font-medium"
                               >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Custom Maker
+                                {t("fleet.addMaker")}
                               </CommandItem>
                             </CommandGroup>
                           </CommandList>
@@ -1721,7 +1724,7 @@ export default function FleetManagement() {
                     </Popover>
                   </div>
                   <div>
-                    <Label>Car Model *</Label>
+                    <Label>{t("common.model")} *</Label>
                     <Popover open={editModelOpen} onOpenChange={setEditModelOpen}>
                       <PopoverTrigger asChild>
                         <Button
@@ -1733,15 +1736,15 @@ export default function FleetManagement() {
                         >
                           {editSelectedModelId
                             ? editCarModels?.find((model) => model.id === editSelectedModelId)?.modelName
-                            : "Select model..."}
+                            : t("fleet.selectModel")}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
-                          <CommandInput placeholder="Search model..." />
+                          <CommandInput placeholder={t("fleet.searchModel")} />
                           <CommandList>
-                            <CommandEmpty>No model found.</CommandEmpty>
+                            <CommandEmpty>{t("common.noData")}</CommandEmpty>
                             <CommandGroup>
                               {editCarModels?.map((model) => (
                                 <CommandItem
@@ -1770,7 +1773,7 @@ export default function FleetManagement() {
                                 className="border-t mt-2 pt-2 text-primary font-medium"
                               >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Add Custom Model
+                                {t("fleet.addModel")}
                               </CommandItem>
                             </CommandGroup>
                           </CommandList>
@@ -1779,44 +1782,47 @@ export default function FleetManagement() {
                     </Popover>
                   </div>
                   <div>
-                    <Label htmlFor="edit-year">Year *</Label>
+                    <Label htmlFor="edit-year">{t("common.year")} *</Label>
                     <Input id="edit-year" name="year" type="number" defaultValue={selectedVehicle.year} min="1900" max="2100" required className="input-client" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="edit-color">Color *</Label>
+                    <Label htmlFor="edit-color">{t("common.color")} *</Label>
                     <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client" />
                   </div>
                   <div>
-                    <Label htmlFor="edit-category">Category *</Label>
+                    <Label htmlFor="edit-category">{t("common.category")} *</Label>
                     <Select name="category" defaultValue={selectedVehicle.category} required>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Economy">Economy</SelectItem>
-                        <SelectItem value="Compact">Compact</SelectItem>
-                        <SelectItem value="Midsize">Midsize</SelectItem>
-                        <SelectItem value="SUV">SUV</SelectItem>
-                        <SelectItem value="Luxury">Luxury</SelectItem>
-                        <SelectItem value="Van">Van</SelectItem>
-                        <SelectItem value="Truck">Truck</SelectItem>
+                        <SelectItem value="Economy">{t("fleet.economy")}</SelectItem>
+                        <SelectItem value="Compact">{t("fleet.compact")}</SelectItem>
+                        <SelectItem value="Intermediate">{t("fleet.intermediate")}</SelectItem>
+                        <SelectItem value="Standard">{t("fleet.standard")}</SelectItem>
+                        <SelectItem value="Full-size">{t("fleet.fullSize")}</SelectItem>
+                        <SelectItem value="Luxury">{t("fleet.luxury")}</SelectItem>
+                        <SelectItem value="SUV">{t("fleet.suv")}</SelectItem>
+                        <SelectItem value="Minivan">{t("fleet.minivan")}</SelectItem>
+                        <SelectItem value="Pickup Truck">{t("fleet.pickupTruck")}</SelectItem>
+                        <SelectItem value="Cargo Van">{t("fleet.cargoVan")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="edit-status">Status</Label>
+                    <Label htmlFor="edit-status">{t("common.status")}</Label>
                     <Select name="status" defaultValue={selectedVehicle.status} onValueChange={setEditStatusValue}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Available">Available</SelectItem>
-                        <SelectItem value="Rented">Rented</SelectItem>
-                        <SelectItem value="Maintenance">Maintenance</SelectItem>
-                        <SelectItem value="Out of Service">Out of Service</SelectItem>
+                        <SelectItem value="Available">{t("fleet.available")}</SelectItem>
+                        <SelectItem value="Rented">{t("fleet.rented")}</SelectItem>
+                        <SelectItem value="Maintenance">{t("nav.maintenance")}</SelectItem>
+                        <SelectItem value="Out of Service">{t("fleet.outOfService")}</SelectItem>
                         <SelectItem value="Sold">Sold</SelectItem>
                       </SelectContent>
                     </Select>
@@ -1824,21 +1830,21 @@ export default function FleetManagement() {
                 </div>
 
                 <div>
-                  <Label htmlFor="edit-mileage">Mileage</Label>
+                  <Label htmlFor="edit-mileage">{t("fleet.mileage")}</Label>
                   <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="edit-dailyRate">Daily Rate ($) *</Label>
+                    <Label htmlFor="edit-dailyRate">{t("fleet.dailyRate")} *</Label>
                     <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" required className="input-client" />
                   </div>
                   <div>
-                    <Label htmlFor="edit-weeklyRate">Weekly Rate ($)</Label>
+                    <Label htmlFor="edit-weeklyRate">{t("fleet.weeklyRate")}</Label>
                     <Input id="edit-weeklyRate" name="weeklyRate" type="number" step="0.01" defaultValue={selectedVehicle.weeklyRate || ""} min="0" />
                   </div>
                   <div>
-                    <Label htmlFor="edit-monthlyRate">Monthly Rate ($)</Label>
+                    <Label htmlFor="edit-monthlyRate">{t("fleet.monthlyRate")}</Label>
                     <Input id="edit-monthlyRate" name="monthlyRate" type="number" step="0.01" defaultValue={selectedVehicle.monthlyRate || ""} min="0" />
                   </div>
                 </div>
@@ -1847,58 +1853,58 @@ export default function FleetManagement() {
                 <div className="space-y-3 p-4 border border-amber-200 rounded-lg bg-amber-50/50">
                   <div className="flex items-center gap-2">
                     <Sun className="h-4 w-4 text-amber-500" />
-                    <h4 className="font-medium text-sm text-amber-800">High Season Pricing (Optional)</h4>
+                    <h4 className="font-medium text-sm text-amber-800">{t("fleet.highSeasonPricing")} ({t("common.optional")})</h4>
                   </div>
-                  <p className="text-xs text-amber-600">Rates applied automatically during your high season date ranges.</p>
+                  <p className="text-xs text-amber-600">{t("fleet.highSeasonPeriodsSubtitle")}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                      <Label htmlFor="edit-highSeasonDailyRate">HS Daily ($)</Label>
+                      <Label htmlFor="edit-highSeasonDailyRate">{t("fleet.hsDaily")}</Label>
                       <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} />
                     </div>
                     <div>
-                      <Label htmlFor="edit-highSeasonWeeklyRate">HS Weekly ($)</Label>
+                      <Label htmlFor="edit-highSeasonWeeklyRate">{t("fleet.hsWeekly")}</Label>
                       <Input id="edit-highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonWeeklyRate || ""} />
                     </div>
                     <div>
-                      <Label htmlFor="edit-highSeasonMonthlyRate">HS Monthly ($)</Label>
+                      <Label htmlFor="edit-highSeasonMonthlyRate">{t("fleet.hsMonthly")}</Label>
                       <Input id="edit-highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonMonthlyRate || ""} />
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">Insurance Information</h4>
+                  <h4 className="font-medium text-sm">{t("fleet.insurance")}</h4>
                   
                   <div>
-                    <Label htmlFor="edit-insuranceProvider">Insurance Provider</Label>
+                    <Label htmlFor="edit-insuranceProvider">{t("fleet.provider")}</Label>
                     <Input id="edit-insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" defaultValue={selectedVehicle.insuranceProvider || ""} />
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-insurancePolicyNumber">Policy Number</Label>
+                    <Label htmlFor="edit-insurancePolicyNumber">{t("fleet.policyNumber")}</Label>
                     <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
                   </div>
 
                   <div>
-                    <Label>Policy Start Date</Label>
+                    <Label>{t("fleet.policyStartDate")}</Label>
                     <ModernDatePicker
                       date={editInsuranceStartDate}
                       onDateChange={setEditInsuranceStartDate}
-                      placeholder="Select start date"
+                      placeholder={t("common.selectDate")}
                     />
                   </div>
 
                   <div>
-                    <Label>Policy Expiry Date</Label>
+                    <Label>{t("fleet.expiryDate")}</Label>
                     <ModernDatePicker
                       date={editInsuranceExpiryDate}
                       onDateChange={setEditInsuranceExpiryDate}
-                      placeholder="Select expiry date"
+                      placeholder={t("common.selectDate")}
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="edit-insuranceAnnualPremium">Annual Premium ($)</Label>
+                    <Label htmlFor="edit-insuranceAnnualPremium">{t("fleet.annualPremium")}</Label>
                     <Input 
                       id="edit-insuranceAnnualPremium" 
                       name="insuranceAnnualPremium" 
@@ -1912,24 +1918,24 @@ export default function FleetManagement() {
                 </div>
 
                 <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">Registration</h4>
+                  <h4 className="font-medium text-sm">{t("fleet.registration")}</h4>
                   <div>
-                    <Label htmlFor="edit-vehicleRegistrationNumber">Registration Number</Label>
+                    <Label htmlFor="edit-vehicleRegistrationNumber">{t("fleet.registrationNumber")}</Label>
                     <Input id="edit-vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" defaultValue={(selectedVehicle as any).vehicleRegistrationNumber || ""} />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label>Expiry Date</Label>
+                      <Label>{t("fleet.expiryDate")}</Label>
                       <ModernDatePicker
                         date={editRegistrationExpiryDate}
                         onDateChange={setEditRegistrationExpiryDate}
-                        placeholder="Select expiry date"
+                        placeholder={t("common.selectDate")}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-registrationFee">Annual Fee ($)</Label>
+                      <Label htmlFor="edit-registrationFee">{t("fleet.annualFee")}</Label>
                       <Input id="edit-registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).registrationFee || ""} />
-                      <p className="text-xs text-muted-foreground mt-1">Registration fees can vary each year</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t("fleet.expiryAutoSet")}</p>
                     </div>
                   </div>
                 </div>
@@ -1943,8 +1949,8 @@ export default function FleetManagement() {
                   >
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-900">Vehicle Purchase Details</span>
-                      <span className="text-xs text-blue-600 font-normal">(Optional)</span>
+                      <span className="text-sm font-medium text-blue-900">{t("fleet.purchaseDetails")}</span>
+                      <span className="text-xs text-blue-600 font-normal">({t("common.optional")})</span>
                     </div>
                     {showEditPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
                   </button>
@@ -1953,22 +1959,22 @@ export default function FleetManagement() {
                     <div className="p-4 space-y-4 bg-white">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <Label>Purchase Type</Label>
+                          <Label>{t("fleet.purchaseType")}</Label>
                           <Select
                             defaultValue={(selectedVehicle as any).purchaseType || undefined}
                             onValueChange={(v) => setEditPurchaseType(v as any)}
                           >
                             <SelectTrigger>
-                              <SelectValue placeholder="Cash or Installments" />
+                              <SelectValue placeholder={t("fleet.cash") + " or " + t("fleet.installments")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Cash">Cash</SelectItem>
-                              <SelectItem value="Installments">Installments</SelectItem>
+                              <SelectItem value="Cash">{t("fleet.cash")}</SelectItem>
+                              <SelectItem value="Installments">{t("fleet.installments")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="edit-purchaseCost">Purchase Price</Label>
+                          <Label htmlFor="edit-purchaseCost">{t("fleet.purchasePrice")}</Label>
                           <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""}
                             onChange={(e) => setEditPurchaseCost(parseFloat(e.target.value) || 0)} />
                         </div>
@@ -1976,22 +1982,22 @@ export default function FleetManagement() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="edit-downPayment">Down Payment</Label>
+                          <Label htmlFor="edit-downPayment">{t("fleet.downPayment")}</Label>
                           <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""}
                             onChange={(e) => setEditDownPayment(parseFloat(e.target.value) || 0)} />
                         </div>
                         <div>
-                          <Label htmlFor="edit-sellerName">Seller / Dealer Name</Label>
+                          <Label htmlFor="edit-sellerName">{t("fleet.sellerDealer")}</Label>
                           <Input id="edit-sellerName" name="sellerName" placeholder="e.g. ABC Motors" defaultValue={(selectedVehicle as any).sellerName || ""} />
                         </div>
                       </div>
 
                       <div>
-                        <Label>Purchase Date</Label>
+                        <Label>{t("fleet.purchaseDate")}</Label>
                         <ModernDatePicker
                           date={editPurchaseDate}
                           onDateChange={setEditPurchaseDate}
-                          placeholder="Select purchase date"
+                          placeholder={t("common.selectDate")}
                         />
                       </div>
 
@@ -2002,16 +2008,16 @@ export default function FleetManagement() {
                           const monthlyDisplay = editMonthlyManual !== null ? editMonthlyManual : computedMonthly;
                           return (
                             <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
-                              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Financing Details</p>
+                              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">{t("fleet.financingDetails")}</p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                  <Label htmlFor="edit-interestRate">Interest Rate (%)</Label>
+                                  <Label htmlFor="edit-interestRate">{t("fleet.interestRate")}</Label>
                                   <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
                                     defaultValue={(selectedVehicle as any).interestRate || ""}
                                     onChange={(e) => { setEditInterestRate(parseFloat(e.target.value) || 0); setEditMonthlyManual(null); }} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="edit-numberOfInstallments">Number of Installments</Label>
+                                  <Label htmlFor="edit-numberOfInstallments">{t("fleet.numInstallments")}</Label>
                                   <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
                                     defaultValue={(selectedVehicle as any).numberOfInstallments || ""}
                                     onChange={(e) => { setEditNumInstallments(parseInt(e.target.value) || 0); setEditMonthlyManual(null); }} />
@@ -2020,7 +2026,7 @@ export default function FleetManagement() {
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <Label htmlFor="edit-monthlyInstallmentAmount">
-                                    Monthly Installment
+                                    {t("fleet.monthlyInstallment")}
                                     {editMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
                                   </Label>
                                   <Input
@@ -2036,7 +2042,7 @@ export default function FleetManagement() {
                                   />
                                 </div>
                                 <div>
-                                  <Label htmlFor="edit-remainingBalance">Remaining Balance</Label>
+                                  <Label htmlFor="edit-remainingBalance">{t("fleet.remainingBalance")}</Label>
                                   <div className="relative">
                                     <Input
                                       id="edit-remainingBalance"
@@ -2064,41 +2070,41 @@ export default function FleetManagement() {
                   <div className="space-y-4 p-4 border border-purple-200 rounded-lg bg-purple-50/40">
                     <div className="flex items-center gap-2">
                       <DollarSign className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-sm font-semibold text-purple-900">Sale Details</h4>
+                      <h4 className="text-sm font-semibold text-purple-900">{t("fleet.saleDetails")}</h4>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="edit-salePrice">Sale Price</Label>
+                        <Label htmlFor="edit-salePrice">{t("fleet.salePrice")}</Label>
                         <Input id="edit-salePrice" name="salePrice" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).salePrice || ""} />
                       </div>
                       <div>
-                        <Label htmlFor="edit-buyerName">Buyer Name</Label>
+                        <Label htmlFor="edit-buyerName">{t("fleet.buyerName")}</Label>
                         <Input id="edit-buyerName" name="buyerName" placeholder="e.g. John Smith" defaultValue={(selectedVehicle as any).buyerName || ""} />
                       </div>
                     </div>
                     <div>
-                      <Label>Sale Date</Label>
+                      <Label>{t("fleet.saleDate")}</Label>
                       <ModernDatePicker
                         date={editSaleDate}
                         onDateChange={setEditSaleDate}
-                        placeholder="Select sale date"
+                        placeholder={t("common.selectDate")}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-saleNotes">Sale Notes</Label>
+                      <Label htmlFor="edit-saleNotes">{t("fleet.saleNotes")}</Label>
                       <Textarea id="edit-saleNotes" name="saleNotes" rows={2} placeholder="e.g. Sold via auction, cash payment..." defaultValue={(selectedVehicle as any).saleNotes || ""} />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <Label htmlFor="edit-notes">Notes</Label>
+                  <Label htmlFor="edit-notes">{t("common.notes")}</Label>
                   <Textarea id="edit-notes" name="notes" rows={3} defaultValue={selectedVehicle.notes || ""} />
                 </div>
 
                 <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
                   <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
-                    Cancel
+                    {t("common.cancel")}
                   </Button>
                   <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
                     {updateMutation.isPending ? t("common.loading") : t("fleet.updateVehicle")}
@@ -2114,12 +2120,12 @@ export default function FleetManagement() {
       <Dialog open={isHighSeasonDialogOpen} onOpenChange={(open) => { if (!open) resetHsForm(); setIsHighSeasonDialogOpen(open); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingPeriod ? "Edit High Season Period" : "Add High Season Period"}</DialogTitle>
-            <DialogDescription>Set a date range when high season pricing applies to all vehicles that have HS rates configured.</DialogDescription>
+            <DialogTitle>{editingPeriod ? t("fleet.editHighSeasonPeriod") : t("fleet.addHighSeasonPeriod")}</DialogTitle>
+            <DialogDescription>{t("fleet.highSeasonSubtitle")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleHighSeasonSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="hs-name">Period Name *</Label>
+              <Label htmlFor="hs-name">{t("fleet.periodName")} *</Label>
               <Input
                 id="hs-name"
                 value={hsName}
@@ -2130,18 +2136,18 @@ export default function FleetManagement() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label>Start Date *</Label>
-                <ModernDatePicker date={hsStartDate} onDateChange={setHsStartDate} placeholder="Select start" />
+                <Label>{t("fleet.startDate")} *</Label>
+                <ModernDatePicker date={hsStartDate} onDateChange={setHsStartDate} placeholder={t("common.selectDate")} />
               </div>
               <div>
-                <Label>End Date *</Label>
-                <ModernDatePicker date={hsEndDate} onDateChange={setHsEndDate} placeholder="Select end" />
+                <Label>{t("fleet.endDate")} *</Label>
+                <ModernDatePicker date={hsEndDate} onDateChange={setHsEndDate} placeholder={t("common.selectDate")} />
               </div>
             </div>
             <DialogFooter className="gap-2">
-              <Button type="button" variant="outline" onClick={() => { resetHsForm(); setIsHighSeasonDialogOpen(false); }}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => { resetHsForm(); setIsHighSeasonDialogOpen(false); }}>{t("common.cancel")}</Button>
               <Button type="submit" className="bg-amber-500 hover:bg-amber-600 text-white" disabled={createHighSeasonMutation.isPending || updateHighSeasonMutation.isPending}>
-                {createHighSeasonMutation.isPending || updateHighSeasonMutation.isPending ? "Saving..." : editingPeriod ? "Update Period" : "Add Period"}
+                {createHighSeasonMutation.isPending || updateHighSeasonMutation.isPending ? t("common.loading") : (editingPeriod ? t("common.saveChanges") : t("fleet.addPeriod"))}
               </Button>
             </DialogFooter>
           </form>
@@ -2152,8 +2158,8 @@ export default function FleetManagement() {
       <Dialog open={isCustomMakerDialogOpen} onOpenChange={setIsCustomMakerDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Custom Car Maker</DialogTitle>
-            <DialogDescription>Add a new car manufacturer to the system.</DialogDescription>
+            <DialogTitle>{t("fleet.addCustomMaker")}</DialogTitle>
+            <DialogDescription>{t("fleet.addMakerSubtitle")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -2169,7 +2175,7 @@ export default function FleetManagement() {
           }}>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="custom-maker-name">Maker Name *</Label>
+                <Label htmlFor="custom-maker-name">{t("fleet.makerName")} *</Label>
                 <Input 
                   id="custom-maker-name" 
                   value={customMakerName}
@@ -2181,7 +2187,7 @@ export default function FleetManagement() {
             </div>
             <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={() => setIsCustomMakerDialogOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={createCustomMakerMutation.isPending}>
                 {createCustomMakerMutation.isPending ? t("common.loading") : t("fleet.addMaker")}
@@ -2195,8 +2201,8 @@ export default function FleetManagement() {
       <Dialog open={isCustomModelDialogOpen} onOpenChange={setIsCustomModelDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Custom Car Model</DialogTitle>
-            <DialogDescription>Add a new car model for the selected manufacturer.</DialogDescription>
+            <DialogTitle>{t("fleet.addCustomModel")}</DialogTitle>
+            <DialogDescription>{t("fleet.addModelSubtitle")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -2216,14 +2222,14 @@ export default function FleetManagement() {
           }}>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="custom-model-maker">Car Maker *</Label>
+                <Label htmlFor="custom-model-maker">{t("fleet.makerBrand")} *</Label>
                 <Select 
                   value={customModelMakerId?.toString() || ""}
                   onValueChange={(value) => setCustomModelMakerId(parseInt(value))}
                   required
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select maker" />
+                    <SelectValue placeholder={t("fleet.selectMaker")} />
                   </SelectTrigger>
                   <SelectContent>
                     {carMakers?.map((maker) => (
@@ -2235,7 +2241,7 @@ export default function FleetManagement() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="custom-model-name">Model Name *</Label>
+                <Label htmlFor="custom-model-name">{t("fleet.modelName")} *</Label>
                 <Input 
                   id="custom-model-name" 
                   value={customModelName}
@@ -2247,7 +2253,7 @@ export default function FleetManagement() {
             </div>
             <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={() => setIsCustomModelDialogOpen(false)}>
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" disabled={createCustomModelMutation.isPending}>
                 {createCustomModelMutation.isPending ? t("common.loading") : t("fleet.addModel")}

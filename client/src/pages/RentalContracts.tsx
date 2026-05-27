@@ -798,7 +798,7 @@ export default function RentalContracts() {
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
                                   <User className="w-3.5 h-3.5" />
                                 </span>
-                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Client Information</h3>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("contracts.clientInformation")}</h3>
                                 <Button
                                   type="button"
                                   variant="ghost"
@@ -807,11 +807,11 @@ export default function RentalContracts() {
                                   onClick={() => window.location.href = '/clients'}
                                 >
                                   <Users className="w-3 h-3 mr-1" />
-                                  Manage
+                                  {t("common.manage")}
                                 </Button>
                               </div>
                               <div className="mb-3">
-                                <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Select Existing Client (Optional)</Label>
+                                <Label className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.chooseClient")}</Label>
                                 <Popover open={clientComboboxOpen} onOpenChange={setClientComboboxOpen}>
                                   <PopoverTrigger asChild>
                                     <Button
@@ -823,17 +823,17 @@ export default function RentalContracts() {
                                       {selectedClientId
                                         ? (() => {
                                             const client = clients.find((c) => c.id.toString() === selectedClientId);
-                                            return client ? `${client.name} - ${client.driverLicenseNumber || "No license"}` : "Choose a client...";
+                                            return client ? `${client.name} - ${client.driverLicenseNumber || t("contracts.noLicenseText")}` : t("contracts.chooseClient");
                                           })()
-                                        : <span className="text-gray-400 text-xs">Search or choose a client...</span>}
+                                        : <span className="text-gray-400 text-xs">{t("contracts.searchOrChooseClient")}</span>}
                                       <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                                     </Button>
                                   </PopoverTrigger>
                                   <PopoverContent className="w-[420px] p-0" align="start">
                                     <Command>
-                                      <CommandInput placeholder="Search clients by name or license..." />
+                                      <CommandInput placeholder={t("contracts.searchClientsPlaceholder")} />
                                       <CommandList>
-                                        <CommandEmpty>No client found.</CommandEmpty>
+                                        <CommandEmpty>{t("contracts.noClientFound")}</CommandEmpty>
                                         <CommandGroup>
                                           <CommandItem
                                             value="new"
@@ -851,7 +851,7 @@ export default function RentalContracts() {
                                             }}
                                           >
                                             <Plus className="mr-2 h-4 w-4" />
-                                            Add New Client
+                                            {t("contracts.addNewClient")}
                                           </CommandItem>
                                           {clients.map((client) => {
                                             const nameParts = (client.name || "").trim().split(" ");
@@ -883,7 +883,7 @@ export default function RentalContracts() {
                                                 }}
                                               >
                                                 <Check className={`mr-2 h-4 w-4 ${selectedClientId === client.id.toString() ? "opacity-100" : "opacity-0"}`} />
-                                                {client.name} - {client.driverLicenseNumber || "No license"}
+                                                {client.name} - {client.driverLicenseNumber || t("contracts.noLicenseText")}
                                               </CommandItem>
                                             );
                                           })}
@@ -895,23 +895,23 @@ export default function RentalContracts() {
                               </div>
                               <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                  <Label htmlFor="clientFirstName" className="text-xs font-medium text-gray-500 mb-1.5 block">First Name *</Label>
+                                  <Label htmlFor="clientFirstName" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.firstNameLabel")} *</Label>
                                   <Input id="clientFirstName" name="clientFirstName" required className="h-9 text-sm input-client" onChange={(e) => setClientFirstNameFilled(!!e.target.value.trim())} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientLastName" className="text-xs font-medium text-gray-500 mb-1.5 block">Last Name *</Label>
+                                  <Label htmlFor="clientLastName" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.lastNameLabel")} *</Label>
                                   <Input id="clientLastName" name="clientLastName" required className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientMotherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">Mother's Full Name</Label>
-                                  <Input id="clientMotherFullName" name="clientMotherFullName" className="h-9 text-sm input-client" placeholder="Optional" />
+                                  <Label htmlFor="clientMotherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.motherFullName")}</Label>
+                                  <Input id="clientMotherFullName" name="clientMotherFullName" className="h-9 text-sm input-client" placeholder={t("common.optional")} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientFatherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">Father's Full Name</Label>
-                                  <Input id="clientFatherFullName" name="clientFatherFullName" className="h-9 text-sm input-client" placeholder="Optional" />
+                                  <Label htmlFor="clientFatherFullName" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.fatherFullName")}</Label>
+                                  <Input id="clientFatherFullName" name="clientFatherFullName" className="h-9 text-sm input-client" placeholder={t("common.optional")} />
                                 </div>
                                 <div className="col-span-2">
-                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Nationality</Label>
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.nationalityLabel")}</Label>
                                   <Popover open={nationalityComboboxOpen} onOpenChange={setNationalityComboboxOpen}>
                                     <PopoverTrigger asChild>
                                       <Button
@@ -920,15 +920,15 @@ export default function RentalContracts() {
                                         aria-expanded={nationalityComboboxOpen}
                                         className="w-full justify-between h-9 text-sm border-[#1e3a8a]/30 font-normal"
                                       >
-                                        {selectedNationality || <span className="text-gray-400 text-xs">Select nationality...</span>}
+                                        {selectedNationality || <span className="text-gray-400 text-xs">{t("clients.selectNationality")}</span>}
                                         <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-full p-0">
                                       <Command>
-                                        <CommandInput placeholder="Search nationality..." />
+                                        <CommandInput placeholder={t("clients.searchNationality")} />
                                         <CommandList>
-                                          <CommandEmpty>No nationality found.</CommandEmpty>
+                                          <CommandEmpty>{t("contracts.noNationalityFound")}</CommandEmpty>
                                           <CommandGroup>
                                             {nationalities.map((nat) => (
                                               <CommandItem
@@ -951,31 +951,31 @@ export default function RentalContracts() {
                                   <input type="hidden" id="clientNationality" name="clientNationality" value={selectedNationality} />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientPhone" className="text-xs font-medium text-gray-500 mb-1.5 block">Phone Number</Label>
+                                  <Label htmlFor="clientPhone" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.phoneNumber")}</Label>
                                   <Input id="clientPhone" name="clientPhone" type="tel" placeholder="+1 234 567 8900" className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientPassportNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">Passport / ID Number</Label>
+                                  <Label htmlFor="clientPassportNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.passportId")}</Label>
                                   <Input id="clientPassportNumber" name="clientPassportNumber" className="h-9 text-sm input-client" placeholder="ID or Passport" />
                                 </div>
                                 <div className="col-span-2">
-                                  <Label htmlFor="clientAddress" className="text-xs font-medium text-gray-500 mb-1.5 block">Address</Label>
+                                  <Label htmlFor="clientAddress" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.addressLabel")}</Label>
                                   <Input id="clientAddress" name="clientAddress" placeholder="Street, City, ZIP" className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientRegistrationNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">Registration Number</Label>
+                                  <Label htmlFor="clientRegistrationNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("clients.registrationNumber")}</Label>
                                   <Input id="clientRegistrationNumber" name="clientRegistrationNumber" placeholder="e.g., 267" className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientPlaceOfRegistration" className="text-xs font-medium text-gray-500 mb-1.5 block">Place of Registration</Label>
+                                  <Label htmlFor="clientPlaceOfRegistration" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("clients.placeOfRegistration")}</Label>
                                   <Input id="clientPlaceOfRegistration" name="clientPlaceOfRegistration" placeholder="e.g., Beirut" className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientDateOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">Date of Birth</Label>
+                                  <Label htmlFor="clientDateOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("clients.dateOfBirth")}</Label>
                                   <Input id="clientDateOfBirth" name="clientDateOfBirth" type="date" className="h-9 text-sm input-client" />
                                 </div>
                                 <div>
-                                  <Label htmlFor="clientPlaceOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">Place of Birth</Label>
+                                  <Label htmlFor="clientPlaceOfBirth" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("clients.placeOfBirth")}</Label>
                                   <Input id="clientPlaceOfBirth" name="clientPlaceOfBirth" placeholder="City, Country" className="h-9 text-sm input-client" />
                                 </div>
                               </div>
@@ -987,24 +987,24 @@ export default function RentalContracts() {
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
                                   <FileText className="w-3.5 h-3.5" />
                                 </span>
-                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Driving License</h3>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("contracts.drivingLicenseSection")}</h3>
                               </div>
                               <div className="space-y-3">
                                 <div>
-                                  <Label htmlFor="drivingLicenseNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">License Number *</Label>
+                                  <Label htmlFor="drivingLicenseNumber" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.licenseNumber")} *</Label>
                                   <Input id="drivingLicenseNumber" name="drivingLicenseNumber" required className="h-9 text-sm input-client" />
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                   <DateDropdownSelector
                                     id="licenseIssueDate"
-                                    label="Issue Date"
+                                    label={t("clients.issueDate")}
                                     value={licenseIssueDate}
                                     onChange={setLicenseIssueDate}
                                     maxDate={new Date()}
                                   />
                                   <DateDropdownSelector
                                     id="licenseExpiryDate"
-                                    label="Expiry Date *"
+                                    label={`${t("clients.expiryDate")} *`}
                                     value={licenseExpiryDate}
                                     onChange={setLicenseExpiryDate}
                                     required
@@ -1017,12 +1017,12 @@ export default function RentalContracts() {
                             <div className="rounded-xl border border-dashed border-gray-300 overflow-hidden">
                               <div className="px-4 py-3 flex items-center gap-2">
                                 <Users className="w-3.5 h-3.5 text-gray-400" />
-                                <span className="text-sm font-medium text-gray-600">Second Driver</span>
-                                <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">Optional</span>
+                                <span className="text-sm font-medium text-gray-600">{t("contracts.secondDriver")}</span>
+                                <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">{t("common.optional")}</span>
                               </div>
                               <div className="px-4 pb-4 space-y-3 border-t border-dashed border-gray-200 bg-gray-50/40">
                                 <div className="pt-3">
-                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Select Client as Second Driver</Label>
+                                  <Label className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.selectClientSecondDriver")}</Label>
                                   <Popover open={secondDriverComboboxOpen} onOpenChange={setSecondDriverComboboxOpen}>
                                     <PopoverTrigger asChild>
                                       <Button
@@ -1034,17 +1034,17 @@ export default function RentalContracts() {
                                         {secondDriverClientId
                                           ? (() => {
                                               const c = clients.find(cl => cl.id.toString() === secondDriverClientId);
-                                              return c ? c.name : "Select client";
+                                              return c ? c.name : t("contracts.selectClient");
                                             })()
-                                          : <span className="text-gray-400 text-xs">Select second driver...</span>}
+                                          : <span className="text-gray-400 text-xs">{t("contracts.selectSecondDriver")}</span>}
                                         <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                                       </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-full p-0" align="start">
                                       <Command>
-                                        <CommandInput placeholder="Search clients..." />
+                                        <CommandInput placeholder={t("contracts.searchClientsPlaceholder")} />
                                         <CommandList>
-                                          <CommandEmpty>No client found.</CommandEmpty>
+                                          <CommandEmpty>{t("contracts.noClientFound")}</CommandEmpty>
                                           <CommandGroup>
                                             <CommandItem
                                               value="__clear__"
@@ -1055,7 +1055,7 @@ export default function RentalContracts() {
                                                 setSecondDriverComboboxOpen(false);
                                               }}
                                             >
-                                              <span className="text-muted-foreground italic">— Remove second driver —</span>
+                                              <span className="text-muted-foreground italic">{t("contracts.removeSecondDriver")}</span>
                                             </CommandItem>
                                             {clients.map((cl) => (
                                               <CommandItem
@@ -1088,17 +1088,17 @@ export default function RentalContracts() {
                                     <div className="space-y-3 rounded-lg border border-gray-200 p-3 bg-white">
                                       <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Full Name</Label>
+                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.fullName")}</Label>
                                           <Input value={c.name} readOnly className="h-9 text-sm bg-gray-50 input-client" />
                                         </div>
                                         <div>
-                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">Date of Birth</Label>
+                                          <Label className="text-xs font-medium text-gray-500 mb-1.5 block">{t("clients.dateOfBirth")}</Label>
                                           <Input value={(c as any).dateOfBirth ? new Date((c as any).dateOfBirth).toLocaleDateString() : "—"} readOnly className="h-9 text-sm bg-gray-50 input-client" />
                                         </div>
                                       </div>
                                       <div className="grid grid-cols-2 gap-3">
-                                        <DateDropdownSelector id="secondDriverLicenseIssueDate" label="License Issue Date" value={secondDriverLicenseIssueDate} onChange={setSecondDriverLicenseIssueDate} />
-                                        <DateDropdownSelector id="secondDriverLicenseExpiryDate" label="License Expiry Date" value={secondDriverLicenseExpiryDate} onChange={setSecondDriverLicenseExpiryDate} />
+                                        <DateDropdownSelector id="secondDriverLicenseIssueDate" label={t("contracts.licenseIssueDate")} value={secondDriverLicenseIssueDate} onChange={setSecondDriverLicenseIssueDate} />
+                                        <DateDropdownSelector id="secondDriverLicenseExpiryDate" label={t("contracts.licenseExpiryDate")} value={secondDriverLicenseExpiryDate} onChange={setSecondDriverLicenseExpiryDate} />
                                       </div>
                                     </div>
                                   );
@@ -1119,7 +1119,7 @@ export default function RentalContracts() {
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-blue-100 text-blue-700">
                                   <Calendar className="w-3.5 h-3.5" />
                                 </span>
-                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Rental Period</h3>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("contracts.rentalPeriodHeader")}</h3>
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                                 {/* Start Date */}
@@ -1132,33 +1132,33 @@ export default function RentalContracts() {
 
                                 {/* Pickup Time */}
                                 <div>
-                                  <Label htmlFor="pickupTime" className="text-sm font-medium">Pickup Time</Label>
+                                  <Label htmlFor="pickupTime" className="text-sm font-medium">{t("contracts.pickupTime")}</Label>
                                   <Input id="pickupTime" type="time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} className="h-9 text-sm input-client mt-1.5" />
-                                  <p className="text-[10px] text-muted-foreground mt-1">Exact hour car was picked up</p>
+                                  <p className="text-[10px] text-muted-foreground mt-1">{t("contracts.exactHourPickup")}</p>
                                 </div>
 
                                 {/* Rental Days */}
                                 <div>
-                                  <Label htmlFor="rentalDays" className="text-sm font-medium">Rental Days *</Label>
+                                  <Label htmlFor="rentalDays" className="text-sm font-medium">{t("contracts.dayCount")} *</Label>
                                   <div className="flex items-center gap-2 mt-1.5">
                                     <Button type="button" variant="outline" size="sm" className="h-9 w-9 shrink-0 p-0 text-lg font-bold" onClick={() => setRentalDays(Math.max(1, rentalDays - 1))}>−</Button>
                                     <Input id="rentalDays" name="rentalDays" type="number" min="1" value={rentalDays} onChange={(e) => setRentalDays(Math.max(1, parseInt(e.target.value) || 1))} className="text-center font-semibold text-sm h-9 input-client" required />
                                     <Button type="button" variant="outline" size="sm" className="h-9 w-9 shrink-0 p-0 text-lg font-bold" onClick={() => setRentalDays(rentalDays + 1)}>+</Button>
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground mt-1">End date calculated automatically</p>
+                                  <p className="text-[10px] text-muted-foreground mt-1">{t("contracts.endDateAutoCalc")}</p>
                                 </div>
 
                                 {/* Return Date */}
                                 <div>
-                                  <Label className="text-sm font-medium">Return Date (Auto)</Label>
+                                  <Label className="text-sm font-medium">{t("contracts.returnDateAuto")}</Label>
                                   <div className="h-9 flex items-center px-3 rounded-md bg-gray-50 border border-dashed border-gray-300 mt-1.5">
                                     {rentalEndDate
                                       ? <span className="font-semibold text-gray-800 text-sm">{rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-                                      : <span className="text-gray-400 text-xs italic">Set start date & days above</span>}
+                                      : <span className="text-gray-400 text-xs italic">{t("contracts.selectDateFirst")}</span>}
                                   </div>
                                   {rentalEndDate && rentalStartDate && (
                                     <p className="text-[10px] text-blue-500 mt-1">
-                                      {rentalDays} day{rentalDays !== 1 ? 's' : ''} · {rentalStartDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                      {rentalDays} {t("contracts.rentalDays")} · {rentalStartDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })} → {rentalEndDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                                     </p>
                                   )}
                                 </div>
@@ -1171,9 +1171,9 @@ export default function RentalContracts() {
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-slate-100 text-slate-600">
                                   <Gauge className="w-3.5 h-3.5" />
                                 </span>
-                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Pickup Odometer</h3>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("contracts.pickupOdometerHeader")}</h3>
                               </div>
-                              <Label htmlFor="pickupKm" className="text-xs font-medium text-gray-500 mb-1.5 block">Odometer Reading (KM) *</Label>
+                              <Label htmlFor="pickupKm" className="text-xs font-medium text-gray-500 mb-1.5 block">{t("contracts.odometerReading")} *</Label>
                               <Input
                                 id="pickupKm"
                                 name="pickupKm"
@@ -1181,7 +1181,7 @@ export default function RentalContracts() {
                                 min={(() => { const v = vehicles.find(v => v.id.toString() === selectedVehicleId); return v?.mileage || 0; })()}
                                 value={pickupKm}
                                 onChange={(e) => setPickupKm(parseInt(e.target.value) || 0)}
-                                placeholder="Enter current odometer reading"
+                                placeholder={t("contracts.enterOdometerReading")}
                                 required
                                 className="h-9 text-sm input-client"
                               />
@@ -1200,7 +1200,7 @@ export default function RentalContracts() {
                                 <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-green-100 text-green-700">
                                   <DollarSign className="w-3.5 h-3.5" />
                                 </span>
-                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Pricing</h3>
+                                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">{t("contracts.pricingHeader")}</h3>
                                 {isHighSeason && (
                                   <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-semibold border border-orange-200">🌞 High Season</span>
                                 )}

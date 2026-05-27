@@ -29,8 +29,10 @@ import { Label } from "@/components/ui/label";
 import { Users, Trash2, Edit, Shield, User } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export default function UserManagement() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -46,22 +48,22 @@ export default function UserManagement() {
   const { data: users, isLoading, refetch } = trpc.admin.listUsers.useQuery();
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
-      toast({ title: "Role updated successfully" });
+      toast({ title: t("users.roleUpdated") });
       refetch();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
     },
   });
 
   const deleteUserMutation = trpc.admin.deleteUser.useMutation({
     onSuccess: () => {
-      toast({ title: "User deleted successfully" });
+      toast({ title: t("users.userDeleted") });
       setDeleteDialogOpen(false);
       refetch();
     },
     onError: (error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
     },
   });
 
@@ -106,15 +108,15 @@ export default function UserManagement() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-2">
             <Users className="h-6 w-6 sm:h-8 sm:w-8" />
-            User Management
+            {t("users.title")}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Manage all users, roles, and permissions
+            {t("users.subtitle")}
           </p>
         </div>
         <Badge variant="outline" className="px-3 py-1">
           <Shield className="h-4 w-4 mr-1" />
-          Super Admin Only
+          {t("users.superAdminOnly")}
         </Badge>
       </div>
 
@@ -137,31 +139,31 @@ export default function UserManagement() {
                   <SelectItem value="user">
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3" />
-                      User
+                      {t("users.user")}
                     </div>
                   </SelectItem>
                   <SelectItem value="admin">
                     <div className="flex items-center gap-1">
                       <Shield className="h-3 w-3" />
-                      Admin
+                      {t("users.admin")}
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="text-xs text-muted-foreground space-y-1">
-              <div>Username: {user.username}</div>
-              {user.email && <div>Email: {user.email}</div>}
-              {user.phone && <div>Phone: {user.phone}</div>}
-              {user.country && <div>Country: {user.country}</div>}
-              <div>Created: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</div>
+              <div>{t("users.username")}: {user.username}</div>
+              {user.email && <div>{t("users.email")}: {user.email}</div>}
+              {user.phone && <div>{t("users.phone")}: {user.phone}</div>}
+              {user.country && <div>{t("users.country")}: {user.country}</div>}
+              <div>{t("users.created")}: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</div>
             </div>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleEditClick(user)}>
-                <Edit className="h-3 w-3 mr-1" /> Edit
+                <Edit className="h-3 w-3 mr-1" /> {t("common.edit")}
               </Button>
               <Button variant="outline" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDeleteClick(user)}>
-                <Trash2 className="h-3 w-3 mr-1" /> Delete
+                <Trash2 className="h-3 w-3 mr-1" /> {t("common.delete")}
               </Button>
             </div>
           </div>
@@ -173,15 +175,15 @@ export default function UserManagement() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Username</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Country</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("users.id")}</TableHead>
+              <TableHead>{t("users.username")}</TableHead>
+              <TableHead>{t("users.name")}</TableHead>
+              <TableHead>{t("users.email")}</TableHead>
+              <TableHead>{t("users.phone")}</TableHead>
+              <TableHead>{t("users.country")}</TableHead>
+              <TableHead>{t("common.status")}</TableHead>
+              <TableHead>{t("users.created")}</TableHead>
+              <TableHead className="text-right">{t("users.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -207,13 +209,13 @@ export default function UserManagement() {
                       <SelectItem value="user">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          User
+                          {t("users.user")}
                         </div>
                       </SelectItem>
                       <SelectItem value="admin">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4" />
-                          Admin
+                          {t("users.admin")}
                         </div>
                       </SelectItem>
                     </SelectContent>
@@ -253,14 +255,14 @@ export default function UserManagement() {
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit User</DialogTitle>
+            <DialogTitle>{t("users.editUser")}</DialogTitle>
             <DialogDescription>
-              Update user information (username and password cannot be changed here)
+              {t("users.editUserSubtitle")}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("users.name")}</Label>
               <Input
                 id="name"
                 value={editForm.name}
@@ -270,7 +272,7 @@ export default function UserManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("users.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -281,7 +283,7 @@ export default function UserManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">{t("users.phone")}</Label>
               <Input
                 id="phone"
                 value={editForm.phone}
@@ -291,7 +293,7 @@ export default function UserManagement() {
               />
             </div>
             <div>
-              <Label htmlFor="country">Country</Label>
+              <Label htmlFor="country">{t("users.country")}</Label>
               <Input
                 id="country"
                 value={editForm.country}
@@ -303,16 +305,16 @@ export default function UserManagement() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={() => {
                 // TODO: Implement update user mutation
-                toast({ title: "Feature coming soon", description: "User update functionality will be added" });
+                toast({ title: t("users.featureComingSoon"), description: t("users.updateFunctionalitySoon") });
                 setEditDialogOpen(false);
               }}
             >
-              Save Changes
+              {t("common.saveChanges")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -322,22 +324,21 @@ export default function UserManagement() {
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete User</DialogTitle>
+            <DialogTitle>{t("users.deleteUser")}</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete user "{selectedUser?.username}"? This
-              action cannot be undone and will delete all associated data.
+              {t("users.deleteConfirm", { name: selectedUser?.username })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={deleteUserMutation.isPending}
             >
-              {deleteUserMutation.isPending ? "Deleting..." : "Delete User"}
+              {deleteUserMutation.isPending ? t("users.deleting") : t("users.deleteUser")}
             </Button>
           </DialogFooter>
         </DialogContent>

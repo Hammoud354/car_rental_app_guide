@@ -157,7 +157,7 @@ export default function Clients() {
       return;
     }
     if (!drivingLicenseNumber) {
-      toast.error("Driving license number is required");
+      toast.error(t("clients.licenseRequired"));
       return;
     }
     if (!createLicenseExpiryDate) {
@@ -249,7 +249,7 @@ export default function Clients() {
       return;
     }
     if (!drivingLicenseNumber) {
-      toast.error("Driving license number is required");
+      toast.error(t("clients.licenseRequired"));
       return;
     }
     if (!editLicenseExpiryDate) {
@@ -332,7 +332,7 @@ export default function Clients() {
             {/* New Client button */}
             <Button size="sm" onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="h-3.5 w-3.5 mr-1.5" />
-              New Client
+              {t("clients.newClient")}
             </Button>
 
             {/* New Client portal workspace */}
@@ -350,8 +350,8 @@ export default function Clients() {
                         <User className="w-5 h-5 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-bold text-white">New Client</h2>
-                        <p className="text-blue-200 text-xs">Fill in the client's personal and license information</p>
+                        <h2 className="text-lg font-bold text-white">{t("clients.newClient")}</h2>
+                        <p className="text-blue-200 text-xs">{t("clients.newClientSubtitle")}</p>
                       </div>
                     </div>
                     <button
@@ -371,19 +371,19 @@ export default function Clients() {
                       <div className="w-full sm:w-[55%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto p-6">
                         <div className="flex items-center gap-2 mb-5">
                           <User className="w-4 h-4 text-blue-700" />
-                          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">Personal Information</h3>
+                          <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("clients.personalInfo")}</h3>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <Label htmlFor="firstName">First Name *</Label>
+                            <Label htmlFor="firstName">{t("clients.firstName")} *</Label>
                             <Input id="firstName" name="firstName" required className="input-client mt-1" />
                           </div>
                           <div>
-                            <Label htmlFor="lastName">Last Name *</Label>
+                            <Label htmlFor="lastName">{t("clients.lastName")} *</Label>
                             <Input id="lastName" name="lastName" required className="input-client mt-1" />
                           </div>
                           <div className="col-span-2">
-                            <Label htmlFor="fatherName">Father's Name *</Label>
+                            <Label htmlFor="fatherName">{t("clients.fathersName")} *</Label>
                             <Input id="fatherName" name="fatherName" required placeholder="Ahmed Hassan" className="input-client mt-1" />
                           </div>
                           <div className="col-span-2">
@@ -391,15 +391,15 @@ export default function Clients() {
                             <Popover open={createNationalityOpen} onOpenChange={setCreateNationalityOpen}>
                               <PopoverTrigger asChild>
                                 <Button variant="outline" role="combobox" aria-expanded={createNationalityOpen} className="w-full justify-between mt-1">
-                                  {createSelectedNationality || "Select nationality..."}
+                                  {createSelectedNationality || t("clients.selectNationality")}
                                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-[300px] p-0" style={{ zIndex: 9999 }}>
                                 <Command>
-                                  <CommandInput placeholder="Search nationality..." />
+                                  <CommandInput placeholder={t("clients.searchNationality")} />
                                   <CommandList>
-                                    <CommandEmpty>No nationality found.</CommandEmpty>
+                                    <CommandEmpty>{t("contracts.noNationalityFound")}</CommandEmpty>
                                     <CommandGroup>
                                       {nationalities.map((nat) => (
                                         <CommandItem key={nat} value={nat} onSelect={(value) => { setCreateSelectedNationality(value); setCreateNationalityOpen(false); }}>
@@ -414,7 +414,7 @@ export default function Clients() {
                             </Popover>
                           </div>
                           <div className="col-span-2">
-                            <Label htmlFor="motherFullName">Mother's Full Name *</Label>
+                            <Label htmlFor="motherFullName">{t("clients.mothersFullName")} *</Label>
                             <Input id="motherFullName" name="motherFullName" required placeholder="Fatima Ahmed" className="input-client mt-1" />
                           </div>
                           <div>
@@ -470,14 +470,14 @@ export default function Clients() {
                             </div>
                             <DateDropdownSelector
                               id="licenseIssueDate"
-                              label="Issue Date"
+                              label={t("clients.issueDate")}
                               value={createLicenseIssueDate}
                               onChange={setCreateLicenseIssueDate}
                               maxDate={new Date()}
                             />
                             <DateDropdownSelector
                               id="licenseExpiryDate"
-                              label="Expiry Date *"
+                              label={`${t("clients.expiryDateRequired")} *`}
                               value={createLicenseExpiryDate}
                               onChange={setCreateLicenseExpiryDate}
                               required
@@ -497,13 +497,13 @@ export default function Clients() {
 
                     {/* Sticky footer */}
                     <div className="flex items-center justify-between px-6 py-4 bg-white border-t border-gray-200 shadow-[0_-2px_8px_rgba(0,0,0,0.06)] flex-shrink-0">
-                      <p className="text-xs text-gray-400">* Required fields</p>
+                      <p className="text-xs text-gray-400">{t("clients.requiredFields")}</p>
                       <div className="flex gap-3">
                         <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                          Cancel
+                          {t("common.cancel")}
                         </Button>
                         <Button type="submit" disabled={createClient.isPending} className="bg-[#1e3a8a] hover:bg-[#1e40af] text-white">
-                          {createClient.isPending ? "Adding..." : "Add Client"}
+                          {createClient.isPending ? t("clients.adding") : t("clients.addClient")}
                         </Button>
                       </div>
                     </div>
@@ -532,7 +532,7 @@ export default function Clients() {
           {filteredClients.length === 0 ? (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
-                {clients.length === 0 ? "No clients yet. Create your first client to get started." : "No clients match your search."}
+                {clients.length === 0 ? t("clients.noClientsYet") : t("clients.noClientsMatch")}
               </CardContent>
             </Card>
           ) : (
@@ -618,25 +618,25 @@ export default function Clients() {
             <DialogHeader>
               <DialogTitle>{t("clients.editClient")}</DialogTitle>
               <DialogDescription>
-                Update the client's information
+                {t("clients.updateClientSubtitle")}
               </DialogDescription>
             </DialogHeader>
             {selectedClient && (
               <form onSubmit={handleEditSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div>
-                  <h3 className="font-semibold mb-4">Personal Information</h3>
+                  <h3 className="font-semibold mb-4">{t("clients.personalInfo")}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="edit-firstName">First Name *</Label>
+                      <Label htmlFor="edit-firstName">{t("clients.firstName")} *</Label>
                       <Input id="edit-firstName" name="firstName" defaultValue={selectedClient.firstName} required className="input-client" />
                     </div>
                     <div>
-                      <Label htmlFor="edit-lastName">Last Name *</Label>
+                      <Label htmlFor="edit-lastName">{t("clients.lastName")} *</Label>
                       <Input id="edit-lastName" name="lastName" defaultValue={selectedClient.lastName} required className="input-client" />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-fatherName">Father's Name *</Label>
+                      <Label htmlFor="edit-fatherName">{t("clients.fathersName")} *</Label>
                       <Input id="edit-fatherName" name="fatherName" defaultValue={selectedClient.fatherName} required placeholder="Ahmed Hassan" className="input-client" />
                     </div>
                     <div className="col-span-2">
@@ -649,15 +649,15 @@ export default function Clients() {
                             aria-expanded={editNationalityOpen}
                             className="w-full justify-between"
                           >
-                            {editSelectedNationality || "Select nationality..."}
+                            {editSelectedNationality || t("clients.selectNationality")}
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-full p-0">
                           <Command>
-                            <CommandInput placeholder="Search nationality..." />
+                            <CommandInput placeholder={t("clients.searchNationality")} />
                             <CommandList>
-                              <CommandEmpty>No nationality found.</CommandEmpty>
+                              <CommandEmpty>{t("contracts.noNationalityFound")}</CommandEmpty>
                               <CommandGroup>
                                 {nationalities.map((nat) => (
                                   <CommandItem
@@ -683,7 +683,7 @@ export default function Clients() {
                       </Popover>
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor="edit-motherFullName">Mother's Full Name *</Label>
+                      <Label htmlFor="edit-motherFullName">{t("clients.mothersFullName")} *</Label>
                       <Input id="edit-motherFullName" name="motherFullName" defaultValue={selectedClient.motherFullName} required placeholder="Fatima Ahmed" className="input-client" />
                     </div>
                     <div className="col-span-2">
@@ -736,7 +736,7 @@ export default function Clients() {
                      <div className="pt-2">
                        <DateDropdownSelector
                          id="edit-licenseIssueDate"
-                         label="Issue Date"
+                         label={t("clients.issueDate")}
                          value={editLicenseIssueDate}
                          onChange={setEditLicenseIssueDate}
                          maxDate={new Date()}
@@ -745,7 +745,7 @@ export default function Clients() {
                      <div className="pt-2">
                        <DateDropdownSelector
                          id="edit-licenseExpiryDate"
-                         label="Expiry Date *"
+                         label={`${t("clients.expiryDateRequired")} *`}
                          value={editLicenseExpiryDate}
                          onChange={setEditLicenseExpiryDate}
                          required
@@ -763,10 +763,10 @@ export default function Clients() {
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
-                    Cancel
+                    {t("common.cancel")}
                   </Button>
                   <Button type="submit" disabled={updateClient.isPending}>
-                    {updateClient.isPending ? "Updating..." : "Update Client"}
+                    {updateClient.isPending ? t("clients.updating") : t("clients.updateClient")}
                   </Button>
                 </div>
               </form>
