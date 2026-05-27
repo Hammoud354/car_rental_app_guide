@@ -14,6 +14,19 @@ import { useTranslation } from "react-i18next";
 
 const MAINTENANCE_TYPES = ["Routine", "Repair", "Inspection", "Emergency", "Oil Change", "Brake Pads Change", "Oil + Filter"] as const;
 
+const ON_SPOT_TYPES = [
+  "Battery Change",
+  "Lamp / Bulb Change",
+  "Brake Light",
+  "Wiper Blades",
+  "Fuse Replacement",
+  "Tire Inflation / Fix",
+  "AC Recharge",
+  "Oil Top-up",
+  "Minor Adjustment",
+  "Other On-Spot",
+] as const;
+
 function getTypeStyle(type: string) {
   const styles: Record<string, { bg: string; text: string; dot: string }> = {
     "Routine": { bg: "bg-blue-50", text: "text-blue-700", dot: "bg-blue-500" },
@@ -108,6 +121,7 @@ export default function Maintenance() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [markInMaintenance, setMarkInMaintenance] = useState(true);
+  const [isOnSpotRepair, setIsOnSpotRepair] = useState(false);
   const [selectedGarageId, setSelectedGarageId] = useState<number | null>(null);
   const [editGarageId, setEditGarageId] = useState<number | null | undefined>(undefined);
 
@@ -162,6 +176,7 @@ export default function Maintenance() {
       setGarageEntryDate(undefined);
       setGarageExitDate(undefined);
       setMarkInMaintenance(true);
+      setIsOnSpotRepair(false);
       setSelectedGarageId(null);
     },
     onError: (error) => {
@@ -472,7 +487,7 @@ export default function Maintenance() {
           setMarkInMaintenance(true);
         }}
         title="New Maintenance Record"
-        subtitle="Record maintenance work performed on a vehicle"
+        subtitle={isOnSpotRepair ? "Quick on-spot repair — no garage needed" : "Record maintenance work performed on a vehicle"}
         icon={Wrench}
         footer={
           <>
@@ -483,6 +498,7 @@ export default function Maintenance() {
               setGarageEntryDate(undefined);
               setGarageExitDate(undefined);
               setMarkInMaintenance(true);
+              setIsOnSpotRepair(false);
             }}>Cancel</Button>
             <Button
               type="submit"
@@ -497,6 +513,34 @@ export default function Maintenance() {
         }
       >
         <form id="add-maintenance-form" onSubmit={handleAddMaintenance} className="space-y-4">
+
+          {/* Mode Toggle */}
+          <div className="flex rounded-xl border border-gray-200 overflow-hidden bg-gray-50 p-1 gap-1">
+            <button
+              type="button"
+              onClick={() => { setIsOnSpotRepair(false); setMarkInMaintenance(true); }}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                !isOnSpotRepair
+                  ? "bg-white text-blue-800 shadow-sm border border-blue-100"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Wrench className="w-3.5 h-3.5" />
+              Standard Maintenance
+            </button>
+            <button
+              type="button"
+              onClick={() => { setIsOnSpotRepair(true); setMarkInMaintenance(false); }}
+              className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all ${
+                isOnSpotRepair
+                  ? "bg-white text-emerald-700 shadow-sm border border-emerald-100"
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Activity className="w-3.5 h-3.5" />
+              On Spot Repair
+            </button>
+          </div>
 
           {/* Vehicle */}
           <div className="rounded-xl border border-gray-200 p-4 bg-gradient-to-br from-slate-50 to-white">
@@ -529,13 +573,15 @@ export default function Maintenance() {
             </Select>
           </div>
 
-          {/* Type & Date */}
+          {/* Service Details */}
           <div className="rounded-xl border border-gray-200 p-4 bg-white">
             <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-orange-100 text-orange-700">
+              <span className={`inline-flex items-center justify-center w-6 h-6 rounded-lg ${isOnSpotRepair ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"}`}>
                 <Wrench className="w-3.5 h-3.5" />
               </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Service Details</h3>
+              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">
+                {isOnSpotRepair ? "On Spot Repair Details" : "Service Details"}
+              </h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -545,9 +591,10 @@ export default function Maintenance() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent style={{ zIndex: 9999 }}>
-                    {MAINTENANCE_TYPES.map(t => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
+                    {isOnSpotRepair
+                      ? ON_SPOT_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)
+                      : MAINTENANCE_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)
+                    }
                   </SelectContent>
                 </Select>
               </div>
@@ -557,116 +604,143 @@ export default function Maintenance() {
                   <ModernDatePicker date={performedAtDate} onDateChange={setPerformedAtDate} placeholder="Select date" />
                 </div>
               </div>
-            </div>
-            <div className="mt-3">
-              <Label className="text-xs font-medium text-gray-600">Description *</Label>
-              <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm input-client" />
-            </div>
-          </div>
-
-          {/* Garage Info */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
-                <MapPin className="w-3.5 h-3.5" />
-              </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Garage</Label>
-                <Select value={selectedGarageId?.toString() || "none"} onValueChange={v => setSelectedGarageId(v === "none" ? null : parseInt(v))}>
-                  <SelectTrigger className="mt-1 h-9 text-sm input-client">
-                    <SelectValue placeholder="Select a garage" />
-                  </SelectTrigger>
-                  <SelectContent style={{ zIndex: 9999 }}>
-                    <SelectItem value="none">No garage selected</SelectItem>
-                    {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
-                      <SelectItem key={g.id} value={g.id.toString()}>
-                        <span className="flex items-center gap-1.5">
-                          {g.isPreferred && <span className="text-amber-500">★</span>}
-                          {g.garageName}
-                          {g.city && <span className="text-gray-400 text-xs">· {g.city}</span>}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Performed By</Label>
-                <Input name="performedBy" list="technicians-list" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
-                <datalist id="technicians-list">
-                  {technicians?.map((tech) => <option key={tech} value={tech} />)}
-                </datalist>
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
-                <div className="mt-1">
-                  <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
-                </div>
-              </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
-                <div className="mt-1">
-                  <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Odometer & Cost */}
-          <div className="rounded-xl border border-gray-200 p-4 bg-white">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
-                <Gauge className="w-3.5 h-3.5" />
-              </span>
-              <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <Label className="text-xs font-medium text-gray-600">
-                  KM Reading
-                  {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
-                </Label>
-                <Input
-                  name="mileageAtService"
-                  type="number"
-                  min="0"
-                  placeholder="45000"
-                  defaultValue={autoFilledKm || undefined}
-                  key={autoFilledKm || 'empty'}
-                  className="mt-1 h-9 text-sm input-client"
-                />
-              </div>
-              <div>
+              <div className={isOnSpotRepair ? "" : "sm:col-span-2"}>
                 <Label className="text-xs font-medium text-gray-600">Cost ($)</Label>
                 <Input name="cost" type="number" step="0.01" min="0" placeholder="0.00" className="mt-1 h-9 text-sm input-client" />
               </div>
-              <div>
-                <Label className="text-xs font-medium text-gray-600">Next Service KM</Label>
-                <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 h-9 text-sm input-client" />
-              </div>
+              {!isOnSpotRepair && (
+                <div className="sm:col-span-2">
+                  <Label className="text-xs font-medium text-gray-600">Description *</Label>
+                  <Textarea name="description" rows={2} required placeholder="Describe the work performed..." className="mt-1 text-sm input-client" />
+                </div>
+              )}
+              {isOnSpotRepair && (
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Notes</Label>
+                  <Input name="description" placeholder="Optional notes..." className="mt-1 h-9 text-sm input-client" />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Garage Status */}
-          <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={markInMaintenance}
-                onChange={(e) => setMarkInMaintenance(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
-              />
+          {/* Garage Info — hidden in on-spot mode */}
+          {!isOnSpotRepair && (
+            <div className="rounded-xl border border-gray-200 p-4 bg-white">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700">
+                  <MapPin className="w-3.5 h-3.5" />
+                </span>
+                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Garage Info</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Garage</Label>
+                  <Select value={selectedGarageId?.toString() || "none"} onValueChange={v => setSelectedGarageId(v === "none" ? null : parseInt(v))}>
+                    <SelectTrigger className="mt-1 h-9 text-sm input-client">
+                      <SelectValue placeholder="Select a garage" />
+                    </SelectTrigger>
+                    <SelectContent style={{ zIndex: 9999 }}>
+                      <SelectItem value="none">No garage selected</SelectItem>
+                      {(garagesList as any[]).filter((g: any) => g.status === "Active").map((g: any) => (
+                        <SelectItem key={g.id} value={g.id.toString()}>
+                          <span className="flex items-center gap-1.5">
+                            {g.isPreferred && <span className="text-amber-500">★</span>}
+                            {g.garageName}
+                            {g.city && <span className="text-gray-400 text-xs">· {g.city}</span>}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Performed By</Label>
+                  <Input name="performedBy" list="technicians-list" placeholder="Technician name" className="mt-1 h-9 text-sm input-client" />
+                  <datalist id="technicians-list">
+                    {technicians?.map((tech) => <option key={tech} value={tech} />)}
+                  </datalist>
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Garage Entry</Label>
+                  <div className="mt-1">
+                    <ModernDatePicker date={garageEntryDate} onDateChange={setGarageEntryDate} placeholder="Entry date" />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Garage Exit</Label>
+                  <div className="mt-1">
+                    <ModernDatePicker date={garageExitDate} onDateChange={setGarageExitDate} placeholder="Exit date" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Odometer — hidden in on-spot mode */}
+          {!isOnSpotRepair && (
+            <div className="rounded-xl border border-gray-200 p-4 bg-white">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-violet-100 text-violet-700">
+                  <Gauge className="w-3.5 h-3.5" />
+                </span>
+                <h3 className="font-semibold text-xs text-gray-700 tracking-wider uppercase">Odometer & Cost</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">
+                    KM Reading
+                    {autoFilledKm && <span className="text-[10px] text-gray-400 ml-1">(auto)</span>}
+                  </Label>
+                  <Input
+                    name="mileageAtService"
+                    type="number"
+                    min="0"
+                    placeholder="45000"
+                    defaultValue={autoFilledKm || undefined}
+                    key={autoFilledKm || 'empty'}
+                    className="mt-1 h-9 text-sm input-client"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-600">Next Service KM</Label>
+                  <Input name="kmDueMaintenance" type="number" min="0" placeholder="50000" className="mt-1 h-9 text-sm input-client" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* In-Garage toggle — hidden in on-spot mode */}
+          {!isOnSpotRepair && (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={markInMaintenance}
+                  onChange={(e) => setMarkInMaintenance(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-orange-300 text-orange-600 focus:ring-orange-500"
+                />
+                <div>
+                  <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
+                  <p className="text-xs text-orange-600 mt-0.5">
+                    Block this vehicle from being rented until maintenance is complete
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
+          {/* On-spot info banner */}
+          {isOnSpotRepair && (
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
+              <Activity className="w-4 h-4 text-emerald-600 mt-0.5 shrink-0" />
               <div>
-                <span className="text-sm font-semibold text-orange-800">Vehicle is in the garage</span>
-                <p className="text-xs text-orange-600 mt-0.5">
-                  Block this vehicle from being rented until maintenance is complete
+                <span className="text-sm font-semibold text-emerald-800">On Spot Repair</span>
+                <p className="text-xs text-emerald-600 mt-0.5">
+                  Vehicle stays available for rental — no garage visit required.
                 </p>
               </div>
-            </label>
-          </div>
+            </div>
+          )}
 
         </form>
       </PortalModal>
