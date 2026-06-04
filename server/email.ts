@@ -268,6 +268,91 @@ export async function sendAdminPaymentNotification(
   return sendEmail(ADMIN_EMAIL, `Payment request: ${username} — ${planName} plan ($${amount})`, html);
 }
 
+export async function sendAccessRequestedEmail(to: string, adminName: string, reason: string, companyName: string) {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">Admin Access Request</h1>
+        <p style="${pStyle}">Hi <strong>${companyName}</strong>,</p>
+        <p style="${pStyle}">
+          A FleetWizards administrator (<strong>${adminName}</strong>) has requested access to your account data.
+        </p>
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Reason provided</p>
+          <p style="margin: 0; font-size: 14px; color: #78350f;">${reason || 'No reason specified'}</p>
+        </div>
+        <p style="${pStyle}">Please log in to your account to approve or reject this request.</p>
+        <a href="https://fleetwizards.app/privacy-settings" style="${btnStyle("#1e40af")}">Review Request</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(to, `Admin access request from ${adminName} — action required`, html);
+}
+
+export async function sendAccessApprovedEmail(adminEmail: string, companyName: string, expiresAt?: Date | null) {
+  const expiry = expiresAt ? expiresAt.toLocaleString() : 'No expiration set';
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">Access Request Approved</h1>
+        <p style="${pStyle}">Your access request for <strong>${companyName}</strong> has been approved.</p>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #166534; text-transform: uppercase;">Access expires</p>
+          <p style="margin: 0; font-size: 14px; color: #15803d;">${expiry}</p>
+        </div>
+        <a href="https://fleetwizards.app/admin/users" style="${btnStyle("#16a34a")}">Go to Admin Panel</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(adminEmail, `Access approved — ${companyName}`, html);
+}
+
+export async function sendAccessStartedEmail(to: string, adminName: string, companyName: string) {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">Admin Access Started</h1>
+        <p style="${pStyle}">Hi <strong>${companyName}</strong>,</p>
+        <p style="${pStyle}">
+          Administrator <strong>${adminName}</strong> has started an approved session on your account.
+        </p>
+        <p style="${pStyle}">This is an automated notification. You can review all access activity in your Privacy settings.</p>
+        <a href="https://fleetwizards.app/access-history" style="${btnStyle("#1e40af")}">View Access History</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(to, `Admin session started on your account — ${adminName}`, html);
+}
+
+export async function sendEmergencyAccessEmail(to: string, adminName: string, reason: string, companyName: string) {
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}; color: #dc2626;">⚠️ Emergency Access Used</h1>
+        <p style="${pStyle}">Hi <strong>${companyName}</strong>,</p>
+        <p style="${pStyle}">
+          An administrator (<strong>${adminName}</strong>) has used <strong>emergency access</strong> to enter your account. This bypasses your privacy settings and is only done for critical platform issues.
+        </p>
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 4px 0; font-size: 12px; font-weight: 600; color: #991b1b; text-transform: uppercase;">Reason</p>
+          <p style="margin: 0; font-size: 14px; color: #7f1d1d;">${reason || 'Critical platform issue'}</p>
+        </div>
+        <p style="${pStyle}">You can review this and all other access activity in your Privacy settings.</p>
+        <a href="https://fleetwizards.app/access-history" style="${btnStyle("#dc2626")}">View Access History</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(to, `⚠️ Emergency admin access on your account — ${adminName}`, html);
+}
+
 export async function sendPasswordResetByAdminEmail(to: string, username: string, temporaryPassword: string) {
   const html = `
     <div style="${baseStyle}">

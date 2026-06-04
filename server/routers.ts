@@ -14,6 +14,10 @@ import {
   sendPasswordResetByAdminEmail,
   sendAdminNewUserNotification,
   sendAdminPaymentNotification,
+  sendAccessRequestedEmail,
+  sendAccessApprovedEmail,
+  sendAccessStartedEmail,
+  sendEmergencyAccessEmail,
 } from "./email";
 import {
   getNextContractNumber,
@@ -406,6 +410,9 @@ export const appRouter = router({
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
         const userId = ctx.user?.id || 1;
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getAllVehicles(userId, input?.filterUserId, true);
       }),
 
@@ -849,6 +856,9 @@ export const appRouter = router({
   // Rental Contracts Router
   contracts: router({
     list: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.filterUserId && ctx.user?.role === 'super_admin') {
+        await db.assertPrivacyAccess(ctx.user.id, ctx.filterUserId, 'reservations');
+      }
       return await db.getAllRentalContracts(ctx.user.id, ctx.filterUserId);
     }),
     
@@ -1379,6 +1389,10 @@ export const appRouter = router({
     list: publicProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
+        const targetUserId = input?.filterUserId || ctx.filterUserId;
+        if (targetUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, targetUserId, 'customers');
+        }
         return await db.getAllClients(ctx.user?.id || 1, input?.filterUserId || ctx.filterUserId);
       }),
     
@@ -1920,6 +1934,10 @@ export const appRouter = router({
     list: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
+        const targetUserId = input?.filterUserId || ctx.filterUserId;
+        if (targetUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, targetUserId, 'invoices');
+        }
         const invoices = await db.listInvoices(input?.filterUserId || ctx.filterUserId || ctx.user.id);
         return invoices;
       }),
@@ -3591,6 +3609,149 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         await db.deleteHighSeasonPeriod(input.id, ctx.user.id);
         return { success: true };
+      }),
+  }),
+
+  // =================== PRIVACY & ADMIN ACCESS ===================
+  privacy: router({
+
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getPrivacySettings(ctx.user.id);
+    }),
+
+    updateSettings: protectedProcedure
+      .input(z.object({
+        mode: z.enum(["full_access", "partial_access", "temporary_access", "approval_required", "full_privacy", "emergency_access"]),
+        allowedModules: z.array(z.string()).optional(),
+        tempAccessExpiry: z.string().nullable().optional(),
+        notifyOnAccess: z.boolean().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return await db.upsertPrivacySettings(ctx.user.id, input);
+      }),
+
+    getPendingRequests: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getPendingAccessRequests(ctx.user.id);
+    }),
+
+    respondToRequest: protectedProcedure
+      .input(z.object({
+        requestId: z.number(),
+        status: z.enum(["approved", "rejected"]),
+        expiresAt: z.string().nullable().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const result = await db.respondToAccessRequest(
+          input.requestId,
+          ctx.user.id,
+          input.status,
+          input.expiresAt || null
+        );
+        if (!result) throw new Error("Request not found");
+
+        if (input.status === "approved") {
+          try {
+            void sendAccessApprovedEmail(
+              result.adminEmail || "",
+              ctx.user.name || ctx.user.username || "Your company",
+              result.expiresAt ? new Date(result.expiresAt) : null
+            );
+          } catch {}
+        }
+        return result;
+      }),
+
+    getAccessLogs: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }).optional())
+      .query(async ({ input, ctx }) => {
+        return await db.getAccessLogs(ctx.user.id, input?.limit || 100);
+      }),
+
+    // Super admin: request access to a company's data
+    requestAccess: superAdminProcedure
+      .input(z.object({
+        companyUserId: z.number(),
+        reason: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const request = await db.createAccessRequest(ctx.user.id, input.companyUserId, input.reason);
+        if (!request) throw new Error("Failed to create access request");
+
+        // Notify the company owner via email
+        try {
+          const ownerRows = await (await import("./db")).getCompanyProfile(input.companyUserId);
+          const ownerEmail = ownerRows?.email || "";
+          const ownerName = ownerRows?.companyName || "Company";
+          const adminName = ctx.user.name || ctx.user.username || "FleetWizards Admin";
+          if (ownerEmail) {
+            void sendAccessRequestedEmail(ownerEmail, adminName, input.reason, ownerName);
+          }
+        } catch {}
+
+        return request;
+      }),
+
+    // Super admin: trigger emergency access (bypasses privacy, notifies owner)
+    emergencyAccess: superAdminProcedure
+      .input(z.object({
+        companyUserId: z.number(),
+        reason: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const adminName = ctx.user.name || ctx.user.username || "FleetWizards Admin";
+
+        // Log the emergency access
+        await db.logAdminAccess({
+          companyUserId: input.companyUserId,
+          adminId: ctx.user.id,
+          action: "Emergency Access",
+          pageAccessed: "all",
+          reason: input.reason,
+        });
+
+        // Notify company owner
+        try {
+          const ownerProfile = await db.getCompanyProfile(input.companyUserId);
+          const ownerEmail = ownerProfile?.email || "";
+          const ownerName = ownerProfile?.companyName || "Company";
+          if (ownerEmail) {
+            void sendEmergencyAccessEmail(ownerEmail, adminName, input.reason, ownerName);
+          }
+        } catch {}
+
+        return { success: true };
+      }),
+
+    // Super admin: check if they can access a specific company module
+    checkAccess: superAdminProcedure
+      .input(z.object({
+        companyUserId: z.number(),
+        module: z.string(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const settings = await db.getPrivacySettings(input.companyUserId);
+        if (!settings) return { allowed: true, mode: "full_access" };
+        const mode = settings.mode as string;
+        let allowed = false;
+
+        if (mode === "full_access") {
+          allowed = true;
+        } else if (mode === "partial_access") {
+          const modules: string[] = Array.isArray(settings.allowedModules) ? settings.allowedModules : [];
+          allowed = modules.includes(input.module) || modules.includes("all");
+        } else if (mode === "temporary_access") {
+          const expiry = settings.tempAccessExpiry ? new Date(settings.tempAccessExpiry) : null;
+          allowed = !!expiry && new Date() < expiry;
+        } else if (mode === "approval_required") {
+          const approved = await db.getAdminApprovedAccess(ctx.user.id, input.companyUserId);
+          allowed = !!approved;
+        } else if (mode === "full_privacy") {
+          allowed = false;
+        } else if (mode === "emergency_access") {
+          allowed = false;
+        }
+
+        return { allowed, mode, settings };
       }),
   }),
 });

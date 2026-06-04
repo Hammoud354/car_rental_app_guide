@@ -1,0 +1,1 @@
+- [Privacy & Admin Access System](privacy-access-system.md) — 3 new DB tables + privacy router + assertPrivacyAccess middleware; modes: full_access/partial_access/temporary/approval_required/full_privacy/emergency

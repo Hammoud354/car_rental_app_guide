@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { 
   BarChart3, FileText, Wrench, Users, User, LogOut, 
   TrendingUp, CalendarDays, Settings, Receipt, Car,
-  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet, Building2, Paintbrush
+  PanelLeftClose, PanelLeftOpen, DollarSign, Sparkles, Menu, X, Crown, Wallet, Building2, Paintbrush, Shield
 } from "lucide-react";
 import { AnimatedLogo } from "@/components/AnimatedLogo";
 import { Button } from "@/components/ui/button";
@@ -316,6 +316,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 <DropdownMenuItem onClick={() => setLocation("/company-settings")}>
                   <Settings className="h-4 w-4 mr-2" />
                   {t("user.companySettings")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setLocation("/privacy-settings")}>
+                  <Shield className="h-4 w-4 mr-2" />
+                  Privacy &amp; Access
                 </DropdownMenuItem>
                 {whiteLabelAccess?.access && (
                   <DropdownMenuItem onClick={() => setLocation("/white-label")}>

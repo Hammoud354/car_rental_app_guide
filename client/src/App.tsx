@@ -52,6 +52,8 @@ const ContractManagement = lazy(() => import("./pages/ContractManagement"));
 const SeoLandingPage = lazy(() => import("./pages/seo/SeoLandingPage"));
 const Blog = lazy(() => import("./pages/Blog"));
 const WhiteLabelSettings = lazy(() => import("./pages/WhiteLabelSettings"));
+const PrivacySettings = lazy(() => import("./pages/PrivacySettings"));
+const AccessHistory = lazy(() => import("./pages/AccessHistory"));
 
 const PUBLIC_ROUTES = [
   "/", "/demo", "/login", "/signin", "/signup", "/register", "/forgot-password", "/reset-password", "/subscription-plans",
@@ -182,6 +184,8 @@ function AppContent() {
             <Route path="/contract-management" component={ContractManagement} />
             <Route path="/invoices" component={Invoices} />
             <Route path="/white-label" component={WhiteLabelSettings} />
+            <Route path="/privacy-settings" component={PrivacySettings} />
+            <Route path="/access-history" component={AccessHistory} />
             <Route path="/404" component={NotFound} />
             <Route component={NotFound} />
           </Switch>

@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable, initializeMaintenanceTypeEnum, initializeWhiteLabelColumns } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable, initializeMaintenanceTypeEnum, initializeWhiteLabelColumns, initializePrivacyTables } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -144,6 +144,9 @@ async function startServer() {
     );
     initializeWhiteLabelColumns().catch(err =>
       console.error("[Startup] Failed to initialize white-label columns:", err)
+    );
+    initializePrivacyTables().catch(err =>
+      console.error("[Startup] Failed to initialize privacy tables:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)

@@ -4542,6 +4542,248 @@ export async function initializeWhiteLabelColumns() {
   }
 }
 
+// ====================== PRIVACY / ADMIN ACCESS SYSTEM ======================
+
+export async function initializePrivacyTables() {
+  const db = await getDb();
+  if (!db) return;
+  try {
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "adminPrivacySettings" (
+        id serial PRIMARY KEY,
+        "userId" integer UNIQUE NOT NULL,
+        mode varchar(50) NOT NULL DEFAULT 'full_access',
+        "allowedModules" text DEFAULT '[]',
+        "tempAccessExpiry" timestamp,
+        "notifyOnAccess" boolean DEFAULT true,
+        "createdAt" timestamp DEFAULT now(),
+        "updatedAt" timestamp DEFAULT now()
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "adminAccessRequests" (
+        id serial PRIMARY KEY,
+        "adminId" integer NOT NULL,
+        "companyUserId" integer NOT NULL,
+        reason text,
+        status varchar(20) DEFAULT 'pending',
+        "requestedAt" timestamp DEFAULT now(),
+        "respondedAt" timestamp,
+        "expiresAt" timestamp,
+        "sessionId" varchar(100)
+      )
+    `);
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS "adminAccessLogs" (
+        id serial PRIMARY KEY,
+        "companyUserId" integer NOT NULL,
+        "adminId" integer NOT NULL,
+        action varchar(200),
+        "pageAccessed" varchar(200),
+        timestamp timestamp DEFAULT now(),
+        reason text,
+        "sessionId" varchar(100),
+        "ipAddress" varchar(45)
+      )
+    `);
+    console.log("[Startup] Privacy & access tables ready");
+  } catch (err) {
+    console.error("[Startup] Failed to initialize privacy tables:", err);
+  }
+}
+
+export async function getPrivacySettings(userId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.execute(
+    sql`SELECT * FROM "adminPrivacySettings" WHERE "userId" = ${userId} LIMIT 1`
+  );
+  const rows = (result as any)?.rows || [];
+  if (!rows[0]) return null;
+  const row = rows[0];
+  try { row.allowedModules = JSON.parse(row.allowedModules || '[]'); } catch { row.allowedModules = []; }
+  return row;
+}
+
+export async function upsertPrivacySettings(userId: number, data: {
+  mode: string;
+  allowedModules?: string[];
+  tempAccessExpiry?: string | null;
+  notifyOnAccess?: boolean;
+}) {
+  const db = await getDb();
+  if (!db) return null;
+  const existing = await getPrivacySettings(userId);
+  const modulesJson = JSON.stringify(data.allowedModules ?? []);
+  const expiry = data.tempAccessExpiry ? new Date(data.tempAccessExpiry) : null;
+  const notify = data.notifyOnAccess ?? true;
+  if (existing) {
+    await db.execute(sql`
+      UPDATE "adminPrivacySettings"
+      SET mode = ${data.mode},
+          "allowedModules" = ${modulesJson},
+          "tempAccessExpiry" = ${expiry},
+          "notifyOnAccess" = ${notify},
+          "updatedAt" = now()
+      WHERE "userId" = ${userId}
+    `);
+  } else {
+    await db.execute(sql`
+      INSERT INTO "adminPrivacySettings" ("userId", mode, "allowedModules", "tempAccessExpiry", "notifyOnAccess")
+      VALUES (${userId}, ${data.mode}, ${modulesJson}, ${expiry}, ${notify})
+    `);
+  }
+  return await getPrivacySettings(userId);
+}
+
+export async function createAccessRequest(adminId: number, companyUserId: number, reason: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const sessionId = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const result = await db.execute(sql`
+    INSERT INTO "adminAccessRequests" ("adminId", "companyUserId", reason, status, "sessionId")
+    VALUES (${adminId}, ${companyUserId}, ${reason}, 'pending', ${sessionId})
+    RETURNING id, "sessionId"
+  `);
+  const rows = (result as any)?.rows || [];
+  return rows[0] || null;
+}
+
+export async function respondToAccessRequest(
+  requestId: number,
+  companyUserId: number,
+  status: 'approved' | 'rejected',
+  expiresAt?: string | null
+) {
+  const db = await getDb();
+  if (!db) return null;
+  const expiry = expiresAt ? new Date(expiresAt) : null;
+  await db.execute(sql`
+    UPDATE "adminAccessRequests"
+    SET status = ${status}, "respondedAt" = now(), "expiresAt" = ${expiry}
+    WHERE id = ${requestId} AND "companyUserId" = ${companyUserId}
+  `);
+  const result = await db.execute(
+    sql`SELECT * FROM "adminAccessRequests" WHERE id = ${requestId} LIMIT 1`
+  );
+  const rows = (result as any)?.rows || [];
+  return rows[0] || null;
+}
+
+export async function getPendingAccessRequests(companyUserId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.execute(sql`
+    SELECT r.*, u.username AS "adminUsername", u.name AS "adminName", u.email AS "adminEmail"
+    FROM "adminAccessRequests" r
+    LEFT JOIN users u ON u.id = r."adminId"
+    WHERE r."companyUserId" = ${companyUserId}
+    ORDER BY r."requestedAt" DESC
+    LIMIT 50
+  `);
+  return (result as any)?.rows || [];
+}
+
+export async function getAdminApprovedAccess(adminId: number, companyUserId: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.execute(sql`
+    SELECT * FROM "adminAccessRequests"
+    WHERE "adminId" = ${adminId}
+      AND "companyUserId" = ${companyUserId}
+      AND status = 'approved'
+      AND ("expiresAt" IS NULL OR "expiresAt" > now())
+    ORDER BY "respondedAt" DESC
+    LIMIT 1
+  `);
+  const rows = (result as any)?.rows || [];
+  return rows[0] || null;
+}
+
+export async function logAdminAccess(data: {
+  companyUserId: number;
+  adminId: number;
+  action: string;
+  pageAccessed?: string;
+  reason?: string;
+  sessionId?: string;
+  ipAddress?: string;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  await db.execute(sql`
+    INSERT INTO "adminAccessLogs" ("companyUserId", "adminId", action, "pageAccessed", reason, "sessionId", "ipAddress")
+    VALUES (
+      ${data.companyUserId}, ${data.adminId}, ${data.action},
+      ${data.pageAccessed ?? null}, ${data.reason ?? null},
+      ${data.sessionId ?? null}, ${data.ipAddress ?? null}
+    )
+  `);
+}
+
+export async function getAccessLogs(companyUserId: number, limit: number = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.execute(sql`
+    SELECT l.*, u.username AS "adminUsername", u.name AS "adminName"
+    FROM "adminAccessLogs" l
+    LEFT JOIN users u ON u.id = l."adminId"
+    WHERE l."companyUserId" = ${companyUserId}
+    ORDER BY l.timestamp DESC
+    LIMIT ${limit}
+  `);
+  return (result as any)?.rows || [];
+}
+
+export async function assertPrivacyAccess(
+  adminUserId: number,
+  targetUserId: number,
+  module: string,
+  ipAddress?: string
+): Promise<void> {
+  const settings = await getPrivacySettings(targetUserId);
+  if (!settings) return; // No settings → full access (default)
+
+  const mode = settings.mode as string;
+  let allowed = false;
+  let reason = mode;
+
+  if (mode === 'full_access') {
+    allowed = true;
+  } else if (mode === 'partial_access') {
+    const modules: string[] = Array.isArray(settings.allowedModules) ? settings.allowedModules : [];
+    allowed = modules.includes(module) || modules.includes('all');
+    reason = allowed ? 'partial_access_allowed' : 'partial_access_denied';
+  } else if (mode === 'temporary_access') {
+    const expiry = settings.tempAccessExpiry ? new Date(settings.tempAccessExpiry) : null;
+    allowed = !!expiry && new Date() < expiry;
+    reason = allowed ? 'temporary_access_valid' : 'temporary_access_expired';
+  } else if (mode === 'approval_required') {
+    const approved = await getAdminApprovedAccess(adminUserId, targetUserId);
+    allowed = !!approved;
+    reason = allowed ? 'approval_granted' : 'approval_required';
+  } else if (mode === 'full_privacy') {
+    allowed = false;
+    reason = 'full_privacy';
+  } else if (mode === 'emergency_access') {
+    allowed = false;
+    reason = 'emergency_access_only';
+  }
+
+  if (allowed) {
+    logAdminAccess({
+      companyUserId: targetUserId,
+      adminId: adminUserId,
+      action: `Viewed ${module}`,
+      pageAccessed: module,
+      reason,
+      ipAddress,
+    }).catch(() => {});
+  } else {
+    throw new Error(`Privacy access denied: ${reason}`);
+  }
+}
+
 export async function hasWhiteLabelAccess(userId: number): Promise<boolean> {
   const db = await getDb();
   if (!db) return false;
