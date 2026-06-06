@@ -792,12 +792,18 @@ export const appRouter = router({
     getExpiringInsurance: protectedProcedure
       .input(z.object({ daysThreshold: z.number().default(30), filterUserId: z.number().optional() }))
       .query(async ({ input, ctx }) => {
+        if (input.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getVehiclesWithExpiringInsurance(ctx.user.id, input.daysThreshold, input.filterUserId);
       }),
 
     getExpiredInsurance: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getVehiclesWithExpiredInsurance(ctx.user.id, input?.filterUserId);
       }),
 
@@ -828,12 +834,18 @@ export const appRouter = router({
     getExpiringRegistration: protectedProcedure
       .input(z.object({ daysThreshold: z.number().default(30), filterUserId: z.number().optional() }))
       .query(async ({ input, ctx }) => {
+        if (input.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getVehiclesWithExpiringRegistration(ctx.user.id, input.daysThreshold, input.filterUserId);
       }),
 
     getExpiredRegistration: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getVehiclesWithExpiredRegistration(ctx.user.id, input?.filterUserId);
       }),
 
@@ -870,6 +882,9 @@ export const appRouter = router({
     getOverdueStatistics: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
+      if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+        await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'reservations');
+      }
       return await db.getOverdueStatistics(ctx.user.id, input?.filterUserId);
     }),
     
@@ -879,6 +894,9 @@ export const appRouter = router({
         filterUserId: z.number().optional() 
       }).optional())
       .query(async ({ ctx, input }) => {
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'reservations');
+        }
         const daysAhead = input?.daysAhead || 3;
         return await db.getExpiringContracts(ctx.user.id, daysAhead, input?.filterUserId);
       }),
@@ -886,6 +904,9 @@ export const appRouter = router({
     getDashboardStatistics: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
+      if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+        await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'reservations');
+      }
       const contracts = await db.getAllRentalContracts(ctx.user.id, input?.filterUserId);
       
       // Calculate actual revenue from all contracts
@@ -921,6 +942,9 @@ export const appRouter = router({
         filterUserId: z.number().optional() 
       }))
       .query(async ({ ctx, input }) => {
+        if (input.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'reservations');
+        }
         return await db.getRentalContractsByStatus(ctx.user.id, input.status, input.filterUserId);
       }),
 
@@ -2666,6 +2690,9 @@ export const appRouter = router({
         const userId = ctx.user.id;
         const daysThreshold = input?.daysThreshold || 30;
         const filterUserId = input?.filterUserId;
+        if (filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, filterUserId, 'vehicles');
+        }
         const expiringDocuments: any[] = [];
         const today = new Date();
         today.setHours(0, 0, 0, 0);

@@ -35,14 +35,30 @@ export async function createContext(
 
   // Check for filterUserId header (sent by Super Admin frontend)
   const filterUserIdHeader = opts.req.headers['x-filter-user-id'];
-  const filterUserId = filterUserIdHeader && filterUserIdHeader !== 'null' 
-    ? parseInt(filterUserIdHeader as string, 10) 
+  const rawFilterUserId = filterUserIdHeader && filterUserIdHeader !== 'null'
+    ? parseInt(filterUserIdHeader as string, 10)
     : null;
+  const resolvedFilterUserId = rawFilterUserId && !isNaN(rawFilterUserId) ? rawFilterUserId : null;
+
+  // Privacy gate: if the target company has blocked admin access, null out filterUserId
+  // so ALL downstream route handlers that rely on ctx.filterUserId return nothing.
+  let effectiveFilterUserId = resolvedFilterUserId;
+  if (resolvedFilterUserId && user?.role === 'super_admin') {
+    try {
+      const { isPrivacyAccessAllowed } = await import('../db');
+      const allowed = await isPrivacyAccessAllowed(user.id, resolvedFilterUserId);
+      if (!allowed) {
+        effectiveFilterUserId = null;
+      }
+    } catch {
+      // On error, fail open (allow) so admin functionality isn't accidentally broken
+    }
+  }
 
   return {
     req: opts.req,
     res: opts.res,
     user,
-    filterUserId: !isNaN(filterUserId as number) ? filterUserId : undefined,
+    filterUserId: effectiveFilterUserId ?? undefined,
   };
 }

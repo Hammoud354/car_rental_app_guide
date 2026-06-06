@@ -4735,6 +4735,25 @@ export async function getAccessLogs(companyUserId: number, limit: number = 100) 
   return (result as any)?.rows || [];
 }
 
+export async function isPrivacyAccessAllowed(adminId: number, targetUserId: number): Promise<boolean> {
+  const settings = await getPrivacySettings(targetUserId);
+  if (!settings) return true;
+  const mode = settings.mode as string;
+  if (mode === 'full_access') return true;
+  if (mode === 'partial_access') return true; // module-level checks handle per-route filtering
+  if (mode === 'temporary_access') {
+    const expiry = settings.tempAccessExpiry ? new Date(settings.tempAccessExpiry) : null;
+    return !!expiry && new Date() < expiry;
+  }
+  if (mode === 'approval_required') {
+    const approved = await getAdminApprovedAccess(adminId, targetUserId);
+    return !!approved;
+  }
+  if (mode === 'full_privacy') return false;
+  if (mode === 'emergency_access') return false;
+  return true;
+}
+
 export async function assertPrivacyAccess(
   adminUserId: number,
   targetUserId: number,
