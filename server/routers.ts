@@ -1864,11 +1864,10 @@ export const appRouter = router({
         fileData: z.string(), // base64-encoded file content
         contentType: z.string(),
       }))
-      .mutation(async ({ input, ctx }) => {
-        const { storagePut } = await import("./storage");
-        const buffer = Buffer.from(input.fileData, "base64");
-        const { url } = await storagePut(input.fileName, buffer, input.contentType);
-        return { url };
+      .mutation(async ({ input }) => {
+        // Store logo as a data URL directly — no external storage credentials needed
+        const dataUrl = `data:${input.contentType};base64,${input.fileData}`;
+        return { url: dataUrl };
       }),
 
     hasWhiteLabelAccess: protectedProcedure.query(async ({ ctx }) => {
