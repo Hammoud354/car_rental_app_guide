@@ -245,7 +245,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             )}>
               {isCollapsed ? (
                 companyProfile?.logoUrl ? (
-                  <img src={companyProfile.logoUrl} alt="logo" className="h-8 w-8 object-contain rounded" />
+                  <img src={companyProfile.logoUrl} alt="logo" className="h-11 w-11 object-contain rounded" />
                 ) : (
                   <span className="text-lg font-extrabold text-blue-600">
                     {companyProfile?.platformName ? companyProfile.platformName.slice(0, 2).toUpperCase() : "FM"}
@@ -253,7 +253,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 )
               ) : companyProfile?.logoUrl ? (
                 <div className="flex flex-col gap-0.5">
-                  <img src={companyProfile.logoUrl} alt="logo" className="h-10 w-auto max-w-[160px] object-contain" />
+                  <img src={companyProfile.logoUrl} alt="logo" className="h-14 w-auto max-w-[180px] object-contain" />
                   {companyProfile?.platformName && (
                     <span className="text-[10px] text-gray-400 font-semibold tracking-widest uppercase">Rental Management</span>
                   )}
