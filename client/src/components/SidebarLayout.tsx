@@ -156,7 +156,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 z-50 shadow-sm">
         <Link href="/dashboard">
           <div className="flex items-center">
-            {companyProfile?.companyName ? (
+            {companyProfile?.logoUrl ? (
+              <img src={companyProfile.logoUrl} alt="logo" className="h-8 w-auto max-w-[120px] object-contain" />
+            ) : companyProfile?.platformName ? (
+              <span className="text-sm font-bold text-gray-900">{companyProfile.platformName}</span>
+            ) : companyProfile?.companyName ? (
               <span className="text-sm font-bold text-gray-900">{companyProfile.companyName}</span>
             ) : (
               <AnimatedLogo size="sm" />
@@ -211,7 +215,25 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               isCollapsed ? "justify-center" : ""
             )}>
               {isCollapsed ? (
-                <span className="text-lg font-extrabold text-blue-600">FM</span>
+                companyProfile?.logoUrl ? (
+                  <img src={companyProfile.logoUrl} alt="logo" className="h-8 w-8 object-contain rounded" />
+                ) : (
+                  <span className="text-lg font-extrabold text-blue-600">
+                    {companyProfile?.platformName ? companyProfile.platformName.slice(0, 2).toUpperCase() : "FM"}
+                  </span>
+                )
+              ) : companyProfile?.logoUrl ? (
+                <div className="flex flex-col gap-0.5">
+                  <img src={companyProfile.logoUrl} alt="logo" className="h-10 w-auto max-w-[160px] object-contain" />
+                  {companyProfile?.platformName && (
+                    <span className="text-[10px] text-gray-400 font-semibold tracking-widest uppercase">Rental Management</span>
+                  )}
+                </div>
+              ) : companyProfile?.platformName ? (
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-gray-900">{companyProfile.platformName}</span>
+                  <span className="text-[10px] text-gray-400 font-semibold tracking-widest uppercase">Rental Management</span>
+                </div>
               ) : companyProfile?.companyName ? (
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-gray-900">{companyProfile.companyName}</span>
