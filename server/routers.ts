@@ -1880,7 +1880,12 @@ export const appRouter = router({
         platformName: z.string().optional(),
         primaryColor: z.string().optional(),
         secondaryColor: z.string().optional(),
+        sidebarColor: z.string().optional(),
         logoUrl: z.string().optional(),
+        faviconUrl: z.string().optional(),
+        loginWelcomeText: z.string().optional(),
+        loginLogoUrl: z.string().optional(),
+        loginBgUrl: z.string().optional(),
         hidePoweredBy: z.boolean().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
@@ -1889,6 +1894,9 @@ export const appRouter = router({
 
         const existing = await db.getCompanyProfile(ctx.user.id);
         if (!existing) throw new Error("Company profile not found. Please set up your company settings first.");
+
+        const pick = <T>(val: T | undefined, fallback: T | null | undefined): T | undefined =>
+          val !== undefined ? val : (fallback ?? undefined);
 
         const updated = await db.upsertCompanyProfile({
           userId: ctx.user.id,
@@ -1901,11 +1909,16 @@ export const appRouter = router({
           phone: existing.phone ?? undefined,
           email: existing.email ?? undefined,
           website: existing.website ?? undefined,
-          logoUrl: input.logoUrl !== undefined ? input.logoUrl : (existing.logoUrl ?? undefined),
-          primaryColor: input.primaryColor !== undefined ? input.primaryColor : (existing.primaryColor ?? undefined),
-          secondaryColor: input.secondaryColor !== undefined ? input.secondaryColor : (existing.secondaryColor ?? undefined),
-          platformName: input.platformName !== undefined ? input.platformName : (existing.platformName ?? undefined),
+          logoUrl: pick(input.logoUrl, existing.logoUrl),
+          primaryColor: pick(input.primaryColor, existing.primaryColor),
+          secondaryColor: pick(input.secondaryColor, existing.secondaryColor),
+          sidebarColor: pick(input.sidebarColor, existing.sidebarColor),
+          platformName: pick(input.platformName, existing.platformName),
           hidePoweredBy: input.hidePoweredBy !== undefined ? input.hidePoweredBy : (existing.hidePoweredBy ?? false),
+          faviconUrl: pick(input.faviconUrl, existing.faviconUrl),
+          loginWelcomeText: pick(input.loginWelcomeText, existing.loginWelcomeText),
+          loginLogoUrl: pick(input.loginLogoUrl, existing.loginLogoUrl),
+          loginBgUrl: pick(input.loginBgUrl, existing.loginBgUrl),
           contractTemplateUrl: existing.contractTemplateUrl ?? undefined,
           contractTemplateFieldMap: existing.contractTemplateFieldMap ?? undefined,
           defaultCurrency: existing.defaultCurrency,

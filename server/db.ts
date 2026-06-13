@@ -1887,6 +1887,11 @@ export async function getCompanyProfile(userId: number) {
       secondaryColor: companyProfiles.secondaryColor,
       platformName: companyProfiles.platformName,
       hidePoweredBy: companyProfiles.hidePoweredBy,
+      sidebarColor: companyProfiles.sidebarColor,
+      faviconUrl: companyProfiles.faviconUrl,
+      loginWelcomeText: companyProfiles.loginWelcomeText,
+      loginLogoUrl: companyProfiles.loginLogoUrl,
+      loginBgUrl: companyProfiles.loginBgUrl,
       contractTemplateUrl: companyProfiles.contractTemplateUrl,
       contractTemplateFieldMap: companyProfiles.contractTemplateFieldMap,
       defaultCurrency: companyProfiles.defaultCurrency,
@@ -1922,6 +1927,11 @@ export async function upsertCompanyProfile(data: {
   secondaryColor?: string;
   platformName?: string;
   hidePoweredBy?: boolean;
+  sidebarColor?: string;
+  faviconUrl?: string;
+  loginWelcomeText?: string;
+  loginLogoUrl?: string;
+  loginBgUrl?: string;
   contractTemplateUrl?: string;
   contractTemplateFieldMap?: any;
   defaultCurrency?: "USD" | "LOCAL";
@@ -1966,6 +1976,11 @@ export async function upsertCompanyProfile(data: {
         secondaryColor: data.secondaryColor,
         platformName: data.platformName,
         hidePoweredBy: data.hidePoweredBy,
+        sidebarColor: data.sidebarColor,
+        faviconUrl: data.faviconUrl,
+        loginWelcomeText: data.loginWelcomeText,
+        loginLogoUrl: data.loginLogoUrl,
+        loginBgUrl: data.loginBgUrl,
         contractTemplateUrl: data.contractTemplateUrl,
         contractTemplateFieldMap: data.contractTemplateFieldMap,
         defaultCurrency: data.defaultCurrency,
@@ -4534,7 +4549,12 @@ export async function initializeWhiteLabelColumns() {
     await db.execute(sql`
       ALTER TABLE "companyProfiles"
         ADD COLUMN IF NOT EXISTS "platformName" varchar(255),
-        ADD COLUMN IF NOT EXISTS "hidePoweredBy" boolean DEFAULT false
+        ADD COLUMN IF NOT EXISTS "hidePoweredBy" boolean DEFAULT false,
+        ADD COLUMN IF NOT EXISTS "sidebarColor" varchar(20),
+        ADD COLUMN IF NOT EXISTS "faviconUrl" text,
+        ADD COLUMN IF NOT EXISTS "loginWelcomeText" varchar(500),
+        ADD COLUMN IF NOT EXISTS "loginLogoUrl" text,
+        ADD COLUMN IF NOT EXISTS "loginBgUrl" text
     `);
     console.log("[Startup] companyProfiles white-label columns ready");
   } catch (err) {

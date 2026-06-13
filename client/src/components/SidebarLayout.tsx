@@ -52,7 +52,6 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (companyProfile?.primaryColor) {
       const hex = companyProfile.primaryColor;
-      // Convert hex to HSL for Tailwind CSS variable
       const r = parseInt(hex.slice(1, 3), 16) / 255;
       const g = parseInt(hex.slice(3, 5), 16) / 255;
       const b = parseInt(hex.slice(5, 7), 16) / 255;
@@ -68,12 +67,39 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           case b: h = ((r - g) / d + 4) / 6; break;
         }
       }
-      const hDeg = Math.round(h * 360);
-      const sPct = Math.round(s * 100);
-      const lPct = Math.round(l * 100);
-      document.documentElement.style.setProperty("--primary", `${hDeg} ${sPct}% ${lPct}%`);
+      document.documentElement.style.setProperty("--primary", `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`);
     }
   }, [companyProfile?.primaryColor]);
+
+  // Apply favicon dynamically when branding changes
+  useEffect(() => {
+    const faviconUrl = (companyProfile as any)?.faviconUrl;
+    if (faviconUrl) {
+      let link = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.head.appendChild(link);
+      }
+      link.href = faviconUrl;
+    }
+  }, [(companyProfile as any)?.faviconUrl]);
+
+  // Compute sidebar theme based on sidebarColor
+  const sidebarBg = (companyProfile as any)?.sidebarColor || "#ffffff";
+  const sidebarIsDark = (() => {
+    const h = sidebarBg.replace("#", "");
+    if (h.length < 6) return false;
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 < 128;
+  })();
+  const sidebarTextColor   = sidebarIsDark ? "#f9fafb" : "#111827";
+  const sidebarSubtext     = sidebarIsDark ? "#9ca3af" : "#6b7280";
+  const sidebarBorderColor = sidebarIsDark ? "rgba(255,255,255,0.08)" : "#e5e7eb";
+  const sidebarNavHoverBg  = sidebarIsDark ? "rgba(255,255,255,0.07)" : "#eff6ff";
+  const sidebarNavHoverText= sidebarIsDark ? "#ffffff" : "#1d4ed8";
 
   const [expandedSections] = useState<Set<string>>(new Set(["main", "management", "clients-invoices", "admin"]));
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -188,15 +214,18 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
       )}
 
       {/* Left Sidebar */}
-      <aside className={cn(
-        "bg-white border-r border-gray-200 flex flex-col transition-all duration-300 shadow-sm",
-        "md:relative fixed inset-y-0 left-0 z-40",
-        "md:translate-x-0",
-        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-        isCollapsed ? "w-20 md:w-20" : "w-72 md:w-72"
-      )}>
+      <aside
+        className={cn(
+          "flex flex-col transition-all duration-300 shadow-sm",
+          "md:relative fixed inset-y-0 left-0 z-40",
+          "md:translate-x-0",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+          isCollapsed ? "w-20 md:w-20" : "w-72 md:w-72"
+        )}
+        style={{ backgroundColor: sidebarBg, borderRight: `1px solid ${sidebarBorderColor}` }}
+      >
         {/* Logo & Toggle Button */}
-        <div className="p-6 border-b border-gray-200 relative">
+        <div className="p-6 relative" style={{ borderBottom: `1px solid ${sidebarBorderColor}` }}>
           {/* Toggle Button */}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -255,10 +284,10 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                 {/* Section Header - Always visible and more prominent */}
                 {!isCollapsed && (
                   <div className="px-3 mb-3">
-                    <h3 className="text-xs font-bold text-gray-900 tracking-wider uppercase">
+                    <h3 className="text-xs font-bold tracking-wider uppercase" style={{ color: sidebarSubtext }}>
                       {section.displayLabel}
                     </h3>
-                    <div className="h-0.5 bg-gradient-to-r from-blue-600 to-transparent mt-2 rounded-full" />
+                    <div className="h-0.5 mt-2 rounded-full" style={{ background: `linear-gradient(to right, ${companyProfile?.primaryColor || "#2563eb"}, transparent)` }} />
                   </div>
                 )}
 
@@ -268,6 +297,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                     {section.items.map((item) => {
                       const isActive = location === item.href;
                       const Icon = item.icon;
+                      const activeBg = companyProfile?.primaryColor || "#2563eb";
                       return (
                         <Link key={item.href} href={item.href}>
                           <div
@@ -275,16 +305,26 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
                             className={cn(
                               "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 group",
                               isCollapsed ? "justify-center" : "gap-3",
-                              isActive
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
                             )}
+                            style={isActive
+                              ? { backgroundColor: activeBg, color: "#ffffff" }
+                              : { color: sidebarTextColor }
+                            }
+                            onMouseEnter={(e) => {
+                              if (!isActive) {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = sidebarNavHoverBg;
+                                (e.currentTarget as HTMLElement).style.color = sidebarNavHoverText;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isActive) {
+                                (e.currentTarget as HTMLElement).style.backgroundColor = "";
+                                (e.currentTarget as HTMLElement).style.color = sidebarTextColor;
+                              }
+                            }}
                             title={isCollapsed ? item.label : undefined}
                           >
-                            <Icon className={cn(
-                              "h-5 w-5 transition-colors",
-                              isActive ? "text-white" : "text-gray-500 group-hover:text-blue-600"
-                            )} />
+                            <Icon className="h-5 w-5 flex-shrink-0" style={{ color: isActive ? "#ffffff" : sidebarSubtext }} />
                             {!isCollapsed && <span>{item.label}</span>}
                           </div>
                         </Link>
@@ -304,22 +344,25 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
         {/* User Profile */}
         {user && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
+          <div className="p-4" style={{ borderTop: `1px solid ${sidebarBorderColor}`, backgroundColor: sidebarIsDark ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.02)" }}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
-                  variant="outline" 
+                  variant="ghost"
                   className={cn(
-                    "w-full bg-white hover:bg-gray-100 border-gray-300 shadow-sm",
+                    "w-full hover:opacity-90 border shadow-sm",
                     isCollapsed ? "justify-center px-2" : "justify-start"
-                  )} 
+                  )}
+                  style={{ borderColor: sidebarBorderColor, color: sidebarTextColor, backgroundColor: sidebarIsDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.03)" }}
                   size="sm"
                   title={isCollapsed ? user.name || user.username : undefined}
                 >
                   <div className={cn(
-                    "h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-xs",
+                    "h-7 w-7 rounded-full flex items-center justify-center text-white font-semibold text-xs flex-shrink-0",
                     !isCollapsed && "mr-2"
-                  )}>
+                  )}
+                    style={{ backgroundColor: companyProfile?.primaryColor || "#2563eb" }}
+                  >
                     {(user.name || user.username || "U").charAt(0).toUpperCase()}
                   </div>
                   {!isCollapsed && <span className="truncate font-medium">{user.name || user.username}</span>}
