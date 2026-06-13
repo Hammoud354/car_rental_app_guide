@@ -4,18 +4,23 @@ export type { WSEvent };
 
 type Listener = (event: WSEvent) => void;
 
+const MAX_RETRIES = 5;
+
 class RealtimeClient {
   private ws: WebSocket | null = null;
   private listeners = new Set<Listener>();
   private pingInterval: ReturnType<typeof setInterval> | null = null;
   private reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
-  private reconnectDelay = 1000;
-  private maxDelay = 30000;
+  private reconnectDelay = 2000;
+  private maxDelay = 60000;
   private shouldConnect = false;
   private url = "";
+  private failCount = 0;
+  private everConnected = false;
 
   connect() {
     this.shouldConnect = true;
+    this.failCount = 0;
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     this.url = `${protocol}//${window.location.host}/ws`;
     this._connect();
@@ -24,13 +29,18 @@ class RealtimeClient {
   private _connect() {
     if (!this.shouldConnect) return;
     if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) return;
+    if (this.failCount >= MAX_RETRIES && !this.everConnected) {
+      // Production proxy doesn't support WS — give up silently, app works fine without it
+      return;
+    }
 
     try {
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
-        console.log("[WS] Connected");
-        this.reconnectDelay = 1000;
+        this.everConnected = true;
+        this.failCount = 0;
+        this.reconnectDelay = 2000;
         this._startPing();
       };
 
@@ -43,22 +53,24 @@ class RealtimeClient {
       };
 
       this.ws.onclose = () => {
-        console.log("[WS] Disconnected — reconnecting in", this.reconnectDelay, "ms");
         this._stopPing();
-        if (this.shouldConnect) {
-          this.reconnectTimeout = setTimeout(() => {
-            this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxDelay);
-            this._connect();
-          }, this.reconnectDelay);
-        }
+        if (!this.shouldConnect) return;
+
+        this.failCount++;
+
+        // If we've never connected and hit the retry cap, stop silently
+        if (!this.everConnected && this.failCount >= MAX_RETRIES) return;
+
+        this.reconnectTimeout = setTimeout(() => {
+          this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxDelay);
+          this._connect();
+        }, this.reconnectDelay);
       };
 
       this.ws.onerror = () => {
         this.ws?.close();
       };
-    } catch (err) {
-      console.warn("[WS] Failed to create connection", err);
-    }
+    } catch {}
   }
 
   disconnect() {
