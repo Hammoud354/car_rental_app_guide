@@ -1,0 +1,71 @@
+Improve the White Label Settings page in FleetWizards to make it more premium, professional, and useful for car rental agencies.
+
+Keep all existing functionality, including:
+
+* Platform name customization
+* Logo upload
+* Primary color selection
+* Accent color selection
+* Hide “Powered by FleetWizards” toggle
+* Live preview
+
+Add the following improvements:
+
+1. Sidebar Background Customization
+   Add a new color picker for sidebar background color so agencies can fully match their brand identity. The live preview should instantly reflect sidebar background changes.
+
+2. Theme Presets
+   Add predefined theme presets users can choose with one click:
+
+* Corporate Blue
+* Luxury Black & Gold
+* Premium Silver
+* Minimal White
+
+Users should still be able to customize colors manually after selecting a preset.
+
+3. Favicon Upload
+   Add a favicon upload option (PNG/ICO) so each agency can customize the browser tab icon. Show a small preview of the favicon.
+
+4. Login Page Customization
+   Add a new section for login page branding with:
+
+* Login page logo upload
+* Welcome text field
+* Optional background image upload
+
+Example preview text:
+“Welcome to Dima Rent a Car Management Portal”
+
+5. Enhanced Live Preview
+   Upgrade the preview area to include tabs or switches for:
+
+* Dashboard Preview
+* Login Page Preview
+* Reservation Page Preview
+* Invoice Page Preview
+
+When branding settings change, all previews should update in real time.
+
+6. Better Current Configuration UI
+   Redesign the Current Configuration box into a cleaner modern summary using status badges such as:
+
+* ✅ Logo Uploaded
+* 🎨 Colors Customized
+* 👁 White Label Enabled
+* 🌐 Favicon Uploaded
+
+Use a premium SaaS design similar to Stripe, Apple, or Linear:
+
+* clean spacing
+* soft shadows
+* rounded cards
+* subtle animations
+* polished typography
+
+Important:
+
+* Keep the design lightweight and responsive
+* Preserve existing backend logic
+* Do not break current white label settings
+* Maintain compatibility with existing agency branding data
