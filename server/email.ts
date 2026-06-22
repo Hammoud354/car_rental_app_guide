@@ -39,20 +39,47 @@ async function sendEmail(to: string, subject: string, html: string) {
     console.warn("[Email] No email credentials configured — skipping email send");
     return false;
   }
-  try {
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: getSenderAddress(),
-      to,
-      subject,
-      html,
-    });
-    console.log(`[Email] Sent "${subject}" to ${to} from ${getSenderAddress()}`);
-    return true;
-  } catch (error) {
-    console.error(`[Email] Failed to send "${subject}" to ${to}:`, error);
-    return false;
+
+  // Try GoDaddy first if configured; fall back to Gmail on auth failure
+  // (GoDaddy SMTP often blocks cloud datacenter IPs)
+  if (hasFleetEmail) {
+    try {
+      const transporter = nodemailer.createTransport({
+        host: "smtpout.secureserver.net",
+        port: 465,
+        secure: true,
+        auth: { user: ENV.fleetEmailUser, pass: ENV.fleetEmailPassword },
+      });
+      await transporter.sendMail({ from: getSenderAddress(), to, subject, html });
+      console.log(`[Email] Sent via GoDaddy: "${subject}" → ${to}`);
+      return true;
+    } catch (err: any) {
+      console.warn(`[Email] GoDaddy failed (${err?.responseCode ?? err?.code ?? "error"}) — trying Gmail fallback`);
+    }
   }
+
+  // Gmail fallback
+  if (hasGmail) {
+    try {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: { user: ENV.gmailFrom, pass: ENV.gmailAppPassword },
+      });
+      await transporter.sendMail({
+        from: `FleetWizards <${ENV.gmailFrom}>`,
+        to,
+        subject,
+        html,
+      });
+      console.log(`[Email] Sent via Gmail: "${subject}" → ${to}`);
+      return true;
+    } catch (error) {
+      console.error(`[Email] Gmail also failed for "${subject}" → ${to}:`, error);
+      return false;
+    }
+  }
+
+  return false;
 }
 
 const baseStyle = `
