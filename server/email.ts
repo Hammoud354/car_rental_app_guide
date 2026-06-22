@@ -50,7 +50,14 @@ async function sendEmail(to: string, subject: string, html: string) {
         secure: true,
         auth: { user: ENV.fleetEmailUser, pass: ENV.fleetEmailPassword },
       });
-      await transporter.sendMail({ from: getSenderAddress(), to, subject, html });
+      await transporter.sendMail({
+        from: getSenderAddress(),
+        to,
+        subject,
+        html,
+        replyTo: "info@fleetwizards.com",
+        headers: { "X-Mailer": "FleetWizards Mailer" },
+      });
       console.log(`[Email] Sent via GoDaddy: "${subject}" → ${to}`);
       return true;
     } catch (err: any) {
@@ -70,6 +77,8 @@ async function sendEmail(to: string, subject: string, html: string) {
         to,
         subject,
         html,
+        replyTo: "info@fleetwizards.com",
+        headers: { "X-Mailer": "FleetWizards Mailer" },
       });
       console.log(`[Email] Sent via Gmail: "${subject}" → ${to}`);
       return true;
@@ -263,7 +272,7 @@ export async function sendAdminDemoNotification(ip: string, userAgent: string) {
       </div>
     </div>
   `;
-  return sendEmail(ADMIN_EMAIL, `🧪 New demo started — ${now} UTC`, html);
+  return sendEmail(ADMIN_EMAIL, `FleetWizards: New demo session started — ${now} UTC`, html);
 }
 
 export async function sendAdminNewUserNotification(username: string, email: string, companyName: string) {
