@@ -57,12 +57,20 @@ export default function FleetManagement() {
   const [selectedModelId, setSelectedModelId] = useState<number | null>(null);
   const [makerOpen, setMakerOpen] = useState(false);
   const [modelOpen, setModelOpen] = useState(false);
-  
+  const [makerSearch, setMakerSearch] = useState("");
+  const [modelSearch, setModelSearch] = useState("");
+  const [customBrand, setCustomBrand] = useState("");
+  const [customModel, setCustomModel] = useState("");
+
   // Car maker and model state for Edit form
   const [editSelectedMakerId, setEditSelectedMakerId] = useState<number | null>(null);
   const [editSelectedModelId, setEditSelectedModelId] = useState<number | null>(null);
   const [editMakerOpen, setEditMakerOpen] = useState(false);
   const [editModelOpen, setEditModelOpen] = useState(false);
+  const [editMakerSearch, setEditMakerSearch] = useState("");
+  const [editModelSearch, setEditModelSearch] = useState("");
+  const [editCustomBrand, setEditCustomBrand] = useState("");
+  const [editCustomModel, setEditCustomModel] = useState("");
   
   // Custom maker/model dialog states
   const [isCustomMakerDialogOpen, setIsCustomMakerDialogOpen] = useState(false);
@@ -323,22 +331,21 @@ export default function FleetManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    // Get brand and model names from selected IDs
+    // Get brand and model names — from selected IDs or free-typed custom values
     const selectedMaker = carMakers?.find(m => m.id === selectedMakerId);
     const selectedModel = carModels?.find(m => m.id === selectedModelId);
-    
-    if (!selectedMaker || !selectedModel) {
+    const brandName = selectedMaker?.name || customBrand;
+    const modelName = selectedModel?.modelName || customModel;
+
+    if (!brandName || !modelName) {
       toast.error(t("fleet.selectMakerAndModel"));
       return;
     }
-    
-    // Super Admin can create vehicles for themselves (default) or for selected user
-    // No validation needed - will use selectedTargetUserId if set, otherwise defaults to current user
-    
+
     createMutation.mutate({
       plateNumber: formData.get("plateNumber") as string,
-      brand: selectedMaker.name,
-      model: selectedModel.modelName,
+      brand: brandName,
+      model: modelName,
       year: parseInt(formData.get("year") as string),
       color: formData.get("color") as string,
       category: formData.get("category") as any,
@@ -390,8 +397,10 @@ export default function FleetManagement() {
     
     const selectedMaker = carMakers?.find(m => m.id === editSelectedMakerId);
     const selectedModel = editCarModels?.find(m => m.id === editSelectedModelId);
-    
-    if (!selectedMaker || !selectedModel) {
+    const brandName = selectedMaker?.name || editCustomBrand;
+    const modelName = selectedModel?.modelName || editCustomModel;
+
+    if (!brandName || !modelName) {
       toast.error(t("fleet.selectMakerAndModel"));
       return;
     }
@@ -400,8 +409,8 @@ export default function FleetManagement() {
 
     const vehicleData: any = {
       plateNumber: formData.get("plateNumber") as string,
-      brand: selectedMaker.name,
-      model: selectedModel.modelName,
+      brand: brandName,
+      model: modelName,
       year: parseInt(formData.get("year") as string),
       color: formData.get("color") as string,
       category: formData.get("category") as any,
@@ -885,24 +894,38 @@ export default function FleetManagement() {
                               <Popover open={makerOpen} onOpenChange={setMakerOpen}>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" role="combobox" aria-expanded={makerOpen} className="w-full justify-between mt-1 overflow-hidden">
-                                    {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : t("fleet.selectMaker")}
+                                    {selectedMakerId ? carMakers?.find((m) => m.id === selectedMakerId)?.name : customBrand || t("fleet.selectMaker")}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
                                   <Command>
-                                    <CommandInput placeholder={t("fleet.searchMaker")} />
+                                    <CommandInput placeholder={t("fleet.searchMaker")} value={makerSearch} onValueChange={setMakerSearch} />
                                     <CommandList>
-                                      <CommandEmpty>{t("common.noData")}</CommandEmpty>
+                                      <CommandEmpty>
+                                        {makerSearch.trim() ? (
+                                          <button
+                                            className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                            onClick={() => { setCustomBrand(makerSearch.trim()); setSelectedMakerId(null); setSelectedModelId(null); setCustomModel(""); setMakerOpen(false); }}
+                                          >
+                                            Use "{makerSearch.trim()}" as brand
+                                          </button>
+                                        ) : t("common.noData")}
+                                      </CommandEmpty>
                                       <CommandGroup>
                                         {carMakers?.map((maker) => (
-                                          <CommandItem key={maker.id} value={maker.name} onSelect={() => { setSelectedMakerId(maker.id); setSelectedModelId(null); setMakerOpen(false); }}>
+                                          <CommandItem key={maker.id} value={maker.name} onSelect={() => { setSelectedMakerId(maker.id); setSelectedModelId(null); setCustomBrand(""); setCustomModel(""); setMakerOpen(false); setMakerSearch(""); }}>
                                             <Check className={cn("mr-2 h-4 w-4", selectedMakerId === maker.id ? "opacity-100" : "opacity-0")} />
                                             {maker.name}
                                           </CommandItem>
                                         ))}
-                                        <CommandItem onSelect={() => { setMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
-                                          <Plus className="mr-2 h-4 w-4" />{t("fleet.addMaker")}
+                                        {makerSearch.trim() && !carMakers?.some(m => m.name.toLowerCase() === makerSearch.trim().toLowerCase()) && (
+                                          <CommandItem onSelect={() => { setCustomBrand(makerSearch.trim()); setSelectedMakerId(null); setSelectedModelId(null); setCustomModel(""); setMakerOpen(false); setMakerSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                            <Plus className="mr-2 h-4 w-4" />Use "{makerSearch.trim()}" as brand
+                                          </CommandItem>
+                                        )}
+                                        <CommandItem onSelect={() => { setMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-1 pt-2 text-muted-foreground text-xs">
+                                          <Plus className="mr-2 h-3 w-3" />{t("fleet.addMaker")} (save to list)
                                         </CommandItem>
                                       </CommandGroup>
                                     </CommandList>
@@ -912,33 +935,56 @@ export default function FleetManagement() {
                             </div>
                             <div>
                               <Label>{t("common.model")} *</Label>
+                              {customBrand && !selectedMakerId ? (
+                                <Input
+                                  className="mt-1"
+                                  placeholder="Type model name"
+                                  value={customModel}
+                                  onChange={(e) => setCustomModel(e.target.value)}
+                                />
+                              ) : (
                               <Popover open={modelOpen} onOpenChange={setModelOpen}>
                                 <PopoverTrigger asChild>
                                   <Button variant="outline" role="combobox" aria-expanded={modelOpen} className="w-full justify-between mt-1 overflow-hidden" disabled={!selectedMakerId}>
-                                    {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : t("fleet.selectModel")}
+                                    {selectedModelId ? carModels?.find((m) => m.id === selectedModelId)?.modelName : customModel || t("fleet.selectModel")}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
                                   <Command>
-                                    <CommandInput placeholder={t("fleet.searchModel")} />
+                                    <CommandInput placeholder={t("fleet.searchModel")} value={modelSearch} onValueChange={setModelSearch} />
                                     <CommandList>
-                                      <CommandEmpty>{t("common.noData")}</CommandEmpty>
+                                      <CommandEmpty>
+                                        {modelSearch.trim() ? (
+                                          <button
+                                            className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                            onClick={() => { setCustomModel(modelSearch.trim()); setSelectedModelId(null); setModelOpen(false); }}
+                                          >
+                                            Use "{modelSearch.trim()}" as model
+                                          </button>
+                                        ) : t("common.noData")}
+                                      </CommandEmpty>
                                       <CommandGroup>
                                         {carModels?.map((model) => (
-                                          <CommandItem key={model.id} value={model.modelName} onSelect={() => { setSelectedModelId(model.id); setModelOpen(false); }}>
+                                          <CommandItem key={model.id} value={model.modelName} onSelect={() => { setSelectedModelId(model.id); setCustomModel(""); setModelOpen(false); setModelSearch(""); }}>
                                             <Check className={cn("mr-2 h-4 w-4", selectedModelId === model.id ? "opacity-100" : "opacity-0")} />
                                             {model.modelName}
                                           </CommandItem>
                                         ))}
-                                        <CommandItem onSelect={() => { setModelOpen(false); setCustomModelMakerId(selectedMakerId); setIsCustomModelDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
-                                          <Plus className="mr-2 h-4 w-4" />{t("fleet.addModel")}
+                                        {modelSearch.trim() && !carModels?.some(m => m.modelName.toLowerCase() === modelSearch.trim().toLowerCase()) && (
+                                          <CommandItem onSelect={() => { setCustomModel(modelSearch.trim()); setSelectedModelId(null); setModelOpen(false); setModelSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                            <Plus className="mr-2 h-4 w-4" />Use "{modelSearch.trim()}" as model
+                                          </CommandItem>
+                                        )}
+                                        <CommandItem onSelect={() => { setModelOpen(false); setCustomModelMakerId(selectedMakerId); setIsCustomModelDialogOpen(true); }} className="border-t mt-1 pt-2 text-muted-foreground text-xs">
+                                          <Plus className="mr-2 h-3 w-3" />{t("fleet.addModel")} (save to list)
                                         </CommandItem>
                                       </CommandGroup>
                                     </CommandList>
                                   </Command>
                                 </PopoverContent>
                               </Popover>
+                              )}
                             </div>
                             <div>
                               <Label htmlFor="year">{t("common.year")} *</Label>
@@ -1670,52 +1716,41 @@ export default function FleetManagement() {
                     <Label>{t("fleet.makerBrand")} *</Label>
                     <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={editMakerOpen}
-                          className="w-full justify-between"
-                        >
+                        <Button variant="outline" role="combobox" aria-expanded={editMakerOpen} className="w-full justify-between">
                           {editSelectedMakerId
                             ? carMakers?.find((maker) => maker.id === editSelectedMakerId)?.name
-                            : t("fleet.selectMaker")}
+                            : editCustomBrand || t("fleet.selectMaker")}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
-                          <CommandInput placeholder={t("fleet.searchMaker")} />
+                          <CommandInput placeholder={t("fleet.searchMaker")} value={editMakerSearch} onValueChange={setEditMakerSearch} />
                           <CommandList>
-                            <CommandEmpty>{t("common.noData")}</CommandEmpty>
+                            <CommandEmpty>
+                              {editMakerSearch.trim() ? (
+                                <button
+                                  className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                  onClick={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); }}
+                                >
+                                  Use "{editMakerSearch.trim()}" as brand
+                                </button>
+                              ) : t("common.noData")}
+                            </CommandEmpty>
                             <CommandGroup>
                               {carMakers?.map((maker) => (
-                                <CommandItem
-                                  key={maker.id}
-                                  value={maker.name}
-                                  onSelect={() => {
-                                    setEditSelectedMakerId(maker.id);
-                                    setEditSelectedModelId(null); // Reset model when maker changes
-                                    setEditMakerOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
+                                <CommandItem key={maker.id} value={maker.name} onSelect={() => { setEditSelectedMakerId(maker.id); setEditSelectedModelId(null); setEditCustomBrand(""); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }}>
+                                  <Check className={cn("mr-2 h-4 w-4", editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0")} />
                                   {maker.name}
                                 </CommandItem>
                               ))}
-                              <CommandItem
-                                onSelect={() => {
-                                  setEditMakerOpen(false);
-                                  setIsCustomMakerDialogOpen(true);
-                                }}
-                                className="border-t mt-2 pt-2 text-primary font-medium"
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t("fleet.addMaker")}
+                              {editMakerSearch.trim() && !carMakers?.some(m => m.name.toLowerCase() === editMakerSearch.trim().toLowerCase()) && (
+                                <CommandItem onSelect={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                  <Plus className="mr-2 h-4 w-4" />Use "{editMakerSearch.trim()}" as brand
+                                </CommandItem>
+                              )}
+                              <CommandItem onSelect={() => { setEditMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-1 pt-2 text-muted-foreground text-xs">
+                                <Plus className="mr-2 h-3 w-3" />{t("fleet.addMaker")} (save to list)
                               </CommandItem>
                             </CommandGroup>
                           </CommandList>
@@ -1725,45 +1760,49 @@ export default function FleetManagement() {
                   </div>
                   <div>
                     <Label>{t("common.model")} *</Label>
+                    {editCustomBrand && !editSelectedMakerId ? (
+                      <Input
+                        className="mt-1"
+                        placeholder="Type model name"
+                        value={editCustomModel}
+                        onChange={(e) => setEditCustomModel(e.target.value)}
+                      />
+                    ) : (
                     <Popover open={editModelOpen} onOpenChange={setEditModelOpen}>
                       <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={editModelOpen}
-                          className="w-full justify-between"
-                          disabled={!editSelectedMakerId}
-                        >
+                        <Button variant="outline" role="combobox" aria-expanded={editModelOpen} className="w-full justify-between" disabled={!editSelectedMakerId}>
                           {editSelectedModelId
                             ? editCarModels?.find((model) => model.id === editSelectedModelId)?.modelName
-                            : t("fleet.selectModel")}
+                            : editCustomModel || t("fleet.selectModel")}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
-                          <CommandInput placeholder={t("fleet.searchModel")} />
+                          <CommandInput placeholder={t("fleet.searchModel")} value={editModelSearch} onValueChange={setEditModelSearch} />
                           <CommandList>
-                            <CommandEmpty>{t("common.noData")}</CommandEmpty>
+                            <CommandEmpty>
+                              {editModelSearch.trim() ? (
+                                <button
+                                  className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                  onClick={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); }}
+                                >
+                                  Use "{editModelSearch.trim()}" as model
+                                </button>
+                              ) : t("common.noData")}
+                            </CommandEmpty>
                             <CommandGroup>
                               {editCarModels?.map((model) => (
-                                <CommandItem
-                                  key={model.id}
-                                  value={model.modelName}
-                                  onSelect={() => {
-                                    setEditSelectedModelId(model.id);
-                                    setEditModelOpen(false);
-                                  }}
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-4 w-4",
-                                      editSelectedModelId === model.id ? "opacity-100" : "opacity-0"
-                                    )}
-                                  />
+                                <CommandItem key={model.id} value={model.modelName} onSelect={() => { setEditSelectedModelId(model.id); setEditCustomModel(""); setEditModelOpen(false); setEditModelSearch(""); }}>
+                                  <Check className={cn("mr-2 h-4 w-4", editSelectedModelId === model.id ? "opacity-100" : "opacity-0")} />
                                   {model.modelName}
                                 </CommandItem>
                               ))}
+                              {editModelSearch.trim() && !editCarModels?.some(m => m.modelName.toLowerCase() === editModelSearch.trim().toLowerCase()) && (
+                                <CommandItem onSelect={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); setEditModelSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                  <Plus className="mr-2 h-4 w-4" />Use "{editModelSearch.trim()}" as model
+                                </CommandItem>
+                              )}
                               <CommandItem
                                 onSelect={() => {
                                   setEditModelOpen(false);
@@ -1780,6 +1819,7 @@ export default function FleetManagement() {
                         </Command>
                       </PopoverContent>
                     </Popover>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="edit-year">{t("common.year")} *</Label>
