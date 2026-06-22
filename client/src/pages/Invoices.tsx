@@ -327,7 +327,6 @@ export default function Invoices() {
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                         <FileText className="w-5 h-5 text-primary" />
                         <h3 className="font-semibold text-base sm:text-lg">{invoice.invoiceNumber}</h3>
-                        {getStatusBadge(invoice.paymentStatus)}
                       </div>
                       <div className="text-sm text-gray-600 space-y-1">
                         <p>
@@ -554,25 +553,54 @@ export default function Invoices() {
                     )}
                   </div>
 
-                  {/* Amount in Words */}
-                  <div className="border-t-2 pt-4 mt-2 space-y-3">
-                    {/* USD in words */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 space-y-1.5">
-                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-2">Amount in Words — USD</p>
-                      <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        {amountToWordsAR(parseFloat(invoiceDetails.totalAmount), 'USD')}
-                      </p>
-                    </div>
+                  {/* Amount in Words — Arabic */}
+                  <div className="border-t-2 pt-4 mt-2 space-y-2" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <p className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-3" dir="ltr">المبالغ بالكلمات</p>
 
-                    {/* Local currency in words */}
-                    {localCurrencyCode !== 'USD' && exchangeRate !== 1 && (
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3 space-y-1.5">
-                        <p className="text-xs font-semibold text-green-700 uppercase tracking-wide mb-2">Amount in Words — {localCurrencyCode}</p>
-                        <p className="text-sm font-medium text-gray-800 leading-snug text-right" dir="rtl" style={{ fontFamily: 'Arial, sans-serif' }}>
-                          {amountToWordsAR(parseFloat(invoiceDetails.totalAmount) * exchangeRate, localCurrencyCode)}
-                        </p>
-                      </div>
-                    )}
+                    {/* Per line item */}
+                    {invoiceDetails.lineItems.map((item: any, index: number) => {
+                      const itemAmt = parseFloat(item.amount);
+                      const currency = localCurrencyCode !== 'USD' && exchangeRate !== 1 ? localCurrencyCode : 'USD';
+                      const displayAmt = currency !== 'USD' ? itemAmt * exchangeRate : itemAmt;
+                      return (
+                        <div key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <p className="text-xs text-gray-500 mb-1 text-left">{item.description}</p>
+                          <p className="text-sm font-medium text-gray-800 leading-snug text-right">
+                            {amountToWordsAR(displayAmt, currency)}
+                          </p>
+                        </div>
+                      );
+                    })}
+
+                    {/* VAT in words */}
+                    {(() => {
+                      const vatAmt = parseFloat(invoiceDetails.taxAmount);
+                      const currency = localCurrencyCode !== 'USD' && exchangeRate !== 1 ? localCurrencyCode : 'USD';
+                      const displayVat = currency !== 'USD' ? vatAmt * exchangeRate : vatAmt;
+                      return (
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                          <p className="text-xs font-semibold text-amber-700 mb-1 text-left">ضريبة القيمة المضافة {vatRate}%</p>
+                          <p className="text-sm font-medium text-gray-800 leading-snug text-right">
+                            {amountToWordsAR(displayVat, currency)}
+                          </p>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Grand total in words */}
+                    {(() => {
+                      const totalAmt = parseFloat(invoiceDetails.totalAmount);
+                      const currency = localCurrencyCode !== 'USD' && exchangeRate !== 1 ? localCurrencyCode : 'USD';
+                      const displayTotal = currency !== 'USD' ? totalAmt * exchangeRate : totalAmt;
+                      return (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-1 text-left">المبلغ الإجمالي شامل الضريبة</p>
+                          <p className="text-base font-bold text-gray-900 leading-snug text-right">
+                            {amountToWordsAR(displayTotal, currency)}
+                          </p>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Notes */}
@@ -617,55 +645,6 @@ export default function Invoices() {
                   </Button>
                 </div>
 
-                {/* Payment Status Update */}
-                {invoiceDetails.paymentStatus !== "paid" && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Update Payment Status</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">Status</label>
-                          <Select value={paymentStatus} onValueChange={(value) => setPaymentStatus(value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="paid">Paid</SelectItem>
-                              <SelectItem value="overdue">Overdue</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <label className="text-sm font-medium mb-2 block">
-                            Payment Method (Optional)
-                          </label>
-                          <Select value={paymentMethod} onValueChange={(value) => setPaymentMethod(value)}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select method" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Cash">Cash</SelectItem>
-                              <SelectItem value="Credit Card">Credit Card</SelectItem>
-                              <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
-                              <SelectItem value="Check">Check</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={handleUpdatePayment}
-                        disabled={!paymentStatus || updatePaymentMutation.isPending}
-                        className="w-full"
-                      >
-                        {updatePaymentMutation.isPending ? "Updating..." : "Update Payment Status"}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             )}
           </DialogContent>
