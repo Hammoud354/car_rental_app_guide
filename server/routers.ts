@@ -216,6 +216,16 @@ export const appRouter = router({
         throw err;
       }
 
+      // Fire-and-forget admin notification — never delays the user
+      const ip =
+        (ctx.req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ||
+        ctx.req.socket?.remoteAddress ||
+        "unknown";
+      const userAgent = ctx.req.headers["user-agent"] || "";
+      import("./email").then(({ sendAdminDemoNotification }) =>
+        sendAdminDemoNotification(ip, userAgent).catch(() => {})
+      );
+
       return {
         success: true,
         userId: demoUser.id,

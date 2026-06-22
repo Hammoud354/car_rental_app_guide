@@ -217,6 +217,28 @@ export async function sendSubscriptionRejectedEmail(to: string, username: string
 
 const ADMIN_EMAIL = "info@fleetwizards.com";
 
+export async function sendAdminDemoNotification(ip: string, userAgent: string) {
+  const now = new Date().toLocaleString("en-US", { timeZone: "UTC", dateStyle: "full", timeStyle: "short" });
+  const html = `
+    <div style="${baseStyle}">
+      <div style="${cardStyle}">
+        <span style="${logoStyle}">🚗 FleetWizards</span>
+        <h1 style="${h1Style}">🧪 New demo session started</h1>
+        <p style="${pStyle}">Someone just launched the <strong>10-minute live demo</strong> on FleetWizards.</p>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>Time (UTC):</strong> ${now}</p>
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;"><strong>IP Address:</strong> ${ip || "unknown"}</p>
+          <p style="margin: 0; font-size: 13px; color: #6b7280; word-break: break-all;"><strong>Browser:</strong> ${userAgent ? userAgent.slice(0, 120) : "unknown"}</p>
+        </div>
+        <p style="${pStyle}">The demo account will be automatically deleted after 10 minutes.</p>
+        <a href="https://fleetwizards.com/admin/analytics" style="${btnStyle()}">View Analytics</a>
+        ${footer()}
+      </div>
+    </div>
+  `;
+  return sendEmail(ADMIN_EMAIL, `🧪 New demo started — ${now} UTC`, html);
+}
+
 export async function sendAdminNewUserNotification(username: string, email: string, companyName: string) {
   const html = `
     <div style="${baseStyle}">
