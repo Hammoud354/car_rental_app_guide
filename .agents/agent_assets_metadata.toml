@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "IKqhbvwvAPTRG_WLLvQSr"
+uri = "file://screenshots/contract_print_form.jpg"
+type = "image"
+title = "Contract Print Form Preview"
