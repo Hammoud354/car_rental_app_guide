@@ -53,6 +53,10 @@ function buildPrintHtml(content: string, title: string): string {
     .tracking-wider { letter-spacing: 0.05em; }
     .hidden, .print\\:hidden, button, [role="button"], svg.lucide { display: none !important; }
     img { max-width: 120px; height: auto; }
+    /* Car damage inspection panels — images must fill container so marks overlay correctly */
+    .car-view-panel { position: relative !important; overflow: hidden !important; line-height: 0 !important; }
+    .car-view-panel img { max-width: 100% !important; width: 100% !important; height: auto !important; display: block !important; }
+    .car-damage-mark { position: absolute !important; }
     .badge, [class*="badge"] { display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 500; }
     /* Invoice-specific: totals table */
     .totals-table { width: 100%; margin-top: 8px; }

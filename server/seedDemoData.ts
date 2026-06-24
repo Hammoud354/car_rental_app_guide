@@ -256,13 +256,26 @@ export async function seedDemoData(userId: number): Promise<void> {
   };
   await db.insert(rentalContracts).values(overdueContract);
 
-  await db.insert(damageMarks).values({
-    userId,
-    contractId: createdContracts[2].id,
-    xPosition: "150.00",
-    yPosition: "200.00",
-    description: "Minor scratch on front bumper",
-  });
+  await db.insert(damageMarks).values([
+    {
+      userId,
+      contractId: createdContracts[2].id,
+      view: "front",
+      xPosition: "48.00",
+      yPosition: "78.00",
+      description: "Minor scratch on front bumper",
+      symbol: "X",
+    },
+    {
+      userId,
+      contractId: createdContracts[2].id,
+      view: "left",
+      xPosition: "62.00",
+      yPosition: "55.00",
+      description: "Small dent on left rear door",
+      symbol: "X",
+    },
+  ]);
 
   const maintenanceTasksData = [
     {

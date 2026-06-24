@@ -164,7 +164,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           {VIEW_LABELS[view]}
         </div>
         {/* position:relative so marks can be overlaid with position:absolute */}
-        <div style={{ position: 'relative', border: '1px solid #d1d5db', borderRadius: '4px', overflow: 'hidden', backgroundColor: 'white', lineHeight: 0 }}>
+        <div className="car-view-panel" style={{ position: 'relative', border: '1px solid #d1d5db', borderRadius: '4px', overflow: 'hidden', backgroundColor: 'white', lineHeight: 0 }}>
           {dataUrl
             ? <img src={dataUrl} alt={VIEW_LABELS[view]} style={{ display: 'block', width: '100%', height: 'auto' }} />
             : <div style={{ paddingTop: '33.33%', backgroundColor: '#f9fafb' }} />
@@ -172,7 +172,7 @@ export const ContractPDFTemplate: React.FC<ContractPDFTemplateProps> = ({ contra
           {viewMarks.map(mark => {
             const globalIdx = marks.findIndex(m => m.id === mark.id) + 1;
             return (
-              <div key={mark.id} style={{
+              <div key={mark.id} className="car-damage-mark" style={{
                 position: 'absolute',
                 left: `${mark.xPosition}%`,
                 top: `${mark.yPosition}%`,
