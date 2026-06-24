@@ -1928,14 +1928,16 @@ export default function RentalContracts() {
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
                 {/* Left side action buttons */}
                 <Button 
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedContract) {
                       toast.error(t("contracts.noContractSelected"));
                       return;
                     }
-                    const success = printElement("contract-content", `Contract ${selectedContract.contractNumber || selectedContract.id}`);
+                    toast.info("Preparing contract for print…");
+                    await new Promise(r => setTimeout(r, 600));
+                    const success = printElement("contract-pdf-template", `Contract ${selectedContract.contractNumber || selectedContract.id}`);
                     if (!success) {
-                      toast.error("Contract content not found");
+                      toast.error("Contract template not found");
                     }
                   }} 
                   variant="outline"
