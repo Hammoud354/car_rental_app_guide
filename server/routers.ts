@@ -710,6 +710,9 @@ export const appRouter = router({
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
         const userId = ctx.user?.id || 1;
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getAvailableVehiclesForMaintenance(userId, input?.filterUserId);
       }),
 
@@ -3651,6 +3654,10 @@ export const appRouter = router({
     list: protectedProcedure
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ ctx, input }) => {
+        const targetUserId = input?.filterUserId;
+        if (targetUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, targetUserId, 'vehicles');
+        }
         return await db.getHighSeasonPeriods(ctx.user.id, input?.filterUserId);
       }),
 
