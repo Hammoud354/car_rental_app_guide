@@ -3808,25 +3808,6 @@ export const appRouter = router({
         return await db.getPrivacySettings(input.userId);
       }),
 
-    // Super admin: set privacy mode for any user (this is the correct route —
-    // privacy.updateSettings only saves for ctx.user.id and cannot target other users)
-    adminSetUserPrivacy: superAdminProcedure
-      .input(z.object({
-        userId: z.number(),
-        mode: z.enum(["full_access", "partial_access", "temporary_access", "approval_required", "full_privacy", "emergency_access"]),
-        allowedModules: z.array(z.string()).optional(),
-        tempAccessExpiry: z.string().nullable().optional(),
-        notifyOnAccess: z.boolean().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        return await db.upsertPrivacySettings(input.userId, {
-          mode: input.mode,
-          allowedModules: input.allowedModules,
-          tempAccessExpiry: input.tempAccessExpiry,
-          notifyOnAccess: input.notifyOnAccess,
-        });
-      }),
-
     // Super admin: check if they can access a specific company module
     checkAccess: superAdminProcedure
       .input(z.object({

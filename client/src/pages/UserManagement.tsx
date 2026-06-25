@@ -26,175 +26,29 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, Trash2, Edit, Shield, User, Lock, ShieldCheck, ShieldOff, Eye, Clock, UserCheck, Loader2 } from "lucide-react";
+import { Users, Trash2, Edit, Shield, User } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { cn } from "@/lib/utils";
-
-const PRIVACY_MODES = [
-  {
-    id: "full_access",
-    label: "Full Access",
-    description: "Admin can see all data at any time.",
-    icon: ShieldCheck,
-    color: "text-green-600",
-    border: "border-green-200",
-    selectedBorder: "border-green-500",
-    bg: "bg-green-50",
-  },
-  {
-    id: "partial_access",
-    label: "Partial Access",
-    description: "Admin can only see allowed modules.",
-    icon: Eye,
-    color: "text-blue-600",
-    border: "border-blue-200",
-    selectedBorder: "border-blue-500",
-    bg: "bg-blue-50",
-  },
-  {
-    id: "temporary_access",
-    label: "Temporary Access",
-    description: "Access expires automatically.",
-    icon: Clock,
-    color: "text-amber-600",
-    border: "border-amber-200",
-    selectedBorder: "border-amber-500",
-    bg: "bg-amber-50",
-  },
-  {
-    id: "approval_required",
-    label: "Approval Required",
-    description: "Admin must request access each time.",
-    icon: UserCheck,
-    color: "text-purple-600",
-    border: "border-purple-200",
-    selectedBorder: "border-purple-500",
-    bg: "bg-purple-50",
-  },
-  {
-    id: "full_privacy",
-    label: "Full Privacy",
-    description: "Admin cannot access any data.",
-    icon: ShieldOff,
-    color: "text-red-600",
-    border: "border-red-200",
-    selectedBorder: "border-red-500",
-    bg: "bg-red-50",
-  },
-];
 
 const PRIVACY_BADGE: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  full_access: { label: "Full Access", variant: "secondary" },
-  partial_access: { label: "Partial", variant: "outline" },
-  temporary_access: { label: "Temp", variant: "outline" },
-  approval_required: { label: "Approval", variant: "outline" },
-  full_privacy: { label: "Private", variant: "destructive" },
-  emergency_access: { label: "Emergency", variant: "destructive" },
+  full_access:      { label: "Full Access",      variant: "secondary"    },
+  partial_access:   { label: "Partial Access",   variant: "outline"      },
+  temporary_access: { label: "Temp Access",      variant: "outline"      },
+  approval_required:{ label: "Approval Req.",    variant: "outline"      },
+  full_privacy:     { label: "Full Privacy",     variant: "destructive"  },
+  emergency_access: { label: "Emergency",        variant: "destructive"  },
 };
 
-function PrivacyBadge({ mode }: { mode?: string | null }) {
-  if (!mode) return <Badge variant="secondary" className="text-xs">Full Access</Badge>;
+function PrivacyBadge({ userId }: { userId: number }) {
+  const { data } = trpc.privacy.adminGetUserPrivacy.useQuery({ userId });
+  const mode = data?.mode ?? null;
+  if (!mode || mode === "full_access") return <Badge variant="secondary" className="text-xs">Full Access</Badge>;
   const b = PRIVACY_BADGE[mode] ?? { label: mode, variant: "outline" as const };
-  return <Badge variant={b.variant} className="text-xs">{b.label}</Badge>;
-}
-
-function UserPrivacyDialog({
-  user,
-  open,
-  onClose,
-  onSaved,
-}: {
-  user: any;
-  open: boolean;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const { toast } = useToast();
-  const { data: current, isLoading } = trpc.privacy.adminGetUserPrivacy.useQuery(
-    { userId: user?.id },
-    { enabled: open && !!user?.id }
-  );
-  const [selectedMode, setSelectedMode] = useState<string>("full_access");
-
-  // Sync state when data loads
-  const currentMode = current?.mode ?? "full_access";
-  const displayMode = open ? (current !== undefined ? currentMode : selectedMode) : selectedMode;
-
-  const setPrivacy = trpc.privacy.adminSetUserPrivacy.useMutation({
-    onSuccess: () => {
-      toast({ title: "Privacy mode updated", description: `${user?.username}'s privacy is now set to ${selectedMode.replace(/_/g, " ")}.` });
-      onSaved();
-      onClose();
-    },
-    onError: (err) => {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    },
-  });
-
-  const handleSave = () => {
-    setPrivacy.mutate({ userId: user.id, mode: selectedMode as any });
-  };
-
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Privacy Mode — {user?.username}
-          </DialogTitle>
-          <DialogDescription>
-            Control how much data you (as super admin) can access for this user's account.
-          </DialogDescription>
-        </DialogHeader>
-
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="space-y-2 py-2">
-            <p className="text-xs text-muted-foreground mb-3">
-              Current saved mode: <span className="font-medium">{currentMode.replace(/_/g, " ")}</span>
-            </p>
-            {PRIVACY_MODES.map((mode) => {
-              const Icon = mode.icon;
-              const active = (selectedMode || currentMode) === mode.id;
-              return (
-                <button
-                  key={mode.id}
-                  type="button"
-                  onClick={() => setSelectedMode(mode.id)}
-                  className={cn(
-                    "w-full flex items-start gap-3 rounded-lg border p-3 text-left transition-all",
-                    active ? `${mode.selectedBorder} ${mode.bg} border-2` : `${mode.border} hover:bg-gray-50`
-                  )}
-                >
-                  <Icon className={cn("h-4 w-4 mt-0.5 shrink-0", mode.color)} />
-                  <div>
-                    <p className={cn("text-sm font-medium", mode.color)}>{mode.label}</p>
-                    <p className="text-xs text-muted-foreground">{mode.description}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button
-            onClick={handleSave}
-            disabled={setPrivacy.isPending || isLoading}
-          >
-            {setPrivacy.isPending && <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />}
-            Save Privacy Mode
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <Badge variant={b.variant} className="text-xs" title="Set by the user from their own privacy settings">
+      {b.label}
+    </Badge>
   );
 }
 
@@ -203,7 +57,6 @@ export default function UserManagement() {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [privacyDialogOpen, setPrivacyDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [editForm, setEditForm] = useState({
     name: "",
@@ -214,12 +67,6 @@ export default function UserManagement() {
   });
 
   const { data: users, isLoading, refetch } = trpc.admin.listUsers.useQuery();
-
-  // Fetch privacy settings for all users so we can show badges
-  const { data: privacyMap, refetch: refetchPrivacy } = trpc.privacy.adminGetUserPrivacy.useQuery(
-    { userId: 0 },
-    { enabled: false }
-  );
 
   const updateRoleMutation = trpc.admin.updateUserRole.useMutation({
     onSuccess: () => {
@@ -257,11 +104,6 @@ export default function UserManagement() {
   const handleDeleteClick = (user: any) => {
     setSelectedUser(user);
     setDeleteDialogOpen(true);
-  };
-
-  const handlePrivacyClick = (user: any) => {
-    setSelectedUser(user);
-    setPrivacyDialogOpen(true);
   };
 
   const handleRoleChange = (userId: number, newRole: "user" | "admin") => {
@@ -337,13 +179,11 @@ export default function UserManagement() {
               {user.phone && <div>{t("users.phone")}: {user.phone}</div>}
               {user.country && <div>{t("users.country")}: {user.country}</div>}
               <div>{t("users.created")}: {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</div>
+              <div className="pt-1"><PrivacyBadge userId={user.id} /></div>
             </div>
             <div className="flex gap-2 pt-1">
               <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleEditClick(user)}>
                 <Edit className="h-3 w-3 mr-1" /> {t("common.edit")}
-              </Button>
-              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handlePrivacyClick(user)}>
-                <Lock className="h-3 w-3 mr-1" /> Privacy
               </Button>
               <Button variant="outline" size="sm" className="h-7 text-xs text-destructive hover:text-destructive" onClick={() => handleDeleteClick(user)}>
                 <Trash2 className="h-3 w-3 mr-1" /> {t("common.delete")}
@@ -372,38 +212,72 @@ export default function UserManagement() {
           </TableHeader>
           <TableBody>
             {users?.map((user) => (
-              <UserRow
-                key={user.id}
-                user={user}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteClick}
-                onPrivacy={handlePrivacyClick}
-                onRoleChange={handleRoleChange}
-                t={t}
-              />
+              <TableRow key={user.id}>
+                <TableCell className="font-mono text-sm">{user.id}</TableCell>
+                <TableCell className="font-medium">{user.username}</TableCell>
+                <TableCell>{user.name || "-"}</TableCell>
+                <TableCell>{user.email || "-"}</TableCell>
+                <TableCell>{user.phone || "-"}</TableCell>
+                <TableCell>{user.country || "-"}</TableCell>
+                <TableCell>
+                  <Select
+                    value={user.role || "user"}
+                    onValueChange={(value) =>
+                      handleRoleChange(user.id, value as "user" | "admin")
+                    }
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          {t("users.user")}
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="admin">
+                        <div className="flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          {t("users.admin")}
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell>
+                  <PrivacyBadge userId={user.id} />
+                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(user)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeleteClick(user)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
-
-      {/* Privacy Dialog */}
-      {selectedUser && (
-        <UserPrivacyDialog
-          user={selectedUser}
-          open={privacyDialogOpen}
-          onClose={() => setPrivacyDialogOpen(false)}
-          onSaved={() => refetch()}
-        />
-      )}
 
       {/* Edit User Dialog */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("users.editUser")}</DialogTitle>
-            <DialogDescription>
-              {t("users.editUserSubtitle")}
-            </DialogDescription>
+            <DialogDescription>{t("users.editUserSubtitle")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -411,9 +285,7 @@ export default function UserManagement() {
               <Input
                 id="name"
                 value={editForm.name}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, name: e.target.value })
-                }
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
               />
             </div>
             <div>
@@ -422,9 +294,7 @@ export default function UserManagement() {
                 id="email"
                 type="email"
                 value={editForm.email}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, email: e.target.value })
-                }
+                onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
               />
             </div>
             <div>
@@ -432,9 +302,7 @@ export default function UserManagement() {
               <Input
                 id="phone"
                 value={editForm.phone}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, phone: e.target.value })
-                }
+                onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
               />
             </div>
             <div>
@@ -442,9 +310,7 @@ export default function UserManagement() {
               <Input
                 id="country"
                 value={editForm.country}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, country: e.target.value })
-                }
+                onChange={(e) => setEditForm({ ...editForm, country: e.target.value })}
               />
             </div>
           </div>
@@ -488,90 +354,5 @@ export default function UserManagement() {
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function UserRow({
-  user,
-  onEdit,
-  onDelete,
-  onPrivacy,
-  onRoleChange,
-  t,
-}: {
-  user: any;
-  onEdit: (u: any) => void;
-  onDelete: (u: any) => void;
-  onPrivacy: (u: any) => void;
-  onRoleChange: (id: number, role: "user" | "admin") => void;
-  t: (k: string, o?: any) => string;
-}) {
-  const { data: privacySettings } = trpc.privacy.adminGetUserPrivacy.useQuery({ userId: user.id });
-  const mode = privacySettings?.mode ?? null;
-
-  return (
-    <TableRow>
-      <TableCell className="font-mono text-sm">{user.id}</TableCell>
-      <TableCell className="font-medium">{user.username}</TableCell>
-      <TableCell>{user.name || "-"}</TableCell>
-      <TableCell>{user.email || "-"}</TableCell>
-      <TableCell>{user.phone || "-"}</TableCell>
-      <TableCell>{user.country || "-"}</TableCell>
-      <TableCell>
-        <Select
-          value={user.role || "user"}
-          onValueChange={(value) => onRoleChange(user.id, value as "user" | "admin")}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="user">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                {t("users.user")}
-              </div>
-            </SelectItem>
-            <SelectItem value="admin">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                {t("users.admin")}
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
-      </TableCell>
-      <TableCell>
-        <button
-          onClick={() => onPrivacy(user)}
-          className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
-          title="Set privacy mode"
-        >
-          <PrivacyBadge mode={mode} />
-        </button>
-      </TableCell>
-      <TableCell className="text-sm text-muted-foreground">
-        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end gap-1">
-          <Button variant="ghost" size="sm" onClick={() => onEdit(user)} title="Edit user">
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => onPrivacy(user)} title="Set privacy mode">
-            <Lock className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(user)}
-            className="text-destructive hover:text-destructive"
-            title="Delete user"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
   );
 }
