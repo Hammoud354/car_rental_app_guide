@@ -1696,468 +1696,444 @@ export default function FleetManagement() {
           )
         )}
 
-        {/* Edit Dialog */}
-        {selectedVehicle && (
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden w-[95vw] sm:w-full">
-              <DialogHeader>
-                <DialogTitle>{t("fleet.editVehicle")}</DialogTitle>
-                <DialogDescription>{t("fleet.subtitle")}</DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleEditVehicle} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-plateNumber">{t("fleet.plateNumber")} *</Label>
-                    <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required className="input-client" />
+        {/* Edit Dialog — full-screen portal, same style as Add */}
+        {selectedVehicle && isEditDialogOpen && createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) setIsEditDialogOpen(false); }}
+          >
+            <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden" style={{ width: "90vw", height: "90vh" }}>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-[#1e3a8a] to-[#1e40af] flex-shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <Car className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <Label htmlFor="edit-vin">VIN</Label>
-                    <Input id="edit-vin" name="vin" defaultValue={selectedVehicle.vin || ""} maxLength={17} />
+                    <h2 className="text-lg font-bold text-white">{t("fleet.editVehicle")}</h2>
+                    <p className="text-blue-200 text-xs">{selectedVehicle.plateNumber} — {selectedVehicle.make} {selectedVehicle.model} {selectedVehicle.year}</p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label>{t("fleet.makerBrand")} *</Label>
-                    <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" role="combobox" aria-expanded={editMakerOpen} className="w-full justify-between">
-                          {editSelectedMakerId
-                            ? carMakers?.find((maker) => maker.id === editSelectedMakerId)?.name
-                            : editCustomBrand || t("fleet.selectMaker")}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput placeholder={t("fleet.searchMaker")} value={editMakerSearch} onValueChange={setEditMakerSearch} />
-                          <CommandList>
-                            <CommandEmpty>
-                              {editMakerSearch.trim() ? (
-                                <button
-                                  className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
-                                  onClick={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); }}
-                                >
-                                  Use "{editMakerSearch.trim()}" as brand
-                                </button>
-                              ) : t("common.noData")}
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {carMakers?.map((maker) => (
-                                <CommandItem key={maker.id} value={maker.name} onSelect={() => { setEditSelectedMakerId(maker.id); setEditSelectedModelId(null); setEditCustomBrand(""); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }}>
-                                  <Check className={cn("mr-2 h-4 w-4", editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0")} />
-                                  {maker.name}
-                                </CommandItem>
-                              ))}
-                              {editMakerSearch.trim() && !carMakers?.some(m => m.name.toLowerCase() === editMakerSearch.trim().toLowerCase()) && (
-                                <CommandItem onSelect={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
-                                  <Plus className="mr-2 h-4 w-4" />Use "{editMakerSearch.trim()}" as brand
-                                </CommandItem>
-                              )}
-                              <CommandItem onSelect={() => { setEditMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-1 pt-2 text-muted-foreground text-xs">
-                                <Plus className="mr-2 h-3 w-3" />{t("fleet.addMaker")} (save to list)
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label>{t("common.model")} *</Label>
-                    {editCustomBrand && !editSelectedMakerId ? (
-                      <Input
-                        className="mt-1"
-                        placeholder="Type model name"
-                        value={editCustomModel}
-                        onChange={(e) => setEditCustomModel(e.target.value)}
-                      />
-                    ) : (
-                    <Popover open={editModelOpen} onOpenChange={setEditModelOpen}>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" role="combobox" aria-expanded={editModelOpen} className="w-full justify-between" disabled={!editSelectedMakerId}>
-                          {editSelectedModelId
-                            ? editCarModels?.find((model) => model.id === editSelectedModelId)?.modelName
-                            : editCustomModel || t("fleet.selectModel")}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
-                        <Command>
-                          <CommandInput placeholder={t("fleet.searchModel")} value={editModelSearch} onValueChange={setEditModelSearch} />
-                          <CommandList>
-                            <CommandEmpty>
-                              {editModelSearch.trim() ? (
-                                <button
-                                  className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
-                                  onClick={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); }}
-                                >
-                                  Use "{editModelSearch.trim()}" as model
-                                </button>
-                              ) : t("common.noData")}
-                            </CommandEmpty>
-                            <CommandGroup>
-                              {editCarModels?.map((model) => (
-                                <CommandItem key={model.id} value={model.modelName} onSelect={() => { setEditSelectedModelId(model.id); setEditCustomModel(""); setEditModelOpen(false); setEditModelSearch(""); }}>
-                                  <Check className={cn("mr-2 h-4 w-4", editSelectedModelId === model.id ? "opacity-100" : "opacity-0")} />
-                                  {model.modelName}
-                                </CommandItem>
-                              ))}
-                              {editModelSearch.trim() && !editCarModels?.some(m => m.modelName.toLowerCase() === editModelSearch.trim().toLowerCase()) && (
-                                <CommandItem onSelect={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); setEditModelSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
-                                  <Plus className="mr-2 h-4 w-4" />Use "{editModelSearch.trim()}" as model
-                                </CommandItem>
-                              )}
-                              <CommandItem
-                                onSelect={() => {
-                                  setEditModelOpen(false);
-                                  setCustomModelMakerId(editSelectedMakerId);
-                                  setIsCustomModelDialogOpen(true);
-                                }}
-                                className="border-t mt-2 pt-2 text-primary font-medium"
-                              >
-                                <Plus className="mr-2 h-4 w-4" />
-                                {t("fleet.addModel")}
-                              </CommandItem>
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    )}
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-year">{t("common.year")} *</Label>
-                    <Input id="edit-year" name="year" type="number" defaultValue={selectedVehicle.year} min="1900" max="2100" required className="input-client" />
-                  </div>
-                </div>
+              {/* Body + Footer */}
+              <form onSubmit={handleEditVehicle} className="flex flex-col flex-1 min-h-0">
+                <div className="flex flex-col sm:flex-row flex-1 min-h-0 overflow-y-auto sm:overflow-hidden">
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="edit-color">{t("common.color")} *</Label>
-                    <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client" />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-category">{t("common.category")} *</Label>
-                    <Select name="category" defaultValue={selectedVehicle.category} required>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Economy">{t("fleet.economy")}</SelectItem>
-                        <SelectItem value="Compact">{t("fleet.compact")}</SelectItem>
-                        <SelectItem value="Intermediate">{t("fleet.intermediate")}</SelectItem>
-                        <SelectItem value="Standard">{t("fleet.standard")}</SelectItem>
-                        <SelectItem value="Full-size">{t("fleet.fullSize")}</SelectItem>
-                        <SelectItem value="Luxury">{t("fleet.luxury")}</SelectItem>
-                        <SelectItem value="SUV">{t("fleet.suv")}</SelectItem>
-                        <SelectItem value="Minivan">{t("fleet.minivan")}</SelectItem>
-                        <SelectItem value="Pickup Truck">{t("fleet.pickupTruck")}</SelectItem>
-                        <SelectItem value="Cargo Van">{t("fleet.cargoVan")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-status">{t("common.status")}</Label>
-                    <Select name="status" defaultValue={selectedVehicle.status} onValueChange={setEditStatusValue}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Available">{t("fleet.available")}</SelectItem>
-                        <SelectItem value="Rented">{t("fleet.rented")}</SelectItem>
-                        <SelectItem value="Maintenance">{t("nav.maintenance")}</SelectItem>
-                        <SelectItem value="Out of Service">{t("fleet.outOfService")}</SelectItem>
-                        <SelectItem value="Sold">Sold</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+                  {/* Left column — Basic Info + Pricing */}
+                  <div className="w-full sm:w-[52%] border-b sm:border-b-0 sm:border-r border-gray-100 sm:overflow-y-auto p-6 space-y-5">
 
-                <div>
-                  <Label htmlFor="edit-mileage">{t("fleet.mileage")}</Label>
-                  <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="edit-dailyRate">{t("fleet.dailyRate")}</Label>
-                    <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" className="input-client" />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-weeklyRate">{t("fleet.weeklyRate")}</Label>
-                    <Input id="edit-weeklyRate" name="weeklyRate" type="number" step="0.01" defaultValue={selectedVehicle.weeklyRate || ""} min="0" />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-monthlyRate">{t("fleet.monthlyRate")}</Label>
-                    <Input id="edit-monthlyRate" name="monthlyRate" type="number" step="0.01" defaultValue={selectedVehicle.monthlyRate || ""} min="0" />
-                  </div>
-                </div>
-
-                {/* High Season Pricing */}
-                <div className="space-y-3 p-4 border border-amber-200 rounded-lg bg-amber-50/50">
-                  <div className="flex items-center gap-2">
-                    <Sun className="h-4 w-4 text-amber-500" />
-                    <h4 className="font-medium text-sm text-amber-800">{t("fleet.highSeasonPricing")} ({t("common.optional")})</h4>
-                  </div>
-                  <p className="text-xs text-amber-600">{t("fleet.highSeasonPeriodsSubtitle")}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Basic Info */}
                     <div>
-                      <Label htmlFor="edit-highSeasonDailyRate">{t("fleet.hsDaily")}</Label>
-                      <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-highSeasonWeeklyRate">{t("fleet.hsWeekly")}</Label>
-                      <Input id="edit-highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonWeeklyRate || ""} />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-highSeasonMonthlyRate">{t("fleet.hsMonthly")}</Label>
-                      <Input id="edit-highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonMonthlyRate || ""} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">{t("fleet.insurance")}</h4>
-                  
-                  <div>
-                    <Label htmlFor="edit-insuranceProvider">{t("fleet.provider")}</Label>
-                    <Input id="edit-insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm, Geico" defaultValue={selectedVehicle.insuranceProvider || ""} />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="edit-insurancePolicyNumber">{t("fleet.policyNumber")}</Label>
-                    <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} />
-                  </div>
-
-                  <div>
-                    <Label>{t("fleet.policyStartDate")}</Label>
-                    <ModernDatePicker
-                      date={editInsuranceStartDate}
-                      onDateChange={setEditInsuranceStartDate}
-                      placeholder={t("common.selectDate")}
-                    />
-                  </div>
-
-                  <div>
-                    <Label>{t("fleet.expiryDate")}</Label>
-                    <ModernDatePicker
-                      date={editInsuranceExpiryDate}
-                      onDateChange={setEditInsuranceExpiryDate}
-                      placeholder={t("common.selectDate")}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="edit-insuranceAnnualPremium">{t("fleet.annualPremium")}</Label>
-                    <Input 
-                      id="edit-insuranceAnnualPremium" 
-                      name="insuranceAnnualPremium" 
-                      type="number" 
-                      step="0.01" 
-                      min="0" 
-                      placeholder="0.00" 
-                      defaultValue={selectedVehicle.insuranceAnnualPremium || ""}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-3 p-4 border rounded-lg bg-muted/30">
-                  <h4 className="font-medium text-sm">{t("fleet.registration")}</h4>
-                  <div>
-                    <Label htmlFor="edit-vehicleRegistrationNumber">{t("fleet.registrationNumber")}</Label>
-                    <Input id="edit-vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" defaultValue={(selectedVehicle as any).vehicleRegistrationNumber || ""} />
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>{t("fleet.expiryDate")}</Label>
-                      <ModernDatePicker
-                        date={editRegistrationExpiryDate}
-                        onDateChange={setEditRegistrationExpiryDate}
-                        placeholder={t("common.selectDate")}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-registrationFee">{t("fleet.annualFee")}</Label>
-                      <Input id="edit-registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).registrationFee || ""} />
-                      <p className="text-xs text-muted-foreground mt-1">{t("fleet.expiryAutoSet")}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Vehicle Purchase Details */}
-                <div className="border rounded-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditPurchaseSection(v => !v)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-900">{t("fleet.purchaseDetails")}</span>
-                      <span className="text-xs text-blue-600 font-normal">({t("common.optional")})</span>
-                    </div>
-                    {showEditPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
-                  </button>
-
-                  {showEditPurchaseSection && (
-                    <div className="p-4 space-y-4 bg-white">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Car className="w-4 h-4 text-blue-700" />
+                        <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("fleet.basicInfo")}</h3>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label>{t("fleet.purchaseType")}</Label>
-                          <Select
-                            defaultValue={(selectedVehicle as any).purchaseType || undefined}
-                            onValueChange={(v) => setEditPurchaseType(v as any)}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={t("fleet.cash") + " or " + t("fleet.installments")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Cash">{t("fleet.cash")}</SelectItem>
-                              <SelectItem value="Installments">{t("fleet.installments")}</SelectItem>
+                          <Label htmlFor="edit-plateNumber">{t("fleet.plateNumber")} *</Label>
+                          <Input id="edit-plateNumber" name="plateNumber" defaultValue={selectedVehicle.plateNumber} required className="input-client mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-vin">VIN</Label>
+                          <Input id="edit-vin" name="vin" defaultValue={selectedVehicle.vin || ""} maxLength={17} className="mt-1" />
+                        </div>
+                        <div>
+                          <Label>{t("fleet.makerBrand")} *</Label>
+                          <Popover open={editMakerOpen} onOpenChange={setEditMakerOpen}>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" role="combobox" aria-expanded={editMakerOpen} className="w-full justify-between mt-1 overflow-hidden">
+                                {editSelectedMakerId ? carMakers?.find((m) => m.id === editSelectedMakerId)?.name : editCustomBrand || t("fleet.selectMaker")}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
+                              <Command>
+                                <CommandInput placeholder={t("fleet.searchMaker")} value={editMakerSearch} onValueChange={setEditMakerSearch} />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    {editMakerSearch.trim() ? (
+                                      <button className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                        onClick={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); }}>
+                                        Use "{editMakerSearch.trim()}" as brand
+                                      </button>
+                                    ) : t("common.noData")}
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {carMakers?.map((maker) => (
+                                      <CommandItem key={maker.id} value={maker.name} onSelect={() => { setEditSelectedMakerId(maker.id); setEditSelectedModelId(null); setEditCustomBrand(""); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }}>
+                                        <Check className={cn("mr-2 h-4 w-4", editSelectedMakerId === maker.id ? "opacity-100" : "opacity-0")} />
+                                        {maker.name}
+                                      </CommandItem>
+                                    ))}
+                                    {editMakerSearch.trim() && !carMakers?.some(m => m.name.toLowerCase() === editMakerSearch.trim().toLowerCase()) && (
+                                      <CommandItem onSelect={() => { setEditCustomBrand(editMakerSearch.trim()); setEditSelectedMakerId(null); setEditSelectedModelId(null); setEditCustomModel(""); setEditMakerOpen(false); setEditMakerSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                        <Plus className="mr-2 h-4 w-4" />Use "{editMakerSearch.trim()}" as brand
+                                      </CommandItem>
+                                    )}
+                                    <CommandItem onSelect={() => { setEditMakerOpen(false); setIsCustomMakerDialogOpen(true); }} className="border-t mt-1 pt-2 text-muted-foreground text-xs">
+                                      <Plus className="mr-2 h-3 w-3" />{t("fleet.addMaker")} (save to list)
+                                    </CommandItem>
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                        <div>
+                          <Label>{t("common.model")} *</Label>
+                          {editCustomBrand && !editSelectedMakerId ? (
+                            <Input className="mt-1" placeholder="Type model name" value={editCustomModel} onChange={(e) => setEditCustomModel(e.target.value)} />
+                          ) : (
+                            <Popover open={editModelOpen} onOpenChange={setEditModelOpen}>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" role="combobox" aria-expanded={editModelOpen} className="w-full justify-between mt-1 overflow-hidden" disabled={!editSelectedMakerId}>
+                                  {editSelectedModelId ? editCarModels?.find((m) => m.id === editSelectedModelId)?.modelName : editCustomModel || t("fleet.selectModel")}
+                                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[220px] p-0" style={{ zIndex: 9999 }}>
+                                <Command>
+                                  <CommandInput placeholder={t("fleet.searchModel")} value={editModelSearch} onValueChange={setEditModelSearch} />
+                                  <CommandList>
+                                    <CommandEmpty>
+                                      {editModelSearch.trim() ? (
+                                        <button className="w-full text-left px-3 py-2 text-sm text-primary font-medium hover:bg-accent"
+                                          onClick={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); }}>
+                                          Use "{editModelSearch.trim()}" as model
+                                        </button>
+                                      ) : t("common.noData")}
+                                    </CommandEmpty>
+                                    <CommandGroup>
+                                      {editCarModels?.map((model) => (
+                                        <CommandItem key={model.id} value={model.modelName} onSelect={() => { setEditSelectedModelId(model.id); setEditCustomModel(""); setEditModelOpen(false); setEditModelSearch(""); }}>
+                                          <Check className={cn("mr-2 h-4 w-4", editSelectedModelId === model.id ? "opacity-100" : "opacity-0")} />
+                                          {model.modelName}
+                                        </CommandItem>
+                                      ))}
+                                      {editModelSearch.trim() && !editCarModels?.some(m => m.modelName.toLowerCase() === editModelSearch.trim().toLowerCase()) && (
+                                        <CommandItem onSelect={() => { setEditCustomModel(editModelSearch.trim()); setEditSelectedModelId(null); setEditModelOpen(false); setEditModelSearch(""); }} className="border-t mt-1 pt-2 text-primary font-medium">
+                                          <Plus className="mr-2 h-4 w-4" />Use "{editModelSearch.trim()}" as model
+                                        </CommandItem>
+                                      )}
+                                      <CommandItem onSelect={() => { setEditModelOpen(false); setCustomModelMakerId(editSelectedMakerId); setIsCustomModelDialogOpen(true); }} className="border-t mt-2 pt-2 text-primary font-medium">
+                                        <Plus className="mr-2 h-4 w-4" />{t("fleet.addModel")}
+                                      </CommandItem>
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-year">{t("common.year")} *</Label>
+                          <Input id="edit-year" name="year" type="number" defaultValue={selectedVehicle.year} min="1900" max="2100" required className="input-client mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-mileage">{t("fleet.mileage")}</Label>
+                          <Input id="edit-mileage" name="mileage" type="number" defaultValue={selectedVehicle.mileage || 0} min="0" className="mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-color">{t("common.color")} *</Label>
+                          <Input id="edit-color" name="color" defaultValue={selectedVehicle.color} required className="input-client mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-category">{t("common.category")} *</Label>
+                          <Select name="category" defaultValue={selectedVehicle.category} required>
+                            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                            <SelectContent style={{ zIndex: 9999 }}>
+                              <SelectItem value="Economy">{t("fleet.economy")}</SelectItem>
+                              <SelectItem value="Compact">{t("fleet.compact")}</SelectItem>
+                              <SelectItem value="Intermediate">{t("fleet.intermediate")}</SelectItem>
+                              <SelectItem value="Standard">{t("fleet.standard")}</SelectItem>
+                              <SelectItem value="Full-size">{t("fleet.fullSize")}</SelectItem>
+                              <SelectItem value="Luxury">{t("fleet.luxury")}</SelectItem>
+                              <SelectItem value="SUV">{t("fleet.suv")}</SelectItem>
+                              <SelectItem value="Minivan">{t("fleet.minivan")}</SelectItem>
+                              <SelectItem value="Pickup Truck">{t("fleet.pickupTruck")}</SelectItem>
+                              <SelectItem value="Cargo Van">{t("fleet.cargoVan")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
-                        <div>
-                          <Label htmlFor="edit-purchaseCost">{t("fleet.purchasePrice")}</Label>
-                          <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""}
-                            onChange={(e) => setEditPurchaseCost(parseFloat(e.target.value) || 0)} />
+                        <div className="col-span-2">
+                          <Label htmlFor="edit-status">{t("common.status")}</Label>
+                          <Select name="status" defaultValue={selectedVehicle.status} onValueChange={setEditStatusValue}>
+                            <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                            <SelectContent style={{ zIndex: 9999 }}>
+                              <SelectItem value="Available">{t("fleet.available")}</SelectItem>
+                              <SelectItem value="Rented">{t("fleet.rented")}</SelectItem>
+                              <SelectItem value="Maintenance">{t("nav.maintenance")}</SelectItem>
+                              <SelectItem value="Out of Service">{t("fleet.outOfService")}</SelectItem>
+                              <SelectItem value="Sold">Sold</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Pricing */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-4">
+                        <DollarSign className="w-4 h-4 text-blue-700" />
+                        <h3 className="font-semibold text-gray-900 text-sm uppercase tracking-wide">{t("fleet.pricingFinancials")}</h3>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                          <Label htmlFor="edit-downPayment">{t("fleet.downPayment")}</Label>
-                          <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""}
-                            onChange={(e) => setEditDownPayment(parseFloat(e.target.value) || 0)} />
+                          <Label htmlFor="edit-dailyRate">{t("fleet.dailyRate")}</Label>
+                          <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" className="input-client mt-1" />
                         </div>
                         <div>
-                          <Label htmlFor="edit-sellerName">{t("fleet.sellerDealer")}</Label>
-                          <Input id="edit-sellerName" name="sellerName" placeholder="e.g. ABC Motors" defaultValue={(selectedVehicle as any).sellerName || ""} />
+                          <Label htmlFor="edit-weeklyRate">{t("fleet.weeklyRate")}</Label>
+                          <Input id="edit-weeklyRate" name="weeklyRate" type="number" step="0.01" defaultValue={selectedVehicle.weeklyRate || ""} min="0" className="mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-monthlyRate">{t("fleet.monthlyRate")}</Label>
+                          <Input id="edit-monthlyRate" name="monthlyRate" type="number" step="0.01" defaultValue={selectedVehicle.monthlyRate || ""} min="0" className="mt-1" />
                         </div>
                       </div>
+                      <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 space-y-3 mt-4">
+                        <div className="flex items-center gap-2">
+                          <Sun className="h-4 w-4 text-amber-500" />
+                          <span className="text-sm font-medium text-amber-800">{t("fleet.highSeasonPricing")}</span>
+                          <span className="text-xs text-amber-600">({t("common.optional")})</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <Label htmlFor="edit-highSeasonDailyRate" className="text-xs">{t("fleet.hsDaily")}</Label>
+                            <Input id="edit-highSeasonDailyRate" name="highSeasonDailyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonDailyRate || ""} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit-highSeasonWeeklyRate" className="text-xs">{t("fleet.hsWeekly")}</Label>
+                            <Input id="edit-highSeasonWeeklyRate" name="highSeasonWeeklyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonWeeklyRate || ""} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit-highSeasonMonthlyRate" className="text-xs">{t("fleet.hsMonthly")}</Label>
+                            <Input id="edit-highSeasonMonthlyRate" name="highSeasonMonthlyRate" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).highSeasonMonthlyRate || ""} className="mt-1" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
+                    {/* Sale Details — visible when status is Sold */}
+                    {(editStatusValue === "Sold" || (editStatusValue === "" && selectedVehicle?.status === "Sold")) && (
+                      <div className="space-y-4 p-4 border border-purple-200 rounded-lg bg-purple-50/40">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-purple-600" />
+                          <h4 className="text-sm font-semibold text-purple-900">{t("fleet.saleDetails")}</h4>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="edit-salePrice">{t("fleet.salePrice")}</Label>
+                            <Input id="edit-salePrice" name="salePrice" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).salePrice || ""} />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit-buyerName">{t("fleet.buyerName")}</Label>
+                            <Input id="edit-buyerName" name="buyerName" placeholder="e.g. John Smith" defaultValue={(selectedVehicle as any).buyerName || ""} />
+                          </div>
+                        </div>
+                        <div>
+                          <Label>{t("fleet.saleDate")}</Label>
+                          <ModernDatePicker date={editSaleDate} onDateChange={setEditSaleDate} placeholder={t("common.selectDate")} />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-saleNotes">{t("fleet.saleNotes")}</Label>
+                          <Textarea id="edit-saleNotes" name="saleNotes" rows={2} placeholder="e.g. Sold via auction, cash payment..." defaultValue={(selectedVehicle as any).saleNotes || ""} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Right column — Insurance / Registration / Maintenance / Purchase / Notes */}
+                  <div className="flex-1 sm:overflow-y-auto p-6 bg-gray-50/40 space-y-4">
+
+                    {/* Insurance */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+                      <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.insurance")}</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="edit-insuranceProvider">{t("fleet.provider")}</Label>
+                          <Input id="edit-insuranceProvider" name="insuranceProvider" placeholder="e.g., State Farm" defaultValue={selectedVehicle.insuranceProvider || ""} className="mt-1" />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-insurancePolicyNumber">{t("fleet.policyNumber")}</Label>
+                          <Input id="edit-insurancePolicyNumber" name="insurancePolicyNumber" defaultValue={selectedVehicle.insurancePolicyNumber || ""} className="mt-1" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs">{t("fleet.policyStartDate")}</Label>
+                          <div className="mt-1">
+                            <ModernDatePicker date={editInsuranceStartDate} onDateChange={setEditInsuranceStartDate} placeholder={t("common.selectDate")} />
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs">{t("fleet.expiryDate")}</Label>
+                          <div className="mt-1">
+                            <ModernDatePicker date={editInsuranceExpiryDate} onDateChange={setEditInsuranceExpiryDate} placeholder={t("common.selectDate")} />
+                          </div>
+                        </div>
+                      </div>
                       <div>
-                        <Label>{t("fleet.purchaseDate")}</Label>
-                        <ModernDatePicker
-                          date={editPurchaseDate}
-                          onDateChange={setEditPurchaseDate}
-                          placeholder={t("common.selectDate")}
-                        />
+                        <Label htmlFor="edit-insuranceAnnualPremium">{t("fleet.annualPremium")}</Label>
+                        <Input id="edit-insuranceAnnualPremium" name="insuranceAnnualPremium" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.insuranceAnnualPremium || ""} className="mt-1" />
                       </div>
+                    </div>
 
-                      {(editPurchaseType === "Installments" || (!(editPurchaseType) && (selectedVehicle as any).purchaseType === "Installments")) && (() => {
-                          const loanAmount = Math.max(0, editPurchaseCost - editDownPayment);
-                          const remaining = loanAmount * (1 + editInterestRate / 100);
-                          const computedMonthly = editNumInstallments > 0 ? remaining / editNumInstallments : 0;
-                          const monthlyDisplay = editMonthlyManual !== null ? editMonthlyManual : computedMonthly;
-                          return (
-                            <div className="space-y-4 pt-3 border-t border-dashed border-blue-200">
-                              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">{t("fleet.financingDetails")}</p>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                  <Label htmlFor="edit-interestRate">{t("fleet.interestRate")}</Label>
-                                  <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
-                                    defaultValue={(selectedVehicle as any).interestRate || ""}
-                                    onChange={(e) => { setEditInterestRate(parseFloat(e.target.value) || 0); setEditMonthlyManual(null); }} />
+                    {/* Registration */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+                      <h4 className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.registration")}</h4>
+                      <div>
+                        <Label htmlFor="edit-vehicleRegistrationNumber">{t("fleet.registrationNumber")}</Label>
+                        <Input id="edit-vehicleRegistrationNumber" name="vehicleRegistrationNumber" placeholder="e.g. REG-2024-001234" defaultValue={(selectedVehicle as any).vehicleRegistrationNumber || ""} className="mt-1" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs">{t("fleet.expiryDate")}</Label>
+                          <div className="mt-1">
+                            <ModernDatePicker date={editRegistrationExpiryDate} onDateChange={setEditRegistrationExpiryDate} placeholder={t("common.selectDate")} />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-registrationFee">{t("fleet.annualFee")}</Label>
+                          <Input id="edit-registrationFee" name="registrationFee" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).registrationFee || ""} className="mt-1" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Next Maintenance */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4">
+                      <Label className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("fleet.nextMaintenance")}</Label>
+                      <div className="mt-2">
+                        <ModernDatePicker date={editNextMaintenanceDate} onDateChange={setEditNextMaintenanceDate} placeholder={t("common.selectDate")} />
+                      </div>
+                    </div>
+
+                    {/* Purchase Details — collapsible */}
+                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                      <button
+                        type="button"
+                        onClick={() => setShowEditPurchaseSection(v => !v)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-blue-50 hover:bg-blue-100 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="h-4 w-4 text-blue-600" />
+                          <span className="text-sm font-medium text-blue-900">{t("fleet.purchaseDetails")}</span>
+                          <span className="text-xs text-blue-500">({t("common.optional")})</span>
+                        </div>
+                        {showEditPurchaseSection ? <ChevronUp className="h-4 w-4 text-blue-600" /> : <ChevronDown className="h-4 w-4 text-blue-600" />}
+                      </button>
+                      {showEditPurchaseSection && (
+                        <div className="p-4 space-y-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label>{t("fleet.purchaseType")}</Label>
+                              <Select defaultValue={(selectedVehicle as any).purchaseType || undefined} onValueChange={(v) => setEditPurchaseType(v as any)}>
+                                <SelectTrigger className="mt-1"><SelectValue placeholder={t("fleet.cash") + " or " + t("fleet.installments")} /></SelectTrigger>
+                                <SelectContent style={{ zIndex: 9999 }}>
+                                  <SelectItem value="Cash">{t("fleet.cash")}</SelectItem>
+                                  <SelectItem value="Installments">{t("fleet.installments")}</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-purchaseCost">{t("fleet.purchasePrice")}</Label>
+                              <Input id="edit-purchaseCost" name="purchaseCost" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={selectedVehicle.purchaseCost || ""} className="mt-1"
+                                onChange={(e) => setEditPurchaseCost(parseFloat(e.target.value) || 0)} />
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="edit-downPayment">{t("fleet.downPayment")}</Label>
+                              <Input id="edit-downPayment" name="downPayment" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).downPayment || ""}
+                                onChange={(e) => setEditDownPayment(parseFloat(e.target.value) || 0)} />
+                            </div>
+                            <div>
+                              <Label htmlFor="edit-sellerName">{t("fleet.sellerDealer")}</Label>
+                              <Input id="edit-sellerName" name="sellerName" placeholder="e.g. ABC Motors" defaultValue={(selectedVehicle as any).sellerName || ""} />
+                            </div>
+                          </div>
+                          <div>
+                            <Label>{t("fleet.purchaseDate")}</Label>
+                            <ModernDatePicker date={editPurchaseDate} onDateChange={setEditPurchaseDate} placeholder={t("common.selectDate")} />
+                          </div>
+                          {(editPurchaseType === "Installments" || (!editPurchaseType && (selectedVehicle as any).purchaseType === "Installments")) && (() => {
+                            const loanAmount = Math.max(0, editPurchaseCost - editDownPayment);
+                            const remaining = loanAmount * (1 + editInterestRate / 100);
+                            const computedMonthly = editNumInstallments > 0 ? remaining / editNumInstallments : 0;
+                            const monthlyDisplay = editMonthlyManual !== null ? editMonthlyManual : computedMonthly;
+                            return (
+                              <div className="space-y-3 pt-3 border-t border-dashed border-blue-200">
+                                <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">{t("fleet.financingDetails")}</p>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <Label htmlFor="edit-interestRate">{t("fleet.interestRate")}</Label>
+                                    <Input id="edit-interestRate" name="interestRate" type="number" step="0.01" min="0" max="100" placeholder="e.g. 8.5"
+                                      defaultValue={(selectedVehicle as any).interestRate || ""}
+                                      onChange={(e) => { setEditInterestRate(parseFloat(e.target.value) || 0); setEditMonthlyManual(null); }} />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="edit-numberOfInstallments">{t("fleet.numInstallments")}</Label>
+                                    <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
+                                      defaultValue={(selectedVehicle as any).numberOfInstallments || ""}
+                                      onChange={(e) => { setEditNumInstallments(parseInt(e.target.value) || 0); setEditMonthlyManual(null); }} />
+                                  </div>
                                 </div>
-                                <div>
-                                  <Label htmlFor="edit-numberOfInstallments">{t("fleet.numInstallments")}</Label>
-                                  <Input id="edit-numberOfInstallments" name="numberOfInstallments" type="number" min="1" step="1" placeholder="e.g. 36"
-                                    defaultValue={(selectedVehicle as any).numberOfInstallments || ""}
-                                    onChange={(e) => { setEditNumInstallments(parseInt(e.target.value) || 0); setEditMonthlyManual(null); }} />
-                                </div>
-                              </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                  <Label htmlFor="edit-monthlyInstallmentAmount">
-                                    {t("fleet.monthlyInstallment")}
-                                    {editMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
-                                  </Label>
-                                  <Input
-                                    id="edit-monthlyInstallmentAmount"
-                                    name="monthlyInstallmentAmount"
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    placeholder="0.00"
-                                    value={monthlyDisplay.toFixed(2)}
-                                    onChange={(e) => setEditMonthlyManual(parseFloat(e.target.value) || 0)}
-                                    className={editMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""}
-                                  />
-                                </div>
-                                <div>
-                                  <Label htmlFor="edit-remainingBalance">{t("fleet.remainingBalance")}</Label>
-                                  <div className="relative">
-                                    <Input
-                                      id="edit-remainingBalance"
-                                      name="remainingBalance"
-                                      type="number"
-                                      step="0.01"
-                                      min="0"
-                                      readOnly
-                                      value={remaining.toFixed(2)}
-                                      className="bg-gray-50 text-gray-700 cursor-default pr-20"
-                                    />
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <Label htmlFor="edit-monthlyInstallmentAmount">
+                                      {t("fleet.monthlyInstallment")}
+                                      {editMonthlyManual === null && <span className="ml-1.5 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>}
+                                    </Label>
+                                    <Input id="edit-monthlyInstallmentAmount" name="monthlyInstallmentAmount" type="number" step="0.01" min="0" placeholder="0.00"
+                                      value={monthlyDisplay.toFixed(2)} onChange={(e) => setEditMonthlyManual(parseFloat(e.target.value) || 0)}
+                                      className={editMonthlyManual === null ? "bg-gray-50 text-gray-700" : ""} />
+                                  </div>
+                                  <div>
+                                    <Label htmlFor="edit-remainingBalance">{t("fleet.remainingBalance")}</Label>
+                                    <div className="relative">
+                                      <Input id="edit-remainingBalance" name="remainingBalance" type="number" step="0.01" min="0" readOnly
+                                        value={remaining.toFixed(2)} className="bg-gray-50 text-gray-700 cursor-default pr-14" />
+                                      <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-medium text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">auto</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })()}
+                            );
+                          })()}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
 
-                {/* Sale Details — visible when status is Sold */}
-                {(editStatusValue === "Sold" || (editStatusValue === "" && selectedVehicle?.status === "Sold")) && (
-                  <div className="space-y-4 p-4 border border-purple-200 rounded-lg bg-purple-50/40">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-4 w-4 text-purple-600" />
-                      <h4 className="text-sm font-semibold text-purple-900">{t("fleet.saleDetails")}</h4>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="edit-salePrice">{t("fleet.salePrice")}</Label>
-                        <Input id="edit-salePrice" name="salePrice" type="number" step="0.01" min="0" placeholder="0.00" defaultValue={(selectedVehicle as any).salePrice || ""} />
-                      </div>
-                      <div>
-                        <Label htmlFor="edit-buyerName">{t("fleet.buyerName")}</Label>
-                        <Input id="edit-buyerName" name="buyerName" placeholder="e.g. John Smith" defaultValue={(selectedVehicle as any).buyerName || ""} />
-                      </div>
-                    </div>
-                    <div>
-                      <Label>{t("fleet.saleDate")}</Label>
-                      <ModernDatePicker
-                        date={editSaleDate}
-                        onDateChange={setEditSaleDate}
-                        placeholder={t("common.selectDate")}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-saleNotes">{t("fleet.saleNotes")}</Label>
-                      <Textarea id="edit-saleNotes" name="saleNotes" rows={2} placeholder="e.g. Sold via auction, cash payment..." defaultValue={(selectedVehicle as any).saleNotes || ""} />
+                    {/* Notes */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-4">
+                      <Label htmlFor="edit-notes" className="font-semibold text-sm text-gray-900 uppercase tracking-wide">{t("common.notes")}</Label>
+                      <Textarea id="edit-notes" name="notes" rows={3} defaultValue={selectedVehicle.notes || ""} className="mt-2" />
                     </div>
                   </div>
-                )}
-
-                <div>
-                  <Label htmlFor="edit-notes">{t("common.notes")}</Label>
-                  <Textarea id="edit-notes" name="notes" rows={3} defaultValue={selectedVehicle.notes || ""} />
                 </div>
 
-                <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
-                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)} className="w-full sm:w-auto">
+                {/* Footer */}
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-white flex-shrink-0">
+                  <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
                     {t("common.cancel")}
                   </Button>
-                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto">
+                  <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
                     {updateMutation.isPending ? t("common.loading") : t("fleet.updateVehicle")}
                   </Button>
-                </DialogFooter>
+                </div>
               </form>
-            </DialogContent>
-          </Dialog>
+            </div>
+          </div>,
+          document.body
         )}
       </div>
       
