@@ -431,6 +431,9 @@ export const appRouter = router({
       .input(z.object({ filterUserId: z.number().optional() }).optional())
       .query(async ({ input, ctx }) => {
         const userId = ctx.user?.id || 1;
+        if (input?.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, input.filterUserId, 'vehicles');
+        }
         return await db.getSoldVehicles(userId, input?.filterUserId);
       }),
     
@@ -1989,6 +1992,9 @@ export const appRouter = router({
         invoiceId: z.number(),
       }))
       .query(async ({ input, ctx }) => {
+        if (ctx.filterUserId && ctx.user?.role === 'super_admin') {
+          await db.assertPrivacyAccess(ctx.user.id, ctx.filterUserId, 'invoices');
+        }
         const invoice = await db.getInvoiceById(input.invoiceId, ctx.filterUserId || ctx.user.id);
         return invoice;
       }),
