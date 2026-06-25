@@ -1632,12 +1632,15 @@ export async function upsertCompanySettings(data: InsertCompanySettings): Promis
 
 
 // Vehicle Analysis
-export async function getVehicleAnalysis(vehicleId: number, userId: number) {
+export async function getVehicleAnalysis(vehicleId: number, userId: number, filterUserId?: number | null) {
   const db = await getDb();
   if (!db) {
     console.warn("[Database] Cannot get vehicle analysis: database not available");
     return null;
   }
+
+  const admin = await isSuperAdmin(userId);
+  const effectiveUserId = admin && filterUserId ? filterUserId : userId;
 
   // Get vehicle details
   const vehicle = await getVehicleById(vehicleId, userId);
@@ -1649,7 +1652,7 @@ export async function getVehicleAnalysis(vehicleId: number, userId: number) {
   const maintenance = await db.select().from(maintenanceRecords)
     .where(and(
       eq(maintenanceRecords.vehicleId, vehicleId),
-      eq(maintenanceRecords.userId, userId)
+      eq(maintenanceRecords.userId, effectiveUserId)
     ))
     .orderBy(desc(maintenanceRecords.performedAt));
 
@@ -1657,7 +1660,7 @@ export async function getVehicleAnalysis(vehicleId: number, userId: number) {
   const contracts = await db.select().from(rentalContracts)
     .where(and(
       eq(rentalContracts.vehicleId, vehicleId),
-      eq(rentalContracts.userId, userId)
+      eq(rentalContracts.userId, effectiveUserId)
     ))
     .orderBy(desc(rentalContracts.rentalStartDate));
 

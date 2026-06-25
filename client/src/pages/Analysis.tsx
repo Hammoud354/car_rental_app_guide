@@ -6,10 +6,12 @@ import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { useUserFilter } from "@/contexts/UserFilterContext";
 
 export default function Analysis() {
   const [, setLocation] = useLocation();
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
+  const { selectedUserId } = useUserFilter();
 
   const { data: user } = trpc.auth.me.useQuery();
   const { data: currentPlan, isLoading: planLoading } = trpc.subscription.getCurrentPlan.useQuery();
@@ -19,9 +21,13 @@ export default function Analysis() {
   const features = (currentPlan?.tier as any)?.features as Record<string, boolean> | undefined;
   const hasAccess = isSuperAdmin || tierName === "internal" || features?.advancedAnalytics === true;
 
-  const { data: vehicles, isLoading: vehiclesLoading } = trpc.fleet.list.useQuery();
+  const filterUserId = isSuperAdmin && selectedUserId ? selectedUserId : undefined;
+
+  const { data: vehicles, isLoading: vehiclesLoading } = trpc.fleet.list.useQuery(
+    filterUserId ? { filterUserId } : {}
+  );
   const { data: analysis, isLoading: analysisLoading } = trpc.fleet.getAnalysis.useQuery(
-    { vehicleId: parseInt(selectedVehicleId) },
+    { vehicleId: parseInt(selectedVehicleId), filterUserId },
     { enabled: !!selectedVehicleId }
   );
 

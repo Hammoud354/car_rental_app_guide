@@ -22,15 +22,26 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useUserFilter } from "@/contexts/UserFilterContext";
+import { useAuth } from "@/_core/hooks/useAuth";
 
 export default function ProfitabilityDashboard() {
-  const { data: analytics, isLoading } = trpc.analytics.vehicleProfitability.useQuery();
+  const { user } = useAuth();
+  const { selectedUserId } = useUserFilter();
+  const filterUserId = user?.role === "super_admin" && selectedUserId ? selectedUserId : undefined;
+
+  const { data: analytics, isLoading } = trpc.analytics.vehicleProfitability.useQuery(
+    filterUserId ? { filterUserId } : undefined
+  );
   const [selectedVehicleId, setSelectedVehicleId] = useState<number | null>(null);
   const { data: vehicleDetails } = trpc.analytics.vehicleFinancialDetails.useQuery(
-    { vehicleId: selectedVehicleId! },
+    { vehicleId: selectedVehicleId!, filterUserId },
     { enabled: selectedVehicleId !== null }
   );
-  const exportQuery = trpc.export.profitabilityExcel.useQuery(undefined, { enabled: false });
+  const exportQuery = trpc.export.profitabilityExcel.useQuery(
+    filterUserId ? { filterUserId } : undefined,
+    { enabled: false }
+  );
 
   if (isLoading) {
     return (

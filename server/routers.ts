@@ -659,9 +659,9 @@ export const appRouter = router({
       }),
 
     getAnalysis: publicProcedure
-      .input(z.object({ vehicleId: z.number() }))
+      .input(z.object({ vehicleId: z.number(), filterUserId: z.number().optional() }))
       .query(async ({ input, ctx }) => {
-        return await db.getVehicleAnalysis(input.vehicleId, ctx.user?.id || 1);
+        return await db.getVehicleAnalysis(input.vehicleId, ctx.user?.id || 1, input.filterUserId);
       }),
     
     getGarageLocations: publicProcedure
@@ -1639,12 +1639,14 @@ export const appRouter = router({
 
   // Profitability Analytics Router
   analytics: router({
-    vehicleProfitability: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getVehicleProfitabilityAnalytics(ctx.user.id);
-    }),
+    vehicleProfitability: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+        return await db.getVehicleProfitabilityAnalytics(ctx.user.id, input?.filterUserId);
+      }),
     
     vehicleFinancialDetails: protectedProcedure
-      .input(z.object({ vehicleId: z.number() }))
+      .input(z.object({ vehicleId: z.number(), filterUserId: z.number().optional() }))
       .query(async ({ ctx, input }) => {
         return await db.getVehicleFinancialDetails(input.vehicleId, ctx.user.id);
       }),
@@ -1652,8 +1654,10 @@ export const appRouter = router({
 
   // Export Router
   export: router({
-    profitabilityExcel: protectedProcedure.query(async ({ ctx }) => {
-      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id);
+    profitabilityExcel: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
+      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id, input?.filterUserId);
       
       // Return raw data for client-side Excel generation
       return vehicles.map((v: any) => ({
@@ -1670,9 +1674,11 @@ export const appRouter = router({
       }));
     }),
     
-    profitabilityPDF: protectedProcedure.query(async ({ ctx }) => {
+    profitabilityPDF: protectedProcedure
+      .input(z.object({ filterUserId: z.number().optional() }).optional())
+      .query(async ({ ctx, input }) => {
       const PDFDocument = (await import('pdfkit')).default;
-      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id);
+      const vehicles = await db.getVehicleProfitabilityAnalytics(ctx.user.id, input?.filterUserId);
       
       // Create PDF document
       const doc = new PDFDocument({ margin: 50 });
