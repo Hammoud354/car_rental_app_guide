@@ -106,8 +106,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  const hasActivePlan = currentPlan && currentPlan.status === "active";
-  if (!hasActivePlan) {
+  const hasAnyPlan = currentPlan && ["active", "grace_period", "archived"].includes(currentPlan.status);
+  if (!hasAnyPlan) {
     return <Redirect to="/subscription-plans" />;
   }
 
