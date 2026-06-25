@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -501,6 +502,10 @@ export const appRouter = router({
         serviceHistory: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const perms = await db.getSubscriptionPermissions(ctx.user?.id || 1);
+        if (!perms.canCreate) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: perms.status === 'grace_period' ? 'Your subscription has expired. You are in a grace period — renew to add new vehicles.' : 'Your account is archived. Renew your subscription to restore full access.' });
+        }
         const isAdmin = await db.isSuperAdmin(ctx.user?.id || 1);
         
         // Super Admin must provide targetUserId, regular users use their own ID
@@ -1028,6 +1033,10 @@ export const appRouter = router({
         targetUserId: z.number().optional(), // For Super Admin to assign contract to specific user
       }))
       .mutation(async ({ input, ctx }) => {
+        const perms = await db.getSubscriptionPermissions(ctx.user.id);
+        if (!perms.canCreate) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: perms.status === 'grace_period' ? 'Your subscription has expired. You are in a grace period — renew to create new contracts.' : 'Your account is archived. Renew your subscription to restore full access.' });
+        }
         const isAdmin = await db.isSuperAdmin(ctx.user.id);
         
         // Super Admin must provide targetUserId, regular users use their own ID
@@ -1470,6 +1479,10 @@ export const appRouter = router({
         targetUserId: z.number().optional(), // For Super Admin to assign client to specific user
       }))
       .mutation(async ({ input, ctx }) => {
+        const perms = await db.getSubscriptionPermissions(ctx.user?.id || 1);
+        if (!perms.canCreate) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: perms.status === 'grace_period' ? 'Your subscription has expired. You are in a grace period — renew to add new clients.' : 'Your account is archived. Renew your subscription to restore full access.' });
+        }
         // Validate license expiry date is in the future
         const today = new Date();
         today.setHours(0, 0, 0, 0); // Reset time to start of day
@@ -1962,6 +1975,10 @@ export const appRouter = router({
         contractId: z.number(),
       }))
       .mutation(async ({ input, ctx }) => {
+        const perms = await db.getSubscriptionPermissions(ctx.user.id);
+        if (!perms.canCreate) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: perms.status === 'grace_period' ? 'Your subscription has expired. You are in a grace period — renew to generate invoices.' : 'Your account is archived. Renew your subscription to restore full access.' });
+        }
         const invoice = await db.generateInvoiceForContract(input.contractId, ctx.user.id);
         return invoice;
       }),
@@ -3802,6 +3819,20 @@ export const appRouter = router({
 
         return { allowed, mode, settings };
       }),
+  }),
+  subscriptions: router({
+    getPermissions: publicProcedure.query(async ({ ctx }) => {
+      const userId = ctx.user?.id;
+      if (!userId) {
+        return {
+          status: 'active' as const,
+          canCreate: true, canEdit: true, canDelete: true, canPrint: true, canExportPDF: true,
+          daysRemaining: null, gracePeriodEndsAt: null, renewalDate: null,
+          tierName: null, tierDisplayName: null,
+        };
+      }
+      return await db.getSubscriptionPermissions(userId);
+    }),
   }),
 });
 export type AppRouter = typeof appRouter;

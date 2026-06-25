@@ -8,7 +8,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable, initializeMaintenanceTypeEnum, initializeWhiteLabelColumns, initializePrivacyTables } from "../db";
+import { initializeSubscriptionTiers, seedSuperAdmin, initializeWhishPaymentRequestsTable, initializeHighSeasonTable, initializePurchaseDetailsColumns, initializeSoldStatusEnum, initializeSaleColumns, initializeAiMaintenanceColumns, initializeMissingVehicleColumns, initializeVehicleUniqueConstraints, cleanupExpiredTempDemoUsers, initializeRentalContractColumns, initializeGaragesTable, initializeMaintenanceTypeEnum, initializeWhiteLabelColumns, initializePrivacyTables, initializeSubscriptionLifecycle } from "../db";
 import { wsManager } from "../websocket";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -147,6 +147,9 @@ async function startServer() {
     );
     initializePrivacyTables().catch(err =>
       console.error("[Startup] Failed to initialize privacy tables:", err)
+    );
+    initializeSubscriptionLifecycle().catch(err =>
+      console.error("[Startup] Failed to initialize subscription lifecycle:", err)
     );
     seedSuperAdmin().catch(err =>
       console.error("[Startup] Failed to seed super admin:", err)

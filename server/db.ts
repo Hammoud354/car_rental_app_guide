@@ -4842,3 +4842,121 @@ export async function hasWhiteLabelAccess(userId: number): Promise<boolean> {
     return false;
   }
 }
+
+/* ─── Subscription Lifecycle ─────────────────────────────────────────────── */
+
+/** One-time startup: extend the enum with grace_period/archived and add gracePeriodEndsAt column */
+export async function initializeSubscriptionLifecycle() {
+  const database = await getDb();
+  if (!database) return;
+  try {
+    await database.execute(sql`ALTER TYPE "subscriptionStatus" ADD VALUE IF NOT EXISTS 'grace_period'`);
+  } catch { /* already exists */ }
+  try {
+    await database.execute(sql`ALTER TYPE "subscriptionStatus" ADD VALUE IF NOT EXISTS 'archived'`);
+  } catch { /* already exists */ }
+  try {
+    await database.execute(sql`ALTER TABLE "userSubscriptions" ADD COLUMN IF NOT EXISTS "gracePeriodEndsAt" TIMESTAMP`);
+  } catch { /* already exists */ }
+}
+
+export type SubscriptionStatus = 'active' | 'grace_period' | 'archived' | 'no_subscription';
+
+export interface SubscriptionPermissions {
+  status: SubscriptionStatus;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canPrint: boolean;
+  canExportPDF: boolean;
+  daysRemaining: number | null;
+  gracePeriodEndsAt: Date | null;
+  renewalDate: Date | null;
+  tierName: string | null;
+  tierDisplayName: string | null;
+}
+
+const GRACE_PERIOD_DAYS = 5;
+
+export async function getSubscriptionPermissions(userId: number): Promise<SubscriptionPermissions> {
+  const fullAccess: SubscriptionPermissions = {
+    status: 'active',
+    canCreate: true, canEdit: true, canDelete: true, canPrint: true, canExportPDF: true,
+    daysRemaining: null, gracePeriodEndsAt: null, renewalDate: null,
+    tierName: 'internal', tierDisplayName: 'Internal',
+  };
+
+  try {
+    const database = await getDb();
+    if (!database) return fullAccess;
+
+    // Super admin / internal / demo → unlimited
+    const userResult = await database.execute(
+      sql`SELECT role, "isInternal", "isTemporaryDemo" FROM users WHERE id = ${userId} LIMIT 1`
+    );
+    const userRows = (userResult as any)?.rows || [];
+    if (userRows.length === 0) return fullAccess;
+    const { role, isInternal, isTemporaryDemo } = userRows[0];
+    if (role === 'super_admin' || isInternal || isTemporaryDemo) return fullAccess;
+
+    // Fetch subscription
+    const subResult = await database.execute(
+      sql`SELECT us."renewalDate", us."gracePeriodEndsAt", us.status, st."tierName", st."displayName"
+          FROM "userSubscriptions" us
+          JOIN "subscriptionTiers" st ON us."tierId" = st.id
+          WHERE us."userId" = ${userId} LIMIT 1`
+    );
+    const subRows = (subResult as any)?.rows || [];
+    if (subRows.length === 0) {
+      return { ...fullAccess, status: 'no_subscription', canCreate: false, canEdit: false, canDelete: false, canPrint: false };
+    }
+
+    const row = subRows[0];
+    const renewalDate: Date | null = row.renewalDate ? new Date(row.renewalDate) : null;
+    const now = new Date();
+
+    // If no renewal date set → treat as always active (admin-controlled)
+    if (!renewalDate) {
+      return { ...fullAccess, tierName: row.tierName, tierDisplayName: row.displayName };
+    }
+
+    const gracePeriodEndsAt = new Date(renewalDate.getTime() + GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+    const daysRemaining = Math.max(0, Math.ceil((renewalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+
+    let status: SubscriptionStatus;
+    if (now <= renewalDate) {
+      status = 'active';
+    } else if (now <= gracePeriodEndsAt) {
+      status = 'grace_period';
+    } else {
+      status = 'archived';
+    }
+
+    // Persist status change if needed
+    const currentDbStatus = row.status;
+    if (currentDbStatus !== status && (status === 'grace_period' || status === 'archived')) {
+      await database.execute(
+        sql`UPDATE "userSubscriptions" SET status = ${status}, "gracePeriodEndsAt" = ${gracePeriodEndsAt}, "updatedAt" = NOW() WHERE "userId" = ${userId}`
+      );
+    }
+
+    const readOnly = status === 'grace_period' || status === 'archived';
+
+    return {
+      status,
+      canCreate: !readOnly,
+      canEdit: !readOnly,
+      canDelete: !readOnly,
+      canPrint: !readOnly,
+      canExportPDF: true,
+      daysRemaining: status === 'active' ? daysRemaining : null,
+      gracePeriodEndsAt: status === 'grace_period' ? gracePeriodEndsAt : null,
+      renewalDate,
+      tierName: row.tierName,
+      tierDisplayName: row.displayName,
+    };
+  } catch (error) {
+    console.error('[getSubscriptionPermissions] Error:', error);
+    return fullAccess;
+  }
+}

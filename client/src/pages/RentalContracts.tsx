@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useSubscriptionPermissions } from "@/hooks/useSubscriptionPermissions";
 import CarDamageInspection from "@/components/CarDamageInspection";
 import { ContractAmendmentDialog } from "@/components/ContractAmendmentDialog";
 import { ContractPDFTemplate } from "@/components/ContractPDFTemplate";
@@ -32,6 +33,7 @@ export default function RentalContracts() {
   const { t } = useTranslation();
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { permissions: subPerms } = useSubscriptionPermissions();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>("");
@@ -636,7 +638,13 @@ export default function RentalContracts() {
               <Button
                 className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
                 size="sm"
-                onClick={() => setIsCreateDialogOpen(true)}
+                onClick={() => {
+                  if (!subPerms.canCreate) {
+                    toast.error(subPerms.status === 'grace_period' ? 'Subscription expired — renew to create contracts.' : 'Account archived — renew your subscription.');
+                    return;
+                  }
+                  setIsCreateDialogOpen(true);
+                }}
               >
                 <Plus className="h-4 w-4 mr-2" />
                 New Contract

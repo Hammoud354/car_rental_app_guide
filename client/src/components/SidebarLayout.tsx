@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
+import { useSubscriptionPermissions } from "@/hooks/useSubscriptionPermissions";
+import { AlertTriangle, Lock, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@/components/LanguageSelector";
 
@@ -31,6 +33,66 @@ interface NavItem {
   href: string;
   label: string;
   icon: any;
+}
+
+function SubscriptionBanner() {
+  const { permissions } = useSubscriptionPermissions();
+  const [, setLocation] = useLocation();
+
+  if (permissions.status === 'grace_period') {
+    const endsAt = permissions.gracePeriodEndsAt ? new Date(permissions.gracePeriodEndsAt) : null;
+    const daysLeft = endsAt ? Math.max(0, Math.ceil((endsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+    return (
+      <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border-b border-amber-200 text-amber-800 text-sm">
+        <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-500" />
+        <span className="flex-1">
+          <strong>Subscription expired.</strong> You have <strong>{daysLeft} day{daysLeft !== 1 ? 's' : ''}</strong> left in your grace period. Creating or editing records is blocked.
+        </span>
+        <button
+          onClick={() => setLocation("/subscription-plans")}
+          className="flex items-center gap-1 text-xs font-semibold text-amber-700 hover:text-amber-900 underline whitespace-nowrap"
+        >
+          <RefreshCw className="h-3 w-3" /> Renew Now
+        </button>
+      </div>
+    );
+  }
+
+  if (permissions.status === 'archived') {
+    return (
+      <div className="flex items-center gap-3 px-4 py-2.5 bg-red-50 border-b border-red-200 text-red-800 text-sm">
+        <Lock className="h-4 w-4 flex-shrink-0 text-red-500" />
+        <span className="flex-1">
+          <strong>Account archived.</strong> Your account is read-only due to subscription expiration. You can still view and export data.
+        </span>
+        <button
+          onClick={() => setLocation("/subscription-plans")}
+          className="flex items-center gap-1 text-xs font-semibold text-red-700 hover:text-red-900 underline whitespace-nowrap"
+        >
+          <RefreshCw className="h-3 w-3" /> Renew Subscription
+        </button>
+      </div>
+    );
+  }
+
+  if (permissions.status === 'active' && permissions.daysRemaining !== null && permissions.daysRemaining <= 7 && permissions.daysRemaining > 0) {
+    return (
+      <div className="flex items-center gap-3 px-4 py-2 bg-blue-50 border-b border-blue-200 text-blue-800 text-sm">
+        <AlertTriangle className="h-4 w-4 flex-shrink-0 text-blue-500" />
+        <span className="flex-1">
+          Your subscription expires in <strong>{permissions.daysRemaining} day{permissions.daysRemaining !== 1 ? 's' : ''}</strong>. Renew to avoid interruption.
+        </span>
+        <button
+          onClick={() => setLocation("/subscription-plans")}
+          className="flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900 underline whitespace-nowrap"
+        >
+          <RefreshCw className="h-3 w-3" /> Renew
+        </button>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export default function SidebarLayout({ children }: { children: React.ReactNode }) {
@@ -405,6 +467,7 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        <SubscriptionBanner />
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-4 sm:py-6 md:py-8 mt-16 md:mt-0">
             {children}

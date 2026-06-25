@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
+import { useSubscriptionPermissions } from "@/hooks/useSubscriptionPermissions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
@@ -40,6 +41,7 @@ export default function Clients() {
   const { t } = useTranslation();
   const utils = trpc.useUtils();
   const { user } = useAuth();
+  const { permissions: subPerms } = useSubscriptionPermissions();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -330,7 +332,13 @@ export default function Clients() {
               Export
             </Button>
             {/* New Client button */}
-            <Button size="sm" onClick={() => setIsCreateDialogOpen(true)}>
+            <Button size="sm" onClick={() => {
+              if (!subPerms.canCreate) {
+                toast.error(subPerms.status === 'grace_period' ? 'Subscription expired — renew to add clients.' : 'Account archived — renew your subscription.');
+                return;
+              }
+              setIsCreateDialogOpen(true);
+            }}>
               <Plus className="h-3.5 w-3.5 mr-1.5" />
               {t("clients.newClient")}
             </Button>

@@ -1,4 +1,4 @@
-
+import { useSubscriptionPermissions } from "@/hooks/useSubscriptionPermissions";
 import { createPortal } from "react-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ export default function FleetManagement() {
   const { t } = useTranslation();
   const utils = trpc.useUtils();
   const { user } = useAuth();
+  const { permissions: subPerms } = useSubscriptionPermissions();
   const { selectedUserId: selectedTargetUserId, setSelectedUserId: setSelectedTargetUserId, isSuperAdmin } = useUserFilter();
   
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -811,6 +812,10 @@ export default function FleetManagement() {
             <Button
               size="sm"
               onClick={async (e) => {
+                if (!subPerms.canCreate) {
+                  toast.error(subPerms.status === 'grace_period' ? 'Subscription expired — renew to add vehicles.' : 'Account archived — renew your subscription.');
+                  return;
+                }
                 e.preventDefault();
                 try {
                   const subscription = await utils.subscription.getCurrentPlan.fetch();

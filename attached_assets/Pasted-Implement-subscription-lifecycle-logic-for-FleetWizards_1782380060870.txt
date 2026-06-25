@@ -1,0 +1,119 @@
+Implement subscription lifecycle logic for FleetWizards with 3 account states: **active**, **grace_period**, and **archived**.
+
+### Subscription Rules
+
+1. Each company account has:
+
+* `subscriptionStartDate`
+* `subscriptionEndDate`
+* `subscriptionStatus` (`active`, `grace_period`, `archived`)
+* `gracePeriodEndsAt`
+
+### Logic
+
+#### Active
+
+If current date <= `subscriptionEndDate`:
+
+* Set status = `active`
+* Full access to all features:
+
+  * dashboard
+  * contracts
+  * invoices
+  * reports
+  * printing
+  * edit/create/delete records
+
+#### Grace Period (5 days)
+
+If current date > `subscriptionEndDate` AND current date <= `subscriptionEndDate + 5 days`:
+
+* Set status = `grace_period`
+* Allow login
+* Show warning banner on every page:
+
+“Your FleetWizards subscription has expired. You are currently in a 5-day grace period. Renew to avoid account archival.”
+
+Permissions during grace period:
+ALLOW:
+
+* login
+* view all data
+* export PDF
+* subscription renewal
+  BLOCK:
+* creating new contracts
+* creating invoices
+* editing important data
+* deleting records
+* printing new contracts
+
+#### Archived
+
+If current date > `subscriptionEndDate + 5 days`:
+
+* Set status = `archived`
+* Allow login
+* Account becomes read-only
+
+Show message:
+“Your account has been archived due to subscription expiration. Renew subscription to restore full access.”
+
+Permissions during archived:
+ALLOW:
+
+* login
+* view historical data
+* export contracts/invoices to PDF
+* renew subscription
+  BLOCK:
+* all create actions
+* all edit actions
+* all delete actions
+* printing
+* adding vehicles/customers/drivers
+
+### Backend Requirements
+
+1. Create middleware or access control function:
+   `checkSubscriptionStatus(companyId)`
+
+This should:
+
+* calculate status automatically based on dates
+* update database if status changes
+* return permissions object
+
+Example permissions object:
+
+```javascript
+{
+  canLogin: true,
+  canView: true,
+  canCreate: false,
+  canEdit: false,
+  canDelete: false,
+  canPrint: false,
+  canExportPDF: true
+}
+```
+
+2. On every authenticated request:
+
+* verify subscription status
+* enforce feature restrictions
+
+3. Admin dashboard:
+   Add a subscription management panel showing:
+
+* current plan
+* expiry date
+* days remaining
+* current status
+* renew button
+
+### Important
+
+Do NOT delete archived company data.
+Keep all data محفوظ (preserved) indefinitely unless manually deleted by super admin.
