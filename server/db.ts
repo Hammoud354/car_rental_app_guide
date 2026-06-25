@@ -274,7 +274,7 @@ export async function createVehicle(vehicle: InsertVehicle) {
     color: vehicle.color,
     category: vehicle.category,
     status: "Available", // Always set to Available for new vehicles
-    dailyRate: vehicle.dailyRate,
+    dailyRate: vehicle.dailyRate || "0",
   };
   
   // Only add optional fields if they have values (not empty string or undefined)

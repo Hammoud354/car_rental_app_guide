@@ -460,7 +460,7 @@ export const appRouter = router({
         color: z.string().min(1).max(50),
         category: z.enum(["Economy", "Compact", "Midsize", "SUV", "Luxury", "Van", "Truck"]),
         status: z.enum(["Available", "Rented", "Maintenance", "Out of Service", "Sold"]).default("Available"),
-        dailyRate: z.string(),
+        dailyRate: z.string().optional(),
         weeklyRate: z.string().optional(),
         monthlyRate: z.string().optional(),
         highSeasonDailyRate: z.string().optional(),

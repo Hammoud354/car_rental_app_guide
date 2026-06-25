@@ -350,7 +350,7 @@ export default function FleetManagement() {
       color: formData.get("color") as string,
       category: formData.get("category") as any,
       status: (formData.get("status") as any) || "Available",
-      dailyRate: formData.get("dailyRate") as string,
+      dailyRate: (formData.get("dailyRate") as string)?.trim() || undefined,
       weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
       monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
       highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
@@ -415,7 +415,7 @@ export default function FleetManagement() {
       color: formData.get("color") as string,
       category: formData.get("category") as any,
       status: newStatus as any,
-      dailyRate: formData.get("dailyRate") as string,
+      dailyRate: (formData.get("dailyRate") as string)?.trim() || undefined,
       weeklyRate: (formData.get("weeklyRate") as string)?.trim() || undefined,
       monthlyRate: (formData.get("monthlyRate") as string)?.trim() || undefined,
       highSeasonDailyRate: (formData.get("highSeasonDailyRate") as string)?.trim() || undefined,
@@ -1029,8 +1029,8 @@ export default function FleetManagement() {
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                              <Label htmlFor="dailyRate">{t("fleet.dailyRate")} *</Label>
-                              <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" required className="input-client mt-1" />
+                              <Label htmlFor="dailyRate">{t("fleet.dailyRate")}</Label>
+                              <Input id="dailyRate" name="dailyRate" type="number" step="0.01" min="0" className="input-client mt-1" />
                             </div>
                             <div>
                               <Label htmlFor="weeklyRate">{t("fleet.weeklyRate")}</Label>
@@ -1876,8 +1876,8 @@ export default function FleetManagement() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="edit-dailyRate">{t("fleet.dailyRate")} *</Label>
-                    <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" required className="input-client" />
+                    <Label htmlFor="edit-dailyRate">{t("fleet.dailyRate")}</Label>
+                    <Input id="edit-dailyRate" name="dailyRate" type="number" step="0.01" defaultValue={selectedVehicle.dailyRate} min="0" className="input-client" />
                   </div>
                   <div>
                     <Label htmlFor="edit-weeklyRate">{t("fleet.weeklyRate")}</Label>
