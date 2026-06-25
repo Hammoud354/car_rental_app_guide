@@ -130,9 +130,12 @@ export async function getAllVehicles(userId: number, filterUserId?: number | nul
   
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
   const rawVehicles = effectiveFilter != null
     ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
-    : await db.select().from(vehicles);
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(vehicles).where(notInArray(vehicles.userId, fullPrivacyIds))
+      : await db.select().from(vehicles);
   const allVehicles = excludeSold ? rawVehicles.filter(v => v.status !== 'Sold') : rawVehicles;
   
   const now = new Date();
@@ -217,6 +220,7 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
   
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
 
   // Exclude Sold and Rented vehicles up front
   const excludedStatuses = ['Sold', 'Rented'];
@@ -224,7 +228,9 @@ export async function getAvailableVehiclesForMaintenance(userId: number, filterU
     ? await db.select().from(vehicles).where(
         and(eq(vehicles.userId, effectiveFilter), notInArray(vehicles.status, excludedStatuses))
       )
-    : await db.select().from(vehicles).where(notInArray(vehicles.status, excludedStatuses));
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(vehicles).where(and(notInArray(vehicles.status, excludedStatuses), notInArray(vehicles.userId, fullPrivacyIds)))
+      : await db.select().from(vehicles).where(notInArray(vehicles.status, excludedStatuses));
 
   const availableVehicles = await Promise.all(
     allVehicles.map(async (vehicle) => {
@@ -514,9 +520,12 @@ export async function getAllRentalContracts(userId: number, filterUserId?: numbe
   }
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
   return effectiveFilter != null
     ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, effectiveFilter))
-    : await db.select().from(rentalContracts);
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(rentalContracts).where(notInArray(rentalContracts.userId, fullPrivacyIds))
+      : await db.select().from(rentalContracts);
 }
 
 export async function getRentalContractById(id: number, userId: number) {
@@ -587,6 +596,7 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
   }
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
   
   // "active" tab shows both active and overdue contracts (overdue are still ongoing rentals)
   const statusCondition = status === "active"
@@ -596,11 +606,15 @@ export async function getRentalContractsByStatus(userId: number, status?: "activ
   if (!status) {
     return effectiveFilter != null
       ? await db.select().from(rentalContracts).where(eq(rentalContracts.userId, effectiveFilter)).orderBy(desc(rentalContracts.id))
-      : await db.select().from(rentalContracts).orderBy(desc(rentalContracts.id));
+      : fullPrivacyIds.length > 0
+        ? await db.select().from(rentalContracts).where(notInArray(rentalContracts.userId, fullPrivacyIds)).orderBy(desc(rentalContracts.id))
+        : await db.select().from(rentalContracts).orderBy(desc(rentalContracts.id));
   }
   return effectiveFilter != null
     ? await db.select().from(rentalContracts).where(and(eq(rentalContracts.userId, effectiveFilter), statusCondition)).orderBy(desc(rentalContracts.id))
-    : await db.select().from(rentalContracts).where(statusCondition).orderBy(desc(rentalContracts.id));
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(rentalContracts).where(and(notInArray(rentalContracts.userId, fullPrivacyIds), statusCondition)).orderBy(desc(rentalContracts.id))
+      : await db.select().from(rentalContracts).where(statusCondition).orderBy(desc(rentalContracts.id));
 }
 
 export async function getActiveContractsByVehicleId(vehicleId: number, userId: number) {
@@ -1013,9 +1027,12 @@ export async function getAllClients(userId: number, filterUserId?: number | null
   
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
   return effectiveFilter != null
     ? await db.select().from(clients).where(eq(clients.userId, effectiveFilter))
-    : await db.select().from(clients);
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(clients).where(notInArray(clients.userId, fullPrivacyIds))
+      : await db.select().from(clients);
 }
 
 export async function getClientById(id: number, userId: number): Promise<Client | undefined> {
@@ -3011,6 +3028,9 @@ export async function getVehiclesWithExpiringInsurance(userId: number, daysThres
     conditions.push(eq(vehicles.userId, filterUserId));
   } else if (!admin) {
     conditions.push(eq(vehicles.userId, userId));
+  } else {
+    const fullPrivacyIds = await getFullPrivacyUserIds();
+    if (fullPrivacyIds.length > 0) conditions.push(notInArray(vehicles.userId, fullPrivacyIds));
   }
   
   return await db.select().from(vehicles)
@@ -3039,6 +3059,9 @@ export async function getVehiclesWithExpiredInsurance(userId: number, filterUser
     conditions.push(eq(vehicles.userId, filterUserId));
   } else if (!admin) {
     conditions.push(eq(vehicles.userId, userId));
+  } else {
+    const fullPrivacyIds = await getFullPrivacyUserIds();
+    if (fullPrivacyIds.length > 0) conditions.push(notInArray(vehicles.userId, fullPrivacyIds));
   }
   
   return await db.select().from(vehicles)
@@ -3124,6 +3147,9 @@ export async function getVehiclesWithExpiringRegistration(userId: number, daysTh
     conditions.push(eq(vehicles.userId, filterUserId));
   } else if (!admin) {
     conditions.push(eq(vehicles.userId, userId));
+  } else {
+    const fullPrivacyIds = await getFullPrivacyUserIds();
+    if (fullPrivacyIds.length > 0) conditions.push(notInArray(vehicles.userId, fullPrivacyIds));
   }
   return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
 }
@@ -3144,6 +3170,9 @@ export async function getVehiclesWithExpiredRegistration(userId: number, filterU
     conditions.push(eq(vehicles.userId, filterUserId));
   } else if (!admin) {
     conditions.push(eq(vehicles.userId, userId));
+  } else {
+    const fullPrivacyIds = await getFullPrivacyUserIds();
+    if (fullPrivacyIds.length > 0) conditions.push(notInArray(vehicles.userId, fullPrivacyIds));
   }
   return await db.select().from(vehicles).where(and(...conditions)).orderBy(vehicles.registrationExpiryDate);
 }
@@ -3250,8 +3279,11 @@ export async function getAllInvoices(userId: number) {
 
   try {
     const admin = await isSuperAdmin(userId);
+    const fullPrivacyIds = admin ? await getFullPrivacyUserIds() : [];
     const result = admin
-      ? await db.select().from(invoices)
+      ? fullPrivacyIds.length > 0
+        ? await db.select().from(invoices).where(notInArray(invoices.userId, fullPrivacyIds))
+        : await db.select().from(invoices)
       : await db.select().from(invoices).where(eq(invoices.userId, userId));
     return result;
   } catch (error) {
@@ -3267,9 +3299,12 @@ export async function getAllInsurancePolicies(userId: number, filterUserId?: num
   try {
     const admin = await isSuperAdmin(userId);
     const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+    const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
     const result = effectiveFilter != null
       ? await db.select().from(insurancePolicies).where(eq(insurancePolicies.userId, effectiveFilter))
-      : await db.select().from(insurancePolicies);
+      : fullPrivacyIds.length > 0
+        ? await db.select().from(insurancePolicies).where(notInArray(insurancePolicies.userId, fullPrivacyIds))
+        : await db.select().from(insurancePolicies);
     return result;
   } catch (error) {
     console.error("Error fetching insurance policies:", error);
@@ -4049,9 +4084,12 @@ export async function getSoldVehicles(userId: number, filterUserId?: number | nu
   if (!db) return [];
   const admin = await isSuperAdmin(userId);
   const effectiveFilter = admin && filterUserId != null ? filterUserId : (!admin ? userId : null);
+  const fullPrivacyIds = admin && effectiveFilter == null ? await getFullPrivacyUserIds() : [];
   const rawVehicles = effectiveFilter != null
     ? await db.select().from(vehicles).where(eq(vehicles.userId, effectiveFilter))
-    : await db.select().from(vehicles);
+    : fullPrivacyIds.length > 0
+      ? await db.select().from(vehicles).where(notInArray(vehicles.userId, fullPrivacyIds))
+      : await db.select().from(vehicles);
   return rawVehicles.filter(v => v.status === 'Sold');
 }
 
@@ -4253,6 +4291,10 @@ export async function getHighSeasonPeriods(userId: number, filterUserId?: number
   const effectiveUserId = admin && filterUserId ? filterUserId : (!admin ? userId : null);
   if (effectiveUserId != null) {
     return db.select().from(highSeasonPeriods).where(eq(highSeasonPeriods.userId, effectiveUserId)).orderBy(asc(highSeasonPeriods.startDate));
+  }
+  const fullPrivacyIds = await getFullPrivacyUserIds();
+  if (fullPrivacyIds.length > 0) {
+    return db.select().from(highSeasonPeriods).where(notInArray(highSeasonPeriods.userId, fullPrivacyIds)).orderBy(asc(highSeasonPeriods.startDate));
   }
   return db.select().from(highSeasonPeriods).orderBy(asc(highSeasonPeriods.startDate));
 }
@@ -4623,6 +4665,16 @@ export async function getPrivacySettings(userId: number) {
   const row = rows[0];
   try { row.allowedModules = JSON.parse(row.allowedModules || '[]'); } catch { row.allowedModules = []; }
   return row;
+}
+
+export async function getFullPrivacyUserIds(): Promise<number[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db.execute(
+    sql`SELECT "userId" FROM "adminPrivacySettings" WHERE mode = 'full_privacy'`
+  );
+  const rows = (result as any)?.rows || [];
+  return rows.map((r: any) => Number(r.userId));
 }
 
 export async function upsertPrivacySettings(userId: number, data: {
