@@ -18,6 +18,17 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
+    // Chunk-load failures after a new deployment produce one of these messages.
+    // Auto-reload fetches the fresh HTML + correct chunk filenames.
+    const msg = error?.message ?? "";
+    const isChunkError =
+      msg.includes("Failed to fetch dynamically imported module") ||
+      msg.includes("Importing a module script failed") ||
+      msg.includes("dynamically imported module");
+    if (isChunkError) {
+      window.location.reload();
+      return { hasError: false, error: null };
+    }
     return { hasError: true, error };
   }
 

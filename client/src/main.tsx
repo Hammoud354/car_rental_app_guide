@@ -1,5 +1,13 @@
 import { trpc } from "@/lib/trpc";
 import { UNAUTHED_ERR_MSG } from '@shared/const';
+
+// After a new deployment, old chunk filenames (hashed by Vite) no longer exist on
+// the server. The browser tries to load them from its cached HTML and gets a 404.
+// Vite fires `vite:preloadError` for this case — hard-reloading fetches the fresh
+// HTML and the correct new chunks.
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, TRPCClientError } from "@trpc/client";
 import { createRoot } from "react-dom/client";
