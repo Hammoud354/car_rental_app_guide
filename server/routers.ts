@@ -43,11 +43,15 @@ export const appRouter = router({
       .mutation(async ({ input, ctx }) => {
         const bcrypt = await import('bcrypt');
         
-        // Convert username to lowercase for case-insensitive comparison
-        const usernameLower = input.username.toLowerCase();
-        
-        // Find user by username (case-insensitive)
-        const user = await db.getUserByUsername(usernameLower);
+        // Usernames are normalized when accounts are created. Apply the same
+        // normalization at sign-in so copied credentials with extra spaces work.
+        const usernameLower = input.username.trim().toLowerCase();
+
+        // Find the account by username first, then by email. Supporting the
+        // account email prevents a valid admin-created account being rejected
+        // when the recipient uses the email from their welcome message.
+        const user = await db.getUserByUsername(usernameLower)
+          || await db.getUserByEmail(usernameLower);
         if (!user) {
           throw new Error('Invalid username or password');
         }
