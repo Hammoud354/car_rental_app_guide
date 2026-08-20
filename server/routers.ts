@@ -53,16 +53,16 @@ export const appRouter = router({
         const user = await db.getUserByUsername(usernameLower)
           || await db.getUserByEmail(usernameLower);
         if (!user) {
-          throw new Error('Invalid username or password');
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
         }
 
         // Verify password with bcrypt
         if (!user.password) {
-          throw new Error('Invalid username or password');
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
         }
         const isValidPassword = await bcrypt.compare(input.password, user.password);
         if (!isValidPassword) {
-          throw new Error('Invalid username or password');
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid username or password" });
         }
 
         // Create session cookie with appropriate expiration
